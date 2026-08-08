@@ -104,8 +104,6 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private void Fire()
     {
         Vector3 muzzlePos = GetMuzzlePosition();
-        Quaternion muzzleRot = (muzzleTransform != null) ? muzzleTransform.rotation : transform.rotation;
-
         Vector3 aimPoint = (controller != null)
             ? controller.GetAimPoint(muzzlePos)
             : (playerCamera.transform.position + playerCamera.transform.forward * 100f);
@@ -115,6 +113,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         {
             fireDirection = transform.forward;
         }
+
+        Quaternion muzzleRot = Quaternion.LookRotation(fireDirection, Vector3.up);
 
         // 1. Spawn Projectile
         if (projectilePrefab != null)

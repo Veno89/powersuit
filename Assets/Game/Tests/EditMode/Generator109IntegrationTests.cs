@@ -69,6 +69,14 @@ namespace Powersuit.Tests.EditMode
             Assert.That(animators, Has.Length.EqualTo(1));
             Assert.That(animators[0].runtimeAnimatorController, Is.EqualTo(controller));
 
+            Transform visual = player.transform.Find("PowerSuitVisual_Generator109");
+            Assert.That(visual, Is.Not.Null);
+            Assert.That(
+                Quaternion.Angle(visual.localRotation, Quaternion.Euler(0f, 180f, 0f)),
+                Is.LessThan(0.1f),
+                "The Blender visual must face the Unity gameplay-forward direction."
+            );
+
             Component weapon = player.GetComponent("PowerSuitWeapon");
             Assert.That(weapon, Is.Not.Null);
             Transform muzzle = weapon.GetType()

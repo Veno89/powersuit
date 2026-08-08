@@ -35,6 +35,12 @@ namespace Powersuit.Editor
         private const string EnemyPrefabPath =
             "Assets/Game/Prefab/Enemies/EnemyPrototype.prefab";
 
+        // The authored Blender asset uses +Y as weapon/character forward. The
+        // standard Blender-to-Unity FBX conversion otherwise leaves the visual
+        // facing opposite the Unity player root's +Z gameplay forward.
+        private static readonly Quaternion ModelFacingCorrection =
+            Quaternion.Euler(0f, 180f, 0f);
+
         private static readonly string[] RequiredClips =
         {
             "PS_Idle",
@@ -417,7 +423,7 @@ namespace Powersuit.Editor
 
                 modelInstance.name = "PowerSuitVisual_Generator109";
                 modelInstance.transform.localPosition = Vector3.zero;
-                modelInstance.transform.localRotation = Quaternion.identity;
+                modelInstance.transform.localRotation = ModelFacingCorrection;
                 modelInstance.transform.localScale = Vector3.one;
                 modelInstance.SetActive(true);
 
@@ -730,6 +736,17 @@ namespace Powersuit.Editor
             if (weapon == null || weapon.MuzzleTransform == null || weapon.MuzzleTransform.name != "Rifle_Muzzle")
             {
                 throw new InvalidOperationException("Generator 109 Rifle_Muzzle is not wired to the weapon.");
+            }
+
+            Transform visual = variant.transform.Find("PowerSuitVisual_Generator109");
+            if (
+                visual == null ||
+                Quaternion.Angle(visual.localRotation, ModelFacingCorrection) > 0.1f
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 visual must apply the Blender-to-Unity forward correction."
+                );
             }
 
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(DemoScenePath) == null)
