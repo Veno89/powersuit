@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 7646132019645809869}
   - component: {fileID: 8481720225154289510}
   - component: {fileID: 4114279548440960474}
+  - component: {fileID: 6954614664465323843}
   m_Layer: 0
   m_Name: PlayerPrototype
   m_TagString: Untagged
@@ -131,6 +132,8 @@ MonoBehaviour:
   aimTransitionSpeed: 12
   maxReticleOffset: 140
   aimMaxDistance: 200
+  recoilRecoverySpeed: 15
+  maxAccumulatedRecoil: 4
 --- !u!114 &7646132019645809869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,6 +153,18 @@ MonoBehaviour:
   projectileLifetime: 4
   projectileRadius: 0.15
   shotsPerSecond: 5
+  muzzleFlashPrefab: {fileID: 1956116924207047940, guid: a8c15c4649c546f499c82aa092ffbf35, type: 3}
+  muzzleFlashColor: {r: 0.3, g: 0.85, b: 1, a: 1}
+  flashLightIntensity: 4
+  flashDuration: 0.05
+  aimRecoilPitch: 1.2
+  aimRecoilYaw: 0.35
+  hipRecoilPitch: 0.7
+  hipRecoilYaw: 0.2
+  audioSource: {fileID: 0}
+  fireSound: {fileID: 0}
+  minPitch: 0.95
+  maxPitch: 1.05
   normalCrosshairColor: {r: 1, g: 1, b: 1, a: 1}
   aimingReticleColor: {r: 0.2, g: 0.9, b: 1, a: 1}
 --- !u!114 &8481720225154289510
@@ -180,6 +195,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PowerSuitAnimationDriver
   controller: {fileID: 0}
   animator: {fileID: 0}
+--- !u!114 &6954614664465323843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7800013680873977227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a2e22aeef790b46bbf9d64ef717da7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReticleHitMarker
+  markerColor: {r: 1, g: 0.25, b: 0.25, a: 1}
+  displayDuration: 0.15
+  startSize: 10
+  endSize: 20
+  lineThickness: 2.5
 --- !u!1 &8894306011820244653
 GameObject:
   m_ObjectHideFlags: 0

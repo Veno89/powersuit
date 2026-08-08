@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public sealed class SimpleEnemy : MonoBehaviour
@@ -13,31 +14,76 @@ public sealed class SimpleEnemy : MonoBehaviour
     [SerializeField] private float projectileSpeed = 12f;
     [SerializeField] private float projectileDamage = 10f;
 
+    [Header("Audio Hooks")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip shootSound;
+    [SerializeField] private AudioClip hitSound;
+    [SerializeField] private AudioClip deathSound;
+
     private Transform player;
     private float nextShotTime;
+    private bool isDead;
+    private Transform visualChild;
 
     private void Start()
     {
-        PowerSuitController controller =
-            FindAnyObjectByType<PowerSuitController>();
-
+        PowerSuitController controller = FindAnyObjectByType<PowerSuitController>();
         if (controller == null)
         {
-            Debug.LogError(
-                "Enemy could not find the player.",
-                this
-            );
-
+            Debug.LogError("Enemy could not find the player.", this);
             enabled = false;
             return;
         }
 
         player = controller.transform;
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        Transform visual = transform.Find("VisualRoot") ?? transform.Find("Model");
+        if (visual == null && transform.childCount > 0)
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.name != "HealthBarUI" && child.GetComponent<Canvas>() == null)
+                {
+                    visual = child;
+                    break;
+                }
+            }
+        }
+        visualChild = visual ?? transform;
+
+        DamageableTarget target = GetComponent<DamageableTarget>();
+        if (target != null)
+        {
+            target.OnHit += HandleHitAudio;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        DamageableTarget target = GetComponent<DamageableTarget>();
+        if (target != null)
+        {
+            target.OnHit -= HandleHitAudio;
+        }
+    }
+
+    private void HandleHitAudio(Vector3 hitPoint, Vector3 hitDirection, float damage)
+    {
+        if (audioSource != null && hitSound != null && !isDead)
+        {
+            audioSource.pitch = Random.Range(0.95f, 1.05f);
+            audioSource.PlayOneShot(hitSound);
+        }
     }
 
     private void Update()
     {
-        if (player == null)
+        if (isDead || player == null)
         {
             return;
         }
@@ -45,89 +91,112 @@ public sealed class SimpleEnemy : MonoBehaviour
         Vector3 targetPosition = player.position;
         targetPosition.y = transform.position.y;
 
-        Vector3 offset =
-            targetPosition - transform.position;
-
+        Vector3 offset = targetPosition - transform.position;
         float distance = offset.magnitude;
 
         if (offset.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation =
-                Quaternion.LookRotation(
-                    offset.normalized
-                );
-
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                turningSpeed * Time.deltaTime
-            );
+            Quaternion targetRotation = Quaternion.LookRotation(offset.normalized);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turningSpeed * Time.deltaTime);
         }
 
         if (distance > stoppingDistance)
         {
-            transform.position +=
-                transform.forward *
-                movementSpeed *
-                Time.deltaTime;
+            transform.position += transform.forward * (movementSpeed * Time.deltaTime);
         }
 
-        if (
-            distance <= shootingRange &&
-            Time.time >= nextShotTime
-        )
+        if (distance <= shootingRange && Time.time >= nextShotTime)
         {
-            nextShotTime =
-                Time.time + 1f / shotsPerSecond;
-
+            nextShotTime = Time.time + 1f / shotsPerSecond;
             FireProjectile();
         }
     }
 
     private void FireProjectile()
     {
-        Vector3 spawnPosition =
-            transform.position +
-            Vector3.up * 1.2f +
-            transform.forward * 0.8f;
+        Vector3 spawnPosition = transform.position + Vector3.up * 1.2f + transform.forward * 0.8f;
+        Vector3 targetPosition = player.position + Vector3.up;
 
-        Vector3 targetPosition =
-            player.position + Vector3.up;
-
-        GameObject projectile =
-            GameObject.CreatePrimitive(
-                PrimitiveType.Sphere
-            );
-
+        GameObject projectile = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         projectile.name = "Enemy Projectile";
         projectile.transform.position = spawnPosition;
-        projectile.transform.localScale =
-            Vector3.one * 0.3f;
+        projectile.transform.localScale = Vector3.one * 0.3f;
 
-        SphereCollider projectileCollider =
-            projectile.GetComponent<SphereCollider>();
+        SphereCollider projectileCollider = projectile.GetComponent<SphereCollider>();
+        if (projectileCollider != null)
+        {
+            projectileCollider.isTrigger = true;
+        }
 
-        projectileCollider.isTrigger = true;
-
-        Rigidbody projectileRigidbody =
-            projectile.AddComponent<Rigidbody>();
-
+        Rigidbody projectileRigidbody = projectile.AddComponent<Rigidbody>();
         projectileRigidbody.useGravity = false;
         projectileRigidbody.isKinematic = true;
 
-        Renderer projectileRenderer =
-            projectile.GetComponent<Renderer>();
+        Renderer projectileRenderer = projectile.GetComponent<Renderer>();
+        if (projectileRenderer != null)
+        {
+            projectileRenderer.material.color = Color.red;
+        }
 
-        projectileRenderer.material.color = Color.red;
-
-        EnemyProjectile projectileBehaviour =
-            projectile.AddComponent<EnemyProjectile>();
-
+        EnemyProjectile projectileBehaviour = projectile.AddComponent<EnemyProjectile>();
         projectileBehaviour.Initialize(
             targetPosition - spawnPosition,
             projectileSpeed,
             projectileDamage,
             transform
         );
+
+        if (audioSource != null && shootSound != null)
+        {
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            audioSource.PlayOneShot(shootSound);
+        }
+    }
+
+    public void HandleDeathSequence(float delay)
+    {
+        if (isDead)
+        {
+            return;
+        }
+
+        isDead = true;
+
+        EnemyHitReaction reaction = GetComponent<EnemyHitReaction>();
+        if (reaction != null)
+        {
+            reaction.StopReaction();
+        }
+
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.pitch = Random.Range(0.95f, 1.05f);
+            audioSource.PlayOneShot(deathSound);
+        }
+
+        StartCoroutine(DoDeathAnimation(Mathf.Max(0.01f, delay)));
+        enabled = false;
+    }
+
+    private IEnumerator DoDeathAnimation(float delay)
+    {
+        float elapsed = 0f;
+        Quaternion startRot = visualChild.localRotation;
+        Quaternion targetRot = startRot * Quaternion.Euler(65f, 0f, 0f);
+        Vector3 startPos = visualChild.localPosition;
+        Vector3 targetPos = startPos - Vector3.up * 0.3f;
+
+        while (elapsed < delay)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / delay;
+
+            visualChild.localRotation = Quaternion.Slerp(startRot, targetRot, t);
+            visualChild.localPosition = Vector3.Lerp(startPos, targetPos, t);
+
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 }
