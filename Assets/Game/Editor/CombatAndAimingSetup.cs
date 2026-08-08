@@ -543,8 +543,6 @@ namespace Powersuit.Editor
             so.FindProperty("barSize").vector2Value = new Vector2(160f, 18f);
             so.FindProperty("canvasScale").vector3Value = new Vector3(0.01f, 0.01f, 0.01f);
             so.FindProperty("maxDisplayDistance").floatValue = 50f;
-            so.FindProperty("backgroundColor").colorValue = new Color(0.1f, 0.1f, 0.1f, 0.9f);
-            so.FindProperty("fillColor").colorValue = new Color(0.95f, 0.2f, 0.2f, 1f);
             so.ApplyModifiedProperties();
 
             healthBar.AssignReferences(target, canvasRect, bgImage, fillImage, fillRect, canvas);

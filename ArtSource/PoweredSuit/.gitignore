@@ -1,0 +1,12 @@
+# Machine-local and generated working state
+blender_path.txt
+powersuit_pipeline.blend
+*.blend[1-9]
+scripts/__pycache__/
+*.py[cod]
+renders/
+exports/
+
+# Immutable evidence for the approved Generator 109 release.
+!Validation/Generator109/renders/
+!Validation/Generator109/renders/**

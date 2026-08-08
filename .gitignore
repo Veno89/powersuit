@@ -31,3 +31,21 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Assets, Packages, ProjectSettings, and every source asset .meta file are tracked.
+
+# Supplied iteration quarantine; curated source/provenance lives in ArtSource.
+/OtherIterations/
+
+# Blender authoring pipeline local/generated state
+/ArtSource/**/__pycache__/
+/ArtSource/**/*.py[cod]
+/ArtSource/**/*.blend[1-9]
+/ArtSource/**/blender_path.txt
+/ArtSource/**/renders/
+/ArtSource/**/exports/
+
+# Immutable, approved validation evidence is deliberately versioned.
+!/ArtSource/PoweredSuit/Validation/Generator109/renders/
+!/ArtSource/PoweredSuit/Validation/Generator109/renders/**
+
+# Local downloadable handoff packages
+/Deliverables/

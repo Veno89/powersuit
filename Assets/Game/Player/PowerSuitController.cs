@@ -70,6 +70,18 @@ public sealed class PowerSuitController : MonoBehaviour
     private float currentFOV;
     private Vector2 currentReticleOffset;
 
+    [Header("Recoil")]
+    [SerializeField] private float recoilRecoverySpeed = 15f;
+    [SerializeField] private float maxAccumulatedRecoil = 4f;
+    private Vector2 currentRecoilOffset;
+
+    public void AddRecoil(float pitchKick, float yawKick)
+    {
+        currentRecoilOffset.y += pitchKick;
+        currentRecoilOffset.x += Random.Range(-yawKick, yawKick);
+        currentRecoilOffset = Vector2.ClampMagnitude(currentRecoilOffset, maxAccumulatedRecoil);
+    }
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -345,13 +357,15 @@ public sealed class PowerSuitController : MonoBehaviour
         currentShoulderOffset = Vector3.Lerp(currentShoulderOffset, targetShoulder, Time.deltaTime * aimTransitionSpeed);
         currentFOV = Mathf.Lerp(currentFOV, targetFOV, Time.deltaTime * aimTransitionSpeed);
 
+        currentRecoilOffset = Vector2.MoveTowards(currentRecoilOffset, Vector2.zero, recoilRecoverySpeed * Time.deltaTime);
+
         if (playerCamera != null)
         {
             playerCamera.fieldOfView = currentFOV;
         }
 
         Vector3 pivot = transform.position + Vector3.up * currentCameraHeight;
-        Quaternion cameraRotation = Quaternion.Euler(cameraPitch, cameraYaw, 0f);
+        Quaternion cameraRotation = Quaternion.Euler(cameraPitch - currentRecoilOffset.y, cameraYaw + currentRecoilOffset.x, 0f);
 
         Vector3 cameraRight = cameraRotation * Vector3.right;
         Vector3 cameraUp = Vector3.up;

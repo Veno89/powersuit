@@ -2,12 +2,12 @@
 
 ## Product concept
 
-Powersuit is a single-player third-person powered-flight action game. The target is a compact 3D sandbox where the player flies a powered suit, fights enemies, collects randomized equipment, and grows stronger. Phase 0 contains only project foundations, test infrastructure, a primitive grey-box flight space, and a visible player placeholder.
+Powersuit is a single-player third-person powered-flight action game. The target is a compact 3D sandbox where the player flies a powered suit, fights enemies, collects randomized equipment, and grows stronger. The current vertical slice includes grounded movement, powered flight, a third-person camera, over-the-shoulder aiming, projectile combat, basic enemies, combat feedback, and the approved Generator 109 suit-and-rifle model.
 
 ## Technical architecture
 
 - Unity 6000.5.7f1 with Universal Render Pipeline 17.5.0 is the fixed editor and renderer baseline.
-- The Input System 1.20.0 is retained for future controls; Phase 0 defines no gameplay input or movement.
+- The Input System 1.20.0 is the primary input backend, with guarded legacy-input fallbacks for the prototype controls.
 - Important rules and calculations should be plain C# with Edit Mode tests where practical.
 - MonoBehaviours should adapt plain C# logic to Unity input, transforms, physics, animation, audio, and presentation.
 - Scene objects hold composition and references, not large gameplay algorithms.
@@ -42,16 +42,17 @@ Repository-wide permanent rules are in the root `AGENTS.md`. Agents must keep ga
 1. Allow Unity to import assets and confirm the Console has no compiler errors.
 2. Run Edit Mode tests.
 3. Run Play Mode tests.
-4. Open `Assets/Scenes/FlightPrototype.unity` and verify the player placeholder, start marker, lighting, and grey-box routes are visible.
-5. When Windows build support is installed, run `Tools > Powersuit > Phase 0 > Build Windows Development Player` or invoke `Powersuit.Editor.PhaseZeroSceneBuilder.BuildWindowsDevelopmentPlayer` in batch mode.
-6. Review source-control changes and confirm no generated directories or licensed assets are staged.
+4. Open `Assets/Scenes/PoweredSuitAimDemo.unity`; verify movement, flight, shoulder aim, `PS_Aim`, rifle muzzle alignment, firing, target hits, and hit feedback.
+5. Confirm `Assets/Scenes/FlightPrototype.unity` remains the shared Build Profile scene and still satisfies the original Phase 0 tests.
+6. Run `Tools > Powered Suit > Build Generator 109 Demo` for the focused Windows development build.
+7. Review source-control changes and confirm no generated directories, Blender working outputs, build products, or unapproved external assets are staged.
 
 ## Current phase status
 
-Phase 0 establishes the `Assets/Game` module layout, Unity-aware Git exclusions, permanent agent rules, Edit/Play Mode smoke-test assemblies, and the preserved `FlightPrototype` scene. The scene builder augments the original scene with primitive ground areas, gaps, walls, pillars, ramps, elevated platforms, a marked start area, lighting, and a non-functional powered-suit placeholder. No flight, combat, enemies, loot, inventory, or progression behavior is present.
+The Phase 0 project foundation and `FlightPrototype` greybox are preserved. The active prototype now adds a controllable powered suit, grounded and flight movement, camera transitions, an over-the-shoulder aiming mode, projectile combat, enemy damage/death behavior, pooled impact and muzzle feedback, hit markers, and focused Generator 109 presentation.
 
-No new packages were added. Unneeded template packages for collaboration, navigation, multiplayer guidance, Timeline, and visual scripting were removed. URP, Input System, the Unity Test Framework, uGUI, and IDE integrations remain.
+Generator 109 is integrated as an additive player prefab and demo scene rather than overwriting the legacy model. Its animator controller retains the existing asset GUID and now contains Idle, Walk, Hover, and Aim states. The weapon fires from the imported `Rifle_Muzzle`, not a fixed placeholder transform. Blender sources and evidence are maintained outside `Assets`, while only approved Unity-ready artifacts enter the import tree.
 
 ## Planned next phase
 
-Phase 1 should implement only a testable powered-flight vertical slice: input actions, a plain C# flight model, a thin player movement adapter, a third-person camera adapter, focused tests, and tuning in the existing grey-box scene. Combat and progression remain later-phase work.
+The next phase should stabilize this vertical slice before expanding scope: tune movement and camera feel in play, visually inspect hand/rifle contact in Unity, add gameplay-focused tests for damage and pooling, resolve remaining prototype presentation issues, and keep progression systems deferred until the combat loop is reliable.

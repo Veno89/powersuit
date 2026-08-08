@@ -1,0 +1,30 @@
+Powered Suit Weapon Framework Reset 06 — Package QA
+Date: 2026-08-07
+
+Static checks performed in the assistant environment:
+- All packaged Python scripts parse/compile successfully.
+- Reset 05 package was inspected before modification.
+- Rigid weapon signature contract remains v4.
+- Scope/receiver/barrel remain centred on local X=0.
+- Powered-suit stock lateral offset is 0.110 m.
+- Stance stock inward seating is 0.080 m.
+- shouldered_precision head/neck roll limit is 12 deg.
+- preferred final sight lateral tolerance is 0.075 m.
+- The obsolete "stock hardpoint must be centred" assertion is removed.
+- Rifle validation now checks stock helper-to-buttpad attachment instead.
+- Reviewable rifle geometry issues append automated blockers and still render all five rifle views.
+- Structural rigidity/missing-asset/optic-warp failures still abort.
+- Rifle generator version is 102 and every aim/render/export consumer requires 102 or newer.
+- PS_Idle, PS_Walk and PS_Hover preservation code is unchanged.
+- Controlled V2 arm-rest proportions are unchanged.
+- Approval/export remain locked unless automated validation is PASS and visual hashes are explicitly approved.
+- Required 13 aim + 5 rifle render filenames remain unchanged.
+- Windows BAT launchers are checked for CRLF line endings before packaging.
+- SHA256SUMS and ZIP integrity are regenerated/verified after packaging.
+
+Not performed here:
+- Blender 5.2 execution (Blender is not installed in the assistant runtime)
+- visual confirmation of the new 110 mm stock interface or head-roll result
+- FBX export
+
+Therefore Reset 06 is code/package-audited but NOT visually approved.

@@ -1,0 +1,1668 @@
+[
+  {
+    "name": "Backpack_Core",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.0,
+      -0.20000004768371582,
+      0.23499999940395355
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Backpack_Thruster.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.23000000417232513,
+      -0.20000004768371582,
+      0.28999999165534973
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Backpack_Thruster.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      -0.23000000417232513,
+      -0.20000004768371582,
+      0.28999999165534973
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Boot_Toe.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Foot.L",
+    "loc": [
+      0.0,
+      -0.05375874042510986,
+      -0.012649044394493103
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Boot_Toe.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Foot.R",
+    "loc": [
+      0.0,
+      -0.05375874042510986,
+      -0.012649044394493103
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Camera",
+    "type": 11,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      5.9429426193237305,
+      -5.401913642883301,
+      4.301373481750488
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714447975158691,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Chest_Core",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.0,
+      -0.21000003814697266,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Chest_Plate",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.0,
+      -0.20000004768371582,
+      -0.1899999976158142
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Chest_Plate.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.20499999821186066,
+      -0.19000005722045898,
+      -0.17000000178813934
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Chest_Plate.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      -0.20499999821186066,
+      -0.19000005722045898,
+      -0.17000000178813934
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Elbow.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerArm.L",
+    "loc": [
+      2.9802322387695312e-08,
+      -0.33500006794929504,
+      -6.4991176884632296e-09
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Elbow.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerArm.R",
+    "loc": [
+      -2.9802322387695312e-08,
+      -0.33500006794929504,
+      -6.4991176884632296e-09
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Forearm.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerArm.L",
+    "loc": [
+      2.9802322387695312e-08,
+      -0.15000000596046448,
+      0.014999997802078724
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Forearm.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerArm.R",
+    "loc": [
+      -2.9802322387695312e-08,
+      -0.15000000596046448,
+      0.014999997802078724
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Forearm_Plate.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerArm.L",
+    "loc": [
+      2.9802322387695312e-08,
+      -0.16999998688697815,
+      0.1550000160932541
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Forearm_Plate.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerArm.R",
+    "loc": [
+      -2.9802322387695312e-08,
+      -0.16999998688697815,
+      0.1550000160932541
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Hand.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Hand.L",
+    "loc": [
+      5.960464477539063e-08,
+      -0.07999994605779648,
+      0.014999999664723873
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Hand.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Hand.R",
+    "loc": [
+      -5.960464477539063e-08,
+      -0.07999994605779648,
+      0.014999999664723873
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.000000238418579
+    ]
+  },
+  {
+    "name": "Heavy_Boot.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Foot.L",
+    "loc": [
+      0.0,
+      -0.21819716691970825,
+      -0.05692093074321747
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Heavy_Boot.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Foot.R",
+    "loc": [
+      0.0,
+      -0.21819716691970825,
+      -0.05692093074321747
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Helmet_Core",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Head",
+    "loc": [
+      0.0,
+      -0.18999993801116943,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Helmet_Crown",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Head",
+    "loc": [
+      0.0,
+      -0.034999847412109375,
+      0.009999999776482582
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Helmet_Jaw",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Head",
+    "loc": [
+      0.0,
+      -0.3299999237060547,
+      -0.03500000014901161
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Helmet_Plate.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Head",
+    "loc": [
+      0.20499999821186066,
+      -0.18999993801116943,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Helmet_Plate.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Head",
+    "loc": [
+      -0.20499999821186066,
+      -0.18999993801116943,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Helmet_Visor",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Head",
+    "loc": [
+      0.0,
+      -0.16999995708465576,
+      -0.17800000309944153
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Hip_Guard.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Hips",
+    "loc": [
+      0.27000001072883606,
+      -0.13999998569488525,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Hip_Guard.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Hips",
+    "loc": [
+      -0.27000001072883606,
+      -0.13999998569488525,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Knee.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.L",
+    "loc": [
+      0.0,
+      -0.3500001132488251,
+      0.019999999552965164
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Knee.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.R",
+    "loc": [
+      0.0,
+      -0.3500001132488251,
+      0.019999999552965164
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Knee_Guard.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.L",
+    "loc": [
+      0.0,
+      -0.3600001037120819,
+      0.16500000655651093
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Knee_Guard.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.R",
+    "loc": [
+      0.0,
+      -0.3600001037120819,
+      0.16500000655651093
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Light",
+    "type": 10,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      3.41056227684021,
+      0.7166036367416382,
+      5.030815124511719
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714449167251587,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Lower_Leg.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.L",
+    "loc": [
+      0.0,
+      -0.15000006556510925,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Lower_Leg.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.R",
+    "loc": [
+      0.0,
+      -0.15000006556510925,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Neck",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Neck",
+    "loc": [
+      0.0,
+      -0.09999990463256836,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Pelvis",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Hips",
+    "loc": [
+      0.0,
+      -0.13999998569488525,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "PowerSuit_Armature",
+    "type": 25,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Preview_Camera",
+    "type": 11,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.265964150428772,
+      -0.05904856324195862,
+      0.47631168365478516
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714447975158691,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Preview_FillLight",
+    "type": 10,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      -2.4340925216674805,
+      1.4838411808013916,
+      2.7906460762023926
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714447975158691,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Preview_Ground",
+    "type": 1,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.265964150428772,
+      -0.05904856324195862,
+      0.46705424785614014
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714447975158691,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Preview_KeyLight",
+    "type": 10,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      2.9660210609436035,
+      3.026730537414551,
+      4.487824440002441
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714447975158691,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Preview_RimLight",
+    "type": 10,
+    "parent": "",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.265964150428772,
+      -3.1448278427124023,
+      3.407801866531372
+    ],
+    "scale": [
+      0.7714447975158691,
+      0.7714447975158691,
+      0.7714447975158691
+    ]
+  },
+  {
+    "name": "Rifle_Barrel_Base",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.36000001430511475
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Barrel_Fluted",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.5400000214576721
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_BoltCarrier",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.02500000037252903,
+      -0.009999999776482582,
+      0.019999999552965164
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_BoltHandleKnob",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.07000000029802322,
+      -0.009999999776482582,
+      -0.019999999552965164
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_BoltHandleStem",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.04800000041723251,
+      -0.009999999776482582,
+      -0.009999999776482582
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_EjectionPort",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.04100000113248825,
+      -0.009999999776482582,
+      0.019999999552965164
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Grip_Cap",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.11999999731779099,
+      -0.1599999964237213
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Grip_Main",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.05000000074505806,
+      -0.14000000059604645
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Handguard_LowerRail",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0430000014603138,
+      0.23999999463558197
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Handguard_Main",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.23999999463558197
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Handguard_SlotL",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.03700000047683716,
+      0.0,
+      0.23999999463558197
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Handguard_SlotR",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      -0.03700000047683716,
+      0.0,
+      0.23999999463558197
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_LeftHandTarget",
+    "type": 0,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.019999999552965164,
+      0.23999999463558197
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_MagBase",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.1550000011920929,
+      0.06499999761581421
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_MagBody",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.07000000029802322,
+      0.07999999821186066
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_MagWell",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.03999999910593033,
+      0.07999999821186066
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_MuzzleBrake",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.7699999809265137
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_MuzzlePoint",
+    "type": 0,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.7799999713897705
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_PicatinnyRail",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.054999999701976776,
+      0.03999999910593033
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Receiver_Lower",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.029999999329447746,
+      0.019999999552965164
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Receiver_Upper",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_RightHandTarget",
+    "type": 0,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.05000000074505806,
+      -0.14000000059604645
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeLensFront",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.10499999672174454,
+      0.18799999356269836
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeLensRear",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.10499999672174454,
+      -0.1679999977350235
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeMainBody",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.10499999672174454,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeMountFront",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.07500000298023224,
+      0.09000000357627869
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeMountRear",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.07500000298023224,
+      -0.09000000357627869
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeObjectiveBell",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.10499999672174454,
+      0.15000000596046448
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeOcularBell",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.10499999672174454,
+      -0.14000000059604645
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopePoint",
+    "type": 0,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.10499999672174454,
+      -0.1899999976158142
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeTurretSide",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.02800000086426735,
+      -0.10499999672174454,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_ScopeTurretTop",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.13199999928474426,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Stock_BufferTube",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      -0.2199999988079071
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Stock_ButtPad",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      -0.4399999976158142
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Stock_CheekRest",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      -0.057999998331069946,
+      -0.30000001192092896
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Stock_Frame",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.0,
+      -0.3199999928474426
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_Trigger",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.03999999910593033,
+      -0.03500000014901161
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "Rifle_TriggerGuard",
+    "type": 1,
+    "parent": "RifleRoot",
+    "partype": 0,
+    "parent_bone": "",
+    "loc": [
+      0.0,
+      0.04500000178813934,
+      -0.03999999910593033
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "name": "RifleRoot",
+    "type": 0,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Hand.R",
+    "loc": [
+      -0.04811026155948639,
+      -0.09655919671058655,
+      0.13009589910507202
+    ],
+    "scale": [
+      -0.9999997615814209,
+      -0.9999997615814209,
+      -0.9999998211860657
+    ]
+  },
+  {
+    "name": "Shin_Plate.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.L",
+    "loc": [
+      0.0,
+      -0.16000008583068848,
+      0.1599999964237213
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Shin_Plate.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "LowerLeg.R",
+    "loc": [
+      0.0,
+      -0.16000008583068848,
+      0.1599999964237213
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Shoulder_Armour.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperArm.L",
+    "loc": [
+      0.12413796782493591,
+      -0.33425164222717285,
+      0.04965516924858093
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Shoulder_Armour.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperArm.R",
+    "loc": [
+      -0.12413796782493591,
+      -0.33425164222717285,
+      0.04965516924858093
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Shoulder_Wing.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperArm.L",
+    "loc": [
+      0.25026562809944153,
+      -0.31382519006729126,
+      0.08933591842651367
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Shoulder_Wing.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperArm.R",
+    "loc": [
+      -0.25026562809944153,
+      -0.31382519006729126,
+      0.08933591842651367
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Thigh_Plate.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperLeg.L",
+    "loc": [
+      1.4901161193847656e-08,
+      -0.25000011920928955,
+      0.14499999582767487
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Thigh_Plate.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperLeg.R",
+    "loc": [
+      1.4901161193847656e-08,
+      -0.25000011920928955,
+      0.14499999582767487
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Thruster_Nozzle.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.23000000417232513,
+      -0.4750000238418579,
+      0.3100000023841858
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Thruster_Nozzle.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      -0.23000000417232513,
+      -0.4750000238418579,
+      0.3100000023841858
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Upper_Arm.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperArm.L",
+    "loc": [
+      0.04482761025428772,
+      -0.12070204317569733,
+      0.017931044101715088
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Upper_Arm.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperArm.R",
+    "loc": [
+      -0.04482761025428772,
+      -0.12070204317569733,
+      0.017931044101715088
+    ],
+    "scale": [
+      1.0000001192092896,
+      1.0000001192092896,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Upper_Chest",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Chest",
+    "loc": [
+      0.0,
+      -0.059999942779541016,
+      -0.014999999664723873
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Upper_Leg.L",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperLeg.L",
+    "loc": [
+      0.0,
+      -0.23000013828277588,
+      8.881784197001252e-16
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Upper_Leg.R",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "UpperLeg.R",
+    "loc": [
+      0.0,
+      -0.23000013828277588,
+      -8.881784197001252e-16
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  },
+  {
+    "name": "Waist",
+    "type": 1,
+    "parent": "PowerSuit_Armature",
+    "partype": 7,
+    "parent_bone": "Spine",
+    "loc": [
+      0.0,
+      -0.25,
+      0.0
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0000001192092896
+    ]
+  }
+]

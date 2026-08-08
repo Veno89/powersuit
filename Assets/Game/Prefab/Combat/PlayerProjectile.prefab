@@ -130,3 +130,8 @@ MonoBehaviour:
   lifetime: 4
   radius: 0.15
   projectileColor: {r: 0.2, g: 0.8, b: 1, a: 1}
+  trailTime: 0.15
+  startWidth: 0.15
+  endWidth: 0.02
+  enemyImpactPrefab: {fileID: 7283120523778202705, guid: ff2831a7a906930429fa1e1f4835bcbb, type: 3}
+  environmentImpactPrefab: {fileID: 5185746805141773366, guid: 5ef9b6fb8891a52468b3aba748936921, type: 3}
