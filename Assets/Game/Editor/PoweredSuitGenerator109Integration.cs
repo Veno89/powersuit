@@ -24,6 +24,8 @@ namespace Powersuit.Editor
         public const string UpperBodyMaskPath =
             "Assets/Game/Animation/PowerSuitUpperBody.mask";
 
+        public const string LayerSafeActionClipSuffix = "_UpperBody";
+
         public const string BasePlayerPrefabPath =
             "Assets/Game/Prefab/Player/PlayerPrototype.prefab";
 
@@ -92,6 +94,14 @@ namespace Powersuit.Editor
                 "PS_WeaponStowed_Walk_Backward",
                 "PS_WeaponStowed_Hover"
             };
+
+        private static readonly string[] WeaponActionClips =
+        {
+            "PS_Weapon_Draw",
+            "PS_Weapon_Sheathe",
+            "PS_Reload",
+            "PS_BoltCycle"
+        };
 
         [MenuItem("Tools/Powered Suit/Integrate Generator 109")]
         public static void IntegrateFromMenu()
@@ -370,6 +380,13 @@ namespace Powersuit.Editor
             IReadOnlyDictionary<string, AnimationClip> clips
         )
         {
+            Dictionary<string, AnimationClip> layerSafeActionClips =
+                WeaponActionClips.ToDictionary(
+                    name => name,
+                    name => CreateOrUpdateLayerSafeActionClip(clips[name]),
+                    StringComparer.Ordinal
+                );
+
             AnimatorController controller =
                 AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
 
@@ -607,27 +624,35 @@ namespace Powersuit.Editor
             AnimatorState draw = AddState(
                 weaponStateMachine,
                 "Draw Weapon",
-                clips["PS_Weapon_Draw"],
+                layerSafeActionClips["PS_Weapon_Draw"],
                 new Vector3(360f, 20f)
             );
             AnimatorState sheathe = AddState(
                 weaponStateMachine,
                 "Sheathe Weapon",
-                clips["PS_Weapon_Sheathe"],
+                layerSafeActionClips["PS_Weapon_Sheathe"],
                 new Vector3(360f, 120f)
             );
             AnimatorState reload = AddState(
                 weaponStateMachine,
                 "Reload",
-                clips["PS_Reload"],
+                layerSafeActionClips["PS_Reload"],
                 new Vector3(360f, 220f)
             );
             AnimatorState cycle = AddState(
                 weaponStateMachine,
                 "Bolt Cycle",
-                clips["PS_BoltCycle"],
+                layerSafeActionClips["PS_BoltCycle"],
                 new Vector3(360f, 320f)
             );
+            foreach (AnimatorState actionState in new[] { draw, sheathe, reload, cycle })
+            {
+                // The imported actions include axis/root/lower-body curves that
+                // do not belong on this override layer. Layer-safe copies remove
+                // them, Write Defaults stays off, and the model root lock handles
+                // Unity Generic's synthesized transition pose.
+                actionState.writeDefaultValues = false;
+            }
             weaponStateMachine.defaultState = empty;
             AddAnyStateTrigger(weaponStateMachine, draw, "DrawWeapon");
             AddAnyStateTrigger(weaponStateMachine, sheathe, "SheatheWeapon");
@@ -641,6 +666,97 @@ namespace Powersuit.Editor
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
             return controller;
+        }
+
+        private static AnimationClip CreateOrUpdateLayerSafeActionClip(
+            AnimationClip source
+        )
+        {
+            string assetPath =
+                $"Assets/Game/Animation/{source.name}{LayerSafeActionClipSuffix}.anim";
+            AnimationClip target = AssetDatabase.LoadAssetAtPath<AnimationClip>(assetPath);
+            if (target == null)
+            {
+                target = new AnimationClip();
+                AssetDatabase.CreateAsset(target, assetPath);
+            }
+
+            // Rebuild the clip curve-by-curve instead of cloning the imported
+            // FBX's serialized payload. Imported Generic clips can retain baked
+            // root data even after their visible empty-path curve is removed.
+            // A fresh whitelist also keeps Root, Hips, and legs entirely out of
+            // the override layer rather than trusting an AvatarMask alone.
+            target.ClearCurves();
+            target.name = source.name + LayerSafeActionClipSuffix;
+            target.frameRate = source.frameRate;
+            target.wrapMode = source.wrapMode;
+            target.legacy = source.legacy;
+            AnimationUtility.SetAnimationClipSettings(
+                target,
+                AnimationUtility.GetAnimationClipSettings(source)
+            );
+
+            foreach (
+                EditorCurveBinding binding in AnimationUtility
+                    .GetCurveBindings(source)
+                    .Where(binding => IsLayerSafeActionBindingPath(binding.path))
+            )
+            {
+                AnimationUtility.SetEditorCurve(
+                    target,
+                    binding,
+                    AnimationUtility.GetEditorCurve(source, binding)
+                );
+            }
+
+            foreach (
+                EditorCurveBinding binding in AnimationUtility
+                    .GetObjectReferenceCurveBindings(source)
+                    .Where(binding => IsLayerSafeActionBindingPath(binding.path))
+            )
+            {
+                AnimationUtility.SetObjectReferenceCurve(
+                    target,
+                    binding,
+                    AnimationUtility.GetObjectReferenceCurve(source, binding)
+                );
+            }
+            AnimationUtility.SetAnimationEvents(
+                target,
+                AnimationUtility.GetAnimationEvents(source)
+            );
+
+            if (
+                AnimationUtility.GetCurveBindings(target)
+                    .Any(binding => !IsLayerSafeActionBindingPath(binding.path)) ||
+                AnimationUtility.GetObjectReferenceCurveBindings(target)
+                    .Any(binding => !IsLayerSafeActionBindingPath(binding.path))
+            )
+            {
+                throw new InvalidOperationException(
+                    $"Layer-safe action '{target.name}' contains a root or lower-body binding."
+                );
+            }
+
+            EditorUtility.SetDirty(target);
+            return target;
+        }
+
+        private static bool IsLayerSafeActionBindingPath(string path)
+        {
+            return path == "Root/Hips/Spine" ||
+                path.StartsWith("Root/Hips/Spine/", StringComparison.Ordinal) ||
+                path == "WeaponRoot" ||
+                path == "WeaponRoot/WeaponMagazine" ||
+                path.StartsWith(
+                    "WeaponRoot/WeaponMagazine/",
+                    StringComparison.Ordinal
+                ) ||
+                path == "WeaponRoot/WeaponBolt" ||
+                path.StartsWith(
+                    "WeaponRoot/WeaponBolt/",
+                    StringComparison.Ordinal
+                );
         }
 
         private static BlendTree CreateDirectionalBlendTree(
@@ -867,6 +983,14 @@ namespace Powersuit.Editor
                 animator.applyRootMotion = false;
                 animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
+                PowerSuitAnimatorRootLock rootLock =
+                    modelInstance.GetComponent<PowerSuitAnimatorRootLock>();
+                if (rootLock == null)
+                {
+                    rootLock = modelInstance.AddComponent<PowerSuitAnimatorRootLock>();
+                }
+                rootLock.CaptureCurrentLocalTransform();
+
                 Transform muzzle = FindChildRecursive(modelInstance.transform, "Rifle_Muzzle");
                 Transform rifleRoot = FindChildRecursive(modelInstance.transform, "RifleRoot");
                 if (muzzle == null || rifleRoot == null)
@@ -994,10 +1118,13 @@ namespace Powersuit.Editor
         {
             SerializedObject serialized = new SerializedObject(controller);
             SetFloat(serialized, "walkSpeed", 2.2f);
-            SetFloat(serialized, "aimCameraDistance", 3.0f);
+            SetFloat(serialized, "aimCameraDistance", 3.4f);
             SetFloat(serialized, "aimCameraHeight", 1.5f);
-            SetVector(serialized, "aimShoulderOffset", new Vector3(1.15f, 0.05f, 0f));
-            SetFloat(serialized, "aimFieldOfView", 52f);
+            // The shouldered rifle sits on player-local -X. Keeping the camera
+            // on +X put the suit between the lens and weapon, so use the firing
+            // side and lift slightly to expose the receiver and barrel.
+            SetVector(serialized, "aimShoulderOffset", new Vector3(-1.6f, 0.3f, 0f));
+            SetFloat(serialized, "aimFieldOfView", 58f);
             SetFloat(serialized, "aimTransitionSpeed", 12f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -1284,6 +1411,40 @@ namespace Powersuit.Editor
                 );
             }
 
+            string[] requiredLayerSafeStates =
+            {
+                "Draw Weapon",
+                "Sheathe Weapon",
+                "Reload",
+                "Bolt Cycle"
+            };
+            foreach (string stateName in requiredLayerSafeStates)
+            {
+                AnimatorState state = controller.layers[1].stateMachine.states
+                    .Select(child => child.state)
+                    .SingleOrDefault(candidate => candidate.name == stateName);
+                AnimationClip actionClip = state?.motion as AnimationClip;
+                if (
+                    state == null ||
+                    actionClip == null ||
+                    state.writeDefaultValues ||
+                    AnimationUtility.GetCurveBindings(actionClip)
+                        .Any(
+                            binding => !IsLayerSafeActionBindingPath(binding.path)
+                        ) ||
+                    AnimationUtility.GetObjectReferenceCurveBindings(actionClip)
+                        .Any(
+                            binding => !IsLayerSafeActionBindingPath(binding.path)
+                        )
+                )
+                {
+                    throw new InvalidOperationException(
+                        $"Weapon action '{stateName}' must use a layer-safe clip " +
+                        "without Animator-root bindings or Write Defaults."
+                    );
+                }
+            }
+
             AvatarMask weaponMask = controller.layers[1].avatarMask;
             string[] requiredActiveMaskLeaves =
             {
@@ -1344,9 +1505,34 @@ namespace Powersuit.Editor
             }
 
             GameObject variant = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerVariantPath);
-            if (variant == null || variant.GetComponent<PowerSuitController>() == null)
+            PowerSuitController suitController =
+                variant != null ? variant.GetComponent<PowerSuitController>() : null;
+            if (variant == null || suitController == null)
             {
                 throw new InvalidOperationException("Generator 109 player variant is invalid.");
+            }
+
+            SerializedObject controllerSettings = new SerializedObject(suitController);
+            SerializedProperty aimDistance =
+                controllerSettings.FindProperty("aimCameraDistance");
+            SerializedProperty aimShoulder =
+                controllerSettings.FindProperty("aimShoulderOffset");
+            SerializedProperty aimFov =
+                controllerSettings.FindProperty("aimFieldOfView");
+            if (
+                aimDistance == null ||
+                aimShoulder == null ||
+                aimFov == null ||
+                aimDistance.floatValue < 3.3f ||
+                aimShoulder.vector3Value.x > -1.4f ||
+                aimShoulder.vector3Value.y < 0.2f ||
+                aimFov.floatValue < 55f
+            )
+            {
+                throw new InvalidOperationException(
+                    "Aim camera must stay on the rifle's local -X shoulder and " +
+                    "retain the wider weapon-readable framing."
+                );
             }
 
             Animator[] animators = variant.GetComponentsInChildren<Animator>(true);
@@ -1404,13 +1590,26 @@ namespace Powersuit.Editor
             }
 
             Transform animatedModel = visual.Find("PowerSuitModel_Generator111");
+            PowerSuitAnimatorRootLock rootLock =
+                animatedModel != null
+                    ? animatedModel.GetComponent<PowerSuitAnimatorRootLock>()
+                    : null;
             if (
                 animatedModel == null ||
-                Quaternion.Angle(animatedModel.localRotation, Quaternion.identity) > 0.1f
+                Quaternion.Angle(animatedModel.localRotation, Quaternion.identity) > 0.1f ||
+                rootLock == null ||
+                !rootLock.HasLock ||
+                rootLock.LockedLocalPosition.sqrMagnitude > 0.000001f ||
+                Quaternion.Angle(
+                    rootLock.LockedLocalRotation,
+                    Quaternion.identity
+                ) > 0.1f ||
+                Vector3.Distance(rootLock.LockedLocalScale, Vector3.one) > 0.0001f
             )
             {
                 throw new InvalidOperationException(
-                    "Generator 111 animated model must be an unrotated child of the facing wrapper."
+                    "Generator 111 animated model must retain its locked identity " +
+                    "transform beneath the facing wrapper."
                 );
             }
 

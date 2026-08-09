@@ -67,11 +67,11 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float cameraCollisionRadius = 0.2f;
 
     [Header("Third-Person Aim Mode")]
-    [SerializeField] private float aimCameraDistance = 2.2f;
+    [SerializeField] private float aimCameraDistance = 3.4f;
     [SerializeField] private float aimCameraHeight = 1.5f;
-    [SerializeField] private Vector3 aimShoulderOffset = new Vector3(1.2f, 0.4f, 0f);
+    [SerializeField] private Vector3 aimShoulderOffset = new Vector3(-1.6f, 0.3f, 0f);
     [SerializeField] private float defaultFieldOfView = 60f;
-    [SerializeField] private float aimFieldOfView = 45f;
+    [SerializeField] private float aimFieldOfView = 58f;
     [SerializeField] private float aimTransitionSpeed = 12f;
     [SerializeField] private float maxReticleOffset = 140f;
     [SerializeField] private float aimMaxDistance = 200f;

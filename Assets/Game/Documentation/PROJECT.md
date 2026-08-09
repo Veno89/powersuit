@@ -40,6 +40,8 @@ Namespaces should begin with `Powersuit`. Editor-only code stays in an `Editor` 
 - `PowerSuitController` exposes signed local velocity (`MovementX`, `MovementY`, normalized speed, backpedal, and aim-walk state) based on actual `CharacterController` motion.
 - The Animator base layer selects ready, stowed, aim, walk/backpedal, and hover locomotion.
 - A masked Weapon Actions layer owns draw, sheathe, reload, and bolt-cycle upper-body motion while leaving the legs on base locomotion.
+- The integration generator extracts each weapon action into a Unity-owned `.anim` that whitelists only the spine/arms and `WeaponRoot`/magazine/bolt controls. Raw FBX action takes must not be assigned directly to the override layer.
+- `PowerSuitAnimatorRootLock` keeps the imported Animator GameObject at its captured identity transform after evaluation. This contains a Unity Generic-Animator transition leak of the FBX axis pose; controller movement and the non-animated wrapper remain the only owners of player motion/facing.
 - `PowerSuitWeaponPresentation` is the carry-state adapter (`Ready`, `Drawing`, `Stowed`, `Sheathing`) and gates weapon use during transitions.
 - `WeaponRuntimeState` owns ammunition, cadence, reload commit, critical hits, and manual cycling. `PowerSuitWeapon` adapts it to input, projectiles, effects, HUD, and animation events.
 - Imported `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt` bones keep suit and rifle motion synchronized in the FBX.
@@ -71,5 +73,7 @@ Implemented in the current candidate:
 - exact clip/importer, hierarchy, mask, axis, muzzle, runtime-state, carry-state, and scene tests
 
 Verification on 2026-08-09: Blender `PASS` with 32 reviewed renders, C# compile with 0 warnings/errors, 35/35 EditMode tests, 4/4 PlayMode tests, zero Unity Console errors after verification, and a successful Windows x64 Development build.
+
+The subsequent hands-on hotfix adds stronger root/action and camera assertions. Its direct live controller exercise passed Draw, Sheathe, Reload, and Bolt Cycle with zero imported-root transform drift and an upright suit throughout; the revised camera diagnostic increased visible rifle silhouette from about 10% to 35%. A complete rerun of the expanded Unity suites is pending because the restarted batch editor currently lacks the local `com.unity.editor.headless` entitlement.
 
 The remaining phase gate is user play acceptance of the demo matrix. Dedicated lateral aim-strafe clips and broader inventory/arsenal systems remain deferred.

@@ -401,10 +401,10 @@ namespace Powersuit.Editor
             SerializedProperty fovProp = so.FindProperty("aimFieldOfView");
             SerializedProperty speedProp = so.FindProperty("aimTransitionSpeed");
 
-            if (distProp != null) distProp.floatValue = 2.2f;
+            if (distProp != null) distProp.floatValue = 3.4f;
             if (heightProp != null) heightProp.floatValue = 1.5f;
-            if (offsetProp != null) offsetProp.vector3Value = new Vector3(1.2f, 0.4f, 0f);
-            if (fovProp != null) fovProp.floatValue = 45f;
+            if (offsetProp != null) offsetProp.vector3Value = new Vector3(-1.6f, 0.3f, 0f);
+            if (fovProp != null) fovProp.floatValue = 58f;
             if (speedProp != null) speedProp.floatValue = 12f;
 
             so.ApplyModifiedProperties();

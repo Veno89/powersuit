@@ -129,19 +129,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimFieldOfView
-      value: 52
+      value: 58
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimCameraDistance
-      value: 3
+      value: 3.4
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimShoulderOffset.x
-      value: 1.15
+      value: -1.6
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimShoulderOffset.y
-      value: 0.05
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 7646132019645809869, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: muzzleTransform
@@ -298,6 +298,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7870674555697902162}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6155874620199438416}
   m_SourcePrefab: {fileID: 100100000, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
 --- !u!4 &1090241104170924233 stripped
 Transform:
@@ -331,6 +334,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6155874620199438416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8033411728724916076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 293047b859a82a7458874455dec983a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerSuitAnimatorRootLock
+  hasLock: 1
+  lockedLocalPosition: {x: 0, y: 0, z: 0}
+  lockedLocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  lockedLocalScale: {x: 1, y: 1, z: 1}
 --- !u!4 &8033411728724916077 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}

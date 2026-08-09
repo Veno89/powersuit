@@ -86,6 +86,41 @@ namespace Powersuit.Tests.EditMode
             Assert.That(controller.layers, Has.Length.EqualTo(2));
             Assert.That(controller.layers[1].name, Is.EqualTo("Weapon Actions"));
             Assert.That(controller.layers[1].avatarMask, Is.Not.Null);
+            foreach (
+                string actionStateName in new[]
+                {
+                    "Draw Weapon",
+                    "Sheathe Weapon",
+                    "Reload",
+                    "Bolt Cycle"
+                }
+            )
+            {
+                AnimatorState actionState = controller.layers[1].stateMachine.states
+                    .Select(child => child.state)
+                    .SingleOrDefault(state => state.name == actionStateName);
+                Assert.That(actionState, Is.Not.Null, actionStateName);
+                Assert.That(
+                    actionState.writeDefaultValues,
+                    Is.False,
+                    $"{actionStateName} must not write unrelated transform defaults."
+                );
+
+                AnimationClip actionClip = actionState.motion as AnimationClip;
+                Assert.That(actionClip, Is.Not.Null, actionStateName);
+                Assert.That(
+                    AnimationUtility.GetCurveBindings(actionClip)
+                        .Any(binding => !IsLayerSafeWeaponActionPath(binding.path)),
+                    Is.False,
+                    $"{actionStateName} must contain only upper-body/weapon bindings."
+                );
+                Assert.That(
+                    AnimationUtility.GetObjectReferenceCurveBindings(actionClip)
+                        .Any(binding => !IsLayerSafeWeaponActionPath(binding.path)),
+                    Is.False,
+                    $"{actionStateName} must contain only upper-body/weapon bindings."
+                );
+            }
             Assert.That(
                 controller.parameters.Select(parameter => parameter.name),
                 Is.SupersetOf(
@@ -105,7 +140,26 @@ namespace Powersuit.Tests.EditMode
 
             GameObject player = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerVariantPath);
             Assert.That(player, Is.Not.Null);
-            Assert.That(player.GetComponent("PowerSuitController"), Is.Not.Null);
+            Component suitController = player.GetComponent("PowerSuitController");
+            Assert.That(suitController, Is.Not.Null);
+
+            SerializedObject controllerSettings = new SerializedObject(suitController);
+            Assert.That(
+                controllerSettings.FindProperty("aimCameraDistance").floatValue,
+                Is.EqualTo(3.4f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("aimCameraHeight").floatValue,
+                Is.EqualTo(1.5f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("aimShoulderOffset").vector3Value,
+                Is.EqualTo(new Vector3(-1.6f, 0.3f, 0f))
+            );
+            Assert.That(
+                controllerSettings.FindProperty("aimFieldOfView").floatValue,
+                Is.EqualTo(58f).Within(0.001f)
+            );
 
             Animator[] animators = player.GetComponentsInChildren<Animator>(true);
             Assert.That(animators, Has.Length.EqualTo(1));
@@ -129,6 +183,29 @@ namespace Powersuit.Tests.EditMode
                 Quaternion.Angle(animatedModel.localRotation, Quaternion.identity),
                 Is.LessThan(0.1f),
                 "The Animator root must remain unrotated beneath the facing wrapper."
+            );
+            Component rootLock = animatedModel.GetComponent("PowerSuitAnimatorRootLock");
+            Assert.That(rootLock, Is.Not.Null);
+            Assert.That(
+                rootLock.GetType().GetProperty("HasLock")?.GetValue(rootLock),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                rootLock.GetType().GetProperty("LockedLocalPosition")
+                    ?.GetValue(rootLock),
+                Is.EqualTo(Vector3.zero)
+            );
+            Quaternion lockedRotation = (Quaternion)rootLock.GetType()
+                .GetProperty("LockedLocalRotation")
+                .GetValue(rootLock);
+            Assert.That(
+                Quaternion.Angle(lockedRotation, Quaternion.identity),
+                Is.LessThan(0.1f)
+            );
+            Assert.That(
+                rootLock.GetType().GetProperty("LockedLocalScale")
+                    ?.GetValue(rootLock),
+                Is.EqualTo(Vector3.one)
             );
 
             Component weapon = player.GetComponent("PowerSuitWeapon");
@@ -201,6 +278,17 @@ namespace Powersuit.Tests.EditMode
         private static GameObject FindRoot(Scene scene, string name)
         {
             return scene.GetRootGameObjects().FirstOrDefault(root => root.name == name);
+        }
+
+        private static bool IsLayerSafeWeaponActionPath(string path)
+        {
+            return path == "Root/Hips/Spine" ||
+                path.StartsWith("Root/Hips/Spine/") ||
+                path == "WeaponRoot" ||
+                path == "WeaponRoot/WeaponMagazine" ||
+                path.StartsWith("WeaponRoot/WeaponMagazine/") ||
+                path == "WeaponRoot/WeaponBolt" ||
+                path.StartsWith("WeaponRoot/WeaponBolt/");
         }
     }
 }

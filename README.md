@@ -22,7 +22,7 @@ Controls:
 - `Shift`: boost
 - `Esc`: release the cursor; click the Game view to capture it again
 
-The aim camera is tuned to show more of the receiver and barrel. Dedicated forward and backward aim-walk clips keep the lower body moving while the weapon remains shouldered. Pure lateral aim strafing currently uses the locomotion fallback; authored left/right strafe clips are intentionally deferred.
+The aim camera now sits on the rifle's local `-X` shoulder (`3.4 m` distance, `-1.6 m` shoulder offset, `58` degree FOV), so the receiver and barrel read beside the suit instead of through its back and helmet. Dedicated forward and backward aim-walk clips keep the lower body moving while the weapon remains shouldered. Pure lateral aim strafing currently uses the locomotion fallback; authored left/right strafe clips are intentionally deferred.
 
 The original `FlightPrototype` greybox and legacy FBXs remain available for comparison and rollback. The focused demo uses `PlayerPrototype_Generator109.prefab`; the `Generator109` Unity names are retained to preserve their existing GUIDs and references even though the nested model is now Generator 111.
 
@@ -53,7 +53,7 @@ The canonical Blender pipeline lives under `ArtSource/PoweredSuit`. Generator 11
 
 The clean Blender build passed with no automated blockers. Technical review approved all 32 required renders, and the gated FBX export SHA-256 is `1c3fb62a3d978de6d5205af5c2f04ebf143bbcd5c10bee3f26ff4e4b4ad3d814`. Unity imports it at `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx` with cameras and lights disabled.
 
-The Animator uses a locomotion base layer and a masked upper-body/weapon-action layer, so the legs can continue walking during reload and bolt cycling. A non-animated wrapper and physical muzzle adapter preserve the verified Blender-to-Unity facing and bore axes.
+The Animator uses a locomotion base layer and a masked upper-body/weapon-action layer, so the legs can continue walking during reload and bolt cycling. Unity-owned action clips contain only the approved spine, arm, magazine, bolt, and `WeaponRoot` curves. A small root lock keeps Unity's Generic Animator from leaking the FBX's `-90` degree axis pose into the imported model during an override-layer transition. The non-animated wrapper and physical muzzle adapter remain the authorities for facing and bore axes.
 
 ## Project layout
 
@@ -73,7 +73,7 @@ The editor integration commands are:
 
 The menu names retain `Generator109` for GUID continuity. The development build is written to `Builds/Windows/PoweredSuitGenerator109/PoweredSuitGenerator109.exe` and is excluded from source control.
 
-Verified on 2026-08-09 with Unity `6000.5.7f1`:
+The Generator 111 candidate was verified on 2026-08-09 with Unity `6000.5.7f1`:
 
 - C# solution compile: 0 warnings, 0 errors
 - Unity Console after verification: 0 errors
@@ -85,4 +85,13 @@ Verified on 2026-08-09 with Unity `6000.5.7f1`:
 
 The Windows build emits non-blocking shader performance warnings from Unity's AI Inference/Sentis package; it still completes successfully.
 
-Automated and technical validation are complete. The remaining release gate is a hands-on play review in `PoweredSuitAimDemo`; the exact matrix and milestone status are recorded in `ROADMAP.md`. See `Assets/Game/Documentation/PROJECT.md` for architecture and phase details.
+After hands-on review exposed a firing face-plant and opposite-shoulder camera, the Unity hotfix was verified separately:
+
+- C# solution compile: 0 warnings, 0 errors
+- draw, sheathe, reload, and bolt-cycle live Animator exercise: `0` degree imported-root rotation, `0 m` position/scale drift, and at least `1.559 m` head-to-feet clearance
+- all four generated upper-body clips: no Animator-root, `Root`, `Hips`, or lower-body bindings; action states use Write Defaults off
+- camera occlusion diagnostic: visible rifle silhouette increased from about `10%` to `35%`
+
+The expanded full Unity suites still need one rerun after the local headless-license entitlement is restored; Unity returned `com.unity.editor.headless was not found` when the stalled live runner was restarted. The prior 35/35 EditMode, 4/4 PlayMode, and development-build results remain recorded above, while the new regression assertions are checked by compilation and the direct live action exercise.
+
+The candidate's original automated and technical validation is complete; the hotfix's targeted checks pass, with its expanded full-suite rerun and hands-on play review still open. The exact matrix and milestone status are recorded in `ROADMAP.md`. See `Assets/Game/Documentation/PROJECT.md` for architecture and phase details.

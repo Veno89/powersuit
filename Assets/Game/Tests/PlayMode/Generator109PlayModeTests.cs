@@ -222,17 +222,63 @@ namespace Powersuit.Tests.PlayMode
             animator.Play("No Weapon Action", 1, 0f);
             animator.Update(0f);
 
+            Transform animatedModel = FindChild(
+                player.transform,
+                "PowerSuitModel_Generator111"
+            );
+            Transform head = FindChild(player.transform, "Head");
+            Transform leftFoot = FindChild(player.transform, "Foot.L");
+            Transform rightFoot = FindChild(player.transform, "Foot.R");
+            Assert.That(animatedModel, Is.Not.Null);
+            Assert.That(head, Is.Not.Null);
+            Assert.That(leftFoot, Is.Not.Null);
+            Assert.That(rightFoot, Is.Not.Null);
+
+            Vector3 baselineModelPosition = animatedModel.localPosition;
+            Quaternion baselineModelRotation = animatedModel.localRotation;
+            Vector3 baselineModelScale = animatedModel.localScale;
+            Assert.That(baselineModelPosition, Is.EqualTo(Vector3.zero));
+            Assert.That(
+                Quaternion.Angle(baselineModelRotation, Quaternion.identity),
+                Is.LessThan(0.1f)
+            );
+            Assert.That(baselineModelScale, Is.EqualTo(Vector3.one));
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "initial locomotion"
+            );
+
             AssertWeaponActionRoundTrip(
                 animator,
                 "DrawWeapon",
                 "Draw Weapon",
-                1.5f
+                1.5f,
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot
             );
             AssertWeaponActionRoundTrip(
                 animator,
                 "SheatheWeapon",
                 "Sheathe Weapon",
-                1.5f
+                1.5f,
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot
             );
 
             Transform lowerLeg = FindChild(player.transform, "LowerLeg.L");
@@ -244,6 +290,16 @@ namespace Powersuit.Tests.PlayMode
                 Is.True,
                 "ReloadWeapon must enter the masked Reload state."
             );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "reload entry"
+            );
             Assert.That(
                 IsInState(animator, 0, "Ready Locomotion"),
                 Is.True,
@@ -254,10 +310,30 @@ namespace Powersuit.Tests.PlayMode
                 Is.GreaterThan(0.1f),
                 "The lower leg must keep walking while the upper-body reload plays."
             );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "reload playback"
+            );
             Assert.That(
                 AdvanceUntilState(animator, 1, "No Weapon Action", 3.5f),
                 Is.True,
                 "Reload must return to No Weapon Action."
+            );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "reload exit"
             );
 
             animator.SetTrigger("CycleWeapon");
@@ -265,6 +341,16 @@ namespace Powersuit.Tests.PlayMode
                 AdvanceUntilState(animator, 1, "Bolt Cycle", 0.5f),
                 Is.True,
                 "CycleWeapon must enter the masked Bolt Cycle state."
+            );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "bolt-cycle entry"
             );
             Assert.That(
                 IsInState(animator, 0, "Ready Locomotion"),
@@ -276,10 +362,30 @@ namespace Powersuit.Tests.PlayMode
                 Is.GreaterThan(0.1f),
                 "The lower leg must keep walking while the upper-body bolt cycle plays."
             );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "bolt-cycle playback"
+            );
             Assert.That(
                 AdvanceUntilState(animator, 1, "No Weapon Action", 1.2f),
                 Is.True,
                 "Bolt Cycle must return to No Weapon Action."
+            );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                "bolt-cycle exit"
             );
 
             animator.SetBool("IsFlying", true);
@@ -306,7 +412,14 @@ namespace Powersuit.Tests.PlayMode
             Animator animator,
             string triggerName,
             string actionStateName,
-            float returnTimeout
+            float returnTimeout,
+            Transform animatedModel,
+            Vector3 baselineModelPosition,
+            Quaternion baselineModelRotation,
+            Vector3 baselineModelScale,
+            Transform head,
+            Transform leftFoot,
+            Transform rightFoot
         )
         {
             animator.SetTrigger(triggerName);
@@ -314,6 +427,16 @@ namespace Powersuit.Tests.PlayMode
                 AdvanceUntilState(animator, 1, actionStateName, 0.5f),
                 Is.True,
                 $"{triggerName} must enter {actionStateName}."
+            );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                $"{actionStateName} entry"
             );
             Assert.That(
                 AdvanceUntilState(
@@ -324,6 +447,51 @@ namespace Powersuit.Tests.PlayMode
                 ),
                 Is.True,
                 $"{actionStateName} must return to No Weapon Action."
+            );
+            AssertAnimatorRootSafe(
+                animatedModel,
+                baselineModelPosition,
+                baselineModelRotation,
+                baselineModelScale,
+                head,
+                leftFoot,
+                rightFoot,
+                $"{actionStateName} exit"
+            );
+        }
+
+        private static void AssertAnimatorRootSafe(
+            Transform animatedModel,
+            Vector3 baselinePosition,
+            Quaternion baselineRotation,
+            Vector3 baselineScale,
+            Transform head,
+            Transform leftFoot,
+            Transform rightFoot,
+            string context
+        )
+        {
+            Assert.That(
+                Vector3.Distance(animatedModel.localPosition, baselinePosition),
+                Is.LessThan(0.001f),
+                $"The Animator root moved during {context}."
+            );
+            Assert.That(
+                Quaternion.Angle(animatedModel.localRotation, baselineRotation),
+                Is.LessThan(0.1f),
+                $"The Animator root rotated during {context}."
+            );
+            Assert.That(
+                Vector3.Distance(animatedModel.localScale, baselineScale),
+                Is.LessThan(0.001f),
+                $"The Animator root scaled during {context}."
+            );
+
+            float highestFoot = Mathf.Max(leftFoot.position.y, rightFoot.position.y);
+            Assert.That(
+                head.position.y,
+                Is.GreaterThan(highestFoot + 1f),
+                $"The powered suit stopped being upright during {context}."
             );
         }
 

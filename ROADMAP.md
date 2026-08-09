@@ -17,7 +17,7 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 | Ready/stowed poses | Complete | Complete | Pending |
 | Draw/sheathe | Complete | Complete | Pending |
 | Forward/backward locomotion | Complete | Complete | Pending |
-| Aim-walk and shoulder camera | Complete for forward/backward movement | Complete | Pending |
+| Aim-walk and shoulder camera | Complete for forward/backward movement | Hotfix targeted checks complete; full-suite rerun pending | Pending |
 | Magazine reload | Complete | Complete | Pending |
 | Manual bolt cycle | Complete | Complete | Pending |
 
@@ -116,13 +116,25 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [ ] Play-check mechanical plausibility, hand contact, sight recovery, and fire/reload/draw transitions.
 - [ ] Milestone 7 accepted.
 
+## Immediate play-feedback hotfix — 2026-08-09
+
+- [x] Reproduce the firing face-plant and trace it to Unity's Generic override-layer transition applying the FBX `-90` degree axis pose to the Animator GameObject.
+- [x] Generate Unity-owned weapon-action clips that whitelist only spine/arm and `WeaponRoot`/magazine/bolt curves, with Write Defaults disabled.
+- [x] Lock the imported Animator root at its authored identity transform after animation evaluation; controller movement and the non-animated facing wrapper remain authoritative.
+- [x] Exercise Draw, Sheathe, Reload, and Bolt Cycle through the real controller graph with `0` degree root rotation, zero position/scale drift, and more than `1.55 m` head-to-feet clearance.
+- [x] Move the aim camera to the rifle's local `-X` shoulder and widen its composition to distance `3.4`, offset `(-1.6, 0.3, 0)`, and FOV `58`.
+- [x] Measure the camera change with an occlusion diagnostic: visible rifle silhouette improves from roughly `10%` to `35%` while muzzle and ocular remain on screen.
+- [ ] Rerun the expanded full EditMode and PlayMode suites after Unity's local headless entitlement is restored; the restart currently reports `com.unity.editor.headless was not found`.
+- [ ] User rechecks firing, reload, bolt cycle, and right-mouse aiming in `PoweredSuitAimDemo`.
+
 ## Final release gate
 
 - [x] Run a clean Blender build from immutable source; all 17 actions, geometry/rigidity/contact checks, and 32 required renders pass.
 - [x] Technically review and hash all 32 pose, transition, locomotion, reload, bolt, aim, and rifle views before gated export.
 - [x] Import additively while preserving legacy FBXs, prefab/controller GUIDs, and Generator 110 rollback evidence.
 - [x] Update the Animator controller in place and verify both layers and their Avatar Mask.
-- [x] Compile with 0 warnings/errors and pass the full 35-test EditMode and 4-test PlayMode suites.
+- [x] Original Generator 111 candidate compiled with 0 warnings/errors and passed the 35-test EditMode and 4-test PlayMode suites.
+- [ ] Rerun the expanded suites containing the Animator-root and camera regression assertions after the local headless-license issue is repaired.
 - [x] Produce a Windows x64 Development build.
 - [x] Update README, project architecture, controls, weapon tuning, asset provenance, and verification totals.
 - [ ] Complete the manual `PoweredSuitAimDemo` matrix: ready, stowed, draw, sheathe, W, S, aimed W/S, fire, empty fire, partial reload, empty reload, critical hit, flight regression, camera collision, and repeated state transitions.
