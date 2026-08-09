@@ -2,15 +2,16 @@
 
 ## Product concept
 
-Powersuit is a single-player third-person powered-flight action game. The target is a compact 3D sandbox where the player flies a powered suit, fights enemies, collects randomized equipment, and grows stronger. The current vertical slice includes grounded movement, powered flight, a third-person camera, over-the-shoulder aiming, projectile combat, basic enemies, combat feedback, and the approved Generator 109 suit-and-rifle model.
+Powersuit is a single-player third-person powered-flight action game. The target is a compact 3D sandbox where the player flies a powered suit, fights enemies, collects equipment, and grows stronger. The current vertical slice includes grounded movement, backpedalling, powered flight, a third-person shoulder camera, aimed locomotion, projectile combat, basic enemies, combat feedback, weapon carry transitions, finite ammunition, reload, and a manual precision-rifle bolt cycle.
 
 ## Technical architecture
 
-- Unity 6000.5.7f1 with Universal Render Pipeline 17.5.0 is the fixed editor and renderer baseline.
-- The Input System 1.20.0 is the primary input backend, with guarded legacy-input fallbacks for the prototype controls.
-- Important rules and calculations should be plain C# with Edit Mode tests where practical.
-- MonoBehaviours should adapt plain C# logic to Unity input, transforms, physics, animation, audio, and presentation.
+- Unity `6000.5.7f1` with Universal Render Pipeline `17.5.0` is the fixed editor and renderer baseline.
+- The Input System `1.20.0` is the primary input backend, with guarded legacy-input fallbacks for prototype controls.
+- Important rules and calculations are plain C# with EditMode tests where practical.
+- MonoBehaviours adapt plain C# logic to Unity input, transforms, physics, animation, audio, and presentation.
 - Scene objects hold composition and references, not large gameplay algorithms.
+- Authored weapon tuning lives in `WeaponDefinition` assets under `Content`; runtime ammo/cadence/reload/cycle rules live in the `Powersuit.Combat.Runtime` assembly.
 - Content assets and tuning data belong under `Content`; code belongs to its owning feature folder.
 - Cross-feature dependencies should point toward `Core`, not between unrelated feature modules.
 
@@ -22,37 +23,53 @@ Powersuit is a single-player third-person powered-flight action game. The target
 | `Player` | Player-domain logic and Unity adapters |
 | `Camera` | Third-person camera logic and adapters |
 | `Combat` | Damage, weapons, targeting, and combat adapters |
-| `Enemies` | Enemy-domain logic and adapters |
+| `Enemies` | Enemy-domain logic and Unity adapters |
 | `Progression` | Equipment, loot, inventory, and progression logic |
 | `World` | Sandbox geometry, encounters, and world adapters |
 | `UI` | Runtime UI and presentation adapters |
 | `Content` | Materials, prefabs, ScriptableObjects, and other authored assets |
 | `Editor` | Editor-only automation and validation utilities |
-| `Tests` | Edit Mode and Play Mode test assemblies |
+| `Tests` | EditMode and PlayMode test assemblies |
 | `Documentation` | Product, architecture, workflow, and phase records |
 
 Namespaces should begin with `Powersuit`. Editor-only code stays in an `Editor` folder or editor-only assembly. Tests are separated into `EditMode` and `PlayMode` assemblies. Preserve Unity-generated `.meta` files whenever assets are moved or renamed.
 
-## Agent operating rules
+## Animation and presentation architecture
 
-Repository-wide permanent rules are in the root `AGENTS.md`. Agents must keep gameplay logic in C#, prefer testable plain C# code, treat Unity components as adapters, avoid large visual scripting graphs, protect `.meta` files, preserve the editor version, and respect phase scope.
+- Generator 111 exports 17 exact Generic-rig clips from one Blender armature.
+- `PowerSuitController` exposes signed local velocity (`MovementX`, `MovementY`, normalized speed, backpedal, and aim-walk state) based on actual `CharacterController` motion.
+- The Animator base layer selects ready, stowed, aim, walk/backpedal, and hover locomotion.
+- A masked Weapon Actions layer owns draw, sheathe, reload, and bolt-cycle upper-body motion while leaving the legs on base locomotion.
+- `PowerSuitWeaponPresentation` is the carry-state adapter (`Ready`, `Drawing`, `Stowed`, `Sheathing`) and gates weapon use during transitions.
+- `WeaponRuntimeState` owns ammunition, cadence, reload commit, critical hits, and manual cycling. `PowerSuitWeapon` adapts it to input, projectiles, effects, HUD, and animation events.
+- Imported `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt` bones keep suit and rifle motion synchronized in the FBX.
+- A non-animated wrapper preserves the measured Blender-to-Unity facing correction after Animator evaluation. Firing originates at an axis-correct child of imported `Rifle_Muzzle`, never a floating placeholder.
 
 ## Validation workflow
 
 1. Allow Unity to import assets and confirm the Console has no compiler errors.
-2. Run Edit Mode tests.
-3. Run Play Mode tests.
-4. Open `Assets/Scenes/PoweredSuitAimDemo.unity`; verify movement, flight, shoulder aim, `PS_Aim`, rifle muzzle alignment, firing, target hits, and hit feedback.
+2. Run the complete EditMode suite.
+3. Run the complete PlayMode suite.
+4. Open `Assets/Scenes/PoweredSuitAimDemo.unity` and execute the manual matrix in the repository `ROADMAP.md`.
 5. Confirm `Assets/Scenes/FlightPrototype.unity` remains the shared Build Profile scene and still satisfies the original Phase 0 tests.
 6. Run `Tools > Powered Suit > Build Generator 109 Demo` for the focused Windows development build.
-7. Review source-control changes and confirm no generated directories, Blender working outputs, build products, or unapproved external assets are staged.
+7. Review source-control changes and confirm no Blender working outputs, build products, caches, or unapproved external assets are staged.
 
 ## Current phase status
 
-The Phase 0 project foundation and `FlightPrototype` greybox are preserved. The active prototype now adds a controllable powered suit, grounded and flight movement, camera transitions, an over-the-shoulder aiming mode, projectile combat, enemy damage/death behavior, pooled impact and muzzle feedback, hit markers, and focused Generator 109 presentation.
+The Phase 0 foundation, `FlightPrototype` greybox, legacy FBXs, and Generator 110 validation archive remain available for rollback. Generator 111 is integrated through the existing additive `Generator109`-named player prefab/demo assets so their GUIDs remain stable.
 
-Generator 109 is integrated as an additive player prefab and demo scene rather than overwriting the legacy model. Its animator controller retains the existing asset GUID and now contains Idle, Walk, Hover, and Aim states. The weapon fires from the imported `Rifle_Muzzle`, not a fixed placeholder transform. Blender sources and evidence are maintained outside `Assets`, while only approved Unity-ready artifacts enter the import tree.
+Implemented in the current candidate:
 
-## Planned next phase
+- ready/stowed rifle poses and draw/sheathe transitions
+- forward walk, backpedal, forward/backward aim-walk, and stowed locomotion
+- gait-speed matching to reduce visible skating
+- a wider over-the-shoulder composition showing more of the rifle
+- data-driven Precision Rifle tuning, finite ammunition, reload, critical hits, and manual bolt cycle
+- runtime reload/cycle timing aligned to authored magazine/bolt frames, with animation triggers kept presentation-only
+- a two-layer Animator that preserves lower-body locomotion during weapon actions
+- exact clip/importer, hierarchy, mask, axis, muzzle, runtime-state, carry-state, and scene tests
 
-The next phase should stabilize this vertical slice before expanding scope: tune movement and camera feel in play, visually inspect hand/rifle contact in Unity, add gameplay-focused tests for damage and pooling, resolve remaining prototype presentation issues, and keep progression systems deferred until the combat loop is reliable.
+Verification on 2026-08-09: Blender `PASS` with 32 reviewed renders, C# compile with 0 warnings/errors, 35/35 EditMode tests, 4/4 PlayMode tests, zero Unity Console errors after verification, and a successful Windows x64 Development build.
+
+The remaining phase gate is user play acceptance of the demo matrix. Dedicated lateral aim-strafe clips and broader inventory/arsenal systems remain deferred.

@@ -1,5 +1,5 @@
 # pyright: reportMissingImports=false
-"""Export the validated Powered Suit and four slotted Actions to Unity FBX.
+"""Export the validated Powered Suit and deterministic slotted Actions to Unity FBX.
 
 Export is intentionally blocked unless:
 - automated validation passed
@@ -36,8 +36,11 @@ from powersuit_pipeline_common import (  # noqa: E402
 )
 
 from weapon_handling_contract import (  # noqa: E402
+    COMPONENT_BOLT,
+    COMPONENT_MAGAZINE,
     assert_weapon_rigid,
     validate_weapon_contract,
+    weapon_components,
 )
 
 EXPORT_FILENAME = "powersuit_animated_with_aim.fbx"
@@ -60,6 +63,20 @@ EXPECTED_RENDER_FILES = {
     "renders/rifle_validation/rifle_front_3q_closeup.png",
     "renders/rifle_validation/rifle_rear_3q_closeup.png",
     "renders/rifle_validation/rifle_with_suit_scale.png",
+    "renders/weapon_animation_validation/ready_idle_front_3q.png",
+    "renders/weapon_animation_validation/stowed_idle_rear_3q.png",
+    "renders/weapon_animation_validation/draw_frame_010_rear_3q.png",
+    "renders/weapon_animation_validation/draw_frame_018_side.png",
+    "renders/weapon_animation_validation/sheathe_frame_021_rear_3q.png",
+    "renders/weapon_animation_validation/walk_forward_frame_009_side.png",
+    "renders/weapon_animation_validation/walk_backward_frame_009_side.png",
+    "renders/weapon_animation_validation/aim_walk_forward_frame_009_front_3q.png",
+    "renders/weapon_animation_validation/aim_walk_backward_frame_009_side.png",
+    "renders/weapon_animation_validation/reload_frame_050_magazine.png",
+    "renders/weapon_animation_validation/reload_frame_064_insert.png",
+    "renders/weapon_animation_validation/bolt_frame_012_close.png",
+    "renders/weapon_animation_validation/stowed_walk_frame_009_rear_3q.png",
+    "renders/weapon_animation_validation/stowed_hover_frame_031_rear_3q.png",
 }
 
 
@@ -94,16 +111,21 @@ def _load_and_verify_approval(root_dir: Path) -> tuple[dict, dict]:
         for relative, expected_hash in approval.get("render_sha256", {}).items()
     }
     if set(approved_hashes) != EXPECTED_RENDER_FILES:
-        raise RuntimeError("Visual approval does not cover the canonical 18-render set.")
+        raise RuntimeError("Visual approval does not cover the canonical 32-render set.")
     report_files = {
         str(relative).replace("\\", "/")
         for relative in (
             *report.get("aim_render_files", []),
             *report.get("rifle_render_files", []),
+            *report.get("weapon_animation_render_files", []),
         )
     }
-    if report_files != EXPECTED_RENDER_FILES or report.get("rifle_render_set_complete") is not True:
-        raise RuntimeError("Validation report does not describe the canonical 18-render set.")
+    if (
+        report_files != EXPECTED_RENDER_FILES
+        or report.get("rifle_render_set_complete") is not True
+        or report.get("weapon_animation_render_set_complete") is not True
+    ):
+        raise RuntimeError("Validation report does not describe the canonical 32-render set.")
     for relative, expected_hash in approved_hashes.items():
         path = root_dir / relative
         if not path.exists() or _sha256(path) != expected_hash:
@@ -118,7 +140,7 @@ def _validate_scene(armature: bpy.types.Object, rifle_root: bpy.types.Object) ->
         unexpected = sorted(action_names - set(REQUIRED_ACTIONS))
         missing = sorted(set(REQUIRED_ACTIONS) - action_names)
         raise RuntimeError(
-            "The export scene must contain exactly the four required Actions "
+            "The export scene must contain exactly the required deterministic Actions "
             f"(missing={missing}, unexpected={unexpected})."
         )
     for name in REQUIRED_ACTIONS:
@@ -135,19 +157,45 @@ def _validate_scene(armature: bpy.types.Object, rifle_root: bpy.types.Object) ->
     if (
         rifle_root.parent != armature
         or rifle_root.parent_type != "BONE"
-        or rifle_root.parent_bone != "Hand.R"
+        or rifle_root.parent_bone != "WeaponRoot"
     ):
         raise RuntimeError("RifleRoot final hierarchy is invalid.")
+    expected_articulated = {
+        obj.name: (
+            "WeaponMagazine"
+            if str(obj.get("ps_weapon_component_role", "")) == COMPONENT_MAGAZINE
+            else "WeaponBolt"
+        )
+        for obj in (
+            weapon_components(rifle_root, COMPONENT_MAGAZINE)
+            + weapon_components(rifle_root, COMPONENT_BOLT)
+        )
+    }
     direct = [
         obj.name for obj in bpy.data.objects
         if obj.parent == armature and obj.parent_type == "BONE"
         and (obj.name == "RifleRoot" or obj.name.startswith("Rifle_"))
     ]
-    if direct != ["RifleRoot"]:
-        raise RuntimeError("Only RifleRoot may be directly parented to Hand.R.")
+    if set(direct) != {"RifleRoot", *expected_articulated}:
+        raise RuntimeError(
+            "Direct weapon/control-bone hierarchy is incomplete: "
+            + ", ".join(sorted(direct))
+        )
+    bad_articulated = [
+        f"{name}->{bpy.data.objects[name].parent_bone}"
+        for name, expected_bone in expected_articulated.items()
+        if bpy.data.objects[name].parent_bone != expected_bone
+    ]
+    if bad_articulated:
+        raise RuntimeError(
+            "Articulated components use wrong control bones: "
+            + ", ".join(bad_articulated)
+        )
     stray = [
         obj.name for obj in bpy.data.objects
-        if obj.name.startswith("Rifle_") and obj.parent != rifle_root
+        if obj.name.startswith("Rifle_")
+        and obj.parent != rifle_root
+        and obj.name not in expected_articulated
     ]
     if stray:
         raise RuntimeError("Stray rifle objects: " + ", ".join(sorted(stray)))
@@ -164,6 +212,27 @@ def _validate_scene(armature: bpy.types.Object, rifle_root: bpy.types.Object) ->
         raise RuntimeError("Active IK remains: " + ", ".join(ik))
     validate_weapon_contract(rifle_root)
     assert_weapon_rigid(rifle_root)
+
+    inward = []
+    for obj in _export_objects(armature, rifle_root):
+        if obj.type != "MESH":
+            continue
+        obj.data.calc_loop_triangles()
+        signed_volume = sum(
+            obj.data.vertices[triangle.vertices[0]].co.dot(
+                obj.data.vertices[triangle.vertices[1]].co.cross(
+                    obj.data.vertices[triangle.vertices[2]].co
+                )
+            )
+            for triangle in obj.data.loop_triangles
+        ) / 6.0
+        if signed_volume <= 1.0e-9:
+            inward.append(f"{obj.name} ({signed_volume:.9g} m^3)")
+    if inward:
+        raise RuntimeError(
+            "Export meshes must be closed and outward-wound for Unity backface "
+            "culling: " + ", ".join(inward)
+        )
 
 
 def _export_objects(armature: bpy.types.Object, rifle_root: bpy.types.Object):
@@ -227,7 +296,7 @@ def main() -> None:
     armature = get_armature()
     rifle_root = get_rifle_root()
     _validate_scene(armature, rifle_root)
-    if int(rifle_root.get("ps_generator_version", 0)) < 109:
+    if int(rifle_root.get("ps_generator_version", 0)) < 111:
         raise RuntimeError("RifleRoot predates the rigid weapon-framework reset.")
     current_blend_hash = _sha256(Path(bpy.data.filepath).resolve())
     if report.get("blend_sha256_at_validation") != current_blend_hash:
@@ -255,6 +324,25 @@ def main() -> None:
         "fbx_size_bytes": export_path.stat().st_size,
         "source_blend": str(Path(bpy.data.filepath).resolve()),
         "exported_actions": list(REQUIRED_ACTIONS),
+        "action_frame_ranges": {
+            name: [
+                int(bpy.data.actions[name].frame_start),
+                int(bpy.data.actions[name].frame_end),
+            ]
+            for name in REQUIRED_ACTIONS
+        },
+        "animation_fps": int(bpy.context.scene.render.fps),
+        "gameplay_timing_markers": {
+            "reload_commit_frame": int(
+                rifle_root.get("ps_reload_commit_frame", 75)
+            ),
+            "reload_end_frame": int(
+                rifle_root.get("ps_reload_frame_end", 84)
+            ),
+            "bolt_cycle_end_frame": int(
+                rifle_root.get("ps_bolt_cycle_frame_end", 20)
+            ),
+        },
         "exported_objects": [obj.name for obj in objects],
         "validation_report_blend_sha256": report.get("blend_sha256_at_validation", ""),
         "unity_import_notes": {

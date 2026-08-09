@@ -1,5 +1,68 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3065580164923797802
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5664846398922915121}
+  m_Layer: 0
+  m_Name: WeaponMuzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5664846398922915121
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3065580164923797802}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1090241104170924233}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7186901363867503162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7563461438458007680}
+  m_Layer: 0
+  m_Name: PowerSuitVisual_Generator109
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7563461438458007680
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7186901363867503162}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.000000030908623, y: 0.7071068, z: 0.7071068, w: -0.000000030908623}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8033411728724916077}
+  m_Father: {fileID: 5983489538182920951}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1126408794865802443
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11,11 +74,15 @@ PrefabInstance:
     - target: {fileID: 4114279548440960474, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: animator
       value: 
-      objectReference: {fileID: 4954097130463571913}
+      objectReference: {fileID: 7870674555697902162}
     - target: {fileID: 4114279548440960474, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: controller
       value: 
       objectReference: {fileID: 7358886071130446257}
+    - target: {fileID: 4114279548440960474, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      propertyPath: weaponPresentation
+      value: 
+      objectReference: {fileID: 333840841786693580}
     - target: {fileID: 6676708341994137148, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -57,29 +124,33 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: aimFieldOfView
-      value: 44
+      propertyPath: walkSpeed
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: aimCameraHeight
-      value: 1.55
+      propertyPath: aimFieldOfView
+      value: 52
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimCameraDistance
-      value: 2.35
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimShoulderOffset.x
-      value: 0.75
+      value: 1.15
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimShoulderOffset.y
-      value: 0.12
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 7646132019645809869, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: muzzleTransform
       value: 
-      objectReference: {fileID: 1643477257114679169}
+      objectReference: {fileID: 5664846398922915121}
+    - target: {fileID: 7646132019645809869, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      propertyPath: weaponDefinition
+      value: 
+      objectReference: {fileID: 11400000, guid: 9c03a6581d063d04f83cf6f4afa31a91, type: 2}
     - target: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: m_Name
       value: PlayerPrototype_Generator109
@@ -93,19 +164,73 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6676708341994137148, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7563461438458007680}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 333840841786693580}
+    - targetCorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9175370816523564101}
   m_SourcePrefab: {fileID: 100100000, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
 --- !u!4 &5983489538182920951 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6676708341994137148, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
   m_PrefabInstance: {fileID: 1126408794865802443}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7178449499544889664 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+  m_PrefabInstance: {fileID: 1126408794865802443}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &333840841786693580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178449499544889664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eed51965b87b49d9bf2029f15a661f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerSuitWeaponPresentation
+  controller: {fileID: 7358886071130446257}
+  animator: {fileID: 7870674555697902162}
+  weapon: {fileID: 7331097523691493382}
+  startsStowed: 0
+  drawDuration: 1
+  sheatheDuration: 1
+--- !u!114 &9175370816523564101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178449499544889664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ae4ddbef6bee644e90ae2ab38a0196f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerSuitWeaponAnimationDriver
+  weapon: {fileID: 7331097523691493382}
+  animator: {fileID: 7870674555697902162}
+--- !u!114 &7331097523691493382 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7646132019645809869, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+  m_PrefabInstance: {fileID: 1126408794865802443}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178449499544889664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1151d6e3e503d5b4b9c83a88d067281c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerSuitWeapon
 --- !u!114 &7358886071130446257 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
   m_PrefabInstance: {fileID: 1126408794865802443}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 7178449499544889664}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 319f1ff6f039f3640be50bab33d5dcf7, type: 3}
@@ -117,7 +242,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 5983489538182920951}
+    m_TransformParent: {fileID: 7563461438458007680}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -133,7 +258,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.00000004371139
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       propertyPath: m_LocalRotation.x
@@ -141,7 +266,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       propertyPath: m_LocalRotation.z
@@ -161,34 +286,37 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       propertyPath: m_Name
-      value: PowerSuitVisual_Generator109
+      value: PowerSuitModel_Generator111
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6943769858546454434, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5664846398922915121}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4954097130463571913}
+      addedObject: {fileID: 7870674555697902162}
   m_SourcePrefab: {fileID: 100100000, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
---- !u!4 &1643477257114679169 stripped
+--- !u!4 &1090241104170924233 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 8769252552137638122, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
+  m_CorrespondingSourceObject: {fileID: 6943769858546454434, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
   m_PrefabInstance: {fileID: 8033411728724916075}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &7186901363867503162 stripped
+--- !u!1 &8033411728724916076 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
   m_PrefabInstance: {fileID: 8033411728724916075}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &4954097130463571913
+--- !u!95 &7870674555697902162
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7186901363867503162}
+  m_GameObject: {fileID: 8033411728724916076}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 663a6c30f2cf69942bd1e64ec91926bf, type: 2}
@@ -203,7 +331,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!4 &7563461438458007680 stripped
+--- !u!4 &8033411728724916077 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f48464ae4ba58b54f976e658ece758b3, type: 3}
   m_PrefabInstance: {fileID: 8033411728724916075}

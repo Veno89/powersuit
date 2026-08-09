@@ -55,7 +55,7 @@ if not exist "renders\validation_report.json" (
 )
 
 set "CONFIRM="
-set /p "CONFIRM=After inspecting all 18 validation PNGs, type APPROVE to export: "
+set /p "CONFIRM=After inspecting all 32 validation PNGs, type APPROVE to export: "
 if /I not "%CONFIRM%"=="APPROVE" (
   echo Approval cancelled. No FBX was exported.
   pause

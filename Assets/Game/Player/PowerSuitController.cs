@@ -5,8 +5,11 @@ using UnityEngine.InputSystem;
 #endif
 
 [RequireComponent(typeof(CharacterController))]
+[DefaultExecutionOrder(-200)]
 public sealed class PowerSuitController : MonoBehaviour
 {
+    private const float MovementStateThreshold = 0.01f;
+
     public bool IsFlying => isFlying;
 
     public bool IsMoving =>
@@ -15,13 +18,35 @@ public sealed class PowerSuitController : MonoBehaviour
 
     public bool IsAiming => isAiming;
 
+    /// <summary>
+    /// The controller's actual planar velocity in suit-local space, normalized
+    /// against the active movement speed. X is right/left and Y is
+    /// forward/backward. Both values are suitable for directional blend trees.
+    /// </summary>
+    public Vector2 LocalMovement => localMovement;
+
+    public float MovementX => localMovement.x;
+
+    public float MovementY => localMovement.y;
+
+    public float MovementSpeedNormalized => localMovement.magnitude;
+
+    public bool IsBackpedaling =>
+        !isFlying &&
+        MovementY < -MovementStateThreshold;
+
+    public bool IsAimWalking =>
+        !isFlying &&
+        isAiming &&
+        MovementSpeedNormalized > MovementStateThreshold;
+
     public Vector2 ReticleScreenPosition =>
         new Vector2(Screen.width * 0.5f, Screen.height * 0.5f) + currentReticleOffset;
 
     public Vector2 ReticleOffset => currentReticleOffset;
 
     [Header("Ground Movement")]
-    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float walkSpeed = 2.2f;
     [SerializeField] private float groundAcceleration = 20f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravity = -25f;
@@ -56,6 +81,7 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private Vector3 horizontalVelocity;
     private float verticalVelocity;
+    private Vector2 localMovement;
 
     private float cameraYaw;
     private float cameraPitch = 15f;
@@ -203,14 +229,16 @@ public sealed class PowerSuitController : MonoBehaviour
 
         controller.Move(movement * Time.deltaTime);
 
-        if (isAiming)
-        {
-            RotateTowardsDirection(cameraForward);
-        }
-        else
-        {
-            RotateTowardsMovement(desiredDirection);
-        }
+        Vector3 facingDirection = PowerSuitLocomotionMath.ResolveFacingDirection(
+            input,
+            desiredDirection,
+            transform.forward,
+            cameraForward,
+            isAiming
+        );
+
+        RotateTowardsMovement(facingDirection);
+        UpdateLocalMovement(walkSpeed);
     }
 
     private void HandleFlight()
@@ -262,6 +290,8 @@ public sealed class PowerSuitController : MonoBehaviour
             RotateTowardsMovement(planarDirection);
         }
 
+        UpdateLocalMovement(selectedSpeed);
+
         if (
             controller.isGrounded &&
             verticalInput < -0.1f
@@ -299,6 +329,19 @@ public sealed class PowerSuitController : MonoBehaviour
             transform.rotation,
             targetRotation,
             turningSpeed * Time.deltaTime
+        );
+    }
+
+    private void UpdateLocalMovement(float referenceSpeed)
+    {
+        Vector3 worldVelocity = controller != null
+            ? controller.velocity
+            : horizontalVelocity;
+
+        localMovement = PowerSuitLocomotionMath.ToLocalMovement(
+            transform.rotation,
+            worldVelocity,
+            referenceSpeed
         );
     }
 
@@ -730,5 +773,123 @@ public sealed class PowerSuitController : MonoBehaviour
 #else
         return Input.GetMouseButtonDown(0);
 #endif
+    }
+}
+
+/// <summary>
+/// Stateless locomotion decisions kept outside the MonoBehaviour so facing and
+/// animation inputs can be verified without running a scene.
+/// </summary>
+public static class PowerSuitLocomotionMath
+{
+    private const float DirectionEpsilon = 0.0001f;
+    private const float BackwardInputThreshold = -0.01f;
+
+    /// <summary>
+    /// Selects the heading the suit should turn toward for the current input.
+    /// Backward ground movement faces opposite its travel vector so velocity is
+    /// reliably local-backward; aim mode always follows the camera heading.
+    /// </summary>
+    public static Vector3 ResolveFacingDirection(
+        Vector2 movementInput,
+        Vector3 desiredMovementDirection,
+        Vector3 currentForward,
+        Vector3 cameraForward,
+        bool isAiming
+    )
+    {
+        if (isAiming)
+        {
+            return NormalizePlanarOrFallback(cameraForward, currentForward);
+        }
+
+        if (movementInput.y < BackwardInputThreshold)
+        {
+            return NormalizePlanarOrFallback(
+                -desiredMovementDirection,
+                currentForward
+            );
+        }
+
+        return NormalizePlanarOrFallback(desiredMovementDirection, Vector3.zero);
+    }
+
+    /// <summary>
+    /// Converts world velocity to a signed, normalized local-space blend value.
+    /// Vertical motion is ignored so jump/fall speed cannot select a walk clip.
+    /// </summary>
+    public static Vector2 ToLocalMovement(
+        Quaternion characterRotation,
+        Vector3 worldVelocity,
+        float referenceSpeed
+    )
+    {
+        if (referenceSpeed <= DirectionEpsilon)
+        {
+            return Vector2.zero;
+        }
+
+        Vector3 planarVelocity = Vector3.ProjectOnPlane(
+            worldVelocity,
+            Vector3.up
+        );
+
+        Vector3 localVelocity = Quaternion.Inverse(characterRotation) * planarVelocity;
+        Vector2 localMovement = new Vector2(
+            localVelocity.x,
+            localVelocity.z
+        ) / referenceSpeed;
+
+        return Vector2.ClampMagnitude(localMovement, 1f);
+    }
+
+    /// <summary>
+    /// Keeps the idle cycle at normal speed and increases gait cadence as
+    /// actual movement approaches its configured maximum. The Generator 111
+    /// walk has about 1.08 metres/second of planted-foot travel at 1x, so the
+    /// demo's 2.2 m/s ground speed is matched closely at the default 2x value.
+    /// </summary>
+    public static float CalculateLocomotionPlaybackSpeed(
+        float normalizedMovementSpeed,
+        float fullSpeedMultiplier
+    )
+    {
+        if (
+            float.IsNaN(normalizedMovementSpeed) ||
+            float.IsInfinity(normalizedMovementSpeed) ||
+            float.IsNaN(fullSpeedMultiplier) ||
+            float.IsInfinity(fullSpeedMultiplier) ||
+            fullSpeedMultiplier < 1f
+        )
+        {
+            throw new System.ArgumentOutOfRangeException(
+                nameof(fullSpeedMultiplier),
+                "Locomotion playback inputs must be finite and the multiplier must be at least one."
+            );
+        }
+
+        return Mathf.Lerp(
+            1f,
+            fullSpeedMultiplier,
+            Mathf.Clamp01(normalizedMovementSpeed)
+        );
+    }
+
+    private static Vector3 NormalizePlanarOrFallback(
+        Vector3 direction,
+        Vector3 fallback
+    )
+    {
+        Vector3 planarDirection = Vector3.ProjectOnPlane(direction, Vector3.up);
+
+        if (planarDirection.sqrMagnitude > DirectionEpsilon)
+        {
+            return planarDirection.normalized;
+        }
+
+        Vector3 planarFallback = Vector3.ProjectOnPlane(fallback, Vector3.up);
+        return planarFallback.sqrMagnitude > DirectionEpsilon
+            ? planarFallback.normalized
+            : Vector3.zero;
     }
 }

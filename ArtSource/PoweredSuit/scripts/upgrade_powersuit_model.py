@@ -118,13 +118,16 @@ class MeshBuilder:
             (cx - sx, cy - sy, cz + sz), (cx + sx, cy - sy, cz + sz),
             (cx + sx, cy + sy, cz + sz), (cx - sx, cy + sy, cz + sz),
         ])
+        # Counter-clockwise when viewed from outside.  The previous ordering
+        # pointed every normal into the box, which Blender's permissive
+        # viewport hid but Unity's backface culling exposed as hollow armor.
         self.faces.extend([
-            (base + 0, base + 1, base + 2, base + 3),
-            (base + 4, base + 7, base + 6, base + 5),
-            (base + 0, base + 4, base + 5, base + 1),
-            (base + 1, base + 5, base + 6, base + 2),
-            (base + 2, base + 6, base + 7, base + 3),
-            (base + 4, base + 0, base + 3, base + 7),
+            (base + 3, base + 2, base + 1, base + 0),
+            (base + 5, base + 6, base + 7, base + 4),
+            (base + 1, base + 5, base + 4, base + 0),
+            (base + 2, base + 6, base + 5, base + 1),
+            (base + 3, base + 7, base + 6, base + 2),
+            (base + 7, base + 3, base + 0, base + 4),
         ])
 
     def add_cylinder(self, center, radius: float, length: float, *, axis: str = "Z", sides: int = 12):
@@ -143,11 +146,19 @@ class MeshBuilder:
                 self.verts.extend([(cx - half, cy + a, cz + b), (cx + half, cy + a, cz + b)])
             else:
                 raise ValueError(axis)
+        cylinder_faces = []
         for index in range(sides):
             nxt = (index + 1) % sides
-            self.faces.append((base + index * 2, base + nxt * 2, base + nxt * 2 + 1, base + index * 2 + 1))
-        self.faces.append(tuple(base + index * 2 for index in reversed(range(sides))))
-        self.faces.append(tuple(base + index * 2 + 1 for index in range(sides)))
+            cylinder_faces.append(
+                (base + index * 2, base + nxt * 2, base + nxt * 2 + 1, base + index * 2 + 1)
+            )
+        cylinder_faces.append(tuple(base + index * 2 for index in reversed(range(sides))))
+        cylinder_faces.append(tuple(base + index * 2 + 1 for index in range(sides)))
+        # The X/Z parameterizations already produce outward winding.  With Y
+        # as the cylinder axis, the same ring order points every face inward.
+        if axis == "Y":
+            cylinder_faces = [tuple(reversed(face)) for face in cylinder_faces]
+        self.faces.extend(cylinder_faces)
 
     def apply(self, obj: bpy.types.Object) -> None:
         mesh = obj.data

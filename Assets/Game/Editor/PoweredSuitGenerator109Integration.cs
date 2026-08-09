@@ -9,6 +9,7 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Powersuit.Combat;
 
 namespace Powersuit.Editor
 {
@@ -19,6 +20,9 @@ namespace Powersuit.Editor
 
         public const string ControllerPath =
             "Assets/Game/Animation/PowerSuitAnimator.controller";
+
+        public const string UpperBodyMaskPath =
+            "Assets/Game/Animation/PowerSuitUpperBody.mask";
 
         public const string BasePlayerPrefabPath =
             "Assets/Game/Prefab/Player/PlayerPrototype.prefab";
@@ -35,19 +39,59 @@ namespace Powersuit.Editor
         private const string EnemyPrefabPath =
             "Assets/Game/Prefab/Enemies/EnemyPrototype.prefab";
 
-        // The authored Blender asset uses +Y as weapon/character forward. The
-        // standard Blender-to-Unity FBX conversion otherwise leaves the visual
-        // facing opposite the Unity player root's +Z gameplay forward.
+        private const string PrecisionRifleDefinitionPath =
+            "Assets/Game/Content/Weapons/PrecisionRifle.asset";
+
+        // Generator 111's carrier-bone FBX imports Blender up as Unity -Z and
+        // Blender forward as Unity +Y. Correct both axes on a wrapper above the
+        // Animator, because animation evaluation writes the model root itself.
         private static readonly Quaternion ModelFacingCorrection =
+            Quaternion.AngleAxis(90f, Vector3.right) *
             Quaternion.Euler(0f, 180f, 0f);
+
+        // The imported rifle preserves its physical bore as local +Y, while
+        // gameplay effects expect Transform.forward (+Z).
+        private static readonly Quaternion MuzzleAdapterRotation =
+            Quaternion.Euler(-90f, 0f, 0f);
 
         private static readonly string[] RequiredClips =
         {
             "PS_Idle",
             "PS_Walk",
             "PS_Hover",
-            "PS_Aim"
+            "PS_Aim",
+            "PS_WeaponReady_Idle",
+            "PS_WeaponStowed_Idle",
+            "PS_Weapon_Draw",
+            "PS_Weapon_Sheathe",
+            "PS_Walk_Forward",
+            "PS_Walk_Backward",
+            "PS_Aim_Walk_Forward",
+            "PS_Aim_Walk_Backward",
+            "PS_WeaponStowed_Walk_Forward",
+            "PS_WeaponStowed_Walk_Backward",
+            "PS_WeaponStowed_Hover",
+            "PS_Reload",
+            "PS_BoltCycle"
         };
+
+        private static readonly HashSet<string> LoopingClips =
+            new HashSet<string>(StringComparer.Ordinal)
+            {
+                "PS_Idle",
+                "PS_Walk",
+                "PS_Hover",
+                "PS_Aim",
+                "PS_WeaponReady_Idle",
+                "PS_WeaponStowed_Idle",
+                "PS_Walk_Forward",
+                "PS_Walk_Backward",
+                "PS_Aim_Walk_Forward",
+                "PS_Aim_Walk_Backward",
+                "PS_WeaponStowed_Walk_Forward",
+                "PS_WeaponStowed_Walk_Backward",
+                "PS_WeaponStowed_Hover"
+            };
 
         [MenuItem("Tools/Powered Suit/Integrate Generator 109")]
         public static void IntegrateFromMenu()
@@ -106,6 +150,7 @@ namespace Powersuit.Editor
             }
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ConfigurePrecisionRifleDefinition();
             ConfigureModelImporter();
             Dictionary<string, AnimationClip> clips = LoadRequiredClips();
             AnimatorController controller = UpdateAnimatorController(clips);
@@ -191,8 +236,11 @@ namespace Powersuit.Editor
             {
                 ModelImporterClipAnimation clip = defaults.FirstOrDefault(
                     candidate =>
-                        candidate.name.IndexOf(requiredName, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        candidate.takeName.IndexOf(requiredName, StringComparison.OrdinalIgnoreCase) >= 0
+                        !configured.Contains(candidate) &&
+                        (
+                            MatchesImportedClipName(candidate.name, requiredName) ||
+                            MatchesImportedClipName(candidate.takeName, requiredName)
+                        )
                 );
 
                 if (clip == null)
@@ -208,8 +256,9 @@ namespace Powersuit.Editor
                 }
 
                 clip.name = requiredName;
-                clip.loopTime = true;
-                clip.loopPose = true;
+                bool shouldLoop = LoopingClips.Contains(requiredName);
+                clip.loopTime = shouldLoop;
+                clip.loopPose = shouldLoop;
                 clip.keepOriginalOrientation = true;
                 clip.keepOriginalPositionY = true;
                 clip.keepOriginalPositionXZ = true;
@@ -221,6 +270,72 @@ namespace Powersuit.Editor
 
             importer.clipAnimations = configured.ToArray();
             importer.SaveAndReimport();
+        }
+
+        private static void ConfigurePrecisionRifleDefinition()
+        {
+            WeaponDefinition definition =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    PrecisionRifleDefinitionPath
+                );
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<WeaponDefinition>();
+                AssetDatabase.CreateAsset(definition, PrecisionRifleDefinitionPath);
+            }
+
+            SerializedObject serialized = new SerializedObject(definition);
+            SetString(serialized, "weaponId", "precision-rifle");
+            SetString(serialized, "displayName", "Precision Rifle");
+            SetEnum(serialized, "weaponClass", 1); // PrecisionRifle
+            SetEnum(serialized, "triggerMode", 0); // SemiAutomatic
+            SetFloat(serialized, "baseDamage", 60f);
+            SetFloat(serialized, "roundsPerMinute", 45f);
+            SetFloat(serialized, "criticalChance", 0.1f);
+            SetFloat(serialized, "criticalDamageMultiplier", 2f);
+            SetInt(serialized, "magazineCapacity", 5);
+            SetInt(serialized, "startingReserveAmmo", 25);
+            SetInt(serialized, "maximumReserveAmmo", 50);
+            SetFloat(serialized, "reloadDurationSeconds", 2.8f);
+            SetFloat(serialized, "reloadCommitNormalizedTime", 0.89f);
+            SetBool(serialized, "requiresManualCycle", true);
+            SetFloat(serialized, "manualCycleDurationSeconds", 0.67f);
+            SetFloat(serialized, "projectileSpeed", 100f);
+            SetFloat(serialized, "projectileLifetimeSeconds", 4f);
+            SetFloat(serialized, "projectileRadius", 0.15f);
+            SetFloat(serialized, "aimSpreadDegrees", 0.15f);
+            SetFloat(serialized, "hipSpreadDegrees", 1.25f);
+            SetFloat(serialized, "aimRecoilPitch", 0.9f);
+            SetFloat(serialized, "aimRecoilYaw", 0.25f);
+            SetFloat(serialized, "hipRecoilPitch", 1.6f);
+            SetFloat(serialized, "hipRecoilYaw", 0.5f);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(definition);
+            AssetDatabase.SaveAssets();
+        }
+
+        private static bool MatchesImportedClipName(
+            string importedName,
+            string requiredName
+        )
+        {
+            if (string.Equals(
+                importedName,
+                requiredName,
+                StringComparison.OrdinalIgnoreCase
+            ))
+            {
+                return true;
+            }
+
+            return importedName.EndsWith(
+                    "|" + requiredName,
+                    StringComparison.OrdinalIgnoreCase
+                ) ||
+                importedName.EndsWith(
+                    ":" + requiredName,
+                    StringComparison.OrdinalIgnoreCase
+                );
         }
 
         private static Dictionary<string, AnimationClip> LoadRequiredClips()
@@ -271,6 +386,24 @@ namespace Powersuit.Editor
             controller.AddParameter("IsMoving", AnimatorControllerParameterType.Bool);
             controller.AddParameter("IsFlying", AnimatorControllerParameterType.Bool);
             controller.AddParameter("IsAiming", AnimatorControllerParameterType.Bool);
+            controller.AddParameter("MovementX", AnimatorControllerParameterType.Float);
+            controller.AddParameter("MovementY", AnimatorControllerParameterType.Float);
+            controller.AddParameter("MovementSpeed", AnimatorControllerParameterType.Float);
+            controller.AddParameter(
+                new AnimatorControllerParameter
+                {
+                    name = "LocomotionPlaybackSpeed",
+                    type = AnimatorControllerParameterType.Float,
+                    defaultFloat = 1f
+                }
+            );
+            controller.AddParameter("IsBackpedaling", AnimatorControllerParameterType.Bool);
+            controller.AddParameter("IsAimWalking", AnimatorControllerParameterType.Bool);
+            controller.AddParameter("WeaponStowed", AnimatorControllerParameterType.Bool);
+            controller.AddParameter("DrawWeapon", AnimatorControllerParameterType.Trigger);
+            controller.AddParameter("SheatheWeapon", AnimatorControllerParameterType.Trigger);
+            controller.AddParameter("ReloadWeapon", AnimatorControllerParameterType.Trigger);
+            controller.AddParameter("CycleWeapon", AnimatorControllerParameterType.Trigger);
 
             AnimatorControllerLayer[] layers = controller.layers;
             if (layers.Length == 0)
@@ -278,6 +411,12 @@ namespace Powersuit.Editor
                 controller.AddLayer("Base Layer");
                 layers = controller.layers;
             }
+
+            for (int index = controller.layers.Length - 1; index >= 1; index--)
+            {
+                controller.RemoveLayer(index);
+            }
+            layers = controller.layers;
 
             AnimatorStateMachine stateMachine = layers[0].stateMachine;
             foreach (ChildAnimatorState child in stateMachine.states.ToArray())
@@ -295,48 +434,294 @@ namespace Powersuit.Editor
                 stateMachine.RemoveAnyStateTransition(transition);
             }
 
-            AnimatorState idle = AddState(stateMachine, "Idle", clips["PS_Idle"], new Vector3(260f, 40f));
-            AnimatorState walk = AddState(stateMachine, "Walk", clips["PS_Walk"], new Vector3(520f, 40f));
-            AnimatorState hover = AddState(stateMachine, "Hover", clips["PS_Hover"], new Vector3(520f, 160f));
-            AnimatorState aim = AddState(stateMachine, "Aim", clips["PS_Aim"], new Vector3(260f, 240f));
-            stateMachine.defaultState = idle;
+            foreach (
+                BlendTree staleTree in AssetDatabase
+                    .LoadAllAssetsAtPath(ControllerPath)
+                    .OfType<BlendTree>()
+                    .ToArray()
+            )
+            {
+                UnityEngine.Object.DestroyImmediate(staleTree, true);
+            }
 
-            AddTransition(idle, walk, Condition("IsMoving", true), Condition("IsFlying", false));
-            AddTransition(idle, hover, Condition("IsFlying", true));
-            AddTransition(walk, idle, Condition("IsMoving", false), Condition("IsFlying", false));
-            AddTransition(walk, hover, Condition("IsFlying", true));
-            AddTransition(hover, idle, Condition("IsFlying", false), Condition("IsMoving", false));
-            AddTransition(hover, walk, Condition("IsFlying", false), Condition("IsMoving", true));
+            foreach (
+                AnimatorStateMachine staleMachine in AssetDatabase
+                    .LoadAllAssetsAtPath(ControllerPath)
+                    .OfType<AnimatorStateMachine>()
+                    .Where(machine => machine != stateMachine)
+                    .ToArray()
+            )
+            {
+                UnityEngine.Object.DestroyImmediate(staleMachine, true);
+            }
 
-            AnimatorStateTransition aimTransition = stateMachine.AddAnyStateTransition(aim);
-            ConfigureTransition(aimTransition);
-            aimTransition.canTransitionToSelf = false;
-            aimTransition.AddCondition(AnimatorConditionMode.If, 0f, "IsAiming");
+            BlendTree readyLocomotion = CreateDirectionalBlendTree(
+                controller,
+                "Ready Locomotion Blend",
+                clips["PS_Walk_Backward"],
+                clips["PS_WeaponReady_Idle"],
+                clips["PS_Walk_Forward"]
+            );
+            BlendTree stowedLocomotion = CreateDirectionalBlendTree(
+                controller,
+                "Stowed Locomotion Blend",
+                clips["PS_WeaponStowed_Walk_Backward"],
+                clips["PS_WeaponStowed_Idle"],
+                clips["PS_WeaponStowed_Walk_Forward"]
+            );
+            BlendTree aimLocomotion = CreateDirectionalBlendTree(
+                controller,
+                "Aim Locomotion Blend",
+                clips["PS_Aim_Walk_Backward"],
+                clips["PS_Aim"],
+                clips["PS_Aim_Walk_Forward"]
+            );
+
+            AnimatorState ready = AddState(
+                stateMachine,
+                "Ready Locomotion",
+                readyLocomotion,
+                new Vector3(220f, 40f)
+            );
+            AnimatorState stowed = AddState(
+                stateMachine,
+                "Stowed Locomotion",
+                stowedLocomotion,
+                new Vector3(220f, 320f)
+            );
+            AnimatorState aim = AddState(
+                stateMachine,
+                "Aim Locomotion",
+                aimLocomotion,
+                new Vector3(500f, 40f)
+            );
+            AnimatorState hover = AddState(
+                stateMachine,
+                "Hover",
+                clips["PS_Hover"],
+                new Vector3(500f, 320f)
+            );
+            AnimatorState stowedHover = AddState(
+                stateMachine,
+                "Stowed Hover",
+                clips["PS_WeaponStowed_Hover"],
+                new Vector3(500f, 460f)
+            );
+            foreach (AnimatorState locomotionState in new[] { ready, stowed, aim })
+            {
+                locomotionState.speedParameterActive = true;
+                locomotionState.speedParameter = "LocomotionPlaybackSpeed";
+            }
+            stateMachine.defaultState = ready;
 
             AddTransition(
+                ready,
                 aim,
-                idle,
-                Condition("IsAiming", false),
-                Condition("IsFlying", false),
-                Condition("IsMoving", false)
+                Condition("IsAiming", true),
+                Condition("IsFlying", false)
             );
             AddTransition(
                 aim,
-                walk,
+                ready,
                 Condition("IsAiming", false),
-                Condition("IsFlying", false),
-                Condition("IsMoving", true)
+                Condition("IsFlying", false)
             );
             AddTransition(
-                aim,
+                ready,
+                stowed,
+                Condition("WeaponStowed", true),
+                Condition("IsFlying", false)
+            );
+            AddTransition(
+                stowed,
+                ready,
+                Condition("WeaponStowed", false),
+                Condition("IsFlying", false)
+            );
+
+            AddTransition(ready, hover, Condition("IsFlying", true));
+            AddTransition(aim, hover, Condition("IsFlying", true));
+            AddTransition(stowed, stowedHover, Condition("IsFlying", true));
+            AddTransition(
                 hover,
-                Condition("IsAiming", false),
-                Condition("IsFlying", true)
+                stowedHover,
+                Condition("IsFlying", true),
+                Condition("WeaponStowed", true)
             );
+            AddTransition(
+                stowedHover,
+                hover,
+                Condition("IsFlying", true),
+                Condition("WeaponStowed", false)
+            );
+            AddTransition(
+                hover,
+                stowed,
+                Condition("IsFlying", false),
+                Condition("WeaponStowed", true)
+            );
+            AddTransition(
+                hover,
+                aim,
+                Condition("IsFlying", false),
+                Condition("WeaponStowed", false),
+                Condition("IsAiming", true)
+            );
+            AddTransition(
+                hover,
+                ready,
+                Condition("IsFlying", false),
+                Condition("WeaponStowed", false),
+                Condition("IsAiming", false)
+            );
+            AddTransition(
+                stowedHover,
+                stowed,
+                Condition("IsFlying", false)
+            );
+
+            AvatarMask upperBodyMask = CreateOrUpdateUpperBodyMask();
+            AnimatorStateMachine weaponStateMachine = new AnimatorStateMachine
+            {
+                name = "Weapon Action State Machine",
+                hideFlags = HideFlags.HideInHierarchy
+            };
+            AssetDatabase.AddObjectToAsset(weaponStateMachine, controller);
+            AnimatorControllerLayer weaponLayer = new AnimatorControllerLayer
+            {
+                name = "Weapon Actions",
+                defaultWeight = 1f,
+                avatarMask = upperBodyMask,
+                blendingMode = AnimatorLayerBlendingMode.Override,
+                stateMachine = weaponStateMachine
+            };
+            controller.AddLayer(weaponLayer);
+
+            AnimatorState empty = AddState(
+                weaponStateMachine,
+                "No Weapon Action",
+                null,
+                new Vector3(100f, 100f)
+            );
+            empty.writeDefaultValues = false;
+            AnimatorState draw = AddState(
+                weaponStateMachine,
+                "Draw Weapon",
+                clips["PS_Weapon_Draw"],
+                new Vector3(360f, 20f)
+            );
+            AnimatorState sheathe = AddState(
+                weaponStateMachine,
+                "Sheathe Weapon",
+                clips["PS_Weapon_Sheathe"],
+                new Vector3(360f, 120f)
+            );
+            AnimatorState reload = AddState(
+                weaponStateMachine,
+                "Reload",
+                clips["PS_Reload"],
+                new Vector3(360f, 220f)
+            );
+            AnimatorState cycle = AddState(
+                weaponStateMachine,
+                "Bolt Cycle",
+                clips["PS_BoltCycle"],
+                new Vector3(360f, 320f)
+            );
+            weaponStateMachine.defaultState = empty;
+            AddAnyStateTrigger(weaponStateMachine, draw, "DrawWeapon");
+            AddAnyStateTrigger(weaponStateMachine, sheathe, "SheatheWeapon");
+            AddAnyStateTrigger(weaponStateMachine, reload, "ReloadWeapon");
+            AddAnyStateTrigger(weaponStateMachine, cycle, "CycleWeapon");
+            AddExitTransition(draw, empty);
+            AddExitTransition(sheathe, empty);
+            AddExitTransition(reload, empty);
+            AddExitTransition(cycle, empty);
 
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
             return controller;
+        }
+
+        private static BlendTree CreateDirectionalBlendTree(
+            AnimatorController controller,
+            string name,
+            Motion backward,
+            Motion idle,
+            Motion forward
+        )
+        {
+            BlendTree tree = new BlendTree
+            {
+                name = name,
+                blendType = BlendTreeType.Simple1D,
+                blendParameter = "MovementY",
+                useAutomaticThresholds = false,
+                hideFlags = HideFlags.HideInHierarchy
+            };
+            tree.AddChild(backward, -1f);
+            tree.AddChild(idle, 0f);
+            tree.AddChild(forward, 1f);
+            AssetDatabase.AddObjectToAsset(tree, controller);
+            return tree;
+        }
+
+        private static AvatarMask CreateOrUpdateUpperBodyMask()
+        {
+            AvatarMask mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(
+                UpperBodyMaskPath
+            );
+            if (mask == null)
+            {
+                mask = new AvatarMask
+                {
+                    name = "PowerSuitUpperBody"
+                };
+                AssetDatabase.CreateAsset(mask, UpperBodyMaskPath);
+            }
+
+            GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
+            if (model == null)
+            {
+                throw new InvalidOperationException(
+                    "Cannot build the upper-body mask without the powered-suit model."
+                );
+            }
+
+            mask.transformCount = 0;
+            mask.AddTransformPath(model.transform, true);
+            for (int index = 0; index < mask.transformCount; index++)
+            {
+                mask.SetTransformActive(
+                    index,
+                    IsUpperBodyAnimationPath(mask.GetTransformPath(index))
+                );
+            }
+
+            EditorUtility.SetDirty(mask);
+            return mask;
+        }
+
+        private static bool IsUpperBodyAnimationPath(string path)
+        {
+            string leaf = path;
+            int separator = leaf.LastIndexOf('/');
+            if (separator >= 0)
+            {
+                leaf = leaf.Substring(separator + 1);
+            }
+
+            return leaf == "Spine" ||
+                leaf == "Chest" ||
+                leaf == "Neck" ||
+                leaf == "Head" ||
+                leaf.StartsWith("Shoulder.", StringComparison.Ordinal) ||
+                leaf.StartsWith("UpperArm.", StringComparison.Ordinal) ||
+                leaf.StartsWith("LowerArm.", StringComparison.Ordinal) ||
+                leaf.StartsWith("Hand.", StringComparison.Ordinal) ||
+                leaf == "WeaponRoot" ||
+                leaf == "WeaponMagazine" ||
+                leaf == "WeaponBolt";
         }
 
         private static AnimatorState AddState(
@@ -373,6 +758,45 @@ namespace Powersuit.Editor
             foreach (AnimatorCondition condition in conditions)
             {
                 transition.AddCondition(condition.mode, condition.threshold, condition.parameter);
+            }
+        }
+
+        private static void AddAnyStateTrigger(
+            AnimatorStateMachine stateMachine,
+            AnimatorState destination,
+            string triggerName
+        )
+        {
+            AnimatorStateTransition transition =
+                stateMachine.AddAnyStateTransition(destination);
+            ConfigureTransition(transition);
+            transition.canTransitionToSelf = false;
+            transition.AddCondition(
+                AnimatorConditionMode.If,
+                0f,
+                triggerName
+            );
+        }
+
+        private static void AddExitTransition(
+            AnimatorState source,
+            AnimatorState destination,
+            params AnimatorCondition[] conditions
+        )
+        {
+            AnimatorStateTransition transition = source.AddTransition(destination);
+            transition.hasExitTime = true;
+            transition.exitTime = 1f;
+            transition.hasFixedDuration = true;
+            transition.duration = 0.02f;
+            transition.interruptionSource = TransitionInterruptionSource.None;
+            foreach (AnimatorCondition condition in conditions)
+            {
+                transition.AddCondition(
+                    condition.mode,
+                    condition.threshold,
+                    condition.parameter
+                );
             }
         }
 
@@ -414,16 +838,22 @@ namespace Powersuit.Editor
                 instance.name = "PlayerPrototype_Generator109";
                 RemoveLegacyVisuals(instance.transform);
 
+                GameObject visualWrapper = new GameObject("PowerSuitVisual_Generator109");
+                visualWrapper.transform.SetParent(instance.transform, false);
+                visualWrapper.transform.localPosition = Vector3.zero;
+                visualWrapper.transform.localRotation = ModelFacingCorrection;
+                visualWrapper.transform.localScale = Vector3.one;
+
                 GameObject modelInstance =
-                    PrefabUtility.InstantiatePrefab(modelPrefab, instance.transform) as GameObject;
+                    PrefabUtility.InstantiatePrefab(modelPrefab, visualWrapper.transform) as GameObject;
                 if (modelInstance == null)
                 {
                     throw new InvalidOperationException("Could not instantiate the Generator 109 FBX.");
                 }
 
-                modelInstance.name = "PowerSuitVisual_Generator109";
+                modelInstance.name = "PowerSuitModel_Generator111";
                 modelInstance.transform.localPosition = Vector3.zero;
-                modelInstance.transform.localRotation = ModelFacingCorrection;
+                modelInstance.transform.localRotation = Quaternion.identity;
                 modelInstance.transform.localScale = Vector3.one;
                 modelInstance.SetActive(true);
 
@@ -438,10 +868,11 @@ namespace Powersuit.Editor
                 animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
                 Transform muzzle = FindChildRecursive(modelInstance.transform, "Rifle_Muzzle");
-                if (muzzle == null)
+                Transform rifleRoot = FindChildRecursive(modelInstance.transform, "RifleRoot");
+                if (muzzle == null || rifleRoot == null)
                 {
                     throw new InvalidOperationException(
-                        "The imported Generator 109 hierarchy does not expose Rifle_Muzzle."
+                        "The imported Generator 111 hierarchy does not expose RifleRoot/Rifle_Muzzle."
                     );
                 }
 
@@ -458,12 +889,54 @@ namespace Powersuit.Editor
                 }
 
                 ConfigureAimCamera(suitController);
-                weapon.MuzzleTransform = muzzle;
+                weapon.MuzzleTransform = CreateMuzzleAdapter(muzzle);
+                WeaponDefinition weaponDefinition =
+                    AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                        PrecisionRifleDefinitionPath
+                    );
+                if (weaponDefinition == null)
+                {
+                    throw new InvalidOperationException(
+                        "The Precision Rifle WeaponDefinition is missing."
+                    );
+                }
+                weapon.Definition = weaponDefinition;
+
+                PowerSuitWeaponPresentation presentation =
+                    instance.GetComponent<PowerSuitWeaponPresentation>();
+                if (presentation == null)
+                {
+                    presentation = instance.AddComponent<PowerSuitWeaponPresentation>();
+                }
+
+                PowerSuitWeaponAnimationDriver weaponAnimationDriver =
+                    instance.GetComponent<PowerSuitWeaponAnimationDriver>();
+                if (weaponAnimationDriver == null)
+                {
+                    weaponAnimationDriver =
+                        instance.AddComponent<PowerSuitWeaponAnimationDriver>();
+                }
 
                 SerializedObject driverObject = new SerializedObject(animationDriver);
                 driverObject.FindProperty("controller").objectReferenceValue = suitController;
                 driverObject.FindProperty("animator").objectReferenceValue = animator;
+                driverObject.FindProperty("weaponPresentation").objectReferenceValue = presentation;
                 driverObject.ApplyModifiedPropertiesWithoutUndo();
+
+                SerializedObject presentationObject = new SerializedObject(presentation);
+                presentationObject.FindProperty("controller").objectReferenceValue = suitController;
+                presentationObject.FindProperty("animator").objectReferenceValue = animator;
+                presentationObject.FindProperty("weapon").objectReferenceValue = weapon;
+                presentationObject.FindProperty("startsStowed").boolValue = false;
+                presentationObject.FindProperty("drawDuration").floatValue = 1f;
+                presentationObject.FindProperty("sheatheDuration").floatValue = 1f;
+                presentationObject.ApplyModifiedPropertiesWithoutUndo();
+
+                SerializedObject weaponAnimationObject =
+                    new SerializedObject(weaponAnimationDriver);
+                weaponAnimationObject.FindProperty("weapon").objectReferenceValue = weapon;
+                weaponAnimationObject.FindProperty("animator").objectReferenceValue = animator;
+                weaponAnimationObject.ApplyModifiedPropertiesWithoutUndo();
 
                 if (instance.GetComponent<ReticleHitMarker>() == null)
                 {
@@ -507,13 +980,24 @@ namespace Powersuit.Editor
             }
         }
 
+        private static Transform CreateMuzzleAdapter(Transform importedMuzzle)
+        {
+            GameObject adapter = new GameObject("WeaponMuzzle");
+            adapter.transform.SetParent(importedMuzzle, false);
+            adapter.transform.localPosition = Vector3.zero;
+            adapter.transform.localRotation = MuzzleAdapterRotation;
+            adapter.transform.localScale = Vector3.one;
+            return adapter.transform;
+        }
+
         private static void ConfigureAimCamera(PowerSuitController controller)
         {
             SerializedObject serialized = new SerializedObject(controller);
-            SetFloat(serialized, "aimCameraDistance", 2.35f);
-            SetFloat(serialized, "aimCameraHeight", 1.55f);
-            SetVector(serialized, "aimShoulderOffset", new Vector3(0.75f, 0.12f, 0f));
-            SetFloat(serialized, "aimFieldOfView", 44f);
+            SetFloat(serialized, "walkSpeed", 2.2f);
+            SetFloat(serialized, "aimCameraDistance", 3.0f);
+            SetFloat(serialized, "aimCameraHeight", 1.5f);
+            SetVector(serialized, "aimShoulderOffset", new Vector3(1.15f, 0.05f, 0f));
+            SetFloat(serialized, "aimFieldOfView", 52f);
             SetFloat(serialized, "aimTransitionSpeed", 12f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -526,6 +1010,62 @@ namespace Powersuit.Editor
                 throw new InvalidOperationException($"Missing serialized property: {propertyName}");
             }
             property.floatValue = value;
+        }
+
+        private static void SetInt(
+            SerializedObject serialized,
+            string propertyName,
+            int value
+        )
+        {
+            SerializedProperty property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException($"Missing serialized property: {propertyName}");
+            }
+            property.intValue = value;
+        }
+
+        private static void SetEnum(
+            SerializedObject serialized,
+            string propertyName,
+            int value
+        )
+        {
+            SerializedProperty property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException($"Missing serialized property: {propertyName}");
+            }
+            property.enumValueIndex = value;
+        }
+
+        private static void SetBool(
+            SerializedObject serialized,
+            string propertyName,
+            bool value
+        )
+        {
+            SerializedProperty property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException($"Missing serialized property: {propertyName}");
+            }
+            property.boolValue = value;
+        }
+
+        private static void SetString(
+            SerializedObject serialized,
+            string propertyName,
+            string value
+        )
+        {
+            SerializedProperty property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException($"Missing serialized property: {propertyName}");
+            }
+            property.stringValue = value;
         }
 
         private static void SetVector(
@@ -710,12 +1250,97 @@ namespace Powersuit.Editor
                 throw new InvalidOperationException("PowerSuitAnimator controller is missing.");
             }
 
-            HashSet<string> stateNames = controller.layers[0].stateMachine.states
+            HashSet<string> stateNames = controller.layers
+                .SelectMany(layer => layer.stateMachine.states)
                 .Select(child => child.state.name)
                 .ToHashSet();
-            if (!new[] { "Idle", "Walk", "Hover", "Aim" }.All(stateNames.Contains))
+            string[] requiredStates =
             {
-                throw new InvalidOperationException("PowerSuitAnimator is missing the Aim state.");
+                "Ready Locomotion",
+                "Stowed Locomotion",
+                "Aim Locomotion",
+                "Hover",
+                "Stowed Hover",
+                "Draw Weapon",
+                "Sheathe Weapon",
+                "Reload",
+                "Bolt Cycle"
+            };
+            if (!requiredStates.All(stateNames.Contains))
+            {
+                throw new InvalidOperationException(
+                    "PowerSuitAnimator is missing one or more combat-animation states."
+                );
+            }
+
+            if (
+                controller.layers.Length != 2 ||
+                controller.layers[1].avatarMask == null ||
+                controller.layers[1].name != "Weapon Actions"
+            )
+            {
+                throw new InvalidOperationException(
+                    "PowerSuitAnimator weapon actions must use the masked upper-body layer."
+                );
+            }
+
+            AvatarMask weaponMask = controller.layers[1].avatarMask;
+            string[] requiredActiveMaskLeaves =
+            {
+                "UpperArm.L",
+                "LowerArm.L",
+                "Hand.L",
+                "UpperArm.R",
+                "LowerArm.R",
+                "Hand.R",
+                "WeaponRoot",
+                "WeaponMagazine",
+                "WeaponBolt"
+            };
+            string[] requiredInactiveMaskLeaves =
+            {
+                "Hips",
+                "Pelvis",
+                "UpperLeg.L",
+                "UpperLeg.R"
+            };
+            if (
+                requiredActiveMaskLeaves.Any(
+                    leaf => !MaskContainsLeaf(weaponMask, leaf, true)
+                ) ||
+                requiredInactiveMaskLeaves.Any(
+                    leaf => !MaskContainsLeaf(weaponMask, leaf, false)
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    "PowerSuit upper-body mask does not preserve the required " +
+                    "weapon/arm controls and lower-body locomotion split."
+                );
+            }
+
+            HashSet<string> parameterNames = controller.parameters
+                .Select(parameter => parameter.name)
+                .ToHashSet();
+            string[] requiredParameters =
+            {
+                "MovementX",
+                "MovementY",
+                "MovementSpeed",
+                "LocomotionPlaybackSpeed",
+                "IsBackpedaling",
+                "IsAimWalking",
+                "WeaponStowed",
+                "DrawWeapon",
+                "SheatheWeapon",
+                "ReloadWeapon",
+                "CycleWeapon"
+            };
+            if (!requiredParameters.All(parameterNames.Contains))
+            {
+                throw new InvalidOperationException(
+                    "PowerSuitAnimator is missing combat-animation parameters."
+                );
             }
 
             GameObject variant = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerVariantPath);
@@ -733,9 +1358,38 @@ namespace Powersuit.Editor
             }
 
             PowerSuitWeapon weapon = variant.GetComponent<PowerSuitWeapon>();
-            if (weapon == null || weapon.MuzzleTransform == null || weapon.MuzzleTransform.name != "Rifle_Muzzle")
+            WeaponDefinition precisionRifle =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    PrecisionRifleDefinitionPath
+                );
+            if (
+                weapon == null ||
+                precisionRifle == null ||
+                weapon.Definition != precisionRifle ||
+                weapon.MuzzleTransform == null ||
+                weapon.MuzzleTransform.name != "WeaponMuzzle" ||
+                weapon.MuzzleTransform.parent == null ||
+                weapon.MuzzleTransform.parent.name != "Rifle_Muzzle" ||
+                weapon.MuzzleTransform.localPosition.sqrMagnitude > 0.000001f ||
+                Quaternion.Angle(
+                    weapon.MuzzleTransform.localRotation,
+                    MuzzleAdapterRotation
+                ) > 0.1f
+            )
             {
-                throw new InvalidOperationException("Generator 109 Rifle_Muzzle is not wired to the weapon.");
+                throw new InvalidOperationException(
+                    "Generator 109 WeaponMuzzle adapter is not wired to Rifle_Muzzle."
+                );
+            }
+
+            if (
+                variant.GetComponent<PowerSuitWeaponPresentation>() == null ||
+                variant.GetComponent<PowerSuitWeaponAnimationDriver>() == null
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 player variant is missing weapon presentation drivers."
+                );
             }
 
             Transform visual = variant.transform.Find("PowerSuitVisual_Generator109");
@@ -745,7 +1399,18 @@ namespace Powersuit.Editor
             )
             {
                 throw new InvalidOperationException(
-                    "Generator 109 visual must apply the Blender-to-Unity forward correction."
+                    "Generator 109 visual wrapper must preserve its runtime facing correction."
+                );
+            }
+
+            Transform animatedModel = visual.Find("PowerSuitModel_Generator111");
+            if (
+                animatedModel == null ||
+                Quaternion.Angle(animatedModel.localRotation, Quaternion.identity) > 0.1f
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 111 animated model must be an unrotated child of the facing wrapper."
                 );
             }
 
@@ -772,6 +1437,31 @@ namespace Powersuit.Editor
             }
 
             return null;
+        }
+
+        private static bool MaskContainsLeaf(
+            AvatarMask mask,
+            string expectedLeaf,
+            bool expectedActive
+        )
+        {
+            for (int index = 0; index < mask.transformCount; index++)
+            {
+                string path = mask.GetTransformPath(index);
+                int separator = path.LastIndexOf('/');
+                string leaf = separator >= 0
+                    ? path.Substring(separator + 1)
+                    : path;
+                if (
+                    leaf == expectedLeaf &&
+                    mask.GetTransformActive(index) == expectedActive
+                )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -1,8 +1,8 @@
 # Powersuit
 
-Powersuit is a single-player third-person powered-suit action prototype built in Unity 6. The current vertical slice combines ground movement, powered flight, an over-the-shoulder aim camera, projectile combat, target reactions, and the approved Generator 109 suit-and-rifle model.
+Powersuit is a single-player third-person powered-suit action prototype built in Unity 6. The current vertical slice combines grounded movement, powered flight, an over-the-shoulder aim camera, projectile combat, target reactions, and the Generator 111 suit-and-precision-rifle animation set.
 
-## Try the Generator 109 demo
+## Try the powered-suit demo
 
 1. Open the project with Unity `6000.5.7f1`.
 2. Open `Assets/Scenes/PoweredSuitAimDemo.unity`.
@@ -10,32 +10,54 @@ Powersuit is a single-player third-person powered-suit action prototype built in
 
 Controls:
 
-- `WASD`: move
+- `WASD`: move; `S` backpedals without turning the suit toward the camera
 - Mouse: look
-- Right mouse: over-the-shoulder aim and `PS_Aim` pose
-- Left mouse: fire from the imported `Rifle_Muzzle`
+- Right mouse: over-the-shoulder aim
+- Left mouse: fire
+- `R`: reload
+- `Q`: draw or stow the rifle
 - `F`: toggle flight
 - `Space`: jump or ascend
 - `Ctrl` or `C`: descend
 - `Shift`: boost
 - `Esc`: release the cursor; click the Game view to capture it again
 
-The original `FlightPrototype` greybox remains available as the shared Build Profile scene. The focused demo uses `PlayerPrototype_Generator109.prefab` and an explicit development-build scene list, so the legacy player/model remains intact for comparison and rollback.
+The aim camera is tuned to show more of the receiver and barrel. Dedicated forward and backward aim-walk clips keep the lower body moving while the weapon remains shouldered. Pure lateral aim strafing currently uses the locomotion fallback; authored left/right strafe clips are intentionally deferred.
+
+The original `FlightPrototype` greybox and legacy FBXs remain available for comparison and rollback. The focused demo uses `PlayerPrototype_Generator109.prefab`; the `Generator109` Unity names are retained to preserve their existing GUIDs and references even though the nested model is now Generator 111.
+
+## Precision Rifle
+
+Weapon behavior is data-driven through `WeaponDefinition` and a testable plain-C# runtime state. The current `PrecisionRifle.asset` tune is:
+
+- 60 body damage, 10% critical chance, 2.0x critical damage
+- 45 rounds per minute
+- 5-round magazine, 25 starting reserve, 50 maximum reserve
+- 2.8-second reload with the ammunition commit aligned to the authored insertion frame
+- 100 m/s projectile speed
+- manual 0.67-second bolt cycle after each accepted shot
+
+The HUD shows magazine/reserve ammunition and the current ready, reload, cycle, or empty state. Presentation gates prevent firing while the rifle is stowed, drawing, sheathing, reloading, or cycling.
 
 ## Current asset status
 
-The canonical Blender pipeline lives under `ArtSource/PoweredSuit`. Generator 109 passed the automated geometry, rig, animation, sightline, grip/contact, and render checks. Its 18 validation images were explicitly approved before export. Unity imports the resulting FBX alongside the legacy model with cameras and lights disabled and four clips:
+The canonical Blender pipeline lives under `ArtSource/PoweredSuit`. Generator 111 preserves the Generator 110 winding fix and adds articulated magazine/bolt controls plus 13 weapon-handling and locomotion actions, for 17 exact exported clips total:
 
-- `PS_Idle`
-- `PS_Walk`
-- `PS_Hover`
-- `PS_Aim`
+- compatibility: `PS_Idle`, `PS_Walk`, `PS_Hover`, `PS_Aim`
+- carry: `PS_WeaponReady_Idle`, `PS_WeaponStowed_Idle`, `PS_WeaponStowed_Hover`
+- transitions: `PS_Weapon_Draw`, `PS_Weapon_Sheathe`
+- ready locomotion: `PS_Walk_Forward`, `PS_Walk_Backward`
+- aimed locomotion: `PS_Aim_Walk_Forward`, `PS_Aim_Walk_Backward`
+- stowed locomotion: `PS_WeaponStowed_Walk_Forward`, `PS_WeaponStowed_Walk_Backward`
+- weapon actions: `PS_Reload`, `PS_BoltCycle`
 
-The Unity-facing artifact is `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx`. The source pipeline, provenance, QA details, and regeneration workflow are documented in `ArtSource/PoweredSuit/README.md` and `ArtSource/PoweredSuit/PROVENANCE.md`.
+The clean Blender build passed with no automated blockers. Technical review approved all 32 required renders, and the gated FBX export SHA-256 is `1c3fb62a3d978de6d5205af5c2f04ebf143bbcd5c10bee3f26ff4e4b4ad3d814`. Unity imports it at `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx` with cameras and lights disabled.
+
+The Animator uses a locomotion base layer and a masked upper-body/weapon-action layer, so the legs can continue walking during reload and bolt cycling. A non-animated wrapper and physical muzzle adapter preserve the verified Blender-to-Unity facing and bore axes.
 
 ## Project layout
 
-- `Assets/Game`: runtime code, editor automation, prefabs, tests, and game content
+- `Assets/Game`: runtime code, editor automation, prefabs, tests, and content
 - `Assets/Scenes`: playable prototype and focused model/combat demo scenes
 - `ArtSource/PoweredSuit`: Blender source, deterministic build scripts, validation, and approval tooling
 - `Packages` and `ProjectSettings`: fixed Unity project configuration
@@ -44,21 +66,23 @@ Gameplay behavior is implemented in C#. Editor scripts create or update Unity as
 
 ## Validation
 
-From Unity, run the EditMode and PlayMode test suites in Test Runner. The Generator 109 tests verify the importer, four animation clips, Aim state, prefab wiring, real muzzle helper, safe demo spawns, and runtime scene load.
-
 The editor integration commands are:
 
 - `Tools > Powered Suit > Integrate Generator 109`
 - `Tools > Powered Suit > Build Generator 109 Demo`
 
-The development build is written to `Builds/Windows/PoweredSuitGenerator109/PoweredSuitGenerator109.exe` and is intentionally excluded from source control.
+The menu names retain `Generator109` for GUID continuity. The development build is written to `Builds/Windows/PoweredSuitGenerator109/PoweredSuitGenerator109.exe` and is excluded from source control.
 
-Verified on 2026-08-08 with Unity `6000.5.7f1`:
+Verified on 2026-08-09 with Unity `6000.5.7f1`:
 
 - C# solution compile: 0 warnings, 0 errors
-- EditMode: 5/5 passed
-- PlayMode: 2/2 passed
+- Unity Console after verification: 0 errors
+- EditMode: 35/35 passed
+- PlayMode: 4/4 passed
+- Blender Generator 111: automated `PASS`, technical visual `APPROVED`, 32/32 reviewed renders
+- imported model orientation: body-up dot `0.9997`, body-forward dot `0.9950`, physical-bore dot `0.9997`, muzzle/bore dot `0.9945`
 - Windows 64-bit Development Player: succeeded
-- headless player smoke: demo loaded and combat ran for 10 seconds with no missing-reference or runtime exceptions
 
-See `Assets/Game/Documentation/PROJECT.md` for the technical architecture and phase record.
+The Windows build emits non-blocking shader performance warnings from Unity's AI Inference/Sentis package; it still completes successfully.
+
+Automated and technical validation are complete. The remaining release gate is a hands-on play review in `PoweredSuitAimDemo`; the exact matrix and milestone status are recorded in `ROADMAP.md`. See `Assets/Game/Documentation/PROJECT.md` for architecture and phase details.

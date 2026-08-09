@@ -1,0 +1,37 @@
+{
+  "approval_basis": "User explicitly reviewed all mandatory PNG renders, including the close grip/stock/elbow views.",
+  "approved": true,
+  "blend_sha256_at_approval": "7ac6d24af0fc7f0ad658d594ef37907f53a9e9145bc94c30ec792ea06c073548",
+  "checklist_confirmed": [
+    "arms bend naturally down and outward",
+    "trigger hand visibly holds the pistol grip",
+    "support palm and fingers visibly wrap the compact foregrip",
+    "no oversized platform remains beneath the handguard",
+    "weapon and arms clear the torso",
+    "small buttpad seats in the right shoulder pocket",
+    "ocular lens is in front of the visor without penetration",
+    "major rifle components and silhouette read clearly",
+    "PS_Idle and PS_Aim visibly differ"
+  ],
+  "render_sha256": {
+    "renders\\aim_validation\\aim_close_elbows.png": "1915faebf73aaee8ebdbf2cb657f9db00696ee7e2120f44854f473bd4f2b91be",
+    "renders\\aim_validation\\aim_close_stock_scope.png": "42dcf5176a688759ebe862c9d4da0b9c5190f0c04b68660e6ed98cf44ff3f2db",
+    "renders\\aim_validation\\aim_close_support_grip.png": "967d32cfb78858b4e1900e16619bd5d5b85a41dacf63f80607c0ebe332f84ccc",
+    "renders\\aim_validation\\aim_close_trigger_grip.png": "0b43b29855a39f1ecfccbce135ff85eca9163d322a17e713e9af6752ab8b2b30",
+    "renders\\aim_validation\\aim_frame_001_front_3q.png": "3fd256b8b9d0ff14b11c856f0b475a626b21176be72a3829d244f9e39ee13b3f",
+    "renders\\aim_validation\\aim_frame_001_side.png": "7cd4a510001d4831678603c9b3b6a9d7016e43d3c0fc523c019848032355a36d",
+    "renders\\aim_validation\\aim_frame_015_front_3q.png": "67474aa6297f9fd9d54bf631d2eb97537831036ff267368521b47c12c915f504",
+    "renders\\aim_validation\\aim_frame_015_side.png": "fe79ccd6d07329619db758b434d2d1019d9977a230d41179f9fdcee56d242214",
+    "renders\\aim_validation\\aim_frame_030_front_3q.png": "d3091a7a8b1922df5837743c4caf3b59bbb9b17274e68449b673ffb6f56e5050",
+    "renders\\aim_validation\\aim_frame_030_side.png": "1ef4483b15e46c223208b8d5a7b1cc6dea4bd01b24ff779a1b3c48dd8e64211b",
+    "renders\\aim_validation\\aim_over_shoulder.png": "64653cc2450d59ce2b779f2f3d1dff67559f416ebd6f9c93e446cab5a3e28cfc",
+    "renders\\aim_validation\\idle_upperbody_front_3q.png": "e618d7aab81714690b66324165a825791d5e5945014ff1b71b501779faf8b293",
+    "renders\\aim_validation\\idle_upperbody_side.png": "81bfac8e6be4cb4214070308e5864c31da73f2bf204363203432e487a3b7ac50",
+    "renders\\rifle_validation\\rifle_front_3q_closeup.png": "bc19efe09ca34c391d803e5f536358fac4cea0b80a6275c62115b03951b0c654",
+    "renders\\rifle_validation\\rifle_left_side_closeup.png": "a2b2cfb3265676dc6e8410db7951b811e4a23dc84610170056039b441aa1e333",
+    "renders\\rifle_validation\\rifle_rear_3q_closeup.png": "7a758cfba7682b3b319e8541dbbf3c158a963b819ce7bd60ee73fdb955bfa5e4",
+    "renders\\rifle_validation\\rifle_right_side_closeup.png": "cf046fe370b4fb49ad7fe3ad9cb0191e6fd26980bdf750e06f039c167e84e535",
+    "renders\\rifle_validation\\rifle_with_suit_scale.png": "dfa8ff608d3257d8117d4581a347599ade463a23cb18d82547603a491b01e8d4"
+  },
+  "validation_report_sha256": "dd291ac4ef3aaa99e2ee803c03116348eb6ef3012361abce42713505bbdf9cfd"
+}

@@ -53,6 +53,7 @@ from weapon_handling_contract import (  # noqa: E402
     validate_weapon_contract,
     weapon_local_position,
     weapon_components,
+    weapon_contract_objects,
 )
 
 REQUIRED_RIFLE_RENDERS = (
@@ -278,7 +279,7 @@ def _suit_scale_meshes(
     armature: bpy.types.Object,
     root: bpy.types.Object,
 ) -> list[bpy.types.Object]:
-    meshes = [obj for obj in object_tree(root) if obj.type == "MESH"]
+    meshes = [obj for obj in weapon_contract_objects(root) if obj.type == "MESH"]
     meshes.extend(
         obj for obj in bpy.data.objects
         if obj.type == "MESH" and obj.parent == armature
@@ -307,7 +308,9 @@ def _render(
     visible_proxy_names = set(suit_scale_names if view == "suit_scale" else rifle_names)
     update_static_render_proxies(proxies, visible_names=visible_proxy_names)
 
-    rifle_meshes = [obj for obj in object_tree(root) if obj.type == "MESH"]
+    rifle_meshes = [
+        obj for obj in weapon_contract_objects(root) if obj.type == "MESH"
+    ]
     framed_meshes = _suit_scale_meshes(armature, root) if view == "suit_scale" else rifle_meshes
     minimum, maximum = world_bounds(framed_meshes)
     center = (minimum + maximum) * 0.5
@@ -428,7 +431,9 @@ def main() -> None:
         sync_detached_rifle_to_hand(armature, root, rifle_state)
 
         output_dir = ensure_directory("renders", "rifle_validation")
-        rifle_sources = [obj for obj in object_tree(root) if obj.type == "MESH"]
+        rifle_sources = [
+            obj for obj in weapon_contract_objects(root) if obj.type == "MESH"
+        ]
         suit_scale_sources = _suit_scale_meshes(armature, root)
         source_objects = list(dict.fromkeys([*rifle_sources, *suit_scale_sources]))
         rifle_names = {obj.name for obj in rifle_sources}

@@ -46,6 +46,10 @@ crashlytics-build.properties
 # Immutable, approved validation evidence is deliberately versioned.
 !/ArtSource/PoweredSuit/Validation/Generator109/renders/
 !/ArtSource/PoweredSuit/Validation/Generator109/renders/**
+!/ArtSource/PoweredSuit/Validation/Generator110/renders/
+!/ArtSource/PoweredSuit/Validation/Generator110/renders/**
+!/ArtSource/PoweredSuit/Validation/Generator111/renders/
+!/ArtSource/PoweredSuit/Validation/Generator111/renders/**
 
 # Local downloadable handoff packages
 /Deliverables/

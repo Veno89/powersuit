@@ -2,73 +2,54 @@
 
 ## Recovered baseline
 
-The inspected starting point was the extracted directory
-`OtherIterations/PoweredSuit_WeaponFramework_Reset06_2026-08-07`. No original
-ZIP or nested version-control history was present.
+The inspected starting point was `OtherIterations/PoweredSuit_WeaponFramework_Reset06_2026-08-07`. No original ZIP or nested version-control history was present.
 
-The canonical recovered input is:
+Canonical recovered input:
 
 - file: `source/powersuit_source.blend`
 - SHA-256: `49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4`
-- retained Actions: `PS_Idle`, `PS_Walk`, `PS_Hover`, and the obsolete source
-  `PS_Aim` that the active pipeline deletes and rebuilds
+- retained compatibility actions: `PS_Idle`, `PS_Walk`, `PS_Hover`; the recovered `PS_Aim` is deleted and rebuilt
 
-That source is byte-identical to
-`OtherIterations/PowerSuitAsset/powersuit.blend`. The reset documents are a
-cumulative changelog over that old source, not six independent clean assets.
+The source is byte-identical to `OtherIterations/PowerSuitAsset/powersuit.blend`. Reset documents are a cumulative changelog over that old source, not six independent clean assets.
 
 ## Historical Reset06 result
 
-The latest recovered historical attempt is Reset06's generated
-`powersuit_pipeline.blend`, not its `.blend1` backup and not the older exported
-FBXs:
+The newest recovered historical attempt was Reset06's generated `powersuit_pipeline.blend`, not its `.blend1` backup or older exported FBXs:
 
 - rifle generator: 102
-- generated blend SHA-256:
-  `8e4d039b612ea406cdf76332a8b5be6d0015dbbb6be5d072e79674917e6f31b4`
+- generated blend SHA-256: `8e4d039b612ea406cdf76332a8b5be6d0015dbbb6be5d072e79674917e6f31b4`
 - automated status: `REVIEW_BLOCKED`
 - visual status: `NOT_REVIEWED`
 - export allowed: `false`
 - sight lateral error: approximately `0.290 m`
 - stock/stance anchor distance: approximately `0.081 m`
 
-The Reset06 stock lateral sign conflicted with the recovered rig's actual named
-shoulder side. Its solver also deliberately applied an offset whose norm was
-about 81 mm while its validator blocked any raw anchor distance above 75 mm.
-Reset06 therefore could not pass its own intended stock placement. It is useful
-historical evidence, not an import-ready asset.
+Reset06 had a stock-side sign conflict and compared its deliberately offset stock target against an incompatible raw-anchor threshold. It could not pass its intended placement. It remains useful evidence, not an import-ready asset. Existing legacy Unity FBXs are byte-identical to the older `PowerSuitAsset/exports` set and are not Reset06 exports.
 
-`powersuit_pipeline.blend1` is only the pre-aim intermediate. The existing
-Unity FBXs are byte-identical to the older `PowerSuitAsset/exports` files and
-must not be described as Reset06 output.
+## Post-Reset06 lineage
 
-## Active post-Reset06 iteration
+The active lineage preserves Reset06's useful clean-source runner, semantic weapon framework, render-first diagnosis, and approval lock while correcting its coordinate, wrist-target, contact, head-settle, camera, manifest, and validation semantics.
 
-The active generator-109 pipeline preserves the sound Reset06 architecture
-while correcting the recovered coordinate, wrist-target, contact, head-settle,
-camera, manifest, and gate semantics. Notable active guarantees include:
+- Generator 109 was the first gated Unity evaluation candidate.
+- Unity back-face culling exposed inward primitive face winding that Blender's normal two-sided display had hidden.
+- Generator 110 corrected suit/rifle winding and added a signed-volume export gate. Its 18-view evidence and FBX remain archived as the rollback baseline.
+- Generator 111 extends the contract to v3/signature v6, introduces explicit articulated magazine and bolt components, and exports 17 synchronized armature actions. Its clean build produced 32 mandatory views, passed automated validation with zero blockers, received technical visual approval, and exported on 2026-08-09.
 
-- weapon contract v2 and rigid signature v5
-- explicit wrist-head target semantics and declared contact-offset vectors
-- fixed stock-side convention and intended-offset stock validation
-- rigid weapon component, topology, material, modifier, and semantic manifest
-- finite-transform and stale rig/hand-version rejection
-- deterministic bounded head search using a documented visor receptor proxy
-- real sight-axis, eye-ray, wrist, grip, stock, torso, and framing checks
-- all reviewable blockers still produce the complete render set
-- exact render-set hashing before approval and export
+Generator 111 guarantees include:
 
-The current report is generated at `renders/validation_report.json`. The
-Generator 109 report matched its generated blend, showed 18/18 renders, passed
-automated validation, and was explicitly approved on 2026-08-08. The exact
-reviewed evidence is frozen under `Validation/Generator109`; active working
-outputs remain regenerable and ignored.
+- explicit wrist-head target semantics and signed contact-offset vectors
+- corrected stock-side convention and intended-target stock validation
+- topology/material/modifier/semantic rigid manifests and finite-transform checks
+- rig v2 and hand-geometry v3 preflight gates
+- bounded deterministic head settling and explicit sight-axis/eye-ray metrics
+- grip, stock, torso, framing, and articulated-component checks
+- three validation render sets that are produced even when review blockers exist
+- exact 32-render hashing before approval and export
+- outward face winding and signed-volume rejection for Unity back-face culling
+- exactly 17 armature actions, with `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt` synchronization
 
 ## Artifact policy
 
-Canonical development inputs are the audited source blend, active scripts,
-launchers, architecture documentation, and provenance records. Working blends,
-renders, approvals, and exports are generated artifacts. An important result
-should be packaged or archived as a named immutable candidate rather than
-silently replacing the Unity model. Generator 109 follows that policy and is
-integrated in Unity alongside the legacy artifact.
+Canonical inputs are the audited source blend, scripts, launchers, documentation, and provenance records. Working blends/renders/exports are regenerable and ignored. Important candidates are frozen under named validation directories rather than silently replacing history.
+
+Generator 110 remains available under `Validation/Generator110`. Generator 111 evidence and the exact exported FBX are under `Validation/Generator111`; the same FBX is imported additively in Unity. Existing `Generator109` Unity asset names remain in place for GUID/reference continuity.

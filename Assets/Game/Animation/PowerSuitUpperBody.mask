@@ -1,0 +1,287 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: PowerSuitUpperBody
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 0
+  - m_Path: Root
+    m_Weight: 0
+  - m_Path: Root/Hips
+    m_Weight: 0
+  - m_Path: Root/Hips/Hip_Guard.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Hip_Guard.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Pelvis
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Backpack_Core
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Backpack_Thruster.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Backpack_Thruster.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Chest_Core
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Chest_Plate
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Chest_Plate.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Chest_Plate.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head/Helmet_Core
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head/Helmet_Crown
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head/Helmet_Jaw
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head/Helmet_Plate.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head/Helmet_Plate.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck/Head/Helmet_Visor
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Neck/Neck
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Elbow.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Forearm.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Forearm_Plate.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Hand.L
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Hand.L/Hand.L
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/Shoulder_Armour.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/Shoulder_Wing.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/Upper_Arm.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Elbow.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Forearm.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Forearm_Plate.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Hand.R
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Hand.R/Hand.R
+    m_Weight: 1
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/Shoulder_Armour.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/Shoulder_Wing.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/Upper_Arm.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Thruster_Nozzle.L
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Thruster_Nozzle.R
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Chest/Upper_Chest
+    m_Weight: 0
+  - m_Path: Root/Hips/Spine/Waist
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Foot.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Foot.L/Boot_Toe.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Foot.L/Heavy_Boot.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Knee.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Knee_Guard.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Lower_Leg.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/LowerLeg.L/Shin_Plate.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/Thigh_Plate.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.L/Upper_Leg.L
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Foot.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Foot.R/Boot_Toe.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Foot.R/Heavy_Boot.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Knee.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Knee_Guard.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Lower_Leg.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/LowerLeg.R/Shin_Plate.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/Thigh_Plate.R
+    m_Weight: 0
+  - m_Path: Root/Hips/UpperLeg.R/Upper_Leg.R
+    m_Weight: 0
+  - m_Path: WeaponRoot
+    m_Weight: 1
+  - m_Path: WeaponRoot/RifleRoot
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Barrel
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Barrel_EnergySleeve
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Barrel_Shroud
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_DataModule
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_EjectionPort_R
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_GripBackstrap
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Handguard_BottomRail
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Handguard_Core
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Handguard_SidePanel_L
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Handguard_SidePanel_R
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Handguard_TopRail
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Muzzle
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_MuzzleBore
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_MuzzleBrake_Baffle_1
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_MuzzleBrake_Baffle_2
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_MuzzleBrake_Core
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_MuzzleBrake_TopFin
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_PistolGrip
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_PrimaryGrip
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Receiver_Core
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Receiver_LowerSpine
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Receiver_UpperShell
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeElevation
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeLensFront
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeLensRear
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeMount_Front
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeMount_Front_Crossbar
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeMount_Rear
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeMount_Rear_Crossbar
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeObjective
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeOcular
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeTube
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_ScopeWindage
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_SightOcular
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Stock_BottomRail
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Stock_ButtPad
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Stock_RearBridge
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Stock_TopRail
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_StockContact
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_StockSpine
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_StockStrut_L
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_StockStrut_R
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_SupportGrip
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_SupportGrip_Mount
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_SupportGripMax
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_SupportGripMin
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_SupportGripTarget
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Trigger
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_TriggerGuard
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_L_1
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_L_2
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_L_3
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_L_4
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_R_1
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_R_2
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_R_3
+    m_Weight: 0
+  - m_Path: WeaponRoot/RifleRoot/Rifle_Vent_R_4
+    m_Weight: 0
+  - m_Path: WeaponRoot/WeaponBolt
+    m_Weight: 1
+  - m_Path: WeaponRoot/WeaponBolt/Rifle_BoltHandleKnob_R
+    m_Weight: 0
+  - m_Path: WeaponRoot/WeaponBolt/Rifle_BoltHandleStem_R
+    m_Weight: 0
+  - m_Path: WeaponRoot/WeaponBolt/Rifle_ChargingRail_R
+    m_Weight: 0
+  - m_Path: WeaponRoot/WeaponMagazine
+    m_Weight: 1
+  - m_Path: WeaponRoot/WeaponMagazine/Rifle_Magazine
+    m_Weight: 0
+  - m_Path: WeaponRoot/WeaponMagazine/Rifle_Magazine_Base
+    m_Weight: 0
