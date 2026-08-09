@@ -138,6 +138,8 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [x] Avoid dirtying the 106-renderer animated subtree twice per frame by restoring the imported Animator root only when a transform channel actually drifts.
 - [x] Profile the live demo at native `3422x1230`: roughly `4.2 ms` frame / `2.0 ms` render, `25` SetPass calls, and `42k` visible triangles, confirming comfortable 60 FPS headroom.
 - [x] Add camera math, collision recovery, frame-policy, prefab contract, and PlayMode framing regression coverage; C# solution compiles with zero warnings/errors.
+- [x] Release the masked Weapon Actions layer to zero weight after draw, sheathe, reload, or bolt cycle so a completed action cannot retain the chest-ready pose over stationary or moving aim.
+- [x] Add an end-to-end PlayMode regression for controller aim -> `Aim Locomotion` -> bolt cycle -> forward rifle aim recovery.
 - [ ] Rerun the new focused Unity fixtures after the current MCP test-runner session is re-established.
 - [ ] User accepts normal framing, orbit smoothness, cover collision recovery, aim transition, and presentation smoothness in `PoweredSuitAimDemo`.
 

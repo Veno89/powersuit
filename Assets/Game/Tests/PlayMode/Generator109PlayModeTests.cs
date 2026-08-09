@@ -271,6 +271,163 @@ namespace Powersuit.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PoweredSuitAimDemo_AimReturnsAfterBoltCycleAndActionLayerReleases()
+        {
+            AsyncOperation loadOperation;
+#if UNITY_EDITOR
+            loadOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(
+                "Assets/Scenes/PoweredSuitAimDemo.unity",
+                new LoadSceneParameters(LoadSceneMode.Single)
+            );
+#else
+            loadOperation = SceneManager.LoadSceneAsync(
+                "PoweredSuitAimDemo",
+                LoadSceneMode.Single
+            );
+#endif
+            Assert.That(loadOperation, Is.Not.Null);
+
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+
+            yield return null;
+            yield return null;
+
+            GameObject player = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Generator 109 Player"
+            );
+            Assert.That(player, Is.Not.Null);
+
+            Behaviour controller = player.GetComponent("PowerSuitController") as Behaviour;
+            Behaviour animationDriver =
+                player.GetComponent("PowerSuitAnimationDriver") as Behaviour;
+            Component weaponAnimationDriver =
+                player.GetComponent("PowerSuitWeaponAnimationDriver");
+            Animator animator = player.GetComponentInChildren<Animator>(true);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(animationDriver, Is.Not.Null);
+            Assert.That(weaponAnimationDriver, Is.Not.Null);
+            Assert.That(animator, Is.Not.Null);
+
+            // Preserve the real animation adapter while replacing only live
+            // mouse input with a deterministic held-aim value.
+            controller.enabled = false;
+            FieldInfo aimingField = controller.GetType().GetField(
+                "isAiming",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            Assert.That(aimingField, Is.Not.Null);
+            aimingField.SetValue(controller, true);
+
+            float aimDeadline = Time.realtimeSinceStartup + 1f;
+            while (
+                Time.realtimeSinceStartup < aimDeadline &&
+                (!animator.GetBool("IsAiming") ||
+                 !IsInState(animator, 0, "Aim Locomotion"))
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(animator.GetBool("IsAiming"), Is.True);
+            Assert.That(
+                IsInState(animator, 0, "Aim Locomotion"),
+                Is.True,
+                "The real controller-to-driver path must enter Aim Locomotion."
+            );
+            Assert.That(
+                animator.GetLayerWeight(1),
+                Is.LessThan(0.01f),
+                "The idle weapon-action layer must not override Aim Locomotion."
+            );
+
+            Component weapon = player.GetComponent("PowerSuitWeapon");
+            Assert.That(weapon, Is.Not.Null);
+            MethodInfo tryFireWeapon = weapon.GetType().GetMethod(
+                "TryFireWeapon",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(tryFireWeapon, Is.Not.Null);
+            object fireResult = tryFireWeapon.Invoke(weapon, null);
+            PropertyInfo firedProperty = fireResult?.GetType().GetProperty("Fired");
+            Assert.That(firedProperty, Is.Not.Null);
+            Assert.That(
+                firedProperty.GetValue(fireResult),
+                Is.EqualTo(true),
+                "The regression must exercise an accepted shot and its real cycle event."
+            );
+
+            float cycleDeadline = Time.realtimeSinceStartup + 1f;
+            while (
+                Time.realtimeSinceStartup < cycleDeadline &&
+                !IsInState(animator, 1, "Bolt Cycle")
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(
+                IsInState(animator, 1, "Bolt Cycle"),
+                Is.True,
+                "An accepted shot must enter the bolt-cycle presentation."
+            );
+            Assert.That(animator.GetLayerWeight(1), Is.GreaterThan(0.99f));
+
+            float releaseDeadline = Time.realtimeSinceStartup + 2f;
+            while (
+                Time.realtimeSinceStartup < releaseDeadline &&
+                (!animator.GetCurrentAnimatorStateInfo(1)
+                    .IsName("No Weapon Action") ||
+                 animator.IsInTransition(1) ||
+                 animator.GetLayerWeight(1) > 0.01f)
+            )
+            {
+                yield return null;
+            }
+
+            // Let the Animator evaluate once with the released override weight
+            // before reading the resulting physical rifle pose.
+            yield return null;
+
+            Assert.That(
+                animator.GetCurrentAnimatorStateInfo(1).IsName("No Weapon Action"),
+                Is.True
+            );
+            Assert.That(animator.IsInTransition(1), Is.False);
+            Assert.That(
+                animator.GetLayerWeight(1),
+                Is.LessThan(0.01f),
+                "A completed bolt cycle must release the upper-body override."
+            );
+            Assert.That(
+                IsInState(animator, 0, "Aim Locomotion"),
+                Is.True,
+                "The base aim state must remain active through bolt cycling."
+            );
+
+            Transform muzzle = weapon?.GetType()
+                .GetProperty("MuzzleTransform")
+                ?.GetValue(weapon) as Transform;
+            Transform importedMuzzle = muzzle?.parent;
+            Transform rifleRoot = importedMuzzle?.parent;
+            Transform stock = rifleRoot?.Find("Rifle_StockContact");
+            Assert.That(muzzle, Is.Not.Null);
+            Assert.That(importedMuzzle, Is.Not.Null);
+            Assert.That(stock, Is.Not.Null);
+
+            Vector3 physicalBore =
+                (importedMuzzle.position - stock.position).normalized;
+            Assert.That(
+                Vector3.Dot(physicalBore, player.transform.forward),
+                Is.GreaterThan(0.9f),
+                "The rifle must return to its forward aim pose after a shot."
+            );
+        }
+
+        [UnityTest]
         public IEnumerator PoweredSuitAimDemo_WeaponActionsPreserveLocomotionAndFlightCarryStates()
         {
             AsyncOperation loadOperation;
@@ -311,6 +468,7 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(animator, Is.Not.Null);
             Assert.That(animator.layerCount, Is.EqualTo(2));
             Assert.That(animator.GetLayerName(1), Is.EqualTo("Weapon Actions"));
+            animator.SetLayerWeight(1, 1f);
             Assert.That(animator.GetLayerWeight(1), Is.GreaterThan(0.99f));
 
             animator.Rebind();

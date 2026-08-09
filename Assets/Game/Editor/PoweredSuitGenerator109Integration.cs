@@ -607,6 +607,8 @@ namespace Powersuit.Editor
             AnimatorControllerLayer weaponLayer = new AnimatorControllerLayer
             {
                 name = "Weapon Actions",
+                // The runtime adapter releases this layer in Awake, before the
+                // first Animator evaluation, then raises it only for actions.
                 defaultWeight = 1f,
                 avatarMask = upperBodyMask,
                 blendingMode = AnimatorLayerBlendingMode.Override,
@@ -1058,6 +1060,8 @@ namespace Powersuit.Editor
                 presentationObject.FindProperty("controller").objectReferenceValue = suitController;
                 presentationObject.FindProperty("animator").objectReferenceValue = animator;
                 presentationObject.FindProperty("weapon").objectReferenceValue = weapon;
+                presentationObject.FindProperty("weaponAnimationDriver").objectReferenceValue =
+                    weaponAnimationDriver;
                 presentationObject.FindProperty("startsStowed").boolValue = false;
                 presentationObject.FindProperty("drawDuration").floatValue = 1f;
                 presentationObject.FindProperty("sheatheDuration").floatValue = 1f;

@@ -55,7 +55,7 @@ The canonical Blender pipeline lives under `ArtSource/PoweredSuit`. Generator 11
 
 The clean Blender build passed with no automated blockers. Technical review approved all 32 required renders, and the gated FBX export SHA-256 is `1c3fb62a3d978de6d5205af5c2f04ebf143bbcd5c10bee3f26ff4e4b4ad3d814`. Unity imports it at `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx` with cameras and lights disabled.
 
-The Animator uses a locomotion base layer and a masked upper-body/weapon-action layer, so the legs can continue walking during reload and bolt cycling. Unity-owned action clips contain only the approved spine, arm, magazine, bolt, and `WeaponRoot` curves. A small root lock keeps Unity's Generic Animator from leaking the FBX's `-90` degree axis pose into the imported model during an override-layer transition. The non-animated wrapper and physical muzzle adapter remain the authorities for facing and bore axes.
+The Animator uses a locomotion base layer and a masked upper-body/weapon-action layer, so the legs can continue walking during reload and bolt cycling. Unity-owned action clips contain only the approved spine, arm, magazine, bolt, and `WeaponRoot` curves. The action layer is enabled only while an action is active and returns to zero weight afterward, preventing a completed shot or reload from holding the chest-ready pose over live aiming. A small root lock keeps Unity's Generic Animator from leaking the FBX's `-90` degree axis pose into the imported model during an override-layer transition. The non-animated wrapper and physical muzzle adapter remain the authorities for facing and bore axes.
 
 ## Project layout
 
@@ -95,6 +95,8 @@ After hands-on review exposed a firing face-plant and opposite-shoulder camera, 
 - camera occlusion diagnostic: visible rifle silhouette increased from about `10%` to `35%`
 
 The subsequent camera/pacing pass was profiled in the live demo at `3422x1230`: approximately `4.2 ms` total frame time, `2.0 ms` render time, `25` SetPass calls, and about `42k` visible triangles. The scene therefore has comfortable 60 FPS throughput; the perceived chop came from uncapped, unsynchronised presentation and frame-dependent camera response rather than a rendering bottleneck. The pass adds display synchronization with a 60 FPS fallback, a wider normal view, non-allocating steady-state camera/aim casts, smooth collision recovery, and conditional Animator-root writes.
+
+The follow-up aim-state repair makes draw, sheathe, reload, and cycle triggers explicitly activate the masked action layer, then releases that layer as soon as it returns to `No Weapon Action`. A new PlayMode regression drives the real controller-to-animation path and requires the physical rifle bore to return to forward aim after bolt cycling. The full C# solution compiles with zero warnings/errors; the focused Unity PlayMode rerun remains part of the hands-on acceptance pass.
 
 The expanded full Unity suites still need one rerun after the local headless-license entitlement is restored; Unity returned `com.unity.editor.headless was not found` when the stalled live runner was restarted. The prior 35/35 EditMode, 4/4 PlayMode, and development-build results remain recorded above, while the new regression assertions are checked by compilation and the direct live action exercise.
 

@@ -8,6 +8,8 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 {
     public const string ReloadTriggerName = "ReloadWeapon";
     public const string CycleTriggerName = "CycleWeapon";
+    public const string WeaponActionLayerName = "Weapon Actions";
+    public const string NoWeaponActionStateName = "No Weapon Action";
 
     [SerializeField] private PowerSuitWeapon weapon;
     [SerializeField] private Animator animator;
@@ -18,9 +20,14 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     private static readonly int CycleTrigger =
         Animator.StringToHash(CycleTriggerName);
 
+    private static readonly int NoWeaponActionState =
+        Animator.StringToHash(NoWeaponActionStateName);
+
     private bool hasReloadTrigger;
     private bool hasCycleTrigger;
     private bool subscribed;
+    private bool actionRequestedThisFrame;
+    private int weaponActionLayerIndex = -1;
 
     private void Awake()
     {
@@ -46,6 +53,12 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
         hasReloadTrigger = HasTrigger(ReloadTrigger);
         hasCycleTrigger = HasTrigger(CycleTrigger);
+        weaponActionLayerIndex = animator.GetLayerIndex(WeaponActionLayerName);
+
+        // A full-weight Generic override layer can retain the last upper-body
+        // pose after returning to a motionless state. Start neutral and only
+        // give the layer weight while an action is actually playing.
+        ReleaseWeaponActionLayer();
     }
 
     private void OnEnable()
@@ -60,15 +73,22 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         Subscribe();
     }
 
+    private void Update()
+    {
+        SynchronizeWeaponActionLayer();
+    }
+
     private void OnDisable()
     {
         Unsubscribe();
+        ReleaseWeaponActionLayer();
     }
 
     private void OnReloadStarted()
     {
         if (hasReloadTrigger)
         {
+            BeginWeaponAction();
             animator.SetTrigger(ReloadTrigger);
         }
     }
@@ -77,7 +97,68 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     {
         if (hasCycleTrigger)
         {
+            BeginWeaponAction();
             animator.SetTrigger(CycleTrigger);
+        }
+    }
+
+    /// <summary>
+    /// Enables the masked override layer immediately before an action trigger.
+    /// Presentation adapters use this for draw and sheathe; reload and cycle
+    /// call it through their accepted weapon-runtime events above.
+    /// </summary>
+    public void BeginWeaponAction()
+    {
+        if (animator == null || weaponActionLayerIndex < 0)
+        {
+            return;
+        }
+
+        actionRequestedThisFrame = true;
+        animator.SetLayerWeight(weaponActionLayerIndex, 1f);
+    }
+
+    private void SynchronizeWeaponActionLayer()
+    {
+        if (animator == null || weaponActionLayerIndex < 0)
+        {
+            return;
+        }
+
+        // Presentation runs before this adapter. Do not immediately undo a
+        // BeginWeaponAction call while its trigger is still waiting for the
+        // Animator's evaluation later in the same frame.
+        if (actionRequestedThisFrame)
+        {
+            actionRequestedThisFrame = false;
+            animator.SetLayerWeight(weaponActionLayerIndex, 1f);
+            return;
+        }
+
+        if (!animator.isInitialized)
+        {
+            return;
+        }
+
+        AnimatorStateInfo current = animator.GetCurrentAnimatorStateInfo(
+            weaponActionLayerIndex
+        );
+        bool isStableEmpty =
+            !animator.IsInTransition(weaponActionLayerIndex) &&
+            current.shortNameHash == NoWeaponActionState;
+
+        animator.SetLayerWeight(
+            weaponActionLayerIndex,
+            isStableEmpty ? 0f : 1f
+        );
+    }
+
+    private void ReleaseWeaponActionLayer()
+    {
+        actionRequestedThisFrame = false;
+        if (animator != null && weaponActionLayerIndex >= 0)
+        {
+            animator.SetLayerWeight(weaponActionLayerIndex, 0f);
         }
     }
 

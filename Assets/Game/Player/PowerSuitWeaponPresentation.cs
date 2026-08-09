@@ -158,6 +158,7 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
     [SerializeField] private PowerSuitController controller;
     [SerializeField] private Animator animator;
     [SerializeField] private PowerSuitWeapon weapon;
+    [SerializeField] private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
     [SerializeField] private bool startsStowed;
     [SerializeField, Min(MinimumTransitionDuration)] private float drawDuration = 1f;
     [SerializeField, Min(MinimumTransitionDuration)] private float sheatheDuration = 1f;
@@ -223,6 +224,11 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
         if (weapon == null)
         {
             weapon = GetComponent<PowerSuitWeapon>();
+        }
+
+        if (weaponAnimationDriver == null)
+        {
+            weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
         }
 
         CacheAnimatorParameters();
@@ -402,6 +408,7 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
     {
         if (isAvailable)
         {
+            weaponAnimationDriver?.BeginWeaponAction();
             animator.SetTrigger(triggerHash);
         }
     }
