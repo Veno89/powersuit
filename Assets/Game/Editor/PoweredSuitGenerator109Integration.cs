@@ -169,6 +169,7 @@ namespace Powersuit.Editor
             CombatFeedbackSetup.SetUpCombatFeedback();
             ValidateCombatFeedbackAssets();
 
+            ConfigureBasePlayerCamera();
             GameObject variant = CreatePlayerVariant(controller);
             PopulateDemoScene(variant);
 
@@ -386,6 +387,8 @@ namespace Powersuit.Editor
                     name => CreateOrUpdateLayerSafeActionClip(clips[name]),
                     StringComparer.Ordinal
                 );
+            AnimationClip layerSafeAirborneAimClip =
+                CreateOrUpdateLayerSafeActionClip(clips["PS_Aim"]);
 
             AnimatorController controller =
                 AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
@@ -598,6 +601,31 @@ namespace Powersuit.Editor
             );
 
             AvatarMask upperBodyMask = CreateOrUpdateUpperBodyMask();
+            AnimatorStateMachine airborneAimStateMachine = new AnimatorStateMachine
+            {
+                name = "Airborne Aim State Machine",
+                hideFlags = HideFlags.HideInHierarchy
+            };
+            AssetDatabase.AddObjectToAsset(airborneAimStateMachine, controller);
+            AnimatorControllerLayer airborneAimLayer = new AnimatorControllerLayer
+            {
+                name = PowerSuitAnimationDriver.AirborneAimLayerName,
+                defaultWeight = 0f,
+                avatarMask = upperBodyMask,
+                blendingMode = AnimatorLayerBlendingMode.Override,
+                stateMachine = airborneAimStateMachine
+            };
+            controller.AddLayer(airborneAimLayer);
+
+            AnimatorState airborneAim = AddState(
+                airborneAimStateMachine,
+                "Airborne Aim Pose",
+                layerSafeAirborneAimClip,
+                new Vector3(180f, 100f)
+            );
+            airborneAim.writeDefaultValues = false;
+            airborneAimStateMachine.defaultState = airborneAim;
+
             AnimatorStateMachine weaponStateMachine = new AnimatorStateMachine
             {
                 name = "Weapon Action State Machine",
@@ -607,9 +635,10 @@ namespace Powersuit.Editor
             AnimatorControllerLayer weaponLayer = new AnimatorControllerLayer
             {
                 name = "Weapon Actions",
-                // The runtime adapter releases this layer in Awake, before the
-                // first Animator evaluation, then raises it only for actions.
-                defaultWeight = 1f,
+                // The runtime adapter raises this layer only for an active
+                // weapon action. Keeping the serialized default neutral also
+                // prevents retained upper-body poses before its first Update.
+                defaultWeight = 0f,
                 avatarMask = upperBodyMask,
                 blendingMode = AnimatorLayerBlendingMode.Override,
                 stateMachine = weaponStateMachine
@@ -1014,7 +1043,7 @@ namespace Powersuit.Editor
                     );
                 }
 
-                ConfigureAimCamera(suitController);
+                ConfigureAimCamera(suitController, 2.2f);
                 PowerSuitFramePacing framePacing =
                     instance.GetComponent<PowerSuitFramePacing>();
                 if (framePacing == null)
@@ -1092,6 +1121,32 @@ namespace Powersuit.Editor
             }
         }
 
+        private static void ConfigureBasePlayerCamera()
+        {
+            GameObject root = PrefabUtility.LoadPrefabContents(BasePlayerPrefabPath);
+            try
+            {
+                PowerSuitController controller =
+                    root.GetComponent<PowerSuitController>();
+                if (controller == null)
+                {
+                    throw new InvalidOperationException(
+                        "The base player prefab is missing PowerSuitController."
+                    );
+                }
+
+                // The legacy FlightPrototype uses this base prefab at its
+                // original movement tune. Persist the shared camera profiles
+                // without silently applying the focused demo's slower walk.
+                ConfigureAimCamera(controller, 5f);
+                PrefabUtility.SaveAsPrefabAsset(root, BasePlayerPrefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
         private static void RemoveLegacyVisuals(Transform playerRoot)
         {
             List<GameObject> removals = new List<GameObject>();
@@ -1125,13 +1180,19 @@ namespace Powersuit.Editor
             return adapter.transform;
         }
 
-        private static void ConfigureAimCamera(PowerSuitController controller)
+        private static void ConfigureAimCamera(
+            PowerSuitController controller,
+            float walkSpeed
+        )
         {
             SerializedObject serialized = new SerializedObject(controller);
-            SetFloat(serialized, "walkSpeed", 2.2f);
-            SetFloat(serialized, "cameraDistance", 6f);
-            SetFloat(serialized, "cameraHeight", 1.55f);
-            SetFloat(serialized, "defaultFieldOfView", 65f);
+            SetFloat(serialized, "walkSpeed", walkSpeed);
+            SetFloat(serialized, "cameraDistance", 7.5f);
+            SetFloat(serialized, "cameraHeight", 1.65f);
+            SetFloat(serialized, "defaultFieldOfView", 68f);
+            SetFloat(serialized, "flightCameraDistance", 9f);
+            SetFloat(serialized, "flightCameraHeight", 1.9f);
+            SetFloat(serialized, "flightFieldOfView", 72f);
             SetFloat(serialized, "cameraCollisionPadding", 0.05f);
             SetFloat(serialized, "cameraCollisionReleaseSharpness", 14f);
             SetFloat(serialized, "cameraLookSharpness", 28f);
@@ -1414,6 +1475,7 @@ namespace Powersuit.Editor
                 "Aim Locomotion",
                 "Hover",
                 "Stowed Hover",
+                "Airborne Aim Pose",
                 "Draw Weapon",
                 "Sheathe Weapon",
                 "Reload",
@@ -1426,14 +1488,45 @@ namespace Powersuit.Editor
                 );
             }
 
+            AnimatorControllerLayer airborneAimLayer = controller.layers
+                .SingleOrDefault(
+                    layer => layer.name == PowerSuitAnimationDriver.AirborneAimLayerName
+                );
+            AnimatorControllerLayer weaponLayer = controller.layers
+                .SingleOrDefault(layer => layer.name == "Weapon Actions");
             if (
-                controller.layers.Length != 2 ||
-                controller.layers[1].avatarMask == null ||
-                controller.layers[1].name != "Weapon Actions"
+                controller.layers.Length != 3 ||
+                airborneAimLayer == null ||
+                airborneAimLayer.avatarMask == null ||
+                airborneAimLayer.defaultWeight != 0f ||
+                weaponLayer == null ||
+                weaponLayer.avatarMask == null ||
+                weaponLayer.defaultWeight != 0f
             )
             {
                 throw new InvalidOperationException(
-                    "PowerSuitAnimator weapon actions must use the masked upper-body layer."
+                    "PowerSuitAnimator must use neutral masked airborne-aim and " +
+                    "weapon-action upper-body layers."
+                );
+            }
+
+            AnimatorState airborneAimState = airborneAimLayer.stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Airborne Aim Pose");
+            AnimationClip airborneAimClip = airborneAimState?.motion as AnimationClip;
+            if (
+                airborneAimState == null ||
+                airborneAimClip == null ||
+                airborneAimState.writeDefaultValues ||
+                AnimationUtility.GetCurveBindings(airborneAimClip)
+                    .Any(binding => !IsLayerSafeActionBindingPath(binding.path)) ||
+                AnimationUtility.GetObjectReferenceCurveBindings(airborneAimClip)
+                    .Any(binding => !IsLayerSafeActionBindingPath(binding.path))
+            )
+            {
+                throw new InvalidOperationException(
+                    "Airborne aim must use a layer-safe upper-body clip without " +
+                    "Animator-root or lower-body bindings."
                 );
             }
 
@@ -1446,7 +1539,7 @@ namespace Powersuit.Editor
             };
             foreach (string stateName in requiredLayerSafeStates)
             {
-                AnimatorState state = controller.layers[1].stateMachine.states
+                AnimatorState state = weaponLayer.stateMachine.states
                     .Select(child => child.state)
                     .SingleOrDefault(candidate => candidate.name == stateName);
                 AnimationClip actionClip = state?.motion as AnimationClip;
@@ -1471,7 +1564,7 @@ namespace Powersuit.Editor
                 }
             }
 
-            AvatarMask weaponMask = controller.layers[1].avatarMask;
+            AvatarMask weaponMask = weaponLayer.avatarMask;
             string[] requiredActiveMaskLeaves =
             {
                 "UpperArm.L",
@@ -1545,6 +1638,12 @@ namespace Powersuit.Editor
                 controllerSettings.FindProperty("cameraHeight");
             SerializedProperty normalFov =
                 controllerSettings.FindProperty("defaultFieldOfView");
+            SerializedProperty flightDistance =
+                controllerSettings.FindProperty("flightCameraDistance");
+            SerializedProperty flightHeight =
+                controllerSettings.FindProperty("flightCameraHeight");
+            SerializedProperty flightFov =
+                controllerSettings.FindProperty("flightFieldOfView");
             SerializedProperty aimDistance =
                 controllerSettings.FindProperty("aimCameraDistance");
             SerializedProperty aimShoulder =
@@ -1555,12 +1654,20 @@ namespace Powersuit.Editor
                 normalDistance == null ||
                 normalHeight == null ||
                 normalFov == null ||
+                flightDistance == null ||
+                flightHeight == null ||
+                flightFov == null ||
                 aimDistance == null ||
                 aimShoulder == null ||
                 aimFov == null ||
-                normalDistance.floatValue < 5.9f ||
-                normalHeight.floatValue < 1.5f ||
-                normalFov.floatValue < 64f ||
+                normalDistance.floatValue < 7.4f ||
+                normalHeight.floatValue < 1.6f ||
+                normalFov.floatValue < 67f ||
+                flightDistance.floatValue < 8.9f ||
+                flightDistance.floatValue <= normalDistance.floatValue ||
+                flightHeight.floatValue < normalHeight.floatValue ||
+                flightFov.floatValue < 71f ||
+                flightFov.floatValue < normalFov.floatValue ||
                 aimDistance.floatValue < 3.3f ||
                 aimDistance.floatValue >= normalDistance.floatValue ||
                 aimShoulder.vector3Value.x > -1.4f ||

@@ -25,8 +25,33 @@ public sealed class EnemyHitReaction : MonoBehaviour
 
     private void Awake()
     {
-        cachedRenderers = GetComponentsInChildren<Renderer>(true);
-        propertyBlock = new MaterialPropertyBlock();
+        EnsureRuntimeCache();
+    }
+
+    private void OnEnable()
+    {
+        // Managed renderer/property-block caches are not serialized across an
+        // Editor script reload. Rebuild them before reactions or teardown use
+        // the component again.
+        EnsureRuntimeCache();
+    }
+
+    private void EnsureRuntimeCache()
+    {
+        if (cachedRenderers == null)
+        {
+            cachedRenderers = GetComponentsInChildren<Renderer>(true);
+        }
+
+        if (propertyBlock == null)
+        {
+            propertyBlock = new MaterialPropertyBlock();
+        }
+
+        if (visualChild != null)
+        {
+            return;
+        }
 
         Transform visual = transform.Find("VisualRoot") ?? transform.Find("Model");
         if (visual == null && transform.childCount > 0)
@@ -50,6 +75,8 @@ public sealed class EnemyHitReaction : MonoBehaviour
 
     public void TriggerReaction(Vector3 hitDirection)
     {
+        EnsureRuntimeCache();
+
         if (flashCoroutine != null)
         {
             StopCoroutine(flashCoroutine);
@@ -150,7 +177,7 @@ public sealed class EnemyHitReaction : MonoBehaviour
 
     private void ResetRenderers()
     {
-        if (cachedRenderers == null) return;
+        if (cachedRenderers == null || propertyBlock == null) return;
         propertyBlock.Clear();
         foreach (Renderer rend in cachedRenderers)
         {

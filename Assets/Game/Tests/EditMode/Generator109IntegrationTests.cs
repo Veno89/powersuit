@@ -10,6 +10,10 @@ namespace Powersuit.Tests.EditMode
 {
     public sealed class Generator109IntegrationTests
     {
+        private const string BaseLayerName = "Base Layer";
+        private const string AirborneAimLayerName = "Airborne Aim";
+        private const string WeaponActionsLayerName = "Weapon Actions";
+
         private const string ModelPath =
             "Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx";
 
@@ -18,6 +22,9 @@ namespace Powersuit.Tests.EditMode
 
         private const string PlayerVariantPath =
             "Assets/Game/Prefab/Player/PlayerPrototype_Generator109.prefab";
+
+        private const string BasePlayerPrefabPath =
+            "Assets/Game/Prefab/Player/PlayerPrototype.prefab";
 
         private const string DemoScenePath =
             "Assets/Scenes/PoweredSuitAimDemo.unity";
@@ -81,11 +88,60 @@ namespace Powersuit.Tests.EditMode
             Assert.That(states, Does.Contain("Stowed Locomotion"));
             Assert.That(states, Does.Contain("Aim Locomotion"));
             Assert.That(states, Does.Contain("Stowed Hover"));
+            Assert.That(states, Does.Contain("Airborne Aim Pose"));
             Assert.That(states, Does.Contain("Reload"));
             Assert.That(states, Does.Contain("Bolt Cycle"));
-            Assert.That(controller.layers, Has.Length.EqualTo(2));
-            Assert.That(controller.layers[1].name, Is.EqualTo("Weapon Actions"));
-            Assert.That(controller.layers[1].avatarMask, Is.Not.Null);
+
+            Assert.That(controller.layers, Has.Length.EqualTo(3));
+            Assert.That(
+                controller.layers.Select(layer => layer.name),
+                Is.EqualTo(
+                    new[]
+                    {
+                        BaseLayerName,
+                        AirborneAimLayerName,
+                        WeaponActionsLayerName
+                    }
+                )
+            );
+
+            AnimatorControllerLayer baseLayer = FindLayer(controller, BaseLayerName);
+            AnimatorControllerLayer airborneAimLayer = FindLayer(
+                controller,
+                AirborneAimLayerName
+            );
+            AnimatorControllerLayer weaponActionsLayer = FindLayer(
+                controller,
+                WeaponActionsLayerName
+            );
+            Assert.That(baseLayer, Is.Not.Null);
+            Assert.That(airborneAimLayer, Is.Not.Null);
+            Assert.That(weaponActionsLayer, Is.Not.Null);
+
+            Assert.That(airborneAimLayer.defaultWeight, Is.Zero);
+            Assert.That(
+                airborneAimLayer.blendingMode,
+                Is.EqualTo(AnimatorLayerBlendingMode.Override)
+            );
+            Assert.That(airborneAimLayer.avatarMask, Is.Not.Null);
+            Assert.That(weaponActionsLayer.defaultWeight, Is.Zero);
+            Assert.That(weaponActionsLayer.avatarMask, Is.Not.Null);
+            Assert.That(
+                airborneAimLayer.avatarMask,
+                Is.SameAs(weaponActionsLayer.avatarMask),
+                "Airborne aim and weapon actions must share the validated upper-body mask."
+            );
+
+            AnimatorState airborneAimState = airborneAimLayer.stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Airborne Aim Pose");
+            Assert.That(airborneAimState, Is.Not.Null);
+            Assert.That(airborneAimState.writeDefaultValues, Is.False);
+            AnimationClip airborneAimClip = airborneAimState.motion as AnimationClip;
+            Assert.That(airborneAimClip, Is.Not.Null);
+            AssertLayerSafeClip(airborneAimClip, "Airborne Aim Pose");
+            AssertUpperBodyMask(airborneAimLayer.avatarMask, "Airborne Aim");
+
             foreach (
                 string actionStateName in new[]
                 {
@@ -96,7 +152,7 @@ namespace Powersuit.Tests.EditMode
                 }
             )
             {
-                AnimatorState actionState = controller.layers[1].stateMachine.states
+                AnimatorState actionState = weaponActionsLayer.stateMachine.states
                     .Select(child => child.state)
                     .SingleOrDefault(state => state.name == actionStateName);
                 Assert.That(actionState, Is.Not.Null, actionStateName);
@@ -108,19 +164,9 @@ namespace Powersuit.Tests.EditMode
 
                 AnimationClip actionClip = actionState.motion as AnimationClip;
                 Assert.That(actionClip, Is.Not.Null, actionStateName);
-                Assert.That(
-                    AnimationUtility.GetCurveBindings(actionClip)
-                        .Any(binding => !IsLayerSafeWeaponActionPath(binding.path)),
-                    Is.False,
-                    $"{actionStateName} must contain only upper-body/weapon bindings."
-                );
-                Assert.That(
-                    AnimationUtility.GetObjectReferenceCurveBindings(actionClip)
-                        .Any(binding => !IsLayerSafeWeaponActionPath(binding.path)),
-                    Is.False,
-                    $"{actionStateName} must contain only upper-body/weapon bindings."
-                );
+                AssertLayerSafeClip(actionClip, actionStateName);
             }
+            AssertUpperBodyMask(weaponActionsLayer.avatarMask, "Weapon Actions");
             Assert.That(
                 controller.parameters.Select(parameter => parameter.name),
                 Is.SupersetOf(
@@ -146,15 +192,27 @@ namespace Powersuit.Tests.EditMode
             SerializedObject controllerSettings = new SerializedObject(suitController);
             Assert.That(
                 controllerSettings.FindProperty("cameraDistance").floatValue,
-                Is.EqualTo(6f).Within(0.001f)
+                Is.EqualTo(7.5f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("cameraHeight").floatValue,
-                Is.EqualTo(1.55f).Within(0.001f)
+                Is.EqualTo(1.65f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("defaultFieldOfView").floatValue,
-                Is.EqualTo(65f).Within(0.001f)
+                Is.EqualTo(68f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("flightCameraDistance").floatValue,
+                Is.EqualTo(9f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("flightCameraHeight").floatValue,
+                Is.EqualTo(1.9f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("flightFieldOfView").floatValue,
+                Is.EqualTo(72f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("cameraCollisionPadding").floatValue,
@@ -183,6 +241,19 @@ namespace Powersuit.Tests.EditMode
             Assert.That(
                 controllerSettings.FindProperty("aimFieldOfView").floatValue,
                 Is.EqualTo(58f).Within(0.001f)
+            );
+
+            GameObject basePlayer =
+                AssetDatabase.LoadAssetAtPath<GameObject>(BasePlayerPrefabPath);
+            Assert.That(basePlayer, Is.Not.Null);
+            Component baseSuitController = basePlayer.GetComponent("PowerSuitController");
+            Assert.That(baseSuitController, Is.Not.Null);
+            SerializedObject baseControllerSettings =
+                new SerializedObject(baseSuitController);
+            Assert.That(
+                baseControllerSettings.FindProperty("walkSpeed").floatValue,
+                Is.EqualTo(5f).Within(0.001f),
+                "Camera integration must preserve the legacy base prefab movement tune."
             );
 
             Component framePacing = player.GetComponent("PowerSuitFramePacing");
@@ -317,6 +388,94 @@ namespace Powersuit.Tests.EditMode
         private static GameObject FindRoot(Scene scene, string name)
         {
             return scene.GetRootGameObjects().FirstOrDefault(root => root.name == name);
+        }
+
+        private static AnimatorControllerLayer FindLayer(
+            AnimatorController controller,
+            string layerName
+        )
+        {
+            return controller.layers.SingleOrDefault(layer => layer.name == layerName);
+        }
+
+        private static void AssertLayerSafeClip(AnimationClip clip, string context)
+        {
+            Assert.That(
+                AnimationUtility.GetCurveBindings(clip)
+                    .Any(binding => !IsLayerSafeWeaponActionPath(binding.path)),
+                Is.False,
+                $"{context} must contain only upper-body/weapon bindings."
+            );
+            Assert.That(
+                AnimationUtility.GetObjectReferenceCurveBindings(clip)
+                    .Any(binding => !IsLayerSafeWeaponActionPath(binding.path)),
+                Is.False,
+                $"{context} must contain only upper-body/weapon bindings."
+            );
+        }
+
+        private static void AssertUpperBodyMask(AvatarMask mask, string context)
+        {
+            foreach (
+                string requiredActiveLeaf in new[]
+                {
+                    "UpperArm.L",
+                    "LowerArm.L",
+                    "Hand.L",
+                    "UpperArm.R",
+                    "LowerArm.R",
+                    "Hand.R",
+                    "WeaponRoot",
+                    "WeaponMagazine",
+                    "WeaponBolt"
+                }
+            )
+            {
+                Assert.That(
+                    MaskContainsLeaf(mask, requiredActiveLeaf, true),
+                    Is.True,
+                    $"{context} mask must include {requiredActiveLeaf}."
+                );
+            }
+
+            foreach (
+                string requiredInactiveLeaf in new[]
+                {
+                    "Hips",
+                    "Pelvis",
+                    "UpperLeg.L",
+                    "UpperLeg.R"
+                }
+            )
+            {
+                Assert.That(
+                    MaskContainsLeaf(mask, requiredInactiveLeaf, false),
+                    Is.True,
+                    $"{context} mask must exclude {requiredInactiveLeaf}."
+                );
+            }
+        }
+
+        private static bool MaskContainsLeaf(
+            AvatarMask mask,
+            string leafName,
+            bool expectedActive
+        )
+        {
+            for (int index = 0; index < mask.transformCount; index++)
+            {
+                string path = mask.GetTransformPath(index);
+                string leaf = path.Substring(path.LastIndexOf('/') + 1);
+                if (
+                    leaf == leafName &&
+                    mask.GetTransformActive(index) == expectedActive
+                )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool IsLayerSafeWeaponActionPath(string path)

@@ -1,12 +1,65 @@
-# Powered Suit Combat and Animation Roadmap
+# PowerSuit Polished Tech Demo / Reusable Framework Roadmap
 
-This roadmap tracks the requested weapon handling, locomotion, aiming, and Precision Rifle pass. Generator 111 is the current verified candidate; Generator 110 and the legacy Unity assets remain the rollback baseline.
+PowerSuit remains a game first. The immediate milestone is a small, exceptionally polished combat-and-flight sandbox whose underlying systems are modular, configurable, documented, asset-agnostic, and reusable enough to approach commercial Unity-package quality naturally. It is not a pivot into a generic framework at the expense of the game.
+
+Generator 111 is the current technically verified character/Precision Rifle candidate; Generator 110 and the legacy Unity assets remain the rollback baseline. The detailed Generator 111 pass history is preserved below, but it is only one part of this broader milestone.
 
 ## Status rules
 
 - `[x]` means implementation and objective automated/technical verification are complete.
 - `[ ]` means work or the stated verification is still outstanding.
 - A milestone's final `accepted` box remains unchecked until the user has exercised that feature in `PoweredSuitAimDemo` and accepted its feel and appearance.
+
+## Completed
+
+- Generator 111 suit/rifle source, 17 exact clips, 32-view Blender validation, rollback evidence, and additive Unity integration.
+- CharacterController ground/flight baseline, physical projectile combat, basic enemies, combat feedback, and editor setup tooling.
+- One data-driven Precision Rifle with finite ammunition, reload timing, critical hits, manual bolt cycling, and a masked weapon-action layer.
+- Initial camera collision/damping/non-allocation work, frame pacing, root-transform containment, and a successful Windows development build.
+- Configurable exploration profiles (`7.5 m` / `1.65 m` / `68` degrees grounded and `9 m` / `1.9 m` / `72` degrees in flight), with the shared shoulder-aim profile retained at `3.4 m` / `58` degrees on the rifle-side local `-X` shoulder.
+- A masked Airborne Aim layer over `Hover`, with Weapon Actions above it, plus airborne reload from stable `Ready` while preserving the hover/aim presentation beneath the action.
+
+These are implementation/technical results, not claims that movement, flight, camera, aiming, animation, or combat feel has received final owner acceptance.
+
+## Current
+
+The owner-reported camera and airborne-combat batch is now implemented and technically verified. The earlier live `6 m` / `65` degree reproduction remains recorded below because it established that the complaint was composition rather than an aim/collision latch. The replacement ground and flight profiles, masked airborne shoulder aim, and airborne reload all pass asset/integration validation and a direct live runtime probe. Remaining work is the expanded Unity PlayMode fixture, actual-input checks while moving/ascending/descending/boosting, and owner acceptance of feel and composition. True weapon-specific through-scope ADS remains separate later work; RMB still uses the shared third-person shoulder profile.
+
+## Next
+
+1. Run the expanded PlayMode fixture and the concise owner matrix using actual aim/reload/flight inputs while moving, ascending, descending, boosting, and recovering from camera collision; retune only from observed results.
+2. Audit and tune broader ground/flight feel across acceleration, braking, takeoff, hover, boost, landing, strafing, camera relationship, and 30/60/120+/uncapped frame rates.
+3. Harden animation layering, airborne combat poses, IK/hardpoints, transitions, and replacement-asset assumptions.
+4. Continue gunplay polish, then add a small set of meaningfully distinct data-driven weapons, improved enemy roles, 1-2 reusable abilities, sandbox polish/performance, and replacement-character validation.
+
+## Milestone phase status
+
+| Phase | Honest current status |
+| --- | --- |
+| A - Stability and architecture | In progress; the current batch passes focused validation, while expanded PlayMode execution and the repository-wide coupling/asset-assumption audit remain |
+| B - Movement and camera | Wider ground/flight profiles and airborne combat integration are technically verified; actual-input feel and owner acceptance remain |
+| C - Animation | Partial; locomotion, masked Airborne Aim, and higher-priority Weapon Actions layers exist, while broader flight transitions, IK, and retargeting remain |
+| D - Gunplay | Partial; one Precision Rifle pipeline exists, while feel, true scope, cover, recoil, and pooling/GC work remain |
+| E - Weapon modularity | Partial; one data-driven rifle exists, while hardpoints, switching, and additional archetypes remain |
+| F - Enemy combat | Basic baseline only; range management, roles, flight response, and encounter quality remain |
+| G - Abilities | Not started |
+| H - Sandbox and performance | Partial; one profile snapshot exists, while representative load, GC/FPS matrix, debug tools, and arena coverage remain |
+| I - Asset replacement validation | Not started |
+
+## Owner-reported flight and camera regressions - 2026-08-09
+
+Checked boxes distinguish completed implementation/technical verification from the unchecked expanded fixture and owner play acceptance.
+
+- [x] Reproduce the normal-camera complaint and record the live state: airborne, not aiming, unobstructed, FOV `65`, distance `6 m`, and approximately 39% viewport-height occupancy.
+- [x] Add configurable wider exploration profiles: grounded `7.5 m` / `1.65 m` / `68` degrees and flight `9 m` / `1.9 m` / `72` degrees, while retaining the shared shoulder aim at `3.4 m` / `58` degrees on local `-X`.
+- [x] Permit reload from stable `Ready` while airborne without grounding or cancelling the active flight presentation; direct live verification completed a reload from `4` to `5` rounds.
+- [x] Add a masked Airborne Aim layer over `Hover`, keep Weapon Actions above it, and preserve hover/aim beneath reload; the physical bore remained forward at dot `0.9997` before and after reload.
+- [x] Pass the generated asset validator/integration checks, the focused `Generator109IntegrationTests` (`3/3` EditMode), the direct live profile/aim/reload probe, and screenshot inspection.
+- [ ] Run the expanded Unity PlayMode fixture; the TestRunner API did not start the requested fixture in this verification session.
+- [ ] Exercise actual aim/reload/flight inputs while moving, ascending, descending, and boosting; verify repeated/empty/partial reload behaviour, camera recovery, and uninterrupted control.
+- [ ] Verify complete camera-to-reticle-to-muzzle convergence in flight and prevent firing through the suit or nearby cover.
+- [ ] Design and implement true Precision Rifle through-scope ADS separately: weapon-specific `ScopePoint`, scope FOV/profile, reticle/overlay, transition, hardpoint validation, and close-cover behaviour.
+- [ ] Owner re-evaluates the revised shoulder composition for weapon visibility, target readability, reticle clearance, and motion comfort.
 
 ## Progress summary
 
@@ -17,8 +70,8 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 | Ready/stowed poses | Complete | Complete | Pending |
 | Draw/sheathe | Complete | Complete | Pending |
 | Forward/backward locomotion | Complete | Complete | Pending |
-| Aim-walk and shoulder camera | Complete for forward/backward movement | Hotfix targeted checks complete; full-suite rerun pending | Pending |
-| Magazine reload | Complete | Complete | Pending |
+| Aim-walk and shoulder camera | Ground clips, wider ground/flight profiles, and masked airborne shoulder aim complete | Asset/integration validation, 3/3 focused EditMode, and direct live bore/profile probe passed; expanded PlayMode pending | Rejected prior framing; retest required |
+| Magazine reload | Grounded and stable-Ready airborne implementation complete | Grounded checks plus direct live airborne `4 -> 5` reload passed; moving/input PlayMode matrix pending | Retest required |
 | Manual bolt cycle | Complete | Complete | Pending |
 
 ## Milestone 0 — Baseline and contracts
@@ -89,6 +142,9 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [x] Retune camera distance, shoulder offset, height, and FOV to show more weapon and less back/helmet.
 - [x] Preserve collision, reticle alignment, physical muzzle direction, and the rule that firing never aims through the player.
 - [x] Add aim-walk renders and runtime orientation/muzzle tests.
+- [x] Replace the owner-rejected exploration composition with configurable grounded (`7.5 m` / `1.65 m` / `68`) and flight (`9 m` / `1.9 m` / `72`) profiles while retaining the shared shoulder-aim profile.
+- [x] Keep the `Hover` base while applying a masked forward-shouldered Airborne Aim pose, with Weapon Actions ordered above it.
+- [ ] Implement true weapon-specific scope presentation as a separate follow-on from the current global third-person shoulder-aim mode.
 - [ ] Play-check aimed W/S and firing for weapon visibility, target readability, unobstructed reticle, and stable sight picture.
 - [ ] Author dedicated left/right aim-strafe clips if the current lateral locomotion fallback is not acceptable.
 - [ ] Milestone 5 accepted.
@@ -98,7 +154,9 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [x] Create `PS_Reload`, including magazine removal, travel, insertion, and return to the weapon.
 - [x] Animate only the contract-approved magazine controls while keeping receiver and sightline rigid.
 - [x] Align ammunition commit to authored frame 75/84 rather than button press.
-- [x] Block firing and carry transitions while reloading; block reload in flight.
+- [x] Block firing and carry transitions while reloading under the original grounded-only contract.
+- [x] Supersede the original flight prohibition with reload from stable airborne `Ready`; the live probe preserved hover/aim and completed one ammunition commit from `4` to `5`.
+- [ ] Play-check airborne reload with actual input while moving and boosting, including empty, partial, repeated-input, and interruption cases.
 - [x] Verify empty, partial, full, insufficient-reserve, repeated-input, cancellation, and exactly-once commit behavior.
 - [x] Technically review exposed frame-50 and frame-64 magazine/hand contact renders.
 - [ ] Play-check HUD, animation, firing lock, magazine ownership, magwell alignment, and repeated reloads.
@@ -124,7 +182,7 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [x] Exercise Draw, Sheathe, Reload, and Bolt Cycle through the real controller graph with `0` degree root rotation, zero position/scale drift, and more than `1.55 m` head-to-feet clearance.
 - [x] Move the aim camera to the rifle's local `-X` shoulder and widen its composition to distance `3.4`, offset `(-1.6, 0.3, 0)`, and FOV `58`.
 - [x] Measure the camera change with an occlusion diagnostic: visible rifle silhouette improves from roughly `10%` to `35%` while muzzle and ocular remain on screen.
-- [ ] Rerun the expanded full EditMode and PlayMode suites after Unity's local headless entitlement is restored; the restart currently reports `com.unity.editor.headless was not found`.
+- [ ] Rerun the expanded full EditMode/PlayMode suites; focused `3/3` EditMode integration passed, but the Unity TestRunner API did not start the requested new PlayMode fixture.
 - [ ] User rechecks firing, reload, bolt cycle, and right-mouse aiming in `PoweredSuitAimDemo`.
 
 ## Camera framing and smoothness hotfix — 2026-08-09
@@ -140,23 +198,28 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [x] Add camera math, collision recovery, frame-policy, prefab contract, and PlayMode framing regression coverage; C# solution compiles with zero warnings/errors.
 - [x] Release the masked Weapon Actions layer to zero weight after draw, sheathe, reload, or bolt cycle so a completed action cannot retain the chest-ready pose over stationary or moving aim.
 - [x] Add an end-to-end PlayMode regression for controller aim -> `Aim Locomotion` -> bolt cycle -> forward rifle aim recovery.
-- [ ] Rerun the new focused Unity fixtures after the current MCP test-runner session is re-established.
-- [ ] User accepts normal framing, orbit smoothness, cover collision recovery, aim transition, and presentation smoothness in `PoweredSuitAimDemo`.
+- [x] Run generated asset validation/integration and the focused `Generator109IntegrationTests` (`3/3` EditMode); the full .NET solution compiles with 0 warnings/errors.
+- [x] Replace the owner-rejected `6 m` / `65` degree composition with grounded `7.5 m` / `68` and flight `9 m` / `72` profiles; retain the earlier live reproduction above as the reason for the change.
+- [ ] Run the expanded Unity PlayMode fixture; the TestRunner API did not start it during this verification session.
+- [ ] User accepts revised ground/flight framing, orbit smoothness, cover collision recovery, shoulder-aim transition, and presentation smoothness in `PoweredSuitAimDemo`.
 
-## Final release gate
+## Generator 111 combat-and-animation pass gate
 
 - [x] Run a clean Blender build from immutable source; all 17 actions, geometry/rigidity/contact checks, and 32 required renders pass.
 - [x] Technically review and hash all 32 pose, transition, locomotion, reload, bolt, aim, and rifle views before gated export.
 - [x] Import additively while preserving legacy FBXs, prefab/controller GUIDs, and Generator 110 rollback evidence.
 - [x] Update the Animator controller in place and verify both layers and their Avatar Mask.
 - [x] Original Generator 111 candidate compiled with 0 warnings/errors and passed the 35-test EditMode and 4-test PlayMode suites.
-- [ ] Rerun the expanded suites containing the Animator-root and camera regression assertions after the local headless-license issue is repaired.
+- [x] Run generated asset validator/integration checks and focused `Generator109IntegrationTests` (`3/3` EditMode) for the new framing/airborne batch.
+- [ ] Run the expanded PlayMode fixture containing camera, airborne aim/reload, action-layer, and Animator-root assertions; the TestRunner API did not start it during this verification session.
 - [x] Produce a Windows x64 Development build.
 - [x] Update README, project architecture, controls, weapon tuning, asset provenance, and verification totals.
-- [ ] Complete the manual `PoweredSuitAimDemo` matrix: ready, stowed, draw, sheathe, W, S, aimed W/S, fire, empty fire, partial reload, empty reload, critical hit, flight regression, camera collision, and repeated state transitions.
+- [ ] Complete the manual `PoweredSuitAimDemo` matrix: ready, stowed, draw, sheathe, W, S, aimed W/S, fire, empty fire, partial reload, empty reload, critical hit, normal/aim framing, airborne shoulder aim, airborne reload, flight movement/boost during weapon actions, camera collision, and repeated state transitions.
 - [x] Commit and push the reviewed candidate to GitHub.
 - [ ] User accepts the combat-and-animation pass.
 
 ## Explicitly deferred
 
-The architecture supports more weapon definitions, but this pass does not add an inventory, loot generation, weapon switching UI, procedural animation, multiplayer, crafting, or a full arsenal. Dedicated lateral aim-strafe clips are also deferred unless the current fallback fails play review.
+Deferred beyond the polished sandbox milestone are multiplayer, crafting, story/campaign content, a full inventory/loot/progression loop, procedural animation, a large arsenal, and Asset Store publication itself. Dedicated lateral aim-strafe clips remain conditional on play review.
+
+The broader milestone does **not** defer a small 3-4 weapon set and switching flow, true weapon-specific scope support, improved enemy roles, 1-2 reusable suit abilities, representative sandbox/performance validation, or replacement-character and replacement-weapon tests.

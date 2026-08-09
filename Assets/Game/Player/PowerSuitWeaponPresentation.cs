@@ -209,8 +209,19 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
 
     private void Awake()
     {
-        EnsureStateMachine();
+        InitializeRuntimeAdapter();
+    }
 
+    private void OnEnable()
+    {
+        // References, Animator-parameter caches, and the plain C# state object
+        // are nonserialized runtime state. Rebuild them after Editor script
+        // reloads as well as on the first Awake.
+        InitializeRuntimeAdapter();
+    }
+
+    private void InitializeRuntimeAdapter()
+    {
         if (controller == null)
         {
             controller = GetComponent<PowerSuitController>();
@@ -232,6 +243,21 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
         }
 
         CacheAnimatorParameters();
+        if (stateMachine == null)
+        {
+            bool restoreStowed =
+                startsStowed ||
+                (
+                    animator != null &&
+                    hasWeaponStowed &&
+                    animator.GetBool(WeaponStowedParameter)
+                );
+            stateMachine = new PowerSuitWeaponPresentationStateMachine(
+                drawDuration,
+                sheatheDuration,
+                restoreStowed
+            );
+        }
         UpdateWeaponStowedParameter();
         if (
             State == PowerSuitWeaponPresentationState.Stowed &&
@@ -246,6 +272,10 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
 
     private void Update()
     {
+        // Defensive fallback for unusual lifecycle ordering; OnEnable normally
+        // restores both this object and the associated Animator caches.
+        EnsureStateMachine();
+
         if (WasTogglePressed())
         {
             Toggle();
@@ -392,9 +422,10 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
         if (weapon != null)
         {
             weapon.PresentationAllowsFire = CanUseWeapon;
-            weapon.PresentationAllowsReload =
-                CanUseWeapon &&
-                (controller == null || !controller.IsFlying);
+            // Reload is an upper-body weapon action. Flight locomotion stays on
+            // the base layer, so a stable ready weapon can reload in the air
+            // without forcing a landing or interrupting hover movement.
+            weapon.PresentationAllowsReload = CanUseWeapon;
         }
     }
 

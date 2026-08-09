@@ -60,8 +60,8 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float turningSpeed = 12f;
 
     [Header("Camera")]
-    [SerializeField] private float cameraDistance = 6f;
-    [SerializeField] private float cameraHeight = 1.55f;
+    [SerializeField] private float cameraDistance = 7.5f;
+    [SerializeField] private float cameraHeight = 1.65f;
     [SerializeField] private float mouseSensitivity = 0.15f;
     [SerializeField] private float controllerLookSpeed = 120f;
     [SerializeField] private float minimumPitch = -55f;
@@ -71,11 +71,16 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float cameraCollisionReleaseSharpness = 14f;
     [SerializeField] private float cameraLookSharpness = 28f;
 
+    [Header("Flight Camera")]
+    [SerializeField] private float flightCameraDistance = 9f;
+    [SerializeField] private float flightCameraHeight = 1.9f;
+    [SerializeField] private float flightFieldOfView = 72f;
+
     [Header("Third-Person Aim Mode")]
     [SerializeField] private float aimCameraDistance = 3.4f;
     [SerializeField] private float aimCameraHeight = 1.5f;
     [SerializeField] private Vector3 aimShoulderOffset = new Vector3(-1.6f, 0.3f, 0f);
-    [SerializeField] private float defaultFieldOfView = 65f;
+    [SerializeField] private float defaultFieldOfView = 68f;
     [SerializeField] private float aimFieldOfView = 58f;
     [SerializeField] private float aimTransitionSpeed = 12f;
     [SerializeField] private float maxReticleOffset = 140f;
@@ -417,10 +422,24 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private void UpdateCamera()
     {
-        float targetDistance = isAiming ? aimCameraDistance : cameraDistance;
-        float targetHeight = isAiming ? aimCameraHeight : cameraHeight;
+        float explorationDistance = isFlying
+            ? flightCameraDistance
+            : cameraDistance;
+        float explorationHeight = isFlying
+            ? flightCameraHeight
+            : cameraHeight;
+        float explorationFov = isFlying
+            ? flightFieldOfView
+            : defaultFieldOfView;
+
+        float targetDistance = isAiming
+            ? aimCameraDistance
+            : explorationDistance;
+        float targetHeight = isAiming
+            ? aimCameraHeight
+            : explorationHeight;
         Vector3 targetShoulder = isAiming ? aimShoulderOffset : Vector3.zero;
-        float targetFOV = isAiming ? aimFieldOfView : defaultFieldOfView;
+        float targetFOV = isAiming ? aimFieldOfView : explorationFov;
         float cameraDeltaTime = Time.unscaledDeltaTime;
         float transitionFactor = PowerSuitCameraMath.ExponentialDampingFactor(
             aimTransitionSpeed,

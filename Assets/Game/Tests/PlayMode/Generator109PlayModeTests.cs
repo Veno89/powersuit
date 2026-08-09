@@ -14,6 +14,10 @@ namespace Powersuit.Tests.PlayMode
 {
     public sealed class Generator109PlayModeTests
     {
+        private const string BaseLayerName = "Base Layer";
+        private const string AirborneAimLayerName = "Airborne Aim";
+        private const string WeaponActionsLayerName = "Weapon Actions";
+
         [UnityTest]
         public IEnumerator Generator109RuntimeComponents_InitializeWithMuzzleContract()
         {
@@ -120,7 +124,8 @@ namespace Powersuit.Tests.PlayMode
 
             Animator animator = player.GetComponentInChildren<Animator>(true);
             Assert.That(animator, Is.Not.Null);
-            animator.Play("Aim Locomotion", 0, 0f);
+            int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
+            animator.Play("Aim Locomotion", baseLayerIndex, 0f);
             animator.Update(0.1f);
             yield return null;
 
@@ -230,12 +235,46 @@ namespace Powersuit.Tests.PlayMode
 
             Camera camera = Camera.main;
             Assert.That(camera, Is.Not.Null);
-            Assert.That(camera.fieldOfView, Is.EqualTo(65f).Within(0.1f));
+            Assert.That(camera.fieldOfView, Is.EqualTo(68f).Within(0.1f));
 
-            Vector3 normalPivot = player.transform.position + Vector3.up * 1.55f;
+            Vector3 normalPivot = player.transform.position + Vector3.up * 1.65f;
             Assert.That(
                 Vector3.Distance(camera.transform.position, normalPivot),
-                Is.EqualTo(6f).Within(0.1f)
+                Is.EqualTo(7.5f).Within(0.1f)
+            );
+
+            FieldInfo flyingField = controller.GetType().GetField(
+                "isFlying",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            Assert.That(flyingField, Is.Not.Null);
+            flyingField.SetValue(controller, true);
+
+            float flightCameraDeadline = Time.realtimeSinceStartup + 1.5f;
+            while (Time.realtimeSinceStartup < flightCameraDeadline)
+            {
+                Vector3 flightPivot =
+                    player.transform.position + Vector3.up * 1.9f;
+                bool reachedFlightProfile =
+                    Mathf.Abs(camera.fieldOfView - 72f) <= 0.1f &&
+                    Mathf.Abs(
+                        Vector3.Distance(camera.transform.position, flightPivot) - 9f
+                    ) <= 0.1f;
+                if (reachedFlightProfile)
+                {
+                    break;
+                }
+
+                yield return null;
+            }
+
+            Vector3 finalFlightPivot =
+                player.transform.position + Vector3.up * 1.9f;
+            Assert.That(camera.fieldOfView, Is.EqualTo(72f).Within(0.1f));
+            Assert.That(
+                Vector3.Distance(camera.transform.position, finalFlightPivot),
+                Is.EqualTo(9f).Within(0.1f),
+                "Unobstructed flight must use the wider flight exploration profile."
             );
 
             Component framePacing = player.GetComponent("PowerSuitFramePacing");
@@ -311,6 +350,15 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(animationDriver, Is.Not.Null);
             Assert.That(weaponAnimationDriver, Is.Not.Null);
             Assert.That(animator, Is.Not.Null);
+            int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
+            int airborneAimLayerIndex = RequireLayerIndex(
+                animator,
+                AirborneAimLayerName
+            );
+            int weaponActionsLayerIndex = RequireLayerIndex(
+                animator,
+                WeaponActionsLayerName
+            );
 
             // Preserve the real animation adapter while replacing only live
             // mouse input with a deterministic held-aim value.
@@ -326,7 +374,7 @@ namespace Powersuit.Tests.PlayMode
             while (
                 Time.realtimeSinceStartup < aimDeadline &&
                 (!animator.GetBool("IsAiming") ||
-                 !IsInState(animator, 0, "Aim Locomotion"))
+                 !IsInState(animator, baseLayerIndex, "Aim Locomotion"))
             )
             {
                 yield return null;
@@ -334,12 +382,17 @@ namespace Powersuit.Tests.PlayMode
 
             Assert.That(animator.GetBool("IsAiming"), Is.True);
             Assert.That(
-                IsInState(animator, 0, "Aim Locomotion"),
+                IsInState(animator, baseLayerIndex, "Aim Locomotion"),
                 Is.True,
                 "The real controller-to-driver path must enter Aim Locomotion."
             );
             Assert.That(
-                animator.GetLayerWeight(1),
+                animator.GetLayerWeight(airborneAimLayerIndex),
+                Is.LessThan(0.01f),
+                "Grounded aim must not enable the airborne-only aim layer."
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
                 Is.LessThan(0.01f),
                 "The idle weapon-action layer must not override Aim Locomotion."
             );
@@ -363,26 +416,29 @@ namespace Powersuit.Tests.PlayMode
             float cycleDeadline = Time.realtimeSinceStartup + 1f;
             while (
                 Time.realtimeSinceStartup < cycleDeadline &&
-                !IsInState(animator, 1, "Bolt Cycle")
+                !IsInState(animator, weaponActionsLayerIndex, "Bolt Cycle")
             )
             {
                 yield return null;
             }
 
             Assert.That(
-                IsInState(animator, 1, "Bolt Cycle"),
+                IsInState(animator, weaponActionsLayerIndex, "Bolt Cycle"),
                 Is.True,
                 "An accepted shot must enter the bolt-cycle presentation."
             );
-            Assert.That(animator.GetLayerWeight(1), Is.GreaterThan(0.99f));
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.GreaterThan(0.99f)
+            );
 
             float releaseDeadline = Time.realtimeSinceStartup + 2f;
             while (
                 Time.realtimeSinceStartup < releaseDeadline &&
-                (!animator.GetCurrentAnimatorStateInfo(1)
+                (!animator.GetCurrentAnimatorStateInfo(weaponActionsLayerIndex)
                     .IsName("No Weapon Action") ||
-                 animator.IsInTransition(1) ||
-                 animator.GetLayerWeight(1) > 0.01f)
+                 animator.IsInTransition(weaponActionsLayerIndex) ||
+                 animator.GetLayerWeight(weaponActionsLayerIndex) > 0.01f)
             )
             {
                 yield return null;
@@ -393,17 +449,21 @@ namespace Powersuit.Tests.PlayMode
             yield return null;
 
             Assert.That(
-                animator.GetCurrentAnimatorStateInfo(1).IsName("No Weapon Action"),
+                animator.GetCurrentAnimatorStateInfo(weaponActionsLayerIndex)
+                    .IsName("No Weapon Action"),
                 Is.True
             );
-            Assert.That(animator.IsInTransition(1), Is.False);
             Assert.That(
-                animator.GetLayerWeight(1),
+                animator.IsInTransition(weaponActionsLayerIndex),
+                Is.False
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
                 Is.LessThan(0.01f),
                 "A completed bolt cycle must release the upper-body override."
             );
             Assert.That(
-                IsInState(animator, 0, "Aim Locomotion"),
+                IsInState(animator, baseLayerIndex, "Aim Locomotion"),
                 Is.True,
                 "The base aim state must remain active through bolt cycling."
             );
@@ -424,6 +484,266 @@ namespace Powersuit.Tests.PlayMode
                 Vector3.Dot(physicalBore, player.transform.forward),
                 Is.GreaterThan(0.9f),
                 "The rifle must return to its forward aim pose after a shot."
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator PoweredSuitAimDemo_AirborneAimAndReloadPreserveHover()
+        {
+            AsyncOperation loadOperation;
+#if UNITY_EDITOR
+            loadOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(
+                "Assets/Scenes/PoweredSuitAimDemo.unity",
+                new LoadSceneParameters(LoadSceneMode.Single)
+            );
+#else
+            loadOperation = SceneManager.LoadSceneAsync(
+                "PoweredSuitAimDemo",
+                LoadSceneMode.Single
+            );
+#endif
+            Assert.That(loadOperation, Is.Not.Null);
+
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+
+            yield return null;
+            yield return null;
+
+            GameObject player = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Generator 109 Player"
+            );
+            Assert.That(player, Is.Not.Null);
+            GameObject enemies = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Test Enemies"
+            );
+            if (enemies != null)
+            {
+                enemies.SetActive(false);
+            }
+
+            Behaviour controller =
+                player.GetComponent("PowerSuitController") as Behaviour;
+            Behaviour animationDriver =
+                player.GetComponent("PowerSuitAnimationDriver") as Behaviour;
+            Component weapon = player.GetComponent("PowerSuitWeapon");
+            Animator animator = player.GetComponentInChildren<Animator>(true);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(animationDriver, Is.Not.Null);
+            Assert.That(animationDriver.enabled, Is.True);
+            Assert.That(weapon, Is.Not.Null);
+            Assert.That(animator, Is.Not.Null);
+
+            int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
+            int airborneAimLayerIndex = RequireLayerIndex(
+                animator,
+                AirborneAimLayerName
+            );
+            int weaponActionsLayerIndex = RequireLayerIndex(
+                animator,
+                WeaponActionsLayerName
+            );
+
+            // Keep the real animation, carry, weapon-runtime, and action-layer
+            // adapters active. Only replace live keyboard/mouse sampling with
+            // deterministic held flight + aim state.
+            controller.enabled = false;
+            FieldInfo flyingField = controller.GetType().GetField(
+                "isFlying",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            FieldInfo aimingField = controller.GetType().GetField(
+                "isAiming",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            Assert.That(flyingField, Is.Not.Null);
+            Assert.That(aimingField, Is.Not.Null);
+            flyingField.SetValue(controller, true);
+            aimingField.SetValue(controller, true);
+
+            float airborneAimDeadline = Time.realtimeSinceStartup + 1.5f;
+            while (
+                Time.realtimeSinceStartup < airborneAimDeadline &&
+                (!animator.GetBool("IsFlying") ||
+                 !animator.GetBool("IsAiming") ||
+                 !IsInState(animator, baseLayerIndex, "Hover") ||
+                 animator.GetLayerWeight(airborneAimLayerIndex) < 0.99f)
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(animator.GetBool("IsFlying"), Is.True);
+            Assert.That(animator.GetBool("IsAiming"), Is.True);
+            Assert.That(
+                IsInState(animator, baseLayerIndex, "Hover"),
+                Is.True,
+                "Airborne aim must retain Hover on the locomotion base layer."
+            );
+            Assert.That(
+                animator.GetLayerWeight(airborneAimLayerIndex),
+                Is.GreaterThan(0.99f),
+                "Held airborne aim must raise the masked Airborne Aim layer."
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.LessThan(0.01f),
+                "Airborne aim alone must not raise the action override."
+            );
+            Assert.That(
+                GetBoolProperty(weapon, "PresentationAllowsReload"),
+                Is.True,
+                "Stable Ready carry must allow reload independently of flight."
+            );
+            AssertWeaponBoreFacesForward(player, weapon, "airborne aim");
+
+            int initialMagazine = GetIntProperty(weapon, "CurrentMagazineAmmo");
+            int initialReserve = GetIntProperty(weapon, "ReserveAmmo");
+            MethodInfo tryFireWeapon = weapon.GetType().GetMethod(
+                "TryFireWeapon",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(tryFireWeapon, Is.Not.Null);
+            object fireResult = tryFireWeapon.Invoke(weapon, null);
+            Assert.That(
+                fireResult?.GetType().GetProperty("Fired")?.GetValue(fireResult),
+                Is.EqualTo(true),
+                "The airborne reload regression needs one real spent round."
+            );
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(initialMagazine - 1)
+            );
+
+            float cycleReleaseDeadline = Time.realtimeSinceStartup + 3.5f;
+            while (
+                Time.realtimeSinceStartup < cycleReleaseDeadline &&
+                (GetBoolProperty(weapon, "IsCycling") ||
+                 !IsStableState(
+                     animator,
+                     weaponActionsLayerIndex,
+                     "No Weapon Action"
+                 ) ||
+                 animator.GetLayerWeight(weaponActionsLayerIndex) > 0.01f)
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(GetBoolProperty(weapon, "IsCycling"), Is.False);
+            Assert.That(
+                IsStableState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "No Weapon Action"
+                ),
+                Is.True,
+                "The preparatory bolt cycle must release before reload begins."
+            );
+
+            MethodInfo tryStartReload = weapon.GetType().GetMethod(
+                "TryStartReload",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(tryStartReload, Is.Not.Null);
+            object reloadStartResult = tryStartReload.Invoke(weapon, null);
+            Assert.That(
+                reloadStartResult?.ToString(),
+                Is.EqualTo("Started"),
+                "A ready weapon must accept reload while flying."
+            );
+
+            float reloadEntryDeadline = Time.realtimeSinceStartup + 1f;
+            while (
+                Time.realtimeSinceStartup < reloadEntryDeadline &&
+                (!IsInState(animator, weaponActionsLayerIndex, "Reload") ||
+                 animator.GetLayerWeight(weaponActionsLayerIndex) < 0.99f)
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(GetBoolProperty(weapon, "IsReloading"), Is.True);
+            Assert.That(
+                IsInState(animator, weaponActionsLayerIndex, "Reload"),
+                Is.True,
+                "Accepted airborne reload must enter the Reload action state."
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.GreaterThan(0.99f)
+            );
+            Assert.That(
+                IsInState(animator, baseLayerIndex, "Hover"),
+                Is.True,
+                "Reload must not replace airborne Hover locomotion."
+            );
+            Assert.That(
+                animator.GetLayerWeight(airborneAimLayerIndex),
+                Is.GreaterThan(0.99f),
+                "Held aim must remain selected beneath the reload action."
+            );
+
+            // Unity may deliberately throttle frames during editor focus or
+            // domain transitions. Allow the real 2.8-second gameplay timer to
+            // accumulate without turning an editor stall into a false failure.
+            float reloadCompletionDeadline = Time.realtimeSinceStartup + 8f;
+            while (
+                Time.realtimeSinceStartup < reloadCompletionDeadline &&
+                (GetBoolProperty(weapon, "IsReloading") ||
+                 !IsStableState(
+                     animator,
+                     weaponActionsLayerIndex,
+                     "No Weapon Action"
+                 ) ||
+                 animator.GetLayerWeight(weaponActionsLayerIndex) > 0.01f)
+            )
+            {
+                yield return null;
+            }
+
+            yield return null;
+
+            Assert.That(GetBoolProperty(weapon, "IsReloading"), Is.False);
+            Assert.That(
+                IsStableState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "No Weapon Action"
+                ),
+                Is.True
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.LessThan(0.01f),
+                "Completed airborne reload must release the action layer."
+            );
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(initialMagazine),
+                "Reload must replace the single round spent by the regression."
+            );
+            Assert.That(
+                GetIntProperty(weapon, "ReserveAmmo"),
+                Is.EqualTo(initialReserve - 1)
+            );
+            Assert.That(
+                IsInState(animator, baseLayerIndex, "Hover"),
+                Is.True
+            );
+            Assert.That(
+                animator.GetLayerWeight(airborneAimLayerIndex),
+                Is.GreaterThan(0.99f),
+                "Held aim must recover immediately after airborne reload."
+            );
+            AssertWeaponBoreFacesForward(
+                player,
+                weapon,
+                "airborne reload recovery"
             );
         }
 
@@ -466,10 +786,26 @@ namespace Powersuit.Tests.PlayMode
 
             Animator animator = player.GetComponentInChildren<Animator>(true);
             Assert.That(animator, Is.Not.Null);
-            Assert.That(animator.layerCount, Is.EqualTo(2));
-            Assert.That(animator.GetLayerName(1), Is.EqualTo("Weapon Actions"));
-            animator.SetLayerWeight(1, 1f);
-            Assert.That(animator.GetLayerWeight(1), Is.GreaterThan(0.99f));
+            Assert.That(animator.layerCount, Is.EqualTo(3));
+            int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
+            int airborneAimLayerIndex = RequireLayerIndex(
+                animator,
+                AirborneAimLayerName
+            );
+            int weaponActionsLayerIndex = RequireLayerIndex(
+                animator,
+                WeaponActionsLayerName
+            );
+            animator.SetLayerWeight(airborneAimLayerIndex, 0f);
+            animator.SetLayerWeight(weaponActionsLayerIndex, 1f);
+            Assert.That(
+                animator.GetLayerWeight(airborneAimLayerIndex),
+                Is.LessThan(0.01f)
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.GreaterThan(0.99f)
+            );
 
             animator.Rebind();
             animator.SetBool("IsFlying", false);
@@ -477,8 +813,17 @@ namespace Powersuit.Tests.PlayMode
             animator.SetBool("WeaponStowed", false);
             animator.SetFloat("MovementY", 1f);
             animator.SetFloat("LocomotionPlaybackSpeed", 2f);
-            animator.Play("Ready Locomotion", 0, 0f);
-            animator.Play("No Weapon Action", 1, 0f);
+            animator.Play("Ready Locomotion", baseLayerIndex, 0f);
+            animator.Play(
+                "Airborne Aim Pose",
+                airborneAimLayerIndex,
+                0f
+            );
+            animator.Play(
+                "No Weapon Action",
+                weaponActionsLayerIndex,
+                0f
+            );
             animator.Update(0f);
 
             Transform animatedModel = FindChild(
@@ -515,6 +860,7 @@ namespace Powersuit.Tests.PlayMode
 
             AssertWeaponActionRoundTrip(
                 animator,
+                weaponActionsLayerIndex,
                 "DrawWeapon",
                 "Draw Weapon",
                 1.5f,
@@ -528,6 +874,7 @@ namespace Powersuit.Tests.PlayMode
             );
             AssertWeaponActionRoundTrip(
                 animator,
+                weaponActionsLayerIndex,
                 "SheatheWeapon",
                 "Sheathe Weapon",
                 1.5f,
@@ -545,7 +892,12 @@ namespace Powersuit.Tests.PlayMode
 
             animator.SetTrigger("ReloadWeapon");
             Assert.That(
-                AdvanceUntilState(animator, 1, "Reload", 0.5f),
+                AdvanceUntilState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "Reload",
+                    0.5f
+                ),
                 Is.True,
                 "ReloadWeapon must enter the masked Reload state."
             );
@@ -560,7 +912,7 @@ namespace Powersuit.Tests.PlayMode
                 "reload entry"
             );
             Assert.That(
-                IsInState(animator, 0, "Ready Locomotion"),
+                IsInState(animator, baseLayerIndex, "Ready Locomotion"),
                 Is.True,
                 "The base locomotion state must remain active during reload."
             );
@@ -580,7 +932,12 @@ namespace Powersuit.Tests.PlayMode
                 "reload playback"
             );
             Assert.That(
-                AdvanceUntilState(animator, 1, "No Weapon Action", 3.5f),
+                AdvanceUntilState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "No Weapon Action",
+                    3.5f
+                ),
                 Is.True,
                 "Reload must return to No Weapon Action."
             );
@@ -597,7 +954,12 @@ namespace Powersuit.Tests.PlayMode
 
             animator.SetTrigger("CycleWeapon");
             Assert.That(
-                AdvanceUntilState(animator, 1, "Bolt Cycle", 0.5f),
+                AdvanceUntilState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "Bolt Cycle",
+                    0.5f
+                ),
                 Is.True,
                 "CycleWeapon must enter the masked Bolt Cycle state."
             );
@@ -612,7 +974,7 @@ namespace Powersuit.Tests.PlayMode
                 "bolt-cycle entry"
             );
             Assert.That(
-                IsInState(animator, 0, "Ready Locomotion"),
+                IsInState(animator, baseLayerIndex, "Ready Locomotion"),
                 Is.True,
                 "The base locomotion state must remain active during bolt cycling."
             );
@@ -632,7 +994,12 @@ namespace Powersuit.Tests.PlayMode
                 "bolt-cycle playback"
             );
             Assert.That(
-                AdvanceUntilState(animator, 1, "No Weapon Action", 1.2f),
+                AdvanceUntilState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "No Weapon Action",
+                    1.2f
+                ),
                 Is.True,
                 "Bolt Cycle must return to No Weapon Action."
             );
@@ -649,19 +1016,29 @@ namespace Powersuit.Tests.PlayMode
 
             animator.SetBool("IsFlying", true);
             animator.SetBool("WeaponStowed", false);
-            animator.Play("Hover", 0, 0f);
+            animator.Play("Hover", baseLayerIndex, 0f);
             animator.Update(0f);
 
             animator.SetBool("WeaponStowed", true);
             Assert.That(
-                AdvanceUntilState(animator, 0, "Stowed Hover", 0.5f),
+                AdvanceUntilState(
+                    animator,
+                    baseLayerIndex,
+                    "Stowed Hover",
+                    0.5f
+                ),
                 Is.True,
                 "Stowing while airborne must select Stowed Hover."
             );
 
             animator.SetBool("WeaponStowed", false);
             Assert.That(
-                AdvanceUntilState(animator, 0, "Hover", 0.5f),
+                AdvanceUntilState(
+                    animator,
+                    baseLayerIndex,
+                    "Hover",
+                    0.5f
+                ),
                 Is.True,
                 "Drawing while airborne must return to ready Hover."
             );
@@ -669,6 +1046,7 @@ namespace Powersuit.Tests.PlayMode
 
         private static void AssertWeaponActionRoundTrip(
             Animator animator,
+            int weaponActionsLayerIndex,
             string triggerName,
             string actionStateName,
             float returnTimeout,
@@ -683,7 +1061,12 @@ namespace Powersuit.Tests.PlayMode
         {
             animator.SetTrigger(triggerName);
             Assert.That(
-                AdvanceUntilState(animator, 1, actionStateName, 0.5f),
+                AdvanceUntilState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    actionStateName,
+                    0.5f
+                ),
                 Is.True,
                 $"{triggerName} must enter {actionStateName}."
             );
@@ -700,7 +1083,7 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(
                 AdvanceUntilState(
                     animator,
-                    1,
+                    weaponActionsLayerIndex,
                     "No Weapon Action",
                     returnTimeout
                 ),
@@ -751,6 +1134,77 @@ namespace Powersuit.Tests.PlayMode
                 head.position.y,
                 Is.GreaterThan(highestFoot + 1f),
                 $"The powered suit stopped being upright during {context}."
+            );
+        }
+
+        private static int RequireLayerIndex(Animator animator, string layerName)
+        {
+            int layerIndex = animator.GetLayerIndex(layerName);
+            Assert.That(
+                layerIndex,
+                Is.GreaterThanOrEqualTo(0),
+                $"Animator layer '{layerName}' is missing."
+            );
+            return layerIndex;
+        }
+
+        private static bool IsStableState(
+            Animator animator,
+            int layerIndex,
+            string stateName
+        )
+        {
+            return !animator.IsInTransition(layerIndex) &&
+                animator.GetCurrentAnimatorStateInfo(layerIndex).IsName(stateName);
+        }
+
+        private static bool GetBoolProperty(Component component, string propertyName)
+        {
+            PropertyInfo property = component.GetType().GetProperty(
+                propertyName,
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(property, Is.Not.Null, propertyName);
+            return (bool)property.GetValue(component);
+        }
+
+        private static int GetIntProperty(Component component, string propertyName)
+        {
+            PropertyInfo property = component.GetType().GetProperty(
+                propertyName,
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(property, Is.Not.Null, propertyName);
+            return (int)property.GetValue(component);
+        }
+
+        private static void AssertWeaponBoreFacesForward(
+            GameObject player,
+            Component weapon,
+            string context
+        )
+        {
+            Transform muzzle = weapon.GetType()
+                .GetProperty("MuzzleTransform")
+                ?.GetValue(weapon) as Transform;
+            Transform importedMuzzle = muzzle?.parent;
+            Transform rifleRoot = importedMuzzle?.parent;
+            Transform stock = rifleRoot?.Find("Rifle_StockContact");
+            Assert.That(muzzle, Is.Not.Null, context);
+            Assert.That(importedMuzzle, Is.Not.Null, context);
+            Assert.That(stock, Is.Not.Null, context);
+
+            Vector3 physicalBore =
+                (importedMuzzle.position - stock.position).normalized;
+            Assert.That(
+                Vector3.Dot(physicalBore, player.transform.forward),
+                Is.GreaterThan(0.9f),
+                $"The physical rifle bore must face gameplay forward during {context}."
+            );
+            Assert.That(
+                Vector3.Dot(muzzle.forward, player.transform.forward),
+                Is.GreaterThan(0.9f),
+                $"The muzzle adapter must face gameplay forward during {context}."
             );
         }
 

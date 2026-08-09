@@ -2,6 +2,7 @@ using UnityEngine;
 
 public sealed class PowerSuitAnimationDriver : MonoBehaviour
 {
+    public const string AirborneAimLayerName = "Airborne Aim";
     public const string MovementXParameterName = "MovementX";
     public const string MovementYParameterName = "MovementY";
     public const string MovementSpeedParameterName = "MovementSpeed";
@@ -15,6 +16,7 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
     [SerializeField] private PowerSuitWeaponPresentation weaponPresentation;
     [SerializeField, Min(0f)] private float movementDamping = 0.1f;
     [SerializeField, Min(1f)] private float fullSpeedLocomotionPlayback = 2f;
+    [SerializeField, Min(0f)] private float airborneAimBlendSharpness = 12f;
 
     private static readonly int IsMovingParameter =
         Animator.StringToHash("IsMoving");
@@ -49,8 +51,40 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
     private bool hasLocomotionPlaybackSpeed;
     private bool hasIsBackpedaling;
     private bool hasIsAimWalking;
+    private int airborneAimLayerIndex = -1;
+    private float airborneAimLayerWeight;
 
     private void Awake()
+    {
+        ResolveDependencies();
+
+        if (controller == null || animator == null)
+        {
+            Debug.LogError(
+                "Could not find the PowerSuitController or Animator.",
+                this
+            );
+
+            enabled = false;
+            return;
+        }
+
+        CacheAnimatorBindings();
+    }
+
+    private void OnEnable()
+    {
+        // Unity can reload scripts while Play Mode remains active. Runtime
+        // layer indices and parameter caches are not serialized, so rebuild
+        // them whenever the adapter is enabled as well as during first Awake.
+        ResolveDependencies();
+        if (controller != null && animator != null)
+        {
+            CacheAnimatorBindings();
+        }
+    }
+
+    private void ResolveDependencies()
     {
         if (controller == null)
         {
@@ -66,18 +100,10 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         {
             weaponPresentation = GetComponent<PowerSuitWeaponPresentation>();
         }
+    }
 
-        if (controller == null || animator == null)
-        {
-            Debug.LogError(
-                "Could not find the PowerSuitController or Animator.",
-                this
-            );
-
-            enabled = false;
-            return;
-        }
-
+    private void CacheAnimatorBindings()
+    {
         hasMovementX = HasParameter(MovementXParameter, AnimatorControllerParameterType.Float);
         hasMovementY = HasParameter(MovementYParameter, AnimatorControllerParameterType.Float);
         hasMovementSpeed = HasParameter(MovementSpeedParameter, AnimatorControllerParameterType.Float);
@@ -87,6 +113,11 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         );
         hasIsBackpedaling = HasParameter(IsBackpedalingParameter, AnimatorControllerParameterType.Bool);
         hasIsAimWalking = HasParameter(IsAimWalkingParameter, AnimatorControllerParameterType.Bool);
+        airborneAimLayerIndex = animator.GetLayerIndex(AirborneAimLayerName);
+        if (airborneAimLayerIndex >= 0)
+        {
+            animator.SetLayerWeight(airborneAimLayerIndex, 0f);
+        }
     }
 
     private void Update()
@@ -109,6 +140,8 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
             IsAimingParameter,
             controller.IsAiming && canAnimateAim
         );
+
+        UpdateAirborneAimLayer(canAnimateAim);
 
         SetOptionalFloat(
             MovementXParameter,
@@ -151,6 +184,49 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
                 IsAimWalkingParameter,
                 controller.IsAimWalking && canAnimateAim
             );
+        }
+    }
+
+    private void UpdateAirborneAimLayer(bool canAnimateAim)
+    {
+        if (airborneAimLayerIndex < 0)
+        {
+            return;
+        }
+
+        float targetWeight =
+            controller.IsFlying &&
+            controller.IsAiming &&
+            canAnimateAim
+                ? 1f
+                : 0f;
+        float blendFactor = PowerSuitCameraMath.ExponentialDampingFactor(
+            airborneAimBlendSharpness,
+            Time.deltaTime
+        );
+        airborneAimLayerWeight = Mathf.Lerp(
+            airborneAimLayerWeight,
+            targetWeight,
+            blendFactor
+        );
+
+        if (Mathf.Abs(airborneAimLayerWeight - targetWeight) < 0.001f)
+        {
+            airborneAimLayerWeight = targetWeight;
+        }
+
+        animator.SetLayerWeight(
+            airborneAimLayerIndex,
+            airborneAimLayerWeight
+        );
+    }
+
+    private void OnDisable()
+    {
+        airborneAimLayerWeight = 0f;
+        if (animator != null && airborneAimLayerIndex >= 0)
+        {
+            animator.SetLayerWeight(airborneAimLayerIndex, 0f);
         }
     }
 
@@ -199,5 +275,6 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
             1f,
             fullSpeedLocomotionPlayback
         );
+        airborneAimBlendSharpness = Mathf.Max(0f, airborneAimBlendSharpness);
     }
 }

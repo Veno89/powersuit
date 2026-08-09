@@ -31,15 +31,7 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
     private void Awake()
     {
-        if (weapon == null)
-        {
-            weapon = GetComponent<PowerSuitWeapon>();
-        }
-
-        if (animator == null)
-        {
-            animator = GetComponentInChildren<Animator>(true);
-        }
+        ResolveDependencies();
 
         if (weapon == null || animator == null)
         {
@@ -51,6 +43,24 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
             return;
         }
 
+        CacheAnimatorBindings();
+    }
+
+    private void ResolveDependencies()
+    {
+        if (weapon == null)
+        {
+            weapon = GetComponent<PowerSuitWeapon>();
+        }
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>(true);
+        }
+    }
+
+    private void CacheAnimatorBindings()
+    {
         hasReloadTrigger = HasTrigger(ReloadTrigger);
         hasCycleTrigger = HasTrigger(CycleTrigger);
         weaponActionLayerIndex = animator.GetLayerIndex(WeaponActionLayerName);
@@ -63,13 +73,19 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
     private void OnEnable()
     {
+        // Recover nonserialized layer/parameter caches after a Play Mode
+        // script reload before subscribing to runtime weapon events.
+        ResolveDependencies();
+        if (weapon != null && animator != null)
+        {
+            CacheAnimatorBindings();
+        }
         Subscribe();
     }
 
     private void Start()
     {
-        // OnEnable runs before Awake when a component starts enabled. Subscribe
-        // again after dependency discovery; the guard keeps this idempotent.
+        // The guard keeps dependency/reload subscription idempotent.
         Subscribe();
     }
 

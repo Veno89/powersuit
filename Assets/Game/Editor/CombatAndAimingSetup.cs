@@ -398,6 +398,9 @@ namespace Powersuit.Editor
             SerializedProperty normalDistProp = so.FindProperty("cameraDistance");
             SerializedProperty normalHeightProp = so.FindProperty("cameraHeight");
             SerializedProperty normalFovProp = so.FindProperty("defaultFieldOfView");
+            SerializedProperty flightDistProp = so.FindProperty("flightCameraDistance");
+            SerializedProperty flightHeightProp = so.FindProperty("flightCameraHeight");
+            SerializedProperty flightFovProp = so.FindProperty("flightFieldOfView");
             SerializedProperty collisionPaddingProp = so.FindProperty("cameraCollisionPadding");
             SerializedProperty collisionReleaseProp = so.FindProperty("cameraCollisionReleaseSharpness");
             SerializedProperty lookSharpnessProp = so.FindProperty("cameraLookSharpness");
@@ -407,9 +410,12 @@ namespace Powersuit.Editor
             SerializedProperty fovProp = so.FindProperty("aimFieldOfView");
             SerializedProperty speedProp = so.FindProperty("aimTransitionSpeed");
 
-            if (normalDistProp != null) normalDistProp.floatValue = 6f;
-            if (normalHeightProp != null) normalHeightProp.floatValue = 1.55f;
-            if (normalFovProp != null) normalFovProp.floatValue = 65f;
+            if (normalDistProp != null) normalDistProp.floatValue = 7.5f;
+            if (normalHeightProp != null) normalHeightProp.floatValue = 1.65f;
+            if (normalFovProp != null) normalFovProp.floatValue = 68f;
+            if (flightDistProp != null) flightDistProp.floatValue = 9f;
+            if (flightHeightProp != null) flightHeightProp.floatValue = 1.9f;
+            if (flightFovProp != null) flightFovProp.floatValue = 72f;
             if (collisionPaddingProp != null) collisionPaddingProp.floatValue = 0.05f;
             if (collisionReleaseProp != null) collisionReleaseProp.floatValue = 14f;
             if (lookSharpnessProp != null) lookSharpnessProp.floatValue = 28f;

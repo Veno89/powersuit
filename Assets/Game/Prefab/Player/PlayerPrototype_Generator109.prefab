@@ -127,34 +127,6 @@ PrefabInstance:
       propertyPath: walkSpeed
       value: 2.2
       objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: cameraHeight
-      value: 1.55
-      objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: aimFieldOfView
-      value: 58
-      objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: cameraDistance
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: aimCameraDistance
-      value: 3.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: defaultFieldOfView
-      value: 65
-      objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: aimShoulderOffset.x
-      value: -1.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
-      propertyPath: aimShoulderOffset.y
-      value: 0.3
-      objectReference: {fileID: 0}
     - target: {fileID: 7646132019645809869, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: muzzleTransform
       value: 
@@ -207,7 +179,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e8df20bc183b114c961febe9afaad95, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PowerSuitFramePacing
   runInBackground: 1
   synchronizeToDisplay: 1
@@ -227,6 +199,7 @@ MonoBehaviour:
   controller: {fileID: 7358886071130446257}
   animator: {fileID: 7870674555697902162}
   weapon: {fileID: 7331097523691493382}
+  weaponAnimationDriver: {fileID: 9175370816523564101}
   startsStowed: 0
   drawDuration: 1
   sheatheDuration: 1
