@@ -1,5 +1,6 @@
 using System.Collections;
 using System;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -44,6 +45,26 @@ namespace Powersuit.Tests.PlayMode
                     weaponType.GetProperty("MuzzleTransform")?.GetValue(weapon),
                     Is.EqualTo(muzzle)
                 );
+
+                FieldInfo aimingField = controllerType.GetField(
+                    "isAiming",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                MethodInfo setCursorLocked = controllerType.GetMethod(
+                    "SetCursorLocked",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                Assert.That(aimingField, Is.Not.Null);
+                Assert.That(setCursorLocked, Is.Not.Null);
+
+                aimingField.SetValue(controller, true);
+                setCursorLocked.Invoke(controller, new object[] { false });
+                Assert.That(
+                    controllerType.GetProperty("IsAiming")?.GetValue(controller),
+                    Is.EqualTo(false),
+                    "Releasing the cursor must never preserve the zoomed aim state."
+                );
+                setCursorLocked.Invoke(controller, new object[] { true });
             }
             finally
             {
@@ -166,6 +187,86 @@ namespace Powersuit.Tests.PlayMode
                 ),
                 Is.GreaterThan(0.8f),
                 "The animated suit's physical front must face gameplay forward."
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator PoweredSuitAimDemo_NormalCameraHasEvaluationRoomAndStablePacing()
+        {
+            AsyncOperation loadOperation;
+#if UNITY_EDITOR
+            loadOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(
+                "Assets/Scenes/PoweredSuitAimDemo.unity",
+                new LoadSceneParameters(LoadSceneMode.Single)
+            );
+#else
+            loadOperation = SceneManager.LoadSceneAsync(
+                "PoweredSuitAimDemo",
+                LoadSceneMode.Single
+            );
+#endif
+            Assert.That(loadOperation, Is.Not.Null);
+
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+
+            yield return null;
+            yield return null;
+
+            GameObject player = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Generator 109 Player"
+            );
+            Assert.That(player, Is.Not.Null);
+
+            Component controller = player.GetComponent("PowerSuitController");
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(
+                controller.GetType().GetProperty("IsAiming")?.GetValue(controller),
+                Is.EqualTo(false)
+            );
+
+            Camera camera = Camera.main;
+            Assert.That(camera, Is.Not.Null);
+            Assert.That(camera.fieldOfView, Is.EqualTo(65f).Within(0.1f));
+
+            Vector3 normalPivot = player.transform.position + Vector3.up * 1.55f;
+            Assert.That(
+                Vector3.Distance(camera.transform.position, normalPivot),
+                Is.EqualTo(6f).Within(0.1f)
+            );
+
+            Component framePacing = player.GetComponent("PowerSuitFramePacing");
+            Assert.That(framePacing, Is.Not.Null);
+            Assert.That(Application.runInBackground, Is.True);
+            Assert.That(Application.targetFrameRate, Is.EqualTo(60));
+            Assert.That(
+                framePacing.GetType().GetProperty("SynchronizeToDisplay")
+                    ?.GetValue(framePacing),
+                Is.EqualTo(true)
+            );
+
+            Type pacingPolicyType = Type.GetType(
+                "PowerSuitFramePacingPolicy, Assembly-CSharp",
+                true
+            );
+            MethodInfo shouldUseVSync = pacingPolicyType.GetMethod(
+                "ShouldUseVSync",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(shouldUseVSync, Is.Not.Null);
+            double refreshRate = Screen.currentResolution.refreshRateRatio.value;
+            bool expectedVSync = (bool)shouldUseVSync.Invoke(
+                null,
+                new object[] { true, refreshRate, 60 }
+            );
+            Assert.That(
+                QualitySettings.vSyncCount,
+                Is.EqualTo(expectedVSync ? 1 : 0),
+                "Displays at 60 Hz or faster should synchronize to native refresh; " +
+                "slower/unknown displays should use the 60 FPS target fallback."
             );
         }
 

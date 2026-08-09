@@ -395,12 +395,24 @@ namespace Powersuit.Editor
             if (controller == null) return;
 
             SerializedObject so = new SerializedObject(controller);
+            SerializedProperty normalDistProp = so.FindProperty("cameraDistance");
+            SerializedProperty normalHeightProp = so.FindProperty("cameraHeight");
+            SerializedProperty normalFovProp = so.FindProperty("defaultFieldOfView");
+            SerializedProperty collisionPaddingProp = so.FindProperty("cameraCollisionPadding");
+            SerializedProperty collisionReleaseProp = so.FindProperty("cameraCollisionReleaseSharpness");
+            SerializedProperty lookSharpnessProp = so.FindProperty("cameraLookSharpness");
             SerializedProperty distProp = so.FindProperty("aimCameraDistance");
             SerializedProperty heightProp = so.FindProperty("aimCameraHeight");
             SerializedProperty offsetProp = so.FindProperty("aimShoulderOffset");
             SerializedProperty fovProp = so.FindProperty("aimFieldOfView");
             SerializedProperty speedProp = so.FindProperty("aimTransitionSpeed");
 
+            if (normalDistProp != null) normalDistProp.floatValue = 6f;
+            if (normalHeightProp != null) normalHeightProp.floatValue = 1.55f;
+            if (normalFovProp != null) normalFovProp.floatValue = 65f;
+            if (collisionPaddingProp != null) collisionPaddingProp.floatValue = 0.05f;
+            if (collisionReleaseProp != null) collisionReleaseProp.floatValue = 14f;
+            if (lookSharpnessProp != null) lookSharpnessProp.floatValue = 28f;
             if (distProp != null) distProp.floatValue = 3.4f;
             if (heightProp != null) heightProp.floatValue = 1.5f;
             if (offsetProp != null) offsetProp.vector3Value = new Vector3(-1.6f, 0.3f, 0f);

@@ -9,6 +9,8 @@ using UnityEngine.InputSystem;
 public sealed class PowerSuitController : MonoBehaviour
 {
     private const float MovementStateThreshold = 0.01f;
+    private const int CameraCollisionHitCapacity = 32;
+    private const int AimHitCapacity = 32;
 
     public bool IsFlying => isFlying;
 
@@ -58,19 +60,22 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float turningSpeed = 12f;
 
     [Header("Camera")]
-    [SerializeField] private float cameraDistance = 5f;
-    [SerializeField] private float cameraHeight = 1.4f;
+    [SerializeField] private float cameraDistance = 6f;
+    [SerializeField] private float cameraHeight = 1.55f;
     [SerializeField] private float mouseSensitivity = 0.15f;
     [SerializeField] private float controllerLookSpeed = 120f;
     [SerializeField] private float minimumPitch = -55f;
     [SerializeField] private float maximumPitch = 70f;
     [SerializeField] private float cameraCollisionRadius = 0.2f;
+    [SerializeField] private float cameraCollisionPadding = 0.05f;
+    [SerializeField] private float cameraCollisionReleaseSharpness = 14f;
+    [SerializeField] private float cameraLookSharpness = 28f;
 
     [Header("Third-Person Aim Mode")]
     [SerializeField] private float aimCameraDistance = 3.4f;
     [SerializeField] private float aimCameraHeight = 1.5f;
     [SerializeField] private Vector3 aimShoulderOffset = new Vector3(-1.6f, 0.3f, 0f);
-    [SerializeField] private float defaultFieldOfView = 60f;
+    [SerializeField] private float defaultFieldOfView = 65f;
     [SerializeField] private float aimFieldOfView = 58f;
     [SerializeField] private float aimTransitionSpeed = 12f;
     [SerializeField] private float maxReticleOffset = 140f;
@@ -85,6 +90,8 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private float cameraYaw;
     private float cameraPitch = 15f;
+    private float smoothedCameraYaw;
+    private float smoothedCameraPitch;
 
     private bool isFlying;
     private bool isAiming;
@@ -94,7 +101,13 @@ public sealed class PowerSuitController : MonoBehaviour
     private float currentCameraHeight;
     private Vector3 currentShoulderOffset;
     private float currentFOV;
+    private float currentCollisionDistance;
+    private bool cameraOccluded;
     private Vector2 currentReticleOffset;
+
+    private readonly RaycastHit[] cameraCollisionHits =
+        new RaycastHit[CameraCollisionHitCapacity];
+    private readonly RaycastHit[] aimHits = new RaycastHit[AimHitCapacity];
 
     [Header("Recoil")]
     [SerializeField] private float recoilRecoverySpeed = 15f;
@@ -125,10 +138,13 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         cameraYaw = transform.eulerAngles.y;
+        smoothedCameraYaw = cameraYaw;
+        smoothedCameraPitch = cameraPitch;
         currentCameraDistance = cameraDistance;
         currentCameraHeight = cameraHeight;
         currentShoulderOffset = Vector3.zero;
         currentFOV = defaultFieldOfView;
+        currentCollisionDistance = cameraDistance;
         playerCamera.fieldOfView = defaultFieldOfView;
 
         SetCursorLocked(true);
@@ -143,8 +159,8 @@ public sealed class PowerSuitController : MonoBehaviour
             return;
         }
 
-        HandleCameraInput();
         HandleAimingState();
+        HandleCameraInput();
 
         if (WasFlightTogglePressed())
         {
@@ -170,6 +186,14 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         UpdateCamera();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+        {
+            SetCursorLocked(false);
+        }
     }
 
     private void HandleGroundMovement()
@@ -328,7 +352,10 @@ public sealed class PowerSuitController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             targetRotation,
-            turningSpeed * Time.deltaTime
+            PowerSuitCameraMath.ExponentialDampingFactor(
+                turningSpeed,
+                Time.deltaTime
+            )
         );
     }
 
@@ -394,13 +421,45 @@ public sealed class PowerSuitController : MonoBehaviour
         float targetHeight = isAiming ? aimCameraHeight : cameraHeight;
         Vector3 targetShoulder = isAiming ? aimShoulderOffset : Vector3.zero;
         float targetFOV = isAiming ? aimFieldOfView : defaultFieldOfView;
+        float cameraDeltaTime = Time.unscaledDeltaTime;
+        float transitionFactor = PowerSuitCameraMath.ExponentialDampingFactor(
+            aimTransitionSpeed,
+            cameraDeltaTime
+        );
 
-        currentCameraDistance = Mathf.Lerp(currentCameraDistance, targetDistance, Time.deltaTime * aimTransitionSpeed);
-        currentCameraHeight = Mathf.Lerp(currentCameraHeight, targetHeight, Time.deltaTime * aimTransitionSpeed);
-        currentShoulderOffset = Vector3.Lerp(currentShoulderOffset, targetShoulder, Time.deltaTime * aimTransitionSpeed);
-        currentFOV = Mathf.Lerp(currentFOV, targetFOV, Time.deltaTime * aimTransitionSpeed);
+        currentCameraDistance = Mathf.Lerp(
+            currentCameraDistance,
+            targetDistance,
+            transitionFactor
+        );
+        currentCameraHeight = Mathf.Lerp(
+            currentCameraHeight,
+            targetHeight,
+            transitionFactor
+        );
+        currentShoulderOffset = Vector3.Lerp(
+            currentShoulderOffset,
+            targetShoulder,
+            transitionFactor
+        );
+        currentFOV = Mathf.Lerp(currentFOV, targetFOV, transitionFactor);
 
         currentRecoilOffset = Vector2.MoveTowards(currentRecoilOffset, Vector2.zero, recoilRecoverySpeed * Time.deltaTime);
+
+        float lookFactor = PowerSuitCameraMath.ExponentialDampingFactor(
+            cameraLookSharpness,
+            cameraDeltaTime
+        );
+        smoothedCameraYaw = Mathf.LerpAngle(
+            smoothedCameraYaw,
+            cameraYaw,
+            lookFactor
+        );
+        smoothedCameraPitch = Mathf.LerpAngle(
+            smoothedCameraPitch,
+            cameraPitch,
+            lookFactor
+        );
 
         if (playerCamera != null)
         {
@@ -408,7 +467,11 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         Vector3 pivot = transform.position + Vector3.up * currentCameraHeight;
-        Quaternion cameraRotation = Quaternion.Euler(cameraPitch - currentRecoilOffset.y, cameraYaw + currentRecoilOffset.x, 0f);
+        Quaternion cameraRotation = Quaternion.Euler(
+            smoothedCameraPitch - currentRecoilOffset.y,
+            smoothedCameraYaw + currentRecoilOffset.x,
+            0f
+        );
 
         Vector3 cameraRight = cameraRotation * Vector3.right;
         Vector3 cameraUp = Vector3.up;
@@ -422,43 +485,113 @@ public sealed class PowerSuitController : MonoBehaviour
         Vector3 rayDirection = desiredPosition - pivot;
         float distance = rayDirection.magnitude;
 
-        float allowedDistance = distance;
+        float allowedDistance = FindAllowedCameraDistance(
+            pivot,
+            rayDirection,
+            distance
+        );
 
-        if (distance > 0.001f)
+        currentCollisionDistance = PowerSuitCameraMath.ResolveCameraDistance(
+            currentCollisionDistance,
+            distance,
+            allowedDistance,
+            cameraOccluded,
+            cameraCollisionReleaseSharpness,
+            cameraDeltaTime,
+            out cameraOccluded
+        );
+
+        if (distance <= 0.001f)
         {
-            RaycastHit[] hits = Physics.SphereCastAll(
+            playerCamera.transform.position = pivot;
+        }
+        else
+        {
+            playerCamera.transform.position =
+                pivot + rayDirection.normalized * currentCollisionDistance;
+        }
+
+        playerCamera.transform.rotation = cameraRotation;
+    }
+
+    private float FindAllowedCameraDistance(
+        Vector3 pivot,
+        Vector3 rayDirection,
+        float distance
+    )
+    {
+        if (distance <= 0.001f)
+        {
+            return 0f;
+        }
+
+        Vector3 direction = rayDirection / distance;
+        int hitCount = Physics.SphereCastNonAlloc(
+            pivot,
+            cameraCollisionRadius,
+            direction,
+            cameraCollisionHits,
+            distance,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore
+        );
+
+        float allowedDistance = ScanCameraHits(
+            cameraCollisionHits,
+            hitCount,
+            distance
+        );
+
+        // NonAlloc hit order is undefined. A saturated buffer might omit the
+        // closest wall, so take the rare allocating path only on overflow.
+        if (hitCount == cameraCollisionHits.Length)
+        {
+            RaycastHit[] overflowHits = Physics.SphereCastAll(
                 pivot,
                 cameraCollisionRadius,
-                rayDirection.normalized,
+                direction,
                 distance,
                 Physics.DefaultRaycastLayers,
                 QueryTriggerInteraction.Ignore
             );
-
-            foreach (RaycastHit hit in hits)
-            {
-                Transform hitTransform = hit.collider.transform;
-
-                if (
-                    hitTransform == transform ||
-                    hitTransform.IsChildOf(transform)
-                )
-                {
-                    continue;
-                }
-
-                allowedDistance = Mathf.Min(
-                    allowedDistance,
-                    Mathf.Max(
-                        0.2f,
-                        hit.distance - cameraCollisionRadius
-                    )
-                );
-            }
+            allowedDistance = Mathf.Min(
+                allowedDistance,
+                ScanCameraHits(overflowHits, overflowHits.Length, distance)
+            );
         }
 
-        playerCamera.transform.position = pivot + rayDirection.normalized * allowedDistance;
-        playerCamera.transform.rotation = cameraRotation;
+        return allowedDistance;
+    }
+
+    private float ScanCameraHits(
+        RaycastHit[] hits,
+        int hitCount,
+        float unobstructedDistance
+    )
+    {
+        float allowedDistance = unobstructedDistance;
+
+        for (int index = 0; index < hitCount; index++)
+        {
+            RaycastHit hit = hits[index];
+            if (hit.collider == null)
+            {
+                continue;
+            }
+
+            Transform hitTransform = hit.collider.transform;
+            if (hitTransform == transform || hitTransform.IsChildOf(transform))
+            {
+                continue;
+            }
+
+            allowedDistance = Mathf.Min(
+                allowedDistance,
+                Mathf.Max(0.2f, hit.distance - cameraCollisionPadding)
+            );
+        }
+
+        return allowedDistance;
     }
 
     public Ray GetAimRay()
@@ -476,23 +609,21 @@ public sealed class PowerSuitController : MonoBehaviour
         Ray aimRay = GetAimRay();
         Vector3 targetPoint;
 
-        RaycastHit[] hits = Physics.RaycastAll(
+        int hitCount = Physics.RaycastNonAlloc(
             aimRay,
+            aimHits,
             aimMaxDistance,
             Physics.DefaultRaycastLayers,
             QueryTriggerInteraction.Ignore
         );
 
-        System.Array.Sort(
-            hits,
-            (first, second) => first.distance.CompareTo(second.distance)
-        );
-
         bool foundHit = false;
         Vector3 hitPoint = Vector3.zero;
+        float nearestDistance = float.PositiveInfinity;
 
-        foreach (RaycastHit hit in hits)
+        for (int index = 0; index < hitCount; index++)
         {
+            RaycastHit hit = aimHits[index];
             if (
                 hit.transform == transform ||
                 hit.transform.IsChildOf(transform)
@@ -501,9 +632,40 @@ public sealed class PowerSuitController : MonoBehaviour
                 continue;
             }
 
-            hitPoint = hit.point;
-            foundHit = true;
-            break;
+            if (hit.distance < nearestDistance)
+            {
+                nearestDistance = hit.distance;
+                hitPoint = hit.point;
+                foundHit = true;
+            }
+        }
+
+        // As with camera collision, saturation makes the NonAlloc subset
+        // unspecified. Preserve correctness in unusually collider-dense shots.
+        if (hitCount == aimHits.Length)
+        {
+            RaycastHit[] overflowHits = Physics.RaycastAll(
+                aimRay,
+                aimMaxDistance,
+                Physics.DefaultRaycastLayers,
+                QueryTriggerInteraction.Ignore
+            );
+
+            foreach (RaycastHit hit in overflowHits)
+            {
+                if (
+                    hit.transform == transform ||
+                    hit.transform.IsChildOf(transform) ||
+                    hit.distance >= nearestDistance
+                )
+                {
+                    continue;
+                }
+
+                nearestDistance = hit.distance;
+                hitPoint = hit.point;
+                foundHit = true;
+            }
         }
 
         if (foundHit)
@@ -559,6 +721,11 @@ public sealed class PowerSuitController : MonoBehaviour
     private void SetCursorLocked(bool locked)
     {
         cursorLocked = locked;
+
+        if (!locked)
+        {
+            isAiming = false;
+        }
 
         Cursor.lockState = locked
             ? CursorLockMode.Locked
@@ -773,6 +940,126 @@ public sealed class PowerSuitController : MonoBehaviour
 #else
         return Input.GetMouseButtonDown(0);
 #endif
+    }
+}
+
+/// <summary>
+/// Frame-rate-independent camera interpolation kept outside the component so
+/// convergence and collision recovery can be verified without a live scene.
+/// </summary>
+public static class PowerSuitCameraMath
+{
+    public static float ExponentialDampingFactor(
+        float sharpness,
+        float deltaTime
+    )
+    {
+        if (float.IsNaN(deltaTime) || deltaTime <= 0f)
+        {
+            return 0f;
+        }
+
+        if (float.IsNaN(sharpness) || sharpness <= 0f)
+        {
+            return 1f;
+        }
+
+        if (float.IsInfinity(deltaTime) || float.IsInfinity(sharpness))
+        {
+            return 1f;
+        }
+
+        return 1f - Mathf.Exp(-sharpness * deltaTime);
+    }
+
+    public static float Damp(
+        float current,
+        float target,
+        float sharpness,
+        float deltaTime
+    )
+    {
+        return Mathf.Lerp(
+            current,
+            target,
+            ExponentialDampingFactor(sharpness, deltaTime)
+        );
+    }
+
+    public static float ResolveCollisionDistance(
+        float currentDistance,
+        float unobstructedDistance,
+        float allowedDistance,
+        float releaseSharpness,
+        float deltaTime
+    )
+    {
+        float targetDistance = Mathf.Clamp(
+            allowedDistance,
+            0f,
+            Mathf.Max(0f, unobstructedDistance)
+        );
+
+        if (targetDistance <= currentDistance)
+        {
+            return targetDistance;
+        }
+
+        return Mathf.Min(
+            unobstructedDistance,
+            Damp(
+                currentDistance,
+                targetDistance,
+                releaseSharpness,
+                deltaTime
+            )
+        );
+    }
+
+    public static float ResolveCameraDistance(
+        float currentDistance,
+        float unobstructedDistance,
+        float allowedDistance,
+        bool wasOccluded,
+        float releaseSharpness,
+        float deltaTime,
+        out bool isOccluded
+    )
+    {
+        const float ObstructionEpsilon = 0.001f;
+        const float RecoverySnapEpsilon = 0.01f;
+
+        bool hasObstruction =
+            allowedDistance < unobstructedDistance - ObstructionEpsilon;
+        isOccluded = hasObstruction || wasOccluded;
+
+        // The normal/aim profile already has its own damping. With no wall
+        // recovery in progress, follow that profile exactly rather than
+        // filtering the outward transition a second time.
+        if (!isOccluded)
+        {
+            return Mathf.Max(0f, unobstructedDistance);
+        }
+
+        float resolvedDistance = ResolveCollisionDistance(
+            currentDistance,
+            unobstructedDistance,
+            allowedDistance,
+            releaseSharpness,
+            deltaTime
+        );
+
+        if (
+            !hasObstruction &&
+            Mathf.Abs(resolvedDistance - unobstructedDistance) <=
+                RecoverySnapEpsilon
+        )
+        {
+            isOccluded = false;
+            return Mathf.Max(0f, unobstructedDistance);
+        }
+
+        return resolvedDistance;
     }
 }
 

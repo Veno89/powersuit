@@ -127,6 +127,20 @@ This roadmap tracks the requested weapon handling, locomotion, aiming, and Preci
 - [ ] Rerun the expanded full EditMode and PlayMode suites after Unity's local headless entitlement is restored; the restart currently reports `com.unity.editor.headless was not found`.
 - [ ] User rechecks firing, reload, bolt cycle, and right-mouse aiming in `PoweredSuitAimDemo`.
 
+## Camera framing and smoothness hotfix — 2026-08-09
+
+- [x] Confirm the normal camera was not stuck in aim mode or collision: the live state was non-aiming at the full configured `5 m` and `60` degree FOV with no external obstruction.
+- [x] Widen normal exploration framing to distance `6 m`, height `1.55 m`, and FOV `65` while preserving the rifle-readable `3.4 m` / `58` degree aim profile.
+- [x] Replace frame-dependent camera interpolation with exponential damping and add mild orbit smoothing without moving controller motion into `FixedUpdate`.
+- [x] Replace steady-state allocating camera and aim casts with reusable hit buffers; preserve a correctness fallback for saturated buffers.
+- [x] Make camera collision pull in immediately and recover smoothly after clearing cover.
+- [x] Add a demo frame-pacing policy: synchronize to displays at 60 Hz or faster, retain a 60 FPS fallback, and keep the simulation active when editor focus changes.
+- [x] Avoid dirtying the 106-renderer animated subtree twice per frame by restoring the imported Animator root only when a transform channel actually drifts.
+- [x] Profile the live demo at native `3422x1230`: roughly `4.2 ms` frame / `2.0 ms` render, `25` SetPass calls, and `42k` visible triangles, confirming comfortable 60 FPS headroom.
+- [x] Add camera math, collision recovery, frame-policy, prefab contract, and PlayMode framing regression coverage; C# solution compiles with zero warnings/errors.
+- [ ] Rerun the new focused Unity fixtures after the current MCP test-runner session is re-established.
+- [ ] User accepts normal framing, orbit smoothness, cover collision recovery, aim transition, and presentation smoothness in `PoweredSuitAimDemo`.
+
 ## Final release gate
 
 - [x] Run a clean Blender build from immutable source; all 17 actions, geometry/rigidity/contact checks, and 32 required renders pass.

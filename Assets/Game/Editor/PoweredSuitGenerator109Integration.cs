@@ -1013,6 +1013,13 @@ namespace Powersuit.Editor
                 }
 
                 ConfigureAimCamera(suitController);
+                PowerSuitFramePacing framePacing =
+                    instance.GetComponent<PowerSuitFramePacing>();
+                if (framePacing == null)
+                {
+                    framePacing = instance.AddComponent<PowerSuitFramePacing>();
+                }
+                ConfigureFramePacing(framePacing);
                 weapon.MuzzleTransform = CreateMuzzleAdapter(muzzle);
                 WeaponDefinition weaponDefinition =
                     AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
@@ -1118,6 +1125,12 @@ namespace Powersuit.Editor
         {
             SerializedObject serialized = new SerializedObject(controller);
             SetFloat(serialized, "walkSpeed", 2.2f);
+            SetFloat(serialized, "cameraDistance", 6f);
+            SetFloat(serialized, "cameraHeight", 1.55f);
+            SetFloat(serialized, "defaultFieldOfView", 65f);
+            SetFloat(serialized, "cameraCollisionPadding", 0.05f);
+            SetFloat(serialized, "cameraCollisionReleaseSharpness", 14f);
+            SetFloat(serialized, "cameraLookSharpness", 28f);
             SetFloat(serialized, "aimCameraDistance", 3.4f);
             SetFloat(serialized, "aimCameraHeight", 1.5f);
             // The shouldered rifle sits on player-local -X. Keeping the camera
@@ -1126,6 +1139,15 @@ namespace Powersuit.Editor
             SetVector(serialized, "aimShoulderOffset", new Vector3(-1.6f, 0.3f, 0f));
             SetFloat(serialized, "aimFieldOfView", 58f);
             SetFloat(serialized, "aimTransitionSpeed", 12f);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ConfigureFramePacing(PowerSuitFramePacing framePacing)
+        {
+            SerializedObject serialized = new SerializedObject(framePacing);
+            SetBool(serialized, "runInBackground", true);
+            SetBool(serialized, "synchronizeToDisplay", true);
+            SetInt(serialized, "fallbackTargetFrameRate", 60);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1513,6 +1535,12 @@ namespace Powersuit.Editor
             }
 
             SerializedObject controllerSettings = new SerializedObject(suitController);
+            SerializedProperty normalDistance =
+                controllerSettings.FindProperty("cameraDistance");
+            SerializedProperty normalHeight =
+                controllerSettings.FindProperty("cameraHeight");
+            SerializedProperty normalFov =
+                controllerSettings.FindProperty("defaultFieldOfView");
             SerializedProperty aimDistance =
                 controllerSettings.FindProperty("aimCameraDistance");
             SerializedProperty aimShoulder =
@@ -1520,18 +1548,40 @@ namespace Powersuit.Editor
             SerializedProperty aimFov =
                 controllerSettings.FindProperty("aimFieldOfView");
             if (
+                normalDistance == null ||
+                normalHeight == null ||
+                normalFov == null ||
                 aimDistance == null ||
                 aimShoulder == null ||
                 aimFov == null ||
+                normalDistance.floatValue < 5.9f ||
+                normalHeight.floatValue < 1.5f ||
+                normalFov.floatValue < 64f ||
                 aimDistance.floatValue < 3.3f ||
+                aimDistance.floatValue >= normalDistance.floatValue ||
                 aimShoulder.vector3Value.x > -1.4f ||
                 aimShoulder.vector3Value.y < 0.2f ||
-                aimFov.floatValue < 55f
+                aimFov.floatValue < 55f ||
+                aimFov.floatValue >= normalFov.floatValue
             )
             {
                 throw new InvalidOperationException(
-                    "Aim camera must stay on the rifle's local -X shoulder and " +
-                    "retain the wider weapon-readable framing."
+                    "Normal camera must retain evaluation room, while aim stays " +
+                    "on the rifle's local -X shoulder with weapon-readable framing."
+                );
+            }
+
+            PowerSuitFramePacing framePacing =
+                variant.GetComponent<PowerSuitFramePacing>();
+            if (
+                framePacing == null ||
+                !framePacing.RunInBackground ||
+                !framePacing.SynchronizeToDisplay ||
+                framePacing.FallbackTargetFrameRate != 60
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 demo player is missing the 60 FPS/display-sync policy."
                 );
             }
 

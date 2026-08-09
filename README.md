@@ -22,7 +22,9 @@ Controls:
 - `Shift`: boost
 - `Esc`: release the cursor; click the Game view to capture it again
 
-The aim camera now sits on the rifle's local `-X` shoulder (`3.4 m` distance, `-1.6 m` shoulder offset, `58` degree FOV), so the receiver and barrel read beside the suit instead of through its back and helmet. Dedicated forward and backward aim-walk clips keep the lower body moving while the weapon remains shouldered. Pure lateral aim strafing currently uses the locomotion fallback; authored left/right strafe clips are intentionally deferred.
+The normal exploration camera now uses a wider `6 m`, `1.55 m` high, `65` degree composition so the full suit and its animation remain readable. The aim camera keeps its separately tuned rifle-side view on local `-X` (`3.4 m` distance, `-1.6 m` shoulder offset, `58` degree FOV), so the receiver and barrel read beside the suit instead of through its back and helmet. Dedicated forward and backward aim-walk clips keep the lower body moving while the weapon remains shouldered. Pure lateral aim strafing currently uses the locomotion fallback; authored left/right strafe clips are intentionally deferred.
+
+Camera transitions and orbit input use frame-rate-independent damping. Collision checks use a reusable hit buffer, pull in immediately to avoid clipping, and release smoothly after clearing cover. The focused demo synchronizes to displays running at least 60 Hz (100 Hz on the current test display), with a 60 FPS fallback and background execution enabled so changing editor focus does not collapse the simulation rate.
 
 The original `FlightPrototype` greybox and legacy FBXs remain available for comparison and rollback. The focused demo uses `PlayerPrototype_Generator109.prefab`; the `Generator109` Unity names are retained to preserve their existing GUIDs and references even though the nested model is now Generator 111.
 
@@ -91,6 +93,8 @@ After hands-on review exposed a firing face-plant and opposite-shoulder camera, 
 - draw, sheathe, reload, and bolt-cycle live Animator exercise: `0` degree imported-root rotation, `0 m` position/scale drift, and at least `1.559 m` head-to-feet clearance
 - all four generated upper-body clips: no Animator-root, `Root`, `Hips`, or lower-body bindings; action states use Write Defaults off
 - camera occlusion diagnostic: visible rifle silhouette increased from about `10%` to `35%`
+
+The subsequent camera/pacing pass was profiled in the live demo at `3422x1230`: approximately `4.2 ms` total frame time, `2.0 ms` render time, `25` SetPass calls, and about `42k` visible triangles. The scene therefore has comfortable 60 FPS throughput; the perceived chop came from uncapped, unsynchronised presentation and frame-dependent camera response rather than a rendering bottleneck. The pass adds display synchronization with a 60 FPS fallback, a wider normal view, non-allocating steady-state camera/aim casts, smooth collision recovery, and conditional Animator-root writes.
 
 The expanded full Unity suites still need one rerun after the local headless-license entitlement is restored; Unity returned `com.unity.editor.headless was not found` when the stalled live runner was restarted. The prior 35/35 EditMode, 4/4 PlayMode, and development-build results remain recorded above, while the new regression assertions are checked by compilation and the direct live action exercise.
 

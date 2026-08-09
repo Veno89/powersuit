@@ -117,18 +117,21 @@ MonoBehaviour:
   boostSpeed: 20
   flightAcceleration: 12
   turningSpeed: 12
-  cameraDistance: 5
-  cameraHeight: 1.4
+  cameraDistance: 6
+  cameraHeight: 1.55
   mouseSensitivity: 0.15
   controllerLookSpeed: 120
   minimumPitch: -55
   maximumPitch: 70
   cameraCollisionRadius: 0.2
-  aimCameraDistance: 2.2
+  cameraCollisionPadding: 0.05
+  cameraCollisionReleaseSharpness: 14
+  cameraLookSharpness: 28
+  aimCameraDistance: 3.4
   aimCameraHeight: 1.5
-  aimShoulderOffset: {x: 1.2, y: 0.4, z: 0}
-  defaultFieldOfView: 60
-  aimFieldOfView: 45
+  aimShoulderOffset: {x: -1.6, y: 0.3, z: 0}
+  defaultFieldOfView: 65
+  aimFieldOfView: 58
   aimTransitionSpeed: 12
   maxReticleOffset: 140
   aimMaxDistance: 200

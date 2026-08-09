@@ -12,6 +12,9 @@ using UnityEngine;
 [DefaultExecutionOrder(10000)]
 public sealed class PowerSuitAnimatorRootLock : MonoBehaviour
 {
+    private const float PositionScaleEpsilonSquared = 0.0000000001f;
+    private const float RotationDotEpsilon = 0.9999999f;
+
     [SerializeField, HideInInspector] private bool hasLock;
     [SerializeField, HideInInspector] private Vector3 lockedLocalPosition;
     [SerializeField, HideInInspector] private Quaternion lockedLocalRotation =
@@ -35,9 +38,31 @@ public sealed class PowerSuitAnimatorRootLock : MonoBehaviour
     public void RestoreNow()
     {
         EnsureLock();
-        transform.localPosition = lockedLocalPosition;
-        transform.localRotation = lockedLocalRotation;
-        transform.localScale = lockedLocalScale;
+
+        if (
+            (transform.localPosition - lockedLocalPosition).sqrMagnitude >
+            PositionScaleEpsilonSquared
+        )
+        {
+            transform.localPosition = lockedLocalPosition;
+        }
+
+        if (
+            Mathf.Abs(
+                Quaternion.Dot(transform.localRotation, lockedLocalRotation)
+            ) < RotationDotEpsilon
+        )
+        {
+            transform.localRotation = lockedLocalRotation;
+        }
+
+        if (
+            (transform.localScale - lockedLocalScale).sqrMagnitude >
+            PositionScaleEpsilonSquared
+        )
+        {
+            transform.localScale = lockedLocalScale;
+        }
     }
 
     private void Awake()

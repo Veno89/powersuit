@@ -145,6 +145,30 @@ namespace Powersuit.Tests.EditMode
 
             SerializedObject controllerSettings = new SerializedObject(suitController);
             Assert.That(
+                controllerSettings.FindProperty("cameraDistance").floatValue,
+                Is.EqualTo(6f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("cameraHeight").floatValue,
+                Is.EqualTo(1.55f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("defaultFieldOfView").floatValue,
+                Is.EqualTo(65f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("cameraCollisionPadding").floatValue,
+                Is.EqualTo(0.05f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("cameraCollisionReleaseSharpness").floatValue,
+                Is.EqualTo(14f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("cameraLookSharpness").floatValue,
+                Is.EqualTo(28f).Within(0.001f)
+            );
+            Assert.That(
                 controllerSettings.FindProperty("aimCameraDistance").floatValue,
                 Is.EqualTo(3.4f).Within(0.001f)
             );
@@ -159,6 +183,21 @@ namespace Powersuit.Tests.EditMode
             Assert.That(
                 controllerSettings.FindProperty("aimFieldOfView").floatValue,
                 Is.EqualTo(58f).Within(0.001f)
+            );
+
+            Component framePacing = player.GetComponent("PowerSuitFramePacing");
+            Assert.That(framePacing, Is.Not.Null);
+            Assert.That(
+                framePacing.GetType().GetProperty("RunInBackground")?.GetValue(framePacing),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                framePacing.GetType().GetProperty("SynchronizeToDisplay")?.GetValue(framePacing),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                framePacing.GetType().GetProperty("FallbackTargetFrameRate")?.GetValue(framePacing),
+                Is.EqualTo(60)
             );
 
             Animator[] animators = player.GetComponentsInChildren<Animator>(true);

@@ -38,6 +38,8 @@ Namespaces should begin with `Powersuit`. Editor-only code stays in an `Editor` 
 
 - Generator 111 exports 17 exact Generic-rig clips from one Blender armature.
 - `PowerSuitController` exposes signed local velocity (`MovementX`, `MovementY`, normalized speed, backpedal, and aim-walk state) based on actual `CharacterController` motion.
+- `PowerSuitController` also owns the late-frame third-person orbit. Normal and aim profiles remain independent; exponential damping is frame-rate invariant, steady-state collision/aim queries reuse buffers, and wall recovery is smoothed without delaying collision pull-in.
+- `PowerSuitFramePacing` is the demo/runtime presentation adapter. It synchronizes to displays at 60 Hz or faster, uses 60 FPS as a fallback, and keeps the simulation active when the Unity Game view loses focus. It changes runtime state only and does not rewrite the shared QualitySettings asset.
 - The Animator base layer selects ready, stowed, aim, walk/backpedal, and hover locomotion.
 - A masked Weapon Actions layer owns draw, sheathe, reload, and bolt-cycle upper-body motion while leaving the legs on base locomotion.
 - The integration generator extracts each weapon action into a Unity-owned `.anim` that whitelists only the spine/arms and `WeaponRoot`/magazine/bolt controls. Raw FBX action takes must not be assigned directly to the override layer.
@@ -67,6 +69,7 @@ Implemented in the current candidate:
 - forward walk, backpedal, forward/backward aim-walk, and stowed locomotion
 - gait-speed matching to reduce visible skating
 - a wider over-the-shoulder composition showing more of the rifle
+- a wider 6 m / 65 degree normal exploration composition, smooth orbit/aim transitions, non-allocating steady-state camera collision, and display-synchronized presentation with a 60 FPS fallback
 - data-driven Precision Rifle tuning, finite ammunition, reload, critical hits, and manual bolt cycle
 - runtime reload/cycle timing aligned to authored magazine/bolt frames, with animation triggers kept presentation-only
 - a two-layer Animator that preserves lower-body locomotion during weapon actions

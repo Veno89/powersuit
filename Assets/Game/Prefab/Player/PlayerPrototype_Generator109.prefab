@@ -128,12 +128,24 @@ PrefabInstance:
       value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      propertyPath: cameraHeight
+      value: 1.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimFieldOfView
       value: 58
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      propertyPath: cameraDistance
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimCameraDistance
       value: 3.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      propertyPath: defaultFieldOfView
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 7602583253053523322, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       propertyPath: aimShoulderOffset.x
@@ -167,6 +179,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 744771702606272323}
+    - targetCorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 333840841786693580}
     - targetCorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
       insertIndex: -1
@@ -182,6 +197,21 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7800013680873977227, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}
   m_PrefabInstance: {fileID: 1126408794865802443}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &744771702606272323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7178449499544889664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e8df20bc183b114c961febe9afaad95, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PowerSuitFramePacing
+  runInBackground: 1
+  synchronizeToDisplay: 1
+  fallbackTargetFrameRate: 60
 --- !u!114 &333840841786693580
 MonoBehaviour:
   m_ObjectHideFlags: 0
