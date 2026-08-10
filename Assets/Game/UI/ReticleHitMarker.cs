@@ -6,12 +6,16 @@ public sealed class ReticleHitMarker : MonoBehaviour
     public static ReticleHitMarker Instance => instance;
 
     [SerializeField] private Color markerColor = new Color(1f, 0.25f, 0.25f, 1f);
+    [SerializeField] private Color killMarkerColor = new Color(1f, 0.82f, 0.2f, 1f);
     [SerializeField] private float displayDuration = 0.15f;
+    [SerializeField] private float killDisplayDuration = 0.28f;
     [SerializeField] private float startSize = 10f;
     [SerializeField] private float endSize = 20f;
     [SerializeField] private float lineThickness = 2.5f;
 
     private float timer;
+    private float activeDuration;
+    private bool showingKill;
     private PowerSuitController controller;
 
     private void Awake()
@@ -34,7 +38,7 @@ public sealed class ReticleHitMarker : MonoBehaviour
         }
     }
 
-    public static void ShowHitMarker()
+    public static void ShowHitMarker(bool wasKilled = false)
     {
         if (instance == null)
         {
@@ -47,13 +51,22 @@ public sealed class ReticleHitMarker : MonoBehaviour
 
         if (instance != null)
         {
-            instance.TriggerHitMarker();
+            instance.TriggerHitMarker(wasKilled);
         }
     }
 
-    public void TriggerHitMarker()
+    public static void ShowKillMarker()
     {
-        timer = displayDuration;
+        ShowHitMarker(true);
+    }
+
+    public void TriggerHitMarker(bool wasKilled = false)
+    {
+        showingKill = wasKilled;
+        activeDuration = wasKilled
+            ? Mathf.Max(displayDuration, killDisplayDuration)
+            : displayDuration;
+        timer = activeDuration;
     }
 
     private void Update()
@@ -83,11 +96,12 @@ public sealed class ReticleHitMarker : MonoBehaviour
         float guiX = reticlePos.x;
         float guiY = Screen.height - reticlePos.y;
 
-        float progress = 1f - (timer / displayDuration);
-        float currentSize = Mathf.Lerp(startSize, endSize, progress);
+        float progress = 1f - (timer / Mathf.Max(0.001f, activeDuration));
+        float sizeMultiplier = showingKill ? 1.35f : 1f;
+        float currentSize = Mathf.Lerp(startSize, endSize, progress) * sizeMultiplier;
         float alpha = Mathf.Clamp01(1f - progress);
 
-        Color c = markerColor;
+        Color c = showingKill ? killMarkerColor : markerColor;
         c.a = alpha;
 
         Color savedColor = GUI.color;

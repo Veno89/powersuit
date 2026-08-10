@@ -1,0 +1,17 @@
+{
+    "name": "Powersuit.DeveloperConsole.Unity",
+    "rootNamespace": "Powersuit.DeveloperConsole.UnityAdapters",
+    "references": [
+        "Powersuit.DeveloperConsole.Runtime",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

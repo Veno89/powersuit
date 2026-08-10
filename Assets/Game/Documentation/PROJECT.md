@@ -1,58 +1,153 @@
-# Powersuit Project Foundation
+# PowerSuit Technical Demo Architecture
 
-## Product concept
+This document describes the current **Feel-First Combat and Flight Tech Demo** implementation. `Assets/Scenes/PoweredSuitAimDemo.unity` is the canonical scene; the reusable gameplay composition is supplied through prefabs and C# runtime bootstrap rather than by rewriting that scene.
 
-Powersuit is a single-player third-person powered-flight action game. The target is a compact 3D sandbox where the player flies a powered suit, fights enemies, collects randomized equipment, and grows stronger. The current vertical slice includes grounded movement, powered flight, a third-person camera, over-the-shoulder aiming, projectile combat, basic enemies, combat feedback, and the approved Generator 109 suit-and-rifle model.
+## Runtime composition
 
-## Technical architecture
+`PlayerPrototype_Generator109.prefab` is the canonical player variant. The retained `Generator109` filename preserves GUID continuity while the nested suit and animation content comes from the later Generator113 asset pass. Generator113 preserves the 18 animation names/ranges and 33 mandatory validation renders while advancing the powered-gait contract to version 4.
 
-- Unity 6000.5.7f1 with Universal Render Pipeline 17.5.0 is the fixed editor and renderer baseline.
-- The Input System 1.20.0 is the primary input backend, with guarded legacy-input fallbacks for the prototype controls.
-- Important rules and calculations should be plain C# with Edit Mode tests where practical.
-- MonoBehaviours should adapt plain C# logic to Unity input, transforms, physics, animation, audio, and presentation.
-- Scene objects hold composition and references, not large gameplay algorithms.
-- Content assets and tuning data belong under `Content`; code belongs to its owning feature folder.
-- Cross-feature dependencies should point toward `Core`, not between unrelated feature modules.
+At runtime, `PowerSuitDemoBootstrap`:
 
-## Folder conventions
+1. resolves the player camera after the prefab is instantiated;
+2. instantiates one `PowerSuitCombatSandbox.prefab`;
+3. binds the owned `EnemySpawnDirector` to the player and HUD;
+4. suppresses the three legacy scene `SimpleEnemy` rollback actors so only the generated encounter architecture runs; and
+5. restores those legacy actors when its ownership ends.
 
-| Folder | Ownership |
+The generated world prefab contains three connected greybox areas—central landing/combat, open flight/long range, and vertical/aerial combat—plus five spawn zones and 19 ground/flight points. It is tech-demo geometry, not final environment art.
+
+## Ownership boundaries
+
+| Location | Responsibility |
 | --- | --- |
-| `Core` | Shared plain C# types, contracts, and utilities |
-| `Player` | Player-domain logic and Unity adapters |
-| `Camera` | Third-person camera logic and adapters |
-| `Combat` | Damage, weapons, targeting, and combat adapters |
-| `Enemies` | Enemy-domain logic and adapters |
-| `Progression` | Equipment, loot, inventory, and progression logic |
-| `World` | Sandbox geometry, encounters, and world adapters |
-| `UI` | Runtime UI and presentation adapters |
-| `Content` | Materials, prefabs, ScriptableObjects, and other authored assets |
-| `Editor` | Editor-only automation and validation utilities |
-| `Tests` | Edit Mode and Play Mode test assemblies |
-| `Documentation` | Product, architecture, workflow, and phase records |
+| `Combat/Runtime` | Engine-independent damage, faction, weapon, cooldown, ultimate, and aim state |
+| `Combat` | Rifle, physical player projectile, damage receivers, and Unity conversion/adapters |
+| `Abilities/Runtime` | Rocket, lightning, void, and target-validation state |
+| `Abilities/Unity` | Target indicator, area-effect execution, projectiles/actors, forces, VFX hooks, and pooling |
+| `Enemies/Runtime` | Archetype configuration, decisions, runtime state, spawn configuration/planning |
+| `Enemies/Unity` | Definitions, controller/motor, attack emitter/projectile, SpawnDirector, zones, signals, and mesh health bars |
+| `Player` | Central input routing, movement/flight, health, ability coordination, animation, rifle presentation, and visual flight response |
+| `UI/HUD` | Testable snapshots/formatting and the screen-space presenter |
+| `DeveloperConsole` | Pure parser/registry/session, Unity overlay/input gate/statistics, and typed gameplay command pack |
+| `Demo` | Runtime world/bootstrap ownership |
+| `Core` | Pool/reset contracts, feedback pool, and frame pacing |
+| `Content` | Authored weapon/enemy definitions and materials |
+| `Prefab` | Generated player, abilities, enemies, combat effects, and world composition |
+| `Editor` | Idempotent generation/integration, validation, and focused Development Build tools |
+| `Tests` | EditMode and PlayMode correctness, integration, content, and lifecycle coverage |
 
-Namespaces should begin with `Powersuit`. Editor-only code stays in an `Editor` folder or editor-only assembly. Tests are separated into `EditMode` and `PlayMode` assemblies. Preserve Unity-generated `.meta` files whenever assets are moved or renamed.
+Important gameplay authority remains in C#. Animation events may align presentation, but ammunition, damage, cooldown, ultimate meter, spawn ownership, reset, and action availability all have code-owned fallbacks.
 
-## Agent operating rules
+## Input and action ownership
 
-Repository-wide permanent rules are in the root `AGENTS.md`. Agents must keep gameplay logic in C#, prefer testable plain C# code, treat Unity components as adapters, avoid large visual scripting graphs, protect `.meta` files, preserve the editor version, and respect phase scope.
+`PowerSuitInputRouter` samples keyboard/mouse or gamepad once per frame and exposes an immutable gameplay frame. It arbitrates held/pressed/released actions, cursor recapture, console focus, scope, targeting, and cancel behavior so the player, weapon, and abilities do not independently compete for raw input.
 
-## Validation workflow
+Keyboard/mouse bindings are:
 
-1. Allow Unity to import assets and confirm the Console has no compiler errors.
-2. Run Edit Mode tests.
-3. Run Play Mode tests.
-4. Open `Assets/Scenes/PoweredSuitAimDemo.unity`; verify movement, flight, shoulder aim, `PS_Aim`, rifle muzzle alignment, firing, target hits, and hit feedback.
-5. Confirm `Assets/Scenes/FlightPrototype.unity` remains the shared Build Profile scene and still satisfies the original Phase 0 tests.
-6. Run `Tools > Powered Suit > Build Generator 109 Demo` for the focused Windows development build.
-7. Review source-control changes and confirm no generated directories, Blender working outputs, build products, or unapproved external assets are staged.
+- `WASD` movement; `Shift` sprints forward/sideways on stable ground and boosts in flight
+- tap `Space` for a normal ground jump; keep an accepted jump held for about 0.9 seconds to enter flight; `Space` then ascends, while `Ctrl` or `C` descends
+- RMB shoulder aim, RMB + `V` Precision Rifle scope toggle, LMB fire, `R` reload, `Q` draw/stow
+- `G` rocket, hold/release `E` lightning, `X` void ultimate
+- Backquote or `F1` console, `Esc` cancel/release cursor
 
-## Current phase status
+There is no `F` flight binding. A jump-to-flight hold must begin with a consumed ground/coyote jump; pressing and holding `Space` only after the player is already falling cannot arm flight. Releasing early or landing before the threshold cancels the sequence, and feet-level touchdown exits flight automatically.
 
-The Phase 0 project foundation and `FlightPrototype` greybox are preserved. The active prototype now adds a controllable powered suit, grounded and flight movement, camera transitions, an over-the-shoulder aiming mode, projectile combat, enemy damage/death behavior, pooled impact and muzzle feedback, hit markers, and focused Generator 109 presentation.
+The scope uses the Precision Rifle's configured `ScopePoint` and aim profile. `V` is accepted only when the ready weapon is both `PrecisionRifle` class and scope-enabled; RMB remains the over-shoulder profile. While scoped, every renderer beneath `RifleRoot` is reversibly suppressed so receiver, barrel, and optic geometry cannot enter the sight picture. Weapon transforms and ballistics continue evaluating, and the presenter draws an aspect-safe circular sight, center crosshair, mil ticks, and range stadia against the same aim-ray point used by the weapon. Flight does not remove weapon reload, shoulder aim, scope, or ability ownership.
 
-Generator 109 is integrated as an additive player prefab and demo scene rather than overwriting the legacy model. Its animator controller retains the existing asset GUID and now contains Idle, Walk, Hover, and Aim states. The weapon fires from the imported `Rifle_Muzzle`, not a fixed placeholder transform. Blender sources and evidence are maintained outside `Assets`, while only approved Unity-ready artifacts enter the import tree.
+## Player, camera, animation, and weapon
 
-## Planned next phase
+`PowerSuitController` adapts a CharacterController to plain-C# movement helpers: acceleration/deceleration, signed camera-relative movement, grounding hysteresis, coyote time, buffered jump, air control, landing, hold-to-flight, hover/braking, vertical flight, boost, banking, and safe ground/flight transitions. The focused player prefab persists the responsive profile (6.5 m/s ground, 14 m/s flight, 28 m/s boost), with piecewise zero-crossing reversal, stronger braking, 20/32 free/combat turning sharpness, 1.65x stable-ground sprint, a 0.9-second accepted-jump flight threshold, and 0.55 held-jump gravity scale. The rollback base prefab retains its legacy 5 m/s tune.
 
-The next phase should stabilize this vertical slice before expanding scope: tune movement and camera feel in play, visually inspect hand/rifle contact in Unity, add gameplay-focused tests for damage and pooling, resolve remaining prototype presentation issues, and keep progression systems deferred until the combat loop is reliable.
+Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps banking/squash presentation-only. `PowerSuitThrusterPresentation` builds four cached blue-white jets (outer plume plus core per nozzle) and two unshadowed backpack glows, driven only by sprint/flight/boost state. Neither component owns movement or the planned heat resource.
+
+The generated Animator uses four layers in this order:
+
+1. `Base`
+2. masked override `Forward Weapon Pose`
+3. masked additive `Bolt Cycle Action`
+4. masked override `Weapon Actions`
+
+The base layer owns locomotion/flight, including a dedicated `Run Locomotion` state driven by `IsRunning`. Generator113 lengthens every stance-aware locomotion stride and lowers ordinary full-speed playback from 4.5x to 2.75x while leaving controller speeds unchanged. Its looping `PS_Run_Forward` clip stays at 1.35x state playback (approximately 243 steps/minute); propulsion feedback intentionally communicates powered assistance instead of demanding impossible human-scale no-slip steps at 10.725 m/s. Sprint is limited to stable-ground forward/lateral ready-carry movement; aim, backpedal, stowed locomotion, and flight keep their dedicated states. Forward pose keeps accepted hip/flight fire pointed forward without forcing aim FOV. The additive layer cycles the articulated bolt, while the highest override owns draw, sheathe, and reload. Code controls commit/cancel/reset behavior.
+
+`WeaponDefinition` owns authored rifle tuning, empty-magazine auto-reload policy, and ground/shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
+
+## Abilities
+
+The abilities share narrow services—cooldown/ultimate state, target validation, faction-safe radial queries/deduplication, external force, pool/reset, HUD, and input arbitration—rather than a large generic ability framework. `AbilityAreaEffectPresentation` procedurally builds cached line/light children once, then drives pulsing target boundaries, rocket shockwave/rays, lightning radius/impact rings, and the lightning column without per-use prefab construction.
+
+- `ShoulderRocketAbility` launches a pooled hardpoint projectile toward the resolved target. Its explosion applies falloff damage and impulse once per receiver.
+- `LightningStrikeAbility` owns hold-to-target/release-to-cast state, validity and cancel rules, target indicator, cooldown, and a pooled warning/strike actor.
+- `VoidUltimateAbility` consumes a full meter, places a pooled field, periodically damages and pulls valid enemies, then applies a final outward burst.
+
+Public tuning APIs support the developer console without exposing private fields through reflection.
+
+## Enemies and encounter direction
+
+The generated content set contains six `EnemyArchetypeDefinition` assets and matching prefabs:
+
+- Stationary Sentry
+- Patrol Rifleman
+- Pursuer
+- Heavy Artillery
+- Flying Harrier
+- Skirmisher
+
+`EnemyArchetypeController` combines definition-driven runtime state, movement/flight decisions, target ownership, force response, health, telegraph/attack signals, and complete pool reset. `EnemyAttackEmitter` and the pooled enemy projectile keep attack presentation and projectile lifecycle separate. `EnemyHealthBarPresenter` uses camera-facing mesh renderers with distance culling rather than a Canvas per enemy.
+
+`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, and live diagnostics. The generated default is tuned to an eight-enemy cap, 5.5-second interval, groups up to two, and threat budget four.
+
+## HUD and developer console
+
+The HUD consumes a quantized `PowerSuitHudSnapshot` and only rebuilds display strings when visible values change. It covers health, ammo/reload, reticle/hit state, rocket/lightning cooldowns, and ultimate meter. The generated Canvas owns a `PowerSuitHudSafeArea`; health sits bottom-left, abilities bottom-center, and ammo/reload bottom-right. The integrated player disables the older IMGUI health and ammunition panels so they cannot overlap the instructions or reload widget. Encounter counts are reported by the developer-console statistics provider rather than the HUD snapshot.
+
+The developer console is enabled in the Editor and Development Builds. Its pure registry/parser provides help, errors, history, quoted arguments, typed parsing, and clamping. The Unity overlay owns cursor/input focus. The gameplay pack exposes intentional APIs for player, rifle, ability, enemy, director, seed/spawn, scene, FPS, pool, and projectile commands. Run `help` in game for the complete current list.
+
+## Pooling and hot paths
+
+`CombatFeedbackPool` is the common lightweight pool and `ICombatPoolable` defines reset hooks. Player projectiles, enemy projectiles, ability projectiles/actors, effects, and generated enemies are prewarmed or reused. Diagnostics expose active, inactive, peak, and miss/instantiation counts. One-time projectile component setup happens during initialization rather than every spawn, and generated materials use instancing.
+
+Reset responsibilities include timers, velocities, health/death, motor/AI state, collider/renderer state, forces, target ownership, effects/trails, subscriptions, HUD state, and director bookkeeping. The PlayMode suite includes 1,000 projectile spawn/recycle operations without steady-state instantiation.
+
+## Generation and scene safety
+
+`PoweredSuitGenerator109Integration` updates the generated controller, animation assets, player prefab, ability prefabs, enemy content, and world prefab, then validates references. When AimDemo already exists, it does not recreate or repopulate the scene. First-time creation remains a separate missing-scene path.
+
+`PowerSuitDemoEnemyContentGenerator` creates the six enemy prefabs, projectile, materials, and world. Existing enemy definition assets are preserved rather than overwritten, so authored tuning survives regeneration.
+
+The local recovery snapshot was audited as semantically equivalent to the committed AimDemo and is excluded from the intended source change. Local scene, render-pipeline, package, project-setting, and recovery churn must not be staged accidentally.
+
+## Validation workflow and current evidence
+
+`PowerSuitValidationRunner` provides menu and callable entry points for the full Unity suites. It writes ignored summaries to:
+
+- `Temp/PowerSuitValidationEditMode.txt`
+- `Temp/PowerSuitValidationPlayMode.txt`
+
+Current 2026-08-10 results:
+
+- `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
+- EditMode: 228/228 passed.
+- PlayMode: 12/12 passed.
+- Generator113 source validation passed for all 18 animation clips and 33 mandatory renders, with powered strides of 0.8379 m walk / 0.9341 m run and 0.0365 m run clearance; generated gait playback, thruster presenter, complete-rifle scope suppression, and importer/prefab data passed integration validation.
+- Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
+- Windows x64 Development Build succeeded at 2026-08-10 17:50. Its package-level Sentis shader warnings were non-blocking.
+- A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
+- Final Unity Console inspection reported 0 errors.
+- Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.
+
+Before accepting the milestone, still perform:
+
+1. Set the Game view to **Fit** or `1x`; local `2x`/`4x` or pan state can mimic camera zoom.
+2. Run the complete ground/flight/aim/scope/fire/reload/ability and conflicting-input matrix, including slopes, steps, close cover, death/respawn, and owner feel review.
+3. Capture real Unity Profiler evidence at representative and stress loads, including CPU/render/GC, pool misses, and 30/60/120+ frame-rate behavior.
+4. Run an extended lifecycle soak with repeated pooled reuse, reloads, seed/spawner changes, scene reload, malformed console commands, and player/enemy death cycles.
+5. Validate a replacement humanoid/retargeting path and complete final animation, character, enemy, world, UI, VFX, and audio content polish.
+6. After sprint/flight propulsion feel is accepted, add a testable overheat/stamina state, cooldown behavior, and HUD bar without coupling it to the visual exhaust adapter.
+
+Automated checks establish technical correctness of the current batch; they do not prove subjective feel, a sustained 60 FPS target on representative hardware, or production-quality content.
+
+## Known limitations and exclusions
+
+Open gaps are owner/manual feel acceptance, directional start/stop/strafe and contact-aware footwork polish, the later sprint/flight overheat resource, profiler captures and performance tuning under representative stress, long lifecycle evidence, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, silent audio hooks, and UI are suitable for a tech demo, not final production art. No external audio assets were added.
+
+Excluded are multiplayer/networking, loot/inventory/rarity, progression/skill trees, crafting, missions/quests/dialogue/story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, and final Asset Store publication.

@@ -25,8 +25,10 @@ STAGES = (
     "upgrade_powersuit_model.py",
     "upgrade_rifle_model.py",
     "create_aim_animation.py",
+    "create_weapon_animation_set.py",
     "render_animation_validation.py",
     "render_rifle_validation.py",
+    "render_weapon_animation_validation.py",
 )
 
 REQUIRED_AIM_RENDERS = {
@@ -53,6 +55,24 @@ REQUIRED_RIFLE_RENDERS = {
     "rifle_with_suit_scale.png",
 }
 
+REQUIRED_WEAPON_ANIMATION_RENDERS = {
+    "ready_idle_front_3q.png",
+    "stowed_idle_rear_3q.png",
+    "draw_frame_010_rear_3q.png",
+    "draw_frame_018_side.png",
+    "sheathe_frame_021_rear_3q.png",
+    "walk_forward_frame_009_side.png",
+    "walk_backward_frame_009_side.png",
+    "aim_walk_forward_frame_009_front_3q.png",
+    "aim_walk_backward_frame_009_side.png",
+    "reload_frame_050_magazine.png",
+    "reload_frame_064_insert.png",
+    "bolt_frame_012_close.png",
+    "stowed_walk_frame_009_rear_3q.png",
+    "stowed_hover_frame_031_rear_3q.png",
+    "run_forward_frame_006_side.png",
+}
+
 
 def _run_stage(filename: str) -> None:
     path = SCRIPT_DIR / filename
@@ -68,16 +88,28 @@ def _run_stage(filename: str) -> None:
 def _verify_outputs() -> None:
     aim_dir = PROJECT_DIR / "renders" / "aim_validation"
     rifle_dir = PROJECT_DIR / "renders" / "rifle_validation"
+    weapon_animation_dir = PROJECT_DIR / "renders" / "weapon_animation_validation"
     aim_names = {path.name for path in aim_dir.glob("*.png")} if aim_dir.is_dir() else set()
     rifle_names = {path.name for path in rifle_dir.glob("*.png")} if rifle_dir.is_dir() else set()
+    weapon_animation_names = (
+        {path.name for path in weapon_animation_dir.glob("*.png")}
+        if weapon_animation_dir.is_dir() else set()
+    )
     missing_aim = sorted(REQUIRED_AIM_RENDERS - aim_names)
     missing_rifle = sorted(REQUIRED_RIFLE_RENDERS - rifle_names)
-    if missing_aim or missing_rifle:
+    missing_weapon_animation = sorted(
+        REQUIRED_WEAPON_ANIMATION_RENDERS - weapon_animation_names
+    )
+    if missing_aim or missing_rifle or missing_weapon_animation:
         details = []
         if missing_aim:
             details.append("aim: " + ", ".join(missing_aim))
         if missing_rifle:
             details.append("rifle: " + ", ".join(missing_rifle))
+        if missing_weapon_animation:
+            details.append(
+                "weapon animation: " + ", ".join(missing_weapon_animation)
+            )
         raise RuntimeError("Mandatory validation renders are incomplete (" + "; ".join(details) + ").")
     report = PROJECT_DIR / "renders" / "validation_report.json"
     if not report.is_file() or report.stat().st_size < 256:

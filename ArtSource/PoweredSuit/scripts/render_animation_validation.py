@@ -29,6 +29,7 @@ from powersuit_pipeline_common import (  # noqa: E402
     body_basis,
     bone_head_world,
     bone_tail_world,
+    can_reuse_validation_render,
     ensure_directory,
     expected_transform_curve_count,
     ensure_object_mode,
@@ -42,6 +43,7 @@ from powersuit_pipeline_common import (  # noqa: E402
     quaternion_angle_degrees,
     remove_pipeline_temps,
     create_static_render_scene,
+    configure_validation_render_engine,
     detach_rifle_for_validation,
     remove_static_render_scene,
     restore_rifle_after_validation,
@@ -55,6 +57,8 @@ from powersuit_pipeline_common import (  # noqa: E402
 )
 
 from weapon_handling_contract import (  # noqa: E402
+    COMPONENT_BOLT,
+    COMPONENT_MAGAZINE,
     COMPONENT_OPTIC,
     COMPONENT_STOCK,
     ROLE_MUZZLE,
@@ -68,6 +72,7 @@ from weapon_handling_contract import (  # noqa: E402
     validate_weapon_contract,
     weapon_contact_surfaces,
     weapon_components,
+    weapon_contract_objects,
     weapon_local_position,
 )
 
@@ -267,21 +272,43 @@ def _validate_animation_invariants(armature: bpy.types.Object) -> dict[str, obje
 
 
 def _validate_hierarchy(armature: bpy.types.Object, root: bpy.types.Object) -> dict[str, object]:
-    if root.parent != armature or root.parent_type != "BONE" or root.parent_bone != "Hand.R":
-        raise RuntimeError("Only RifleRoot must be bone-parented to PowerSuit_Armature -> Hand.R.")
+    if root.parent != armature or root.parent_type != "BONE" or root.parent_bone != "WeaponRoot":
+        raise RuntimeError(
+            "RifleRoot must be bone-parented to the verified WeaponRoot carrier."
+        )
+    expected_articulated = {
+        obj.name: ("WeaponMagazine" if str(obj.get("ps_weapon_component_role", "")) == COMPONENT_MAGAZINE else "WeaponBolt")
+        for obj in (
+            weapon_components(root, COMPONENT_MAGAZINE)
+            + weapon_components(root, COMPONENT_BOLT)
+        )
+    }
     direct_bone_rifle = [
         obj.name for obj in bpy.data.objects
         if obj.parent == armature and obj.parent_type == "BONE"
         and (obj.name == RIFLE_ROOT_NAME or obj.name.startswith("Rifle_"))
     ]
-    if direct_bone_rifle != [RIFLE_ROOT_NAME]:
+    expected_direct = {RIFLE_ROOT_NAME, *expected_articulated}
+    if set(direct_bone_rifle) != expected_direct:
         raise RuntimeError(
             "Unexpected rifle objects directly bone-parented: "
             + ", ".join(sorted(direct_bone_rifle))
         )
+    bad_articulated = [
+        f"{name}->{bpy.data.objects[name].parent_bone}"
+        for name, expected_bone in expected_articulated.items()
+        if bpy.data.objects[name].parent_bone != expected_bone
+    ]
+    if bad_articulated:
+        raise RuntimeError(
+            "Articulated rifle components use wrong control bones: "
+            + ", ".join(bad_articulated)
+        )
     stray = [
         obj.name for obj in bpy.data.objects
-        if obj.name.startswith("Rifle_") and obj.parent != root
+        if obj.name.startswith("Rifle_")
+        and obj.parent != root
+        and obj.name not in expected_articulated
     ]
     if stray:
         raise RuntimeError("Stray rifle objects outside RifleRoot: " + ", ".join(sorted(stray)))
@@ -345,7 +372,9 @@ def _upper_body_meshes(
         if obj.parent == armature and obj.parent_type == "BONE" and obj.parent_bone in UPPER_PARENT_BONES:
             result.append(obj)
     if include_rifle:
-        result.extend(obj for obj in object_tree(root) if obj.type == "MESH")
+        result.extend(
+            obj for obj in weapon_contract_objects(root) if obj.type == "MESH"
+        )
     return list(dict.fromkeys(result))
 
 
@@ -651,7 +680,7 @@ def _aim_pose_geometry_metrics(
         if bpy.data.objects.get(name) is not None
     ]
     non_stock_weapon_meshes = [
-        child for child in root.children
+        child for child in weapon_contract_objects(root)
         if child.type == "MESH"
         and str(child.get("ps_weapon_component_role", "")) != COMPONENT_STOCK
     ]
@@ -956,6 +985,13 @@ def _render_one(
 
     set_camera_look_at(camera, location, target)
     _position_lights(lights, target, right, forward, up)
+    if can_reuse_validation_render(output_path):
+        _validate_render_content(output_path)
+        print(
+            f"Reused validated render after interrupted pass: {output_path}",
+            flush=True,
+        )
+        return
     render_scene.render.filepath = str(output_path)
     print(
         f"[Aim validation] Render {output_path.name}: "
@@ -1026,11 +1062,13 @@ def _render_all(
     armature: bpy.types.Object,
     root: bpy.types.Object,
     rifle_state: dict[str, object],
-) -> list[Path]:
+) -> tuple[list[Path], str]:
     output_dir = ensure_directory("renders", "aim_validation")
 
     suit_sources = _upper_body_meshes(armature, root, include_rifle=False)
-    rifle_sources = [obj for obj in object_tree(root) if obj.type == "MESH"]
+    rifle_sources = [
+        obj for obj in weapon_contract_objects(root) if obj.type == "MESH"
+    ]
     source_objects = list(dict.fromkeys([*suit_sources, *rifle_sources]))
     suit_names = {obj.name for obj in suit_sources}
     rifle_names = {obj.name for obj in rifle_sources}
@@ -1044,7 +1082,7 @@ def _render_all(
             source_objects,
         )
         camera, lights = _create_camera_and_lights(render_scene, render_collection)
-        render_scene.render.engine = "BLENDER_WORKBENCH"
+        render_backend = configure_validation_render_engine(render_scene)
         render_scene.display.shading.color_type = "OBJECT"
         render_scene.display.shading.light = "STUDIO"
         render_scene.display.shading.show_shadows = True
@@ -1082,7 +1120,7 @@ def _render_all(
             )
             paths.append(path)
             print(f"Rendered: {path}", flush=True)
-        return paths
+        return paths, render_backend
     finally:
         remove_static_render_scene(render_scene, render_collection, proxies)
         remove_pipeline_temps()
@@ -1148,7 +1186,7 @@ def main() -> None:
                 print(f"  - {blocker}", flush=True)
 
         print("[Aim validation] Rendering mandatory close-ups...", flush=True)
-        render_paths = _render_all(armature, root, rifle_state)
+        render_paths, render_backend = _render_all(armature, root, rifle_state)
         names = {path.name for path in render_paths}
         if names != set(REQUIRED_AIM_RENDERS):
             raise RuntimeError("Mandatory aim render set is incomplete.")
@@ -1159,6 +1197,7 @@ def main() -> None:
             "blend_file": blend_path.name,
             "blend_sha256_at_validation": _file_sha256(blend_path),
             "automated_validation": ("PASS" if not automated_blockers else "REVIEW_BLOCKED"),
+            "validation_render_backend": render_backend,
             "automated_blockers": automated_blockers,
             "visual_validation": "NOT_REVIEWED",
             "export_allowed": False,

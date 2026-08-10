@@ -1,0 +1,21 @@
+{
+    "name": "Powersuit.HUD.EditModeTests",
+    "rootNamespace": "Powersuit.UI.HUD.Tests",
+    "references": [
+        "Powersuit.HUD.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

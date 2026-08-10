@@ -33,6 +33,8 @@ from powersuit_pipeline_common import (  # noqa: E402
     save_current_blend,
 )
 from weapon_handling_contract import (  # noqa: E402
+    COMPONENT_BOLT,
+    COMPONENT_MAGAZINE,
     COMPONENT_OPTIC,
     COMPONENT_PRIMARY_GRIP,
     COMPONENT_STOCK,
@@ -47,6 +49,7 @@ from weapon_handling_contract import (  # noqa: E402
     freeze_rigid_weapon,
     normalize_rigid_weapon_children,
     tag_component,
+    tag_articulated_owner,
     tag_contact_surface,
     tag_helper,
     tag_weapon_root,
@@ -214,9 +217,9 @@ def create_box(
         (-x, -y, z), (x, -y, z), (x, y, z), (-x, y, z),
     ]
     faces = [
-        (0, 1, 2, 3), (4, 7, 6, 5),
-        (0, 4, 5, 1), (1, 5, 6, 2),
-        (2, 6, 7, 3), (4, 0, 3, 7),
+        (3, 2, 1, 0), (5, 6, 7, 4),
+        (1, 5, 4, 0), (2, 6, 5, 1),
+        (3, 7, 6, 2), (7, 3, 0, 4),
     ]
     mesh = bpy.data.meshes.new(name + "_Mesh")
     mesh.from_pydata(vertices, [], faces)
@@ -250,9 +253,9 @@ def create_tapered_box(
         (-rx, back_y, rz), (rx, back_y, rz), (fx, front_y, fz), (-fx, front_y, fz),
     ]
     faces = [
-        (0, 1, 2, 3), (4, 7, 6, 5),
-        (0, 4, 5, 1), (1, 5, 6, 2),
-        (2, 6, 7, 3), (4, 0, 3, 7),
+        (3, 2, 1, 0), (5, 6, 7, 4),
+        (1, 5, 4, 0), (2, 6, 5, 1),
+        (3, 7, 6, 2), (7, 3, 0, 4),
     ]
     mesh = bpy.data.meshes.new(name + "_Mesh")
     mesh.from_pydata(vertices, [], faces)
@@ -298,6 +301,8 @@ def create_cylinder(
         faces.append((index * 2, nxt * 2, nxt * 2 + 1, index * 2 + 1))
     faces.append(tuple(index * 2 for index in reversed(range(sides))))
     faces.append(tuple(index * 2 + 1 for index in range(sides)))
+    if axis == "Y":
+        faces = [tuple(reversed(face)) for face in faces]
     mesh = bpy.data.meshes.new(name + "_Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
@@ -374,7 +379,7 @@ def build_rifle() -> bpy.types.Object:
     root["ps_scope_point_local"] = tuple(SCOPE_OCULAR)
     root["ps_support_grip_x_local"] = 0.0
     root["ps_scope_x_local"] = 0.0
-    root["ps_generator_version"] = 109
+    root["ps_generator_version"] = 111
     root["ps_stock_lateral_offset_m"] = float(STOCK_LATERAL_OFFSET)
 
     p: list[bpy.types.Object] = []
@@ -395,6 +400,12 @@ def build_rifle() -> bpy.types.Object:
     p.append(create_box("Rifle_ChargingRail_R", (-0.100, 0.03, 0.198),
         (0.018, 0.18, 0.022), material=materials["edge"], bevel=SMALL_BEVEL,
         collection=collection))
+    p.append(create_cylinder("Rifle_BoltHandleStem_R", (-0.126, 0.025, 0.198),
+        radius=0.008, length=0.052, axis="X", material=materials["edge"],
+        bevel=0.0015, collection=collection))
+    p.append(create_cylinder("Rifle_BoltHandleKnob_R", (-0.158, 0.025, 0.198),
+        radius=0.015, length=0.020, axis="X", material=materials["grip"],
+        bevel=0.0015, collection=collection))
 
     # Handguard and barrel.
     p.append(create_tapered_box("Rifle_Handguard_Core", (0, 0.35, 0.140),
@@ -603,7 +614,18 @@ def build_rifle() -> bpy.types.Object:
 
     _parent_local([*p, *helpers], root)
     for child in p:
-        if child.name.startswith("Rifle_Scope"):
+        if child.name in {
+            "Rifle_Magazine",
+            "Rifle_Magazine_Base",
+        }:
+            tag_component(child, COMPONENT_MAGAZINE)
+        elif child.name in {
+            "Rifle_ChargingRail_R",
+            "Rifle_BoltHandleStem_R",
+            "Rifle_BoltHandleKnob_R",
+        }:
+            tag_component(child, COMPONENT_BOLT)
+        elif child.name.startswith("Rifle_Scope"):
             tag_component(child, COMPONENT_OPTIC)
         elif child.name.startswith("Rifle_Stock"):
             tag_component(child, COMPONENT_STOCK)
@@ -611,6 +633,12 @@ def build_rifle() -> bpy.types.Object:
             tag_component(child, COMPONENT_PRIMARY_GRIP)
         elif child.name in {"Rifle_SupportGrip", "Rifle_SupportGrip_Mount"}:
             tag_component(child, COMPONENT_SUPPORT_GRIP)
+    for child in p:
+        if str(child.get("ps_weapon_component_role", "")) in {
+            COMPONENT_MAGAZINE,
+            COMPONENT_BOLT,
+        }:
+            tag_articulated_owner(root, child)
     tag_contact_surface(
         next(child for child in p if child.name == "Rifle_PistolGrip"),
         ROLE_PRIMARY_GRIP,

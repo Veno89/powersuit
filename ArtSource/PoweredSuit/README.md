@@ -1,65 +1,70 @@
 # Powered Suit Blender Pipeline
 
-This directory is the authoritative Blender authoring source and tooling for
-the Powered Suit character and its reusable rigid-weapon framework.
+This directory is the authoritative Blender authoring source and deterministic tooling for the Powered Suit character and its reusable rigid-weapon framework.
 
 ## Current status
 
-Approved Generator 109 release:
+Approved Generator 113 candidate:
 
 - Blender: 5.2 LTS
-- rifle generator: 109
+- rifle generator: 111
+- weapon contract: v3; rigid signature: v6
+- animation contract: v4
 - automated validation: `PASS`
-- visual validation: `APPROVED`
+- technical visual validation: `APPROVED`
 - export allowed: `true`
-- required renders produced: 13 aim + 5 rifle
+- required renders: 13 aim + 5 rifle + 15 weapon-animation = 33
+- exported clips: 18 exact armature actions
+- generated blend SHA-256: `a5054d65af2cb6a04836216456a1a3162f8d860c6c421533a7ac08a9f70d2d4b`
+- exported FBX SHA-256: `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`
 
-The automated pass and all 18 required renders received explicit visual
-approval on 2026-08-08. The approval record and exact reviewed images are
-archived under `Validation/Generator109`; the approved FBX was then exported
-and copied into Unity alongside the legacy model.
+The clean Generator113 build passed with no automated blockers. All 33 mandatory renders were technically reviewed and hash-locked before the gated export on 2026-08-10. The exact report, approval, images, export manifest, and FBX are archived under `Validation/Generator113`.
+
+Generator 110 remains the winding/closed-geometry repair baseline, Generator 111 remains the 17-action rollback candidate, and Generator 112 remains the first sprint candidate. Generator 113 preserves their geometry, rig, weapon controls, 18 action names, and action ranges while lengthening the stance-aware powered gait. The run still uses frames 1-21 at 30 FPS, a 20-frame cycle with a native cadence of 180 steps per minute.
 
 ## What is authoritative
 
-- `source/powersuit_source.blend` — immutable, audited recovered input
-- `scripts/` — active build, pose, validation, approval, and export tools
-- `Validation/Generator109/` — immutable approval report and reviewed images
+- `source/powersuit_source.blend` — immutable audited recovered input
+- `scripts/` — active build, animation, validation, approval, and export tools
+- `Validation/Generator109/` through `Validation/Generator113/` — immutable candidate evidence and rollback artifacts
 - `WEAPON_FRAMEWORK.md` — weapon/stance architecture reference
 - `PROVENANCE.md` — exact lineage and historical Reset06 diagnosis
-- `UNITY_INTEGRATION.md` — safe later Unity import procedure
+- `UNITY_INTEGRATION.md` — safe Unity integration procedure
 - `audit/legacy/` — frozen evidence about recovered older iterations
 - `RESET_01.md` through `RESET_06.md` — historical changelog, not active code
 
-The following are generated working artifacts and are intentionally ignored by
-Git: active `powersuit_pipeline.blend`, working `renders/`, working `exports/`,
-Blender backups, machine-local Blender paths, and Python bytecode. Named
-validation archives are versioned exceptions.
+Active `powersuit_pipeline.blend`, working `renders/`, working `exports/`, Blender backups, machine-local Blender paths, and Python bytecode are generated and ignored. Named validation archives are deliberate versioned exceptions.
 
 ## Build and review on Windows
 
 1. If needed, run `00_SET_BLENDER_PATH_WINDOWS.bat` once.
 2. Run `01_BUILD_AND_RENDER_WINDOWS.bat`.
-3. Open `renders/validation_report.json` and confirm automated status is
-   `PASS` with no blockers.
-4. Inspect every PNG under `renders/aim_validation` and
-   `renders/rifle_validation`.
-5. Reject and revise the result if a grip, stock, sight line, elbow, camera,
-   silhouette, clipping, or frame-stability problem remains visible.
-6. Only after genuine visual acceptance, run
-   `02_APPROVE_AND_EXPORT_WINDOWS.bat` and type `APPROVE` when prompted.
+3. Confirm `renders/validation_report.json` says `PASS` with no blockers.
+4. Inspect every PNG under `renders/aim_validation`, `renders/rifle_validation`, and `renders/weapon_animation_validation`.
+5. Reject and revise if pose readability, hand contact, stock/sight alignment, camera framing, locomotion, draw/sheathe continuity, magazine handling, bolt handling, clipping, or frame stability remains unacceptable.
+6. Only after genuine technical visual acceptance, run `02_APPROVE_AND_EXPORT_WINDOWS.bat` and type `APPROVE` when prompted.
 
-The build launcher always resets the working scene from the audited source,
-then runs every modelling, rig, pose, and validation stage in Blender. It does
-not rely on a hand-edited intermediate `.blend`.
+The build launcher resets the working scene from the audited source, runs all modelling/rig/pose/animation stages, renders all three validation sets, and writes the aggregate report. It does not depend on a hand-edited intermediate `.blend`.
+
+If headless Workbench rendering crashes inside a Windows display driver while Unity is open, set `POWERSUIT_VALIDATION_RENDER_ENGINE=cycles_cpu` before launching the pipeline. The fallback uses deterministic 8-sample CPU rendering and the same structural, image-content, review, hash, and export gates. `POWERSUIT_REUSE_VALIDATION_RENDERS=1` is only for an interrupted pass; it reuses a PNG only after the canonical content validator accepts it.
+
+## Animation set
+
+Generator 113 exports exactly:
+
+- `PS_Idle`, `PS_Walk`, `PS_Hover`, `PS_Aim`
+- `PS_WeaponReady_Idle`, `PS_WeaponStowed_Idle`, `PS_WeaponStowed_Hover`
+- `PS_Weapon_Draw`, `PS_Weapon_Sheathe`
+- `PS_Walk_Forward`, `PS_Walk_Backward`
+- `PS_Run_Forward`
+- `PS_Aim_Walk_Forward`, `PS_Aim_Walk_Backward`
+- `PS_WeaponStowed_Walk_Forward`, `PS_WeaponStowed_Walk_Backward`
+- `PS_Reload`, `PS_BoltCycle`
+
+All use one armature Action Slot. Rifle and articulated-component animation is carried by non-deforming armature controls, avoiding unsynchronized object-action FBX takes.
 
 ## Architecture boundary
 
-The weapon remains rigid below one `RifleRoot`. The weapon owns visible
-geometry and semantic hardpoints; a stance profile owns character behaviour.
-Pose solving moves the complete weapon, adapts the character to fixed targets,
-bakes `PS_Aim`, removes temporary IK, and only then attaches `RifleRoot` to
-`Hand.R`. Individual weapon parts must never be moved to force a pose to pass.
+The weapon is rigid beneath `RifleRoot`, except for contract-approved magazine and bolt component sets. Semantic hardpoints and contact-offset vectors are part of the rigid signature. Pose solving moves the complete weapon, adapts the character to fixed targets, removes temporary IK, and bakes synchronized armature actions. Unapproved rifle-part movement fails validation.
 
-Blender files are authoring inputs. Unity should receive only an explicitly
-approved FBX imported alongside the current live model; gameplay logic remains
-in C#.
+Blender files are authoring inputs. Unity receives only a gated FBX; gameplay state, ammunition, damage, cadence, reload, critical hits, and cycling remain in C#.

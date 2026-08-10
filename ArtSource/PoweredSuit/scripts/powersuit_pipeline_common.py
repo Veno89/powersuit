@@ -20,10 +20,77 @@ from mathutils import Matrix, Quaternion, Vector  # type: ignore
 ARMATURE_NAME = "PowerSuit_Armature"
 RIFLE_ROOT_NAME = "RifleRoot"
 RIGHT_HAND_BONE = "Hand.R"
-REQUIRED_ACTIONS = ("PS_Idle", "PS_Walk", "PS_Hover", "PS_Aim")
+LEGACY_ACTIONS = ("PS_Idle", "PS_Walk", "PS_Hover", "PS_Aim")
+WEAPON_ANIMATION_ACTIONS = (
+    "PS_WeaponReady_Idle",
+    "PS_WeaponStowed_Idle",
+    "PS_Weapon_Draw",
+    "PS_Weapon_Sheathe",
+    "PS_Walk_Forward",
+    "PS_Walk_Backward",
+    "PS_Aim_Walk_Forward",
+    "PS_Aim_Walk_Backward",
+    "PS_Reload",
+    "PS_BoltCycle",
+    "PS_WeaponStowed_Walk_Forward",
+    "PS_WeaponStowed_Walk_Backward",
+    "PS_WeaponStowed_Hover",
+    "PS_Run_Forward",
+)
+REQUIRED_ACTIONS = (*LEGACY_ACTIONS, *WEAPON_ANIMATION_ACTIONS)
 PIPELINE_TEMP_PREFIX = "PS_PIPELINE_TEMP_"
 REQUIRED_RIG_UPGRADE_VERSION = 2
-REQUIRED_HAND_GEOMETRY_VERSION = 2
+REQUIRED_HAND_GEOMETRY_VERSION = 3
+
+
+def configure_validation_render_engine(scene: bpy.types.Scene) -> str:
+    """Select deterministic validation rendering with a CPU-safe fallback.
+
+    Workbench remains the canonical fast path. Some Windows NVIDIA drivers can
+    stack-overflow in headless Workbench rendering while Unity also owns a GPU
+    context; POWERSUIT_VALIDATION_RENDER_ENGINE=cycles_cpu avoids that driver
+    path without skipping or weakening any image gate.
+    """
+    requested = os.environ.get(
+        "POWERSUIT_VALIDATION_RENDER_ENGINE",
+        "workbench",
+    ).strip().lower()
+    if requested == "cycles_cpu":
+        scene.render.engine = "CYCLES"
+        scene.cycles.device = "CPU"
+        scene.cycles.samples = 8
+        scene.cycles.use_denoising = False
+        scene.cycles.use_adaptive_sampling = True
+        if scene.world is None:
+            scene.world = bpy.data.worlds.new(
+                PIPELINE_TEMP_PREFIX + "ValidationWorld"
+            )
+        scene.world.use_nodes = True
+        background = scene.world.node_tree.nodes.get("Background")
+        if background is not None:
+            background.inputs["Color"].default_value = (0.42, 0.46, 0.52, 1.0)
+            background.inputs["Strength"].default_value = 0.85
+        return "CYCLES_CPU_8_SAMPLES"
+    if requested not in {"", "workbench"}:
+        raise RuntimeError(
+            "POWERSUIT_VALIDATION_RENDER_ENGINE must be 'workbench' or "
+            "'cycles_cpu'."
+        )
+    scene.render.engine = "BLENDER_WORKBENCH"
+    return "BLENDER_WORKBENCH"
+
+
+def can_reuse_validation_render(path: Path) -> bool:
+    """Allow explicit crash-resume without silently accepting stale evidence."""
+    requested = os.environ.get(
+        "POWERSUIT_REUSE_VALIDATION_RENDERS",
+        "",
+    ).strip().lower()
+    return (
+        requested in {"1", "true", "yes"}
+        and path.is_file()
+        and path.stat().st_size >= 4096
+    )
 
 
 def require_blender_52() -> None:
@@ -169,7 +236,18 @@ def find_action_slot(action: bpy.types.Action, animated_id) -> object:
     if not slots:
         raise RuntimeError(f"Action '{action.name}' has no Blender 5.2 Action Slot.")
 
-    # Prefer a slot whose identifier/name explicitly contains the object name.
+    # Prefer an exact Blender slot identifier/name match. This matters for
+    # articulated siblings such as Rifle_Magazine and Rifle_Magazine_Base,
+    # where a substring-only lookup can silently select the wrong channelbag.
+    expected_identifier = f"{animated_id.id_type[:2]}{animated_id.name}"
+    for slot in slots:
+        identifier = str(getattr(slot, "identifier", ""))
+        name = str(getattr(slot, "name", ""))
+        if identifier == expected_identifier or name == animated_id.name:
+            return slot
+
+    # Retain a compatibility fallback for Actions produced by Blender builds
+    # that decorate slot labels differently.
     for slot in slots:
         label = " ".join(
             str(getattr(slot, attr, ""))
@@ -595,13 +673,19 @@ def detach_rifle_for_validation(
     the detached root from the baked Hand.R matrix at each requested frame,
     avoiding a fresh-file dependency-graph recursion observed in Blender 5.2.
     """
-    if root.parent != armature or root.parent_type != "BONE" or root.parent_bone != RIGHT_HAND_BONE:
+    if (
+        root.parent != armature
+        or root.parent_type != "BONE"
+        or root.parent_bone not in {RIGHT_HAND_BONE, "WeaponRoot"}
+    ):
         raise RuntimeError(
-            "RifleRoot must be bone-parented only to Hand.R before validation detaches it."
+            "RifleRoot must be bone-parented to Hand.R or the verified "
+            "WeaponRoot carrier before validation detaches it."
         )
-    hand = armature.pose.bones.get(RIGHT_HAND_BONE)
+    carrier_name = root.parent_bone
+    hand = armature.pose.bones.get(carrier_name)
     if hand is None:
-        raise RuntimeError(f"Missing required pose bone '{RIGHT_HAND_BONE}'.")
+        raise RuntimeError(f"Missing required pose bone '{carrier_name}'.")
     world = root.matrix_world.copy()
     hand_world = matrix_world_for_pose_bone(armature, hand)
     hand_offset = hand_world.inverted() @ world
@@ -612,6 +696,7 @@ def detach_rifle_for_validation(
         "world": world,
         "matrix_parent_inverse": root.matrix_parent_inverse.copy(),
         "hand_offset": hand_offset,
+        "carrier_bone": carrier_name,
     }
     root.parent = None
     root.parent_type = "OBJECT"
@@ -629,9 +714,10 @@ def sync_detached_rifle_to_hand(
 ) -> None:
     if root.parent is not None:
         raise RuntimeError("RifleRoot must remain detached during validation sync.")
-    hand = armature.pose.bones.get(RIGHT_HAND_BONE)
+    carrier_name = str(state.get("carrier_bone", RIGHT_HAND_BONE))
+    hand = armature.pose.bones.get(carrier_name)
     if hand is None:
-        raise RuntimeError(f"Missing required pose bone '{RIGHT_HAND_BONE}'.")
+        raise RuntimeError(f"Missing required pose bone '{carrier_name}'.")
     root.matrix_world = matrix_world_for_pose_bone(armature, hand) @ state["hand_offset"]
     bpy.context.view_layer.update()
 
@@ -650,7 +736,11 @@ def restore_rifle_after_validation(
     root.matrix_parent_inverse = state["matrix_parent_inverse"]
     root.matrix_world = world
     bpy.context.view_layer.update()
-    if root.parent != armature or root.parent_type != "BONE" or root.parent_bone != RIGHT_HAND_BONE:
+    if (
+        root.parent != armature
+        or root.parent_type != "BONE"
+        or root.parent_bone != str(state["parent_bone"])
+    ):
         raise RuntimeError("Failed to restore RifleRoot bone parenting after validation.")
 
 

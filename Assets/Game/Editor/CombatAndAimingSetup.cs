@@ -395,16 +395,34 @@ namespace Powersuit.Editor
             if (controller == null) return;
 
             SerializedObject so = new SerializedObject(controller);
+            SerializedProperty normalDistProp = so.FindProperty("cameraDistance");
+            SerializedProperty normalHeightProp = so.FindProperty("cameraHeight");
+            SerializedProperty normalFovProp = so.FindProperty("defaultFieldOfView");
+            SerializedProperty flightDistProp = so.FindProperty("flightCameraDistance");
+            SerializedProperty flightHeightProp = so.FindProperty("flightCameraHeight");
+            SerializedProperty flightFovProp = so.FindProperty("flightFieldOfView");
+            SerializedProperty collisionPaddingProp = so.FindProperty("cameraCollisionPadding");
+            SerializedProperty collisionReleaseProp = so.FindProperty("cameraCollisionReleaseSharpness");
+            SerializedProperty lookSharpnessProp = so.FindProperty("cameraLookSharpness");
             SerializedProperty distProp = so.FindProperty("aimCameraDistance");
             SerializedProperty heightProp = so.FindProperty("aimCameraHeight");
             SerializedProperty offsetProp = so.FindProperty("aimShoulderOffset");
             SerializedProperty fovProp = so.FindProperty("aimFieldOfView");
             SerializedProperty speedProp = so.FindProperty("aimTransitionSpeed");
 
-            if (distProp != null) distProp.floatValue = 2.2f;
-            if (heightProp != null) heightProp.floatValue = 1.5f;
-            if (offsetProp != null) offsetProp.vector3Value = new Vector3(1.2f, 0.4f, 0f);
-            if (fovProp != null) fovProp.floatValue = 45f;
+            if (normalDistProp != null) normalDistProp.floatValue = 9.5f;
+            if (normalHeightProp != null) normalHeightProp.floatValue = 1.5f;
+            if (normalFovProp != null) normalFovProp.floatValue = 72f;
+            if (flightDistProp != null) flightDistProp.floatValue = 11f;
+            if (flightHeightProp != null) flightHeightProp.floatValue = 1.75f;
+            if (flightFovProp != null) flightFovProp.floatValue = 74f;
+            if (collisionPaddingProp != null) collisionPaddingProp.floatValue = 0.05f;
+            if (collisionReleaseProp != null) collisionReleaseProp.floatValue = 14f;
+            if (lookSharpnessProp != null) lookSharpnessProp.floatValue = 28f;
+            if (distProp != null) distProp.floatValue = 4.3f;
+            if (heightProp != null) heightProp.floatValue = 1.45f;
+            if (offsetProp != null) offsetProp.vector3Value = new Vector3(-1.2f, 0.05f, 0f);
+            if (fovProp != null) fovProp.floatValue = 62f;
             if (speedProp != null) speedProp.floatValue = 12f;
 
             so.ApplyModifiedProperties();

@@ -13,6 +13,8 @@ public sealed class SimpleEnemy : MonoBehaviour
     [SerializeField] private float shotsPerSecond = 1f;
     [SerializeField] private float projectileSpeed = 12f;
     [SerializeField] private float projectileDamage = 10f;
+    [SerializeField] private EnemyProjectile projectilePrefab;
+    [SerializeField, Min(0)] private int projectilePrewarmCount = 6;
 
     [Header("Audio Hooks")]
     [SerializeField] private AudioSource audioSource;
@@ -24,6 +26,9 @@ public sealed class SimpleEnemy : MonoBehaviour
     private float nextShotTime;
     private bool isDead;
     private Transform visualChild;
+
+    private static GameObject fallbackProjectileTemplate;
+    private static Material fallbackProjectileMaterial;
 
     private void Start()
     {
@@ -55,6 +60,15 @@ public sealed class SimpleEnemy : MonoBehaviour
             }
         }
         visualChild = visual ?? transform;
+
+        GameObject projectileTemplate = GetProjectileTemplate();
+        if (projectileTemplate != null)
+        {
+            CombatFeedbackPool.Prewarm(
+                projectileTemplate,
+                projectilePrewarmCount
+            );
+        }
 
         DamageableTarget target = GetComponent<DamageableTarget>();
         if (target != null)
@@ -117,28 +131,25 @@ public sealed class SimpleEnemy : MonoBehaviour
         Vector3 spawnPosition = transform.position + Vector3.up * 1.2f + transform.forward * 0.8f;
         Vector3 targetPosition = player.position + Vector3.up;
 
-        GameObject projectile = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        GameObject projectile = CombatFeedbackPool.Spawn(
+            GetProjectileTemplate(),
+            spawnPosition,
+            Quaternion.LookRotation(targetPosition - spawnPosition)
+        );
+        if (projectile == null)
+        {
+            return;
+        }
+
         projectile.name = "Enemy Projectile";
-        projectile.transform.position = spawnPosition;
         projectile.transform.localScale = Vector3.one * 0.3f;
-
-        SphereCollider projectileCollider = projectile.GetComponent<SphereCollider>();
-        if (projectileCollider != null)
+        EnemyProjectile projectileBehaviour =
+            projectile.GetComponent<EnemyProjectile>();
+        if (projectileBehaviour == null)
         {
-            projectileCollider.isTrigger = true;
+            CombatFeedbackPool.Recycle(projectile);
+            return;
         }
-
-        Rigidbody projectileRigidbody = projectile.AddComponent<Rigidbody>();
-        projectileRigidbody.useGravity = false;
-        projectileRigidbody.isKinematic = true;
-
-        Renderer projectileRenderer = projectile.GetComponent<Renderer>();
-        if (projectileRenderer != null)
-        {
-            projectileRenderer.material.color = Color.red;
-        }
-
-        EnemyProjectile projectileBehaviour = projectile.AddComponent<EnemyProjectile>();
         projectileBehaviour.Initialize(
             targetPosition - spawnPosition,
             projectileSpeed,
@@ -151,6 +162,58 @@ public sealed class SimpleEnemy : MonoBehaviour
             audioSource.pitch = Random.Range(0.9f, 1.1f);
             audioSource.PlayOneShot(shootSound);
         }
+    }
+
+    private GameObject GetProjectileTemplate()
+    {
+        if (projectilePrefab != null)
+        {
+            return projectilePrefab.gameObject;
+        }
+
+        if (fallbackProjectileTemplate != null)
+        {
+            return fallbackProjectileTemplate;
+        }
+
+        GameObject template = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        template.name = "LegacyEnemyProjectileFallbackTemplate";
+        template.hideFlags = HideFlags.HideAndDontSave;
+        template.transform.localScale = Vector3.one * 0.3f;
+
+        SphereCollider projectileCollider =
+            template.GetComponent<SphereCollider>();
+        if (projectileCollider != null)
+        {
+            projectileCollider.isTrigger = true;
+        }
+
+        Rigidbody projectileRigidbody = template.AddComponent<Rigidbody>();
+        projectileRigidbody.useGravity = false;
+        projectileRigidbody.isKinematic = true;
+
+        Renderer projectileRenderer = template.GetComponent<Renderer>();
+        if (projectileRenderer != null)
+        {
+            Shader shader =
+                Shader.Find("Universal Render Pipeline/Unlit") ??
+                Shader.Find("Unlit/Color");
+            if (shader != null)
+            {
+                fallbackProjectileMaterial = new Material(shader)
+                {
+                    name = "Legacy Enemy Projectile Fallback",
+                    color = Color.red,
+                    hideFlags = HideFlags.HideAndDontSave
+                };
+                projectileRenderer.sharedMaterial = fallbackProjectileMaterial;
+            }
+        }
+
+        template.AddComponent<EnemyProjectile>();
+        template.SetActive(false);
+        fallbackProjectileTemplate = template;
+        return fallbackProjectileTemplate;
     }
 
     public void HandleDeathSequence(float delay)
@@ -199,4 +262,11 @@ public sealed class SimpleEnemy : MonoBehaviour
 
         Destroy(gameObject);
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        projectilePrewarmCount = Mathf.Max(0, projectilePrewarmCount);
+    }
+#endif
 }

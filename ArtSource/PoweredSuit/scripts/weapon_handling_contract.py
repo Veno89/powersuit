@@ -5,7 +5,8 @@ Blender 5.2 pipeline responsibilities:
 - declare weapon helper roles independent of object names
 - declare reusable stance-family limits
 - validate a weapon's hardpoint contract
-- freeze and verify rigid weapon-child transforms
+- freeze and verify weapon geometry/authored hardpoints
+- permit only explicitly tagged magazine/bolt articulation within safe limits
 
 This module does not model, pose, render, or export anything by itself.
 """
@@ -19,8 +20,8 @@ from dataclasses import dataclass
 import bpy  # type: ignore
 from mathutils import Matrix, Vector  # type: ignore
 
-CONTRACT_VERSION = 2
-RIGID_SIGNATURE_VERSION = 5
+CONTRACT_VERSION = 3
+RIGID_SIGNATURE_VERSION = 6
 
 ROLE_PRIMARY_GRIP = "primary_grip"
 ROLE_SUPPORT_GRIP = "support_grip"
@@ -42,6 +43,29 @@ COMPONENT_OPTIC = "optic"
 COMPONENT_STOCK = "stock"
 COMPONENT_PRIMARY_GRIP = "primary_grip"
 COMPONENT_SUPPORT_GRIP = "support_grip"
+COMPONENT_MAGAZINE = "magazine"
+COMPONENT_BOLT = "bolt"
+WEAPON_OWNER_PROPERTY = "ps_weapon_owner_id"
+
+ARTICULATED_COMPONENT_ROLES = frozenset({
+    COMPONENT_MAGAZINE,
+    COMPONENT_BOLT,
+})
+
+# Animation may transform only the tagged mechanical pieces. Geometry, helper
+# hardpoints and every other child remain frozen. Limits are deliberately broad
+# enough for the authored clips but narrow enough to catch a detached/exploded
+# weapon caused by a bad object Action Slot.
+ARTICULATION_LIMITS = {
+    COMPONENT_MAGAZINE: {
+        "translation_m": 0.45,
+        "rotation_deg": 50.0,
+    },
+    COMPONENT_BOLT: {
+        "translation_m": 0.16,
+        "rotation_deg": 20.0,
+    },
+}
 
 
 @dataclass(frozen=True)
@@ -132,6 +156,9 @@ def tag_weapon_root(root: bpy.types.Object, *, weapon_id: str, stance_family: st
     root["ps_weapon_active"] = True
     root["ps_weapon_forward_axis"] = "+Y"
     root["ps_weapon_up_axis"] = "+Z"
+    root["ps_weapon_articulated_component_roles"] = sorted(
+        ARTICULATED_COMPONENT_ROLES
+    )
 
 
 
@@ -189,7 +216,22 @@ def tag_helper(obj: bpy.types.Object, role: str) -> None:
 
 
 def tag_component(obj: bpy.types.Object, role: str) -> None:
+    if not role:
+        raise ValueError("Weapon component role cannot be empty.")
     obj["ps_weapon_component_role"] = role
+
+
+def is_articulated_component(obj: bpy.types.Object) -> bool:
+    return str(obj.get("ps_weapon_component_role", "")) in ARTICULATED_COMPONENT_ROLES
+
+
+def tag_articulated_owner(root: bpy.types.Object, obj: bpy.types.Object) -> None:
+    role = str(obj.get("ps_weapon_component_role", ""))
+    if role not in ARTICULATED_COMPONENT_ROLES:
+        raise ValueError(
+            f"'{obj.name}' is not tagged as an articulated weapon component."
+        )
+    obj[WEAPON_OWNER_PROPERTY] = str(root.get("ps_weapon_id", ""))
 
 
 def tag_contact_surface(obj: bpy.types.Object, role: str) -> None:
@@ -222,9 +264,23 @@ def require_weapon_helper(root: bpy.types.Object, role: str) -> bpy.types.Object
     return helper
 
 
+def weapon_contract_objects(root: bpy.types.Object) -> list[bpy.types.Object]:
+    """Return frozen root children plus bone-parented articulated components."""
+    owner_id = str(root.get("ps_weapon_id", ""))
+    by_pointer = {int(obj.as_pointer()): obj for obj in root.children}
+    for obj in bpy.data.objects:
+        if (
+            obj != root
+            and obj.parent != root
+            and str(obj.get(WEAPON_OWNER_PROPERTY, "")) == owner_id
+        ):
+            by_pointer[int(obj.as_pointer())] = obj
+    return sorted(by_pointer.values(), key=lambda obj: obj.name)
+
+
 def weapon_components(root: bpy.types.Object, role: str) -> list[bpy.types.Object]:
     return [
-        child for child in root.children
+        child for child in weapon_contract_objects(root)
         if child.type == "MESH" and str(child.get("ps_weapon_component_role", "")) == role
     ]
 
@@ -454,7 +510,7 @@ def compute_rigid_manifest(root: bpy.types.Object) -> dict[str, object]:
     """
     bpy.context.view_layer.update()
     children: list[dict[str, object]] = []
-    for child in sorted(root.children, key=lambda item: item.name):
+    for child in weapon_contract_objects(root):
         authored = _authored_matrix(child)
         if authored is None:
             raise RuntimeError(
@@ -476,6 +532,7 @@ def compute_rigid_manifest(root: bpy.types.Object) -> dict[str, object]:
             "contact_surface_role": str(
                 child.get("ps_weapon_contact_surface_role", "")
             ),
+            "owner_id": str(child.get(WEAPON_OWNER_PROPERTY, "")),
         }
         if child.type == "MESH" and child.data is not None:
             mesh = child.data
@@ -554,6 +611,10 @@ def _manifest_difference_summary(
             changed.append("mesh geometry")
         if before.get("modifiers") != after.get("modifiers"):
             changed.append("modifiers")
+        if before.get("component_role") != after.get("component_role"):
+            changed.append("component role")
+        if before.get("owner_id") != after.get("owner_id"):
+            changed.append("owner")
         if changed:
             messages.append(f"{name}: " + ", ".join(changed))
         if len(messages) >= 6:
@@ -563,7 +624,7 @@ def _manifest_difference_summary(
 
 def _runtime_transform_difference(root: bpy.types.Object) -> str | None:
     identity = Matrix.Identity(4)
-    for child in sorted(root.children, key=lambda item: item.name):
+    for child in weapon_contract_objects(root):
         authored = _authored_matrix(child)
         if authored is None:
             return f"{child.name}: missing authored transform"
@@ -571,6 +632,37 @@ def _runtime_transform_difference(root: bpy.types.Object) -> str | None:
         if child.type == "MESH":
             if not bool(child.get(RIGID_MESH_BAKED_PROPERTY, False)):
                 return f"{child.name}: mesh is not marked transform-baked"
+            role = str(child.get("ps_weapon_component_role", ""))
+            if role in ARTICULATED_COMPONENT_ROLES:
+                limits = ARTICULATION_LIMITS[role]
+                translation = actual.translation.length
+                _location, rotation, scale = actual.decompose()
+                scale_error = max(abs(float(value) - 1.0) for value in scale)
+                rotation_deg = math.degrees(float(rotation.angle))
+                determinant = float(actual.to_3x3().determinant())
+                values = [
+                    float(actual[row][column])
+                    for row in range(4)
+                    for column in range(4)
+                ]
+                if not all(math.isfinite(value) for value in values):
+                    return f"{child.name}: articulated transform is non-finite"
+                if determinant <= 0.0 or scale_error > RIGID_RUNTIME_TOLERANCE:
+                    return (
+                        f"{child.name}: articulated transform changed scale/reflection "
+                        f"(det={determinant:.4f}, scale error={scale_error:.3e})"
+                    )
+                if translation > float(limits["translation_m"]) + RIGID_RUNTIME_TOLERANCE:
+                    return (
+                        f"{child.name}: {role} travel {translation:.3f} m exceeds "
+                        f"{float(limits['translation_m']):.3f} m"
+                    )
+                if rotation_deg > float(limits["rotation_deg"]) + 0.05:
+                    return (
+                        f"{child.name}: {role} rotation {rotation_deg:.2f} deg exceeds "
+                        f"{float(limits['rotation_deg']):.2f} deg"
+                    )
+                continue
             delta = _matrix_max_abs_delta(actual, identity)
             if delta > RIGID_RUNTIME_TOLERANCE:
                 return f"{child.name}: mesh child moved (identity delta={delta:.3e})"
@@ -613,9 +705,27 @@ def assert_weapon_rigid(root: bpy.types.Object) -> str:
     if runtime_difference is not None:
         raise RuntimeError(
             "Rigid weapon runtime transform changed after construction. Animation may "
-            "only move RifleRoot. Difference: " + runtime_difference + "."
+            "only move RifleRoot or explicitly tagged magazine/bolt components. "
+            "Difference: " + runtime_difference + "."
         )
     return actual
+
+
+def assert_articulated_components_at_rest(root: bpy.types.Object) -> None:
+    """Require every approved mechanical component to be at its authored rest transform."""
+    identity = Matrix.Identity(4)
+    failures: list[str] = []
+    for child in weapon_contract_objects(root):
+        if child.type != "MESH" or not is_articulated_component(child):
+            continue
+        delta = _matrix_max_abs_delta(_effective_local_matrix(root, child), identity)
+        if delta > RIGID_RUNTIME_TOLERANCE:
+            failures.append(f"{child.name}={delta:.3e}")
+    if failures:
+        raise RuntimeError(
+            "Weapon mechanical components are not at authored rest: "
+            + ", ".join(failures)
+        )
 
 def validate_weapon_contract(
     root: bpy.types.Object,
@@ -629,6 +739,15 @@ def validate_weapon_contract(
         )
     stance_name = str(root.get("ps_weapon_stance_family", ""))
     profile = get_stance_profile(stance_name)
+    declared_articulation = {
+        str(value)
+        for value in root.get("ps_weapon_articulated_component_roles", ())
+    }
+    if declared_articulation != set(ARTICULATED_COMPONENT_ROLES):
+        raise RuntimeError(
+            "Weapon articulation declaration is invalid: "
+            f"{sorted(declared_articulation)}"
+        )
     helpers = weapon_helpers(root)
     missing = [role for role in REQUIRED_ROLES if role not in helpers]
     if missing:
@@ -684,6 +803,31 @@ def validate_weapon_contract(
                 f"found {len(surfaces)}."
             )
 
+    for role in sorted(ARTICULATED_COMPONENT_ROLES):
+        components = weapon_components(root, role)
+        if not components:
+            raise RuntimeError(
+                f"Weapon contract requires at least one articulated '{role}' component."
+            )
+        for component in components:
+            valid_root_child = component.parent == root
+            valid_control_bone = (
+                component.parent is not None
+                and component.parent.type == "ARMATURE"
+                and component.parent_type == "BONE"
+                and component.parent_bone in {"WeaponMagazine", "WeaponBolt"}
+                and str(component.get(WEAPON_OWNER_PROPERTY, ""))
+                == str(root.get("ps_weapon_id", ""))
+            )
+            if component.type != "MESH" or not (
+                valid_root_child or valid_control_bone
+            ):
+                raise RuntimeError(
+                    f"Articulated component '{component.name}' must be a direct "
+                    f"mesh child of '{root.name}' or use its approved armature "
+                    "control bone."
+                )
+
     primary = weapon_local_position(root, helpers[ROLE_PRIMARY_GRIP])
     support = weapon_local_position(root, helpers[ROLE_SUPPORT_GRIP])
     stock = weapon_local_position(root, helpers[ROLE_STOCK_CONTACT])
@@ -719,4 +863,8 @@ def validate_weapon_contract(
         "stock_contact_local": tuple(float(v) for v in stock),
         "sight_ocular_local": tuple(float(v) for v in sight),
         "muzzle_local": tuple(float(v) for v in muzzle),
+        "articulated_components": {
+            role: [component.name for component in weapon_components(root, role)]
+            for role in sorted(ARTICULATED_COMPONENT_ROLES)
+        },
     }

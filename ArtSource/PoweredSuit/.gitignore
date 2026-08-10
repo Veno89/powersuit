@@ -7,6 +7,12 @@ scripts/__pycache__/
 renders/
 exports/
 
-# Immutable evidence for the approved Generator 109 release.
+# Immutable evidence for approved releases.
 !Validation/Generator109/renders/
 !Validation/Generator109/renders/**
+!Validation/Generator110/renders/
+!Validation/Generator110/renders/**
+!Validation/Generator111/renders/
+!Validation/Generator111/renders/**
+!Validation/Generator112/renders/
+!Validation/Generator112/renders/**

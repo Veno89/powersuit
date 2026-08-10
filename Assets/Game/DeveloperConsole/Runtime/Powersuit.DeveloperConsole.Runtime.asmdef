@@ -1,0 +1,14 @@
+{
+    "name": "Powersuit.DeveloperConsole.Runtime",
+    "rootNamespace": "Powersuit.DeveloperConsole",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

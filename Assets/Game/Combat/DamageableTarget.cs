@@ -1,10 +1,14 @@
 using System;
+using Powersuit.Combat;
+using Powersuit.Combat.UnityAdapters;
 using UnityEngine;
 
-public sealed class DamageableTarget : MonoBehaviour
+public sealed class DamageableTarget : MonoBehaviour, IDamageReceiver
 {
     [SerializeField] private float maximumHealth = 100f;
     [SerializeField] private float deathDelay = 0.5f;
+    [SerializeField] private CombatFaction faction = CombatFaction.Enemy;
+    [SerializeField] private bool allowFriendlyFire;
 
     private float currentHealth;
     private bool isDead;
@@ -12,6 +16,9 @@ public sealed class DamageableTarget : MonoBehaviour
     public float CurrentHealth => currentHealth;
     public float MaximumHealth => maximumHealth;
     public bool IsDead => isDead;
+    public CombatFaction Faction =>
+        faction == CombatFaction.None ? CombatFaction.Enemy : faction;
+    public bool CanReceiveDamage => !isDead;
 
     public event Action<float, float> OnHealthChanged;
     public event Action<Vector3, Vector3, float> OnHit;
@@ -29,16 +36,53 @@ public sealed class DamageableTarget : MonoBehaviour
 
     public void TakeDamage(float damage, Vector3 hitPoint, Vector3 hitDirection)
     {
-        if (isDead)
+        ApplyDamageInternal(damage, hitPoint, hitDirection);
+    }
+
+    public DamageResult ApplyDamage(DamageInfo damage)
+    {
+        if (
+            !CanReceiveDamage ||
+            !CombatFactionPolicy.CanDamage(
+                damage.Faction,
+                Faction,
+                allowFriendlyFire
+            )
+        )
         {
-            return;
+            return DamageResult.Ignored;
         }
 
-        currentHealth = Mathf.Max(0f, currentHealth - Mathf.Max(0f, damage));
-        OnHealthChanged?.Invoke(currentHealth, maximumHealth);
-        OnHit?.Invoke(hitPoint, hitDirection, damage);
+        return ApplyDamageInternal(
+            damage.Amount,
+            CombatVectorConversion.ToUnity(damage.Position),
+            CombatVectorConversion.ToUnity(damage.Direction)
+        );
+    }
 
-        DamageNumberManager.SpawnDamageNumber(hitPoint + Vector3.up * 0.3f, damage, isPlayerDamage: false);
+    private DamageResult ApplyDamageInternal(
+        float damage,
+        Vector3 hitPoint,
+        Vector3 hitDirection
+    )
+    {
+        float requestedDamage = Mathf.Max(0f, damage);
+        if (isDead || requestedDamage <= 0f)
+        {
+            return DamageResult.Ignored;
+        }
+
+        float healthBefore = currentHealth;
+        currentHealth = Mathf.Max(0f, currentHealth - requestedDamage);
+        float appliedDamage = healthBefore - currentHealth;
+        OnHealthChanged?.Invoke(currentHealth, maximumHealth);
+        OnHit?.Invoke(hitPoint, hitDirection, appliedDamage);
+
+        DamageNumberManager.SpawnDamageNumber(
+            hitPoint + Vector3.up * 0.3f,
+            appliedDamage,
+            isPlayerDamage: false
+        );
 
         EnemyHitReaction reaction = GetComponent<EnemyHitReaction>();
         if (reaction != null && currentHealth > 0f)
@@ -50,6 +94,8 @@ public sealed class DamageableTarget : MonoBehaviour
         {
             HandleDeath();
         }
+
+        return DamageResult.Applied(appliedDamage, isDead);
     }
 
     private void HandleDeath()

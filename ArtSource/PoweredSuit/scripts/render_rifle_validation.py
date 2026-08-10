@@ -24,6 +24,8 @@ from powersuit_pipeline_common import (  # noqa: E402
     activate_action,
     body_basis,
     bone_head_world,
+    can_reuse_validation_render,
+    configure_validation_render_engine,
     ensure_directory,
     ensure_object_mode,
     get_armature,
@@ -53,6 +55,7 @@ from weapon_handling_contract import (  # noqa: E402
     validate_weapon_contract,
     weapon_local_position,
     weapon_components,
+    weapon_contract_objects,
 )
 
 REQUIRED_RIFLE_RENDERS = (
@@ -278,7 +281,7 @@ def _suit_scale_meshes(
     armature: bpy.types.Object,
     root: bpy.types.Object,
 ) -> list[bpy.types.Object]:
-    meshes = [obj for obj in object_tree(root) if obj.type == "MESH"]
+    meshes = [obj for obj in weapon_contract_objects(root) if obj.type == "MESH"]
     meshes.extend(
         obj for obj in bpy.data.objects
         if obj.type == "MESH" and obj.parent == armature
@@ -307,7 +310,9 @@ def _render(
     visible_proxy_names = set(suit_scale_names if view == "suit_scale" else rifle_names)
     update_static_render_proxies(proxies, visible_names=visible_proxy_names)
 
-    rifle_meshes = [obj for obj in object_tree(root) if obj.type == "MESH"]
+    rifle_meshes = [
+        obj for obj in weapon_contract_objects(root) if obj.type == "MESH"
+    ]
     framed_meshes = _suit_scale_meshes(armature, root) if view == "suit_scale" else rifle_meshes
     minimum, maximum = world_bounds(framed_meshes)
     center = (minimum + maximum) * 0.5
@@ -369,6 +374,12 @@ def _render(
             )
     _position_lights(lights, target, right, forward, up)
     path = output_dir / filename
+    if can_reuse_validation_render(path):
+        print(
+            f"Reused validated render after interrupted pass: {path}",
+            flush=True,
+        )
+        return path
     render_scene.render.filepath = str(path)
     print(f"[Rifle validation] Render {filename}: view {view}", flush=True)
     bpy.ops.render.render(write_still=True, scene=render_scene.name)
@@ -428,7 +439,9 @@ def main() -> None:
         sync_detached_rifle_to_hand(armature, root, rifle_state)
 
         output_dir = ensure_directory("renders", "rifle_validation")
-        rifle_sources = [obj for obj in object_tree(root) if obj.type == "MESH"]
+        rifle_sources = [
+            obj for obj in weapon_contract_objects(root) if obj.type == "MESH"
+        ]
         suit_scale_sources = _suit_scale_meshes(armature, root)
         source_objects = list(dict.fromkeys([*rifle_sources, *suit_scale_sources]))
         rifle_names = {obj.name for obj in rifle_sources}
@@ -444,7 +457,7 @@ def main() -> None:
                 source_objects,
             )
             camera, lights = _create_camera_and_lights(render_scene, render_collection)
-            render_scene.render.engine = "BLENDER_WORKBENCH"
+            configure_validation_render_engine(render_scene)
             render_scene.display.shading.color_type = "OBJECT"
             render_scene.display.shading.light = "STUDIO"
             render_scene.display.shading.show_shadows = True

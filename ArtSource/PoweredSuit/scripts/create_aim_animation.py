@@ -84,7 +84,7 @@ LOWER_BODY_BONES = (
 def _assert_rifle_ready(root: bpy.types.Object) -> None:
     armature = get_armature()
     require_character_asset_versions(armature)
-    if int(root.get("ps_generator_version", 0)) < 109:
+    if int(root.get("ps_generator_version", 0)) < 111:
         raise RuntimeError(
             "RifleRoot predates the rigid weapon-framework reset. "
             "Run upgrade_rifle_model.py first."

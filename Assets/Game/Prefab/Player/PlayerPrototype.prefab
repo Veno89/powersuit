@@ -117,21 +117,58 @@ MonoBehaviour:
   boostSpeed: 20
   flightAcceleration: 12
   turningSpeed: 12
-  cameraDistance: 5
-  cameraHeight: 1.4
+  movementSettings:
+    groundDeceleration: 26
+    groundBrakingAcceleration: 38
+    airAcceleration: 7
+    airDeceleration: 1.5
+    airBrakingAcceleration: 10
+    terminalFallSpeed: 35
+    groundedStickVelocity: -2
+    groundedReleaseGraceSeconds: 0.06
+    coyoteTimeSeconds: 0.12
+    jumpBufferSeconds: 0.12
+    flightDeceleration: 9
+    flightBrakingAcceleration: 22
+    flightVerticalSpeed: 8
+    boostVerticalSpeed: 14
+    flightVerticalAcceleration: 18
+    flightVerticalDeceleration: 14
+    flightVerticalBrakingAcceleration: 28
+    flightTakeoffSpeed: 5
+    flightTakeoffGraceSeconds: 0.12
+    flightToggleCooldownSeconds: 0.15
+    boostAccelerationMultiplier: 1.5
+    flightLandingInputThreshold: 0.1
+    flightLandingIntentGraceSeconds: 0.25
+  cameraDistance: 9.5
+  cameraHeight: 1.5
   mouseSensitivity: 0.15
   controllerLookSpeed: 120
   minimumPitch: -55
   maximumPitch: 70
   cameraCollisionRadius: 0.2
-  aimCameraDistance: 2.2
-  aimCameraHeight: 1.5
-  aimShoulderOffset: {x: 1.2, y: 0.4, z: 0}
-  defaultFieldOfView: 60
-  aimFieldOfView: 45
+  cameraCollisionPadding: 0.05
+  cameraCollisionReleaseSharpness: 14
+  cameraLookSharpness: 28
+  flightCameraDistance: 11
+  flightCameraHeight: 1.75
+  flightFieldOfView: 74
+  boostCameraDistance: 12
+  boostCameraHeight: 1.8
+  boostFieldOfView: 82
+  aimCameraDistance: 4.3
+  aimCameraHeight: 1.45
+  aimShoulderOffset: {x: -1.2, y: 0.05, z: 0}
+  defaultFieldOfView: 72
+  aimFieldOfView: 62
   aimTransitionSpeed: 12
   maxReticleOffset: 140
   aimMaxDistance: 200
+  scopePoint: {fileID: 0}
+  scopeEyeRelief: 0.045
+  scopedNearClipPlane: 0.02
+  scopeActivationPolicy: 1
   recoilRecoverySpeed: 15
   maxAccumulatedRecoil: 4
 --- !u!114 &7646132019645809869
@@ -148,6 +185,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PowerSuitWeapon
   muzzleTransform: {fileID: 8183974565744455760}
   projectilePrefab: {fileID: 7681147712830104469, guid: 5b4a1c303746175489dbc2419acaea4e, type: 3}
+  weaponDefinition: {fileID: 0}
   damage: 25
   projectileSpeed: 50
   projectileLifetime: 4
@@ -157,6 +195,8 @@ MonoBehaviour:
   muzzleFlashColor: {r: 0.3, g: 0.85, b: 1, a: 1}
   flashLightIntensity: 4
   flashDuration: 0.05
+  aimSpreadDegrees: 0
+  hipSpreadDegrees: 0
   aimRecoilPitch: 1.2
   aimRecoilYaw: 0.35
   hipRecoilPitch: 0.7
@@ -181,6 +221,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maximumHealth: 100
   respawnDelay: 2
+  faction: 1
+  allowFriendlyFire: 0
 --- !u!114 &4114279548440960474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,6 +237,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PowerSuitAnimationDriver
   controller: {fileID: 0}
   animator: {fileID: 0}
+  weaponPresentation: {fileID: 0}
+  weaponAnimationDriver: {fileID: 0}
+  movementDamping: 0.1
+  fullSpeedLocomotionPlayback: 2
+  forwardPoseBlendSharpness: 12
 --- !u!114 &6954614664465323843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,7 +255,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ReticleHitMarker
   markerColor: {r: 1, g: 0.25, b: 0.25, a: 1}
+  killMarkerColor: {r: 1, g: 0.82, b: 0.2, a: 1}
   displayDuration: 0.15
+  killDisplayDuration: 0.28
   startSize: 10
   endSize: 20
   lineThickness: 2.5

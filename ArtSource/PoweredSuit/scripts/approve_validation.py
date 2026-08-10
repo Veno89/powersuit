@@ -1,5 +1,5 @@
 # pyright: reportMissingImports=false
-"""Record the user's explicit visual review decision for the validation renders.
+"""Record an explicit technical visual-review decision for the validation renders.
 
 Usage after inspecting every image:
   blender --background powersuit_pipeline.blend \
@@ -40,7 +40,24 @@ RIFLE_FILES = (
     "renders/rifle_validation/rifle_rear_3q_closeup.png",
     "renders/rifle_validation/rifle_with_suit_scale.png",
 )
-EXPECTED_RENDER_FILES = (*AIM_FILES, *RIFLE_FILES)
+WEAPON_ANIMATION_FILES = (
+    "renders/weapon_animation_validation/ready_idle_front_3q.png",
+    "renders/weapon_animation_validation/stowed_idle_rear_3q.png",
+    "renders/weapon_animation_validation/draw_frame_010_rear_3q.png",
+    "renders/weapon_animation_validation/draw_frame_018_side.png",
+    "renders/weapon_animation_validation/sheathe_frame_021_rear_3q.png",
+    "renders/weapon_animation_validation/walk_forward_frame_009_side.png",
+    "renders/weapon_animation_validation/walk_backward_frame_009_side.png",
+    "renders/weapon_animation_validation/aim_walk_forward_frame_009_front_3q.png",
+    "renders/weapon_animation_validation/aim_walk_backward_frame_009_side.png",
+    "renders/weapon_animation_validation/reload_frame_050_magazine.png",
+    "renders/weapon_animation_validation/reload_frame_064_insert.png",
+    "renders/weapon_animation_validation/bolt_frame_012_close.png",
+    "renders/weapon_animation_validation/stowed_walk_frame_009_rear_3q.png",
+    "renders/weapon_animation_validation/stowed_hover_frame_031_rear_3q.png",
+    "renders/weapon_animation_validation/run_forward_frame_006_side.png",
+)
+EXPECTED_RENDER_FILES = (*AIM_FILES, *RIFLE_FILES, *WEAPON_ANIMATION_FILES)
 CHECKLIST = (
     "arms bend naturally down and outward",
     "trigger hand visibly holds the pistol grip",
@@ -51,6 +68,14 @@ CHECKLIST = (
     "ocular lens is in front of the visor without penetration",
     "major rifle components and silhouette read clearly",
     "PS_Idle and PS_Aim visibly differ",
+    "ready and stowed poses read clearly and keep the rifle attached",
+    "draw and sheath transitions have no visible pop",
+    "forward walk and backward backpedal have grounded directional footwork",
+    "aim-walk preserves the shouldered weapon while the legs move",
+    "reload shows magazine removal and insertion with hand contact",
+    "bolt cycle visibly moves the hand and mechanism",
+    "stowed walk and hover retain the back-mounted rifle",
+    "forward run visibly differs from walk with longer stride, lean, and flight",
 )
 
 
@@ -101,6 +126,10 @@ def main() -> None:
         raise RuntimeError("Automated blockers remain in the validation report.")
     if report.get("rifle_render_set_complete") is not True:
         raise RuntimeError("The validation report does not confirm the complete rifle render set.")
+    if report.get("weapon_animation_render_set_complete") is not True:
+        raise RuntimeError(
+            "The validation report does not confirm the complete weapon-animation render set."
+        )
 
     normalized_aim = {
         str(relative).replace("\\", "/")
@@ -110,8 +139,18 @@ def main() -> None:
         str(relative).replace("\\", "/")
         for relative in report.get("rifle_render_files", [])
     }
-    if normalized_aim != set(AIM_FILES) or normalized_rifle != set(RIFLE_FILES):
-        raise RuntimeError("Validation report render paths are not the canonical 18-file set.")
+    normalized_weapon_animation = {
+        str(relative).replace("\\", "/")
+        for relative in report.get("weapon_animation_render_files", [])
+    }
+    if (
+        normalized_aim != set(AIM_FILES)
+        or normalized_rifle != set(RIFLE_FILES)
+        or normalized_weapon_animation != set(WEAPON_ANIMATION_FILES)
+    ):
+        raise RuntimeError(
+            "Validation report paths are not the canonical 33-render set."
+        )
     if report.get("blend_sha256_at_validation") != _sha256(blend_path):
         raise RuntimeError("The .blend changed after validation. Rebuild and review again.")
 
@@ -131,7 +170,7 @@ def main() -> None:
 
     approval = {
         "approved": True,
-        "approval_basis": "User explicitly reviewed all mandatory PNG renders, including the close grip/stock/elbow views.",
+        "approval_basis": "Technical QA explicitly reviewed all mandatory PNG renders, including pose, contact, transition, locomotion, reload, and bolt views.",
         "checklist_confirmed": list(CHECKLIST),
         "blend_sha256_at_approval": _sha256(blend_path),
         "validation_report_sha256": _sha256(report_path),

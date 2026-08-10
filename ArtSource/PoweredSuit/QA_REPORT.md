@@ -1,98 +1,85 @@
-# Generator 109 Approved QA Report
+# Generator 113 Approved QA Report
 
-Date: 2026-08-08
-Environment: Blender 5.2.0 LTS on Windows
-Formal asset state: automated `PASS`, visual `APPROVED`, export allowed
+Date: 2026-08-10
 
-## Current packaged candidate
+Environment: Blender 5.2.0 LTS and Unity 6000.5.7f1 on Windows
 
-- immutable source blend SHA-256:
-  `49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4`
-- generated `powersuit_pipeline.blend` SHA-256:
-  `5b41ec1bd51f69a8e91c4052d6e99e7bed2d3d2f4afcf38a56e37609c8c11e99`
-- approved `renders/validation_report.json` SHA-256:
-  `77cb69bd887801393f49da08993a4cf582bbabce627033a8c5cf2a52778e5d9e`
-- report blend hash matches the generated blend: yes
-- aim renders: 13/13
-- rifle renders: 5/5
-- automated blockers: 0
-- `visual_approval.json` SHA-256:
-  `0c4e7c0ee935d19d0363da22ce31f1a585e216c3007fbeb556cce995fe3b4f7a`
-- exported FBX SHA-256:
-  `b06492383c47750fbb7335dadf56794856b09bca2425c442e81e867e9a689b69`
+Formal asset state: automated `PASS`, technical visual `APPROVED`, export allowed
+
+## Packaged candidate
+
+- immutable source blend SHA-256: `49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4`
+- generated `powersuit_pipeline.blend` SHA-256: `a5054d65af2cb6a04836216456a1a3162f8d860c6c421533a7ac08a9f70d2d4b`
+- approved `validation_report.json` SHA-256: `a6d8c7bd98659f2cee33c906ca845d6e01e2d060dbc906b31de647ab664bf4ee`
+- `visual_approval.json` SHA-256: `7d6cc01a5ecce4067d1ae4409cb3dd23df68ed48da2ec3fa5acf279a8ee66d9b`
+- `export_manifest.json` SHA-256: `0a14ed949eba508857de4a004c317769eb1d6449f050318fd3c82b493815813d`
+- exported FBX SHA-256: `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`
 - Unity FBX hash matches the approved export: yes
+- required renders: 13 aim + 5 rifle + 15 weapon animation = 33/33
+- automated blockers: 0
 
-## Runtime result
+## Asset and animation result
 
-- rifle generator: 109
-- weapon contract: v2
-- rigid signature: v5
+- rifle generator: 111
+- weapon contract: v3
+- rigid signature: v6
+- animation contract: v4
 - rig upgrade: v2
-- hand geometry: v2 on both hands
-- legacy Actions retained: `PS_Idle`, `PS_Walk`, `PS_Hover`
-- rebuilt Action: `PS_Aim`
-- all four Actions use one Blender 5.2 armature Action Slot
-- only `RifleRoot` is attached directly to `Hand.R`
-- rifle direct children: 60
-- active temporary IK/validation objects: none
+- hand geometry: v3 on both hands
+- exact exported armature actions: 18
+- non-deforming weapon controls: `WeaponRoot`, `WeaponMagazine`, `WeaponBolt`
 - root motion: 0 m
+- draw/sheathe endpoint deltas: 0 m
+- reload magazine travel: `0.32194 m`
+- bolt travel: `0.09500 m`
+- reload timing: frames 1-84 at 30 FPS, ammunition commit at frame 75
+- bolt timing: frames 1-20 at 30 FPS
+- run timing: frames 1-21 at 30 FPS, 20-frame loop, 180 native steps per minute
 
-Selected final aim metrics:
+Selected aim/contact metrics:
 
 - sight lateral / vertical: `0.011011 / 0.011282 m`
 - sight front clearance: `0.088841 m`
-- visor/rifle sight-axis angle: `1.7457°`
-- firing-side receptor-to-ocular ray angle: `9.9458°`
-- head yaw / pitch / roll: `0.5° / 5.5° / -6.0°`
-- trigger/support wrist target error: below `0.00005 m`
+- visor/rifle sight-axis angle: `1.7457 degrees`
+- firing-side receptor-to-ocular ray angle: `9.9458 degrees`
+- trigger/support wrist target error: below `0.000054 m`
 - trigger/support hand-grip overlap pairs: `18 / 6`
 - stock/shoulder overlap pairs: `22`
 - non-stock weapon/torso overlap pairs: `0`
+- forward/backward foot phase delta: `0.21299 m`
+- run/walk stride: `0.93411 / 0.83793 m`
+- run airborne clearance: `0.03650 m`
+- run/ready torso forward projection: `0.10809 / -0.01189 m`
+- run trigger/support wrist error: below `0.000053 m`
 
-## Tests performed
+## Blender verification
 
-1. Audited Reset06 scripts, both historical `.blend` files, all historical
-   renders/reports, older `PowerSuitAsset` files, and the Unity workspace.
-2. Python-compiled all 11 active scripts.
-3. Ran repeated clean builds from `source/powersuit_source.blend` through all
-   six Blender stages, including the final exact-code repeat.
-4. Validated Action Slots, curve/key counts, preserved legacy Action data,
-   hierarchy, positive transforms, finite values, rigid signature, semantic
-   hardpoints, reach, sight, contact, collision, framing, and complete renders.
-5. Inspected all 18 required images at full resolution. The current stylised
-   candidate reads as a coherent shouldered aim pose and none of the listed
-   gross rejection conditions was observed. The user then explicitly approved
-   promotion, and the approval tool recorded the exact 18 render hashes.
-6. Repeated the final clean build while retaining the prior output temporarily:
-   semantic reports were equal and 18/18 decoded PNG pixel buffers were exactly
-   equal (`max channel RMS = 0`).
-7. Confirmed Blender container/encoding bytes are not reproducible across clean
-   runs: 0/18 compressed PNG hashes matched even though decoded pixels were
-   identical, and `.blend` hashes differed. The report hash correspondingly
-   changes because it records the generated blend hash. Use the hashes above
-   for this packaged candidate, not as universal generator-output hashes.
-8. Confirmed canonical export refused the candidate before approval, then
-   exported exactly the approved four-action asset after approval.
-9. In an isolated temporary copy, confirmed approval covers exactly 18 render
-   hashes, a changed approved render blocks export, and `--reject` works even
-   for an automated `REVIEW_BLOCKED` report. The temporary approval was removed;
-   the canonical candidate remained unchanged until explicit user approval.
-10. Verified active Windows launchers use CRLF, shell launchers pass Git Bash
-    syntax checking, and both platforms preflight Blender 5.2 before the build
-    launcher resets generated work.
+1. Rebuilt from immutable source through model, rig, rifle, Aim, 14-action weapon/locomotion authoring, and all three render stages.
+2. Validated exact action names/ranges, one armature slot per action, finite transforms, hierarchy, articulated-component ownership, rigid manifests, root motion, grip/stock/sight contact, collision, framing, draw/sheathe endpoints, locomotion phase, run stride/flight/forward commitment, magazine travel, and bolt travel.
+3. Produced and inspected all 33 mandatory images, including the run flight-phase side view. Reload cameras expose magazine removal/insertion and hand contact rather than hiding them behind armor.
+4. Recorded technical visual approval against the exact report, blend, and 33 image hashes; export remained locked until approval.
+5. Exported exactly the 18 required actions and verified the FBX manifest, timing markers, selected objects, hash, and size.
+6. Confirmed Generator 110's outward face winding and positive-volume export gate remain active, preventing the hollow/open-box appearance caused by back-face culling.
 
-## Visual and integration boundary
+## Unity verification
 
-The Generator 109 result is approved for Unity evaluation. It is imported
-alongside the legacy model so rollback remains straightforward; the legacy FBX
-and `.meta` were not overwritten. The immutable reviewed report, approval
-record, and 18 images live under `Validation/Generator109`.
+- active Unity FBX SHA-256 matches the approved Generator 113 export exactly
+- retained FBX GUID `f48464ae4ba58b54f976e658ece758b3`
+- imported with Generic rig, cameras/lights disabled, hierarchy retained, and optimization disabled
+- ModelImporter contains exactly 18 configured clips with unique matching takes
+- Unity exposes exactly 18 imported `AnimationClip` subassets
+- `PS_Run_Forward` imports as frames 0-20, 30 FPS, `0.667 s`, with loop time and loop pose enabled
+- the `.meta` diff preserves every Generator 111 clip entry and adds only the run clip entry
+- regenerated controller and player/world assets completed successfully
+- C# solution: 18 assemblies, 0 warnings, 0 errors
+- Unity Console after verification: 0 errors
+- EditMode: 228/228 passed
+- PlayMode: 12/12 passed
+- Windows x64 Development build: succeeded on 2026-08-10 at 21:01
+- 15-second headless smoke: no gameplay exception, assertion, or missing-reference patterns
 
-Unity `6000.5.7f1` imported the approved FBX with four clips and no imported
-cameras or lights. The additive prefab/demo integration passed 5/5 EditMode
-tests and 2/2 PlayMode tests, produced a Windows 64-bit Development Player, and
-completed a 10-second headless player smoke without missing references or
-runtime exceptions.
+Unity's AI Inference/Sentis package emitted non-blocking third-party shader performance warnings during the Development build. No compiler, test, scene-load, smoke, or build failure resulted.
 
-Blender emitted two non-blocking deprecation warnings for `Material.use_nodes`,
-which remains valid in Blender 5.2 but is expected to change in Blender 6.0.
+## Acceptance boundary
+
+Generator 113 is technically approved and integrated for hands-on evaluation. The exact evidence is frozen under `Validation/Generator113`; Generators 110 through 112 remain immutable rollback candidates. Generator113 records 0.8379 m walk stride, 0.9341 m run stride, 0.0365 m run airborne clearance, animation contract version 4, and the deterministic Cycles CPU validation fallback used after the NVIDIA headless Workbench crash. User play acceptance of powered gait/propulsion, residual foot slide, transitions, camera feel, reload contact, bolt feel, jump-to-flight timing, and scoped sight feel remains a separate gate in the repository `ROADMAP.md`.

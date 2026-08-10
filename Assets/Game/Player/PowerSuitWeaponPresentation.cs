@@ -1,0 +1,581 @@
+using System;
+using UnityEngine;
+
+public enum PowerSuitWeaponPresentationState
+{
+    Ready,
+    Drawing,
+    Stowed,
+    Sheathing
+}
+
+/// <summary>
+/// Deterministic weapon carry state independent of input, animation, and frame
+/// timing. Transition requests are accepted only from stable endpoint states.
+/// </summary>
+public sealed class PowerSuitWeaponPresentationStateMachine
+{
+    private readonly float drawDuration;
+    private readonly float sheatheDuration;
+    private float remainingTransitionTime;
+
+    public PowerSuitWeaponPresentationState State { get; private set; }
+
+    public bool CanUseWeapon => State == PowerSuitWeaponPresentationState.Ready;
+
+    public bool IsTransitioning =>
+        State == PowerSuitWeaponPresentationState.Drawing ||
+        State == PowerSuitWeaponPresentationState.Sheathing;
+
+    public float RemainingTransitionTime => remainingTransitionTime;
+
+    public PowerSuitWeaponPresentationStateMachine(
+        float drawDuration,
+        float sheatheDuration,
+        bool startsStowed = false
+    )
+    {
+        ValidateDuration(drawDuration, nameof(drawDuration));
+        ValidateDuration(sheatheDuration, nameof(sheatheDuration));
+
+        this.drawDuration = drawDuration;
+        this.sheatheDuration = sheatheDuration;
+        State = startsStowed
+            ? PowerSuitWeaponPresentationState.Stowed
+            : PowerSuitWeaponPresentationState.Ready;
+    }
+
+    public bool RequestDraw()
+    {
+        if (State != PowerSuitWeaponPresentationState.Stowed)
+        {
+            return false;
+        }
+
+        State = PowerSuitWeaponPresentationState.Drawing;
+        remainingTransitionTime = drawDuration;
+        return true;
+    }
+
+    public bool RequestSheathe()
+    {
+        if (State != PowerSuitWeaponPresentationState.Ready)
+        {
+            return false;
+        }
+
+        State = PowerSuitWeaponPresentationState.Sheathing;
+        remainingTransitionTime = sheatheDuration;
+        return true;
+    }
+
+    public bool Toggle()
+    {
+        if (State == PowerSuitWeaponPresentationState.Ready)
+        {
+            return RequestSheathe();
+        }
+
+        if (State == PowerSuitWeaponPresentationState.Stowed)
+        {
+            return RequestDraw();
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Cancels an active transition and returns directly to a configured stable
+    /// endpoint without replaying draw or sheathe timing.
+    /// </summary>
+    public void Reset(bool resetToStowed)
+    {
+        State = resetToStowed
+            ? PowerSuitWeaponPresentationState.Stowed
+            : PowerSuitWeaponPresentationState.Ready;
+        remainingTransitionTime = 0f;
+    }
+
+    /// <summary>
+    /// Advances the active transition. Returns true only on the tick that a
+    /// stable endpoint is reached.
+    /// </summary>
+    public bool Tick(float deltaTime)
+    {
+        if (
+            deltaTime < 0f ||
+            float.IsNaN(deltaTime) ||
+            float.IsInfinity(deltaTime)
+        )
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(deltaTime),
+                "Tick duration must be finite and non-negative."
+            );
+        }
+
+        if (!IsTransitioning || deltaTime == 0f)
+        {
+            return false;
+        }
+
+        remainingTransitionTime = Mathf.Max(
+            0f,
+            remainingTransitionTime - deltaTime
+        );
+
+        if (remainingTransitionTime > 0f)
+        {
+            return false;
+        }
+
+        State = State == PowerSuitWeaponPresentationState.Drawing
+            ? PowerSuitWeaponPresentationState.Ready
+            : PowerSuitWeaponPresentationState.Stowed;
+
+        return true;
+    }
+
+    private static void ValidateDuration(float duration, string parameterName)
+    {
+        if (
+            duration <= 0f ||
+            float.IsNaN(duration) ||
+            float.IsInfinity(duration)
+        )
+        {
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                "Transition duration must be finite and greater than zero."
+            );
+        }
+    }
+}
+
+[DisallowMultipleComponent]
+[DefaultExecutionOrder(-100)]
+public sealed class PowerSuitWeaponPresentation : MonoBehaviour
+{
+    public const string WeaponStowedParameterName = "WeaponStowed";
+    public const string DrawWeaponTriggerName = "DrawWeapon";
+    public const string SheatheWeaponTriggerName = "SheatheWeapon";
+    public const string StowedLocomotionStateName = "Stowed Locomotion";
+
+    private const float MinimumTransitionDuration = 0.01f;
+
+    [SerializeField] private PowerSuitController controller;
+    [SerializeField] private Animator animator;
+    [SerializeField] private PowerSuitWeapon weapon;
+    [SerializeField] private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
+    [SerializeField] private bool startsStowed;
+    [SerializeField, Min(MinimumTransitionDuration)] private float drawDuration = 1f;
+    [SerializeField, Min(MinimumTransitionDuration)] private float sheatheDuration = 1f;
+
+    private static readonly int WeaponStowedParameter =
+        Animator.StringToHash(WeaponStowedParameterName);
+
+    private static readonly int DrawWeaponTrigger =
+        Animator.StringToHash(DrawWeaponTriggerName);
+
+    private static readonly int SheatheWeaponTrigger =
+        Animator.StringToHash(SheatheWeaponTriggerName);
+
+    private static readonly int ReloadWeaponTrigger =
+        Animator.StringToHash(PowerSuitWeaponAnimationDriver.ReloadTriggerName);
+
+    private static readonly int CycleWeaponTrigger =
+        Animator.StringToHash(PowerSuitWeaponAnimationDriver.CycleTriggerName);
+
+    private static readonly int StowedLocomotionState =
+        Animator.StringToHash(StowedLocomotionStateName);
+
+    private PowerSuitWeaponPresentationStateMachine stateMachine;
+    private PowerSuitInputRouter inputRouter;
+    private int fallbackInputFrame = -1;
+    private PowerSuitInputSnapshot fallbackInputSnapshot;
+    private bool hasWeaponStowed;
+    private bool hasDrawWeapon;
+    private bool hasSheatheWeapon;
+    private bool hasReloadWeapon;
+    private bool hasCycleWeapon;
+
+    public PowerSuitWeaponPresentationState State
+    {
+        get
+        {
+            EnsureStateMachine();
+            return stateMachine.State;
+        }
+    }
+
+    public bool CanUseWeapon
+    {
+        get
+        {
+            EnsureStateMachine();
+            return stateMachine.CanUseWeapon;
+        }
+    }
+
+    public bool IsTransitioning
+    {
+        get
+        {
+            EnsureStateMachine();
+            return stateMachine.IsTransitioning;
+        }
+    }
+
+    private void Awake()
+    {
+        InitializeRuntimeAdapter();
+    }
+
+    private void OnEnable()
+    {
+        // References, Animator-parameter caches, and the plain C# state object
+        // are nonserialized runtime state. Rebuild them after Editor script
+        // reloads as well as on the first Awake.
+        InitializeRuntimeAdapter();
+    }
+
+    private void InitializeRuntimeAdapter()
+    {
+        if (controller == null)
+        {
+            controller = GetComponent<PowerSuitController>();
+        }
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
+
+        if (weapon == null)
+        {
+            weapon = GetComponent<PowerSuitWeapon>();
+        }
+
+        if (weaponAnimationDriver == null)
+        {
+            weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
+        }
+
+        if (inputRouter == null)
+        {
+            inputRouter = GetComponent<PowerSuitInputRouter>();
+        }
+
+        CacheAnimatorParameters();
+        if (stateMachine == null)
+        {
+            bool restoreStowed =
+                startsStowed ||
+                (
+                    animator != null &&
+                    hasWeaponStowed &&
+                    animator.GetBool(WeaponStowedParameter)
+                );
+            stateMachine = new PowerSuitWeaponPresentationStateMachine(
+                drawDuration,
+                sheatheDuration,
+                restoreStowed
+            );
+        }
+        UpdateWeaponStowedParameter();
+        if (
+            State == PowerSuitWeaponPresentationState.Stowed &&
+            animator != null &&
+            animator.HasState(0, StowedLocomotionState)
+        )
+        {
+            animator.Play(StowedLocomotionState, 0, 0f);
+        }
+        UpdateWeaponAvailability();
+    }
+
+    private void Update()
+    {
+        // Defensive fallback for unusual lifecycle ordering; OnEnable normally
+        // restores both this object and the associated Animator caches.
+        EnsureStateMachine();
+
+        if (WasTogglePressed())
+        {
+            Toggle();
+        }
+
+        if (
+            controller != null &&
+            controller.AimRequested &&
+            State == PowerSuitWeaponPresentationState.Stowed
+        )
+        {
+            RequestDraw();
+        }
+
+        if (stateMachine.Tick(Time.deltaTime))
+        {
+            UpdateWeaponStowedParameter();
+        }
+
+        UpdateWeaponAvailability();
+    }
+
+    public bool RequestDraw()
+    {
+        EnsureStateMachine();
+
+        if (IsWeaponBusy() || !stateMachine.RequestDraw())
+        {
+            return false;
+        }
+
+        ResetOptionalTrigger(SheatheWeaponTrigger, hasSheatheWeapon);
+        SetOptionalTrigger(DrawWeaponTrigger, hasDrawWeapon);
+        UpdateWeaponAvailability();
+        return true;
+    }
+
+    public bool RequestSheathe()
+    {
+        EnsureStateMachine();
+
+        if (IsWeaponBusy() || !stateMachine.RequestSheathe())
+        {
+            return false;
+        }
+
+        ResetOptionalTrigger(DrawWeaponTrigger, hasDrawWeapon);
+        SetOptionalTrigger(SheatheWeaponTrigger, hasSheatheWeapon);
+        UpdateWeaponAvailability();
+        return true;
+    }
+
+    public bool Toggle()
+    {
+        EnsureStateMachine();
+
+        if (State == PowerSuitWeaponPresentationState.Ready)
+        {
+            return RequestSheathe();
+        }
+
+        if (State == PowerSuitWeaponPresentationState.Stowed)
+        {
+            return RequestDraw();
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Cancels presentation transitions and action-layer residue so the player
+    /// returns at the component's configured stable carry state.
+    /// </summary>
+    public void ResetForRespawn()
+    {
+        EnsureStateMachine();
+        stateMachine.Reset(startsStowed);
+
+        ResetOptionalTrigger(DrawWeaponTrigger, hasDrawWeapon);
+        ResetOptionalTrigger(SheatheWeaponTrigger, hasSheatheWeapon);
+        ResetOptionalTrigger(ReloadWeaponTrigger, hasReloadWeapon);
+        ResetOptionalTrigger(CycleWeaponTrigger, hasCycleWeapon);
+
+        ResetAnimatorLayer(
+            PowerSuitWeaponAnimationDriver.WeaponActionLayerName,
+            PowerSuitWeaponAnimationDriver.NoWeaponActionStateName
+        );
+        ResetAnimatorLayer(
+            PowerSuitWeaponAnimationDriver.BoltCycleLayerName,
+            PowerSuitWeaponAnimationDriver.NoBoltCycleStateName
+        );
+
+        UpdateWeaponStowedParameter();
+        if (
+            startsStowed &&
+            animator != null &&
+            animator.HasState(0, StowedLocomotionState)
+        )
+        {
+            animator.Play(StowedLocomotionState, 0, 0f);
+        }
+
+        UpdateWeaponAvailability();
+    }
+
+    private void EnsureStateMachine()
+    {
+        if (stateMachine != null)
+        {
+            return;
+        }
+
+        stateMachine = new PowerSuitWeaponPresentationStateMachine(
+            Mathf.Max(MinimumTransitionDuration, drawDuration),
+            Mathf.Max(MinimumTransitionDuration, sheatheDuration),
+            startsStowed
+        );
+    }
+
+    private void CacheAnimatorParameters()
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        hasWeaponStowed = HasParameter(
+            WeaponStowedParameter,
+            AnimatorControllerParameterType.Bool
+        );
+
+        hasDrawWeapon = HasParameter(
+            DrawWeaponTrigger,
+            AnimatorControllerParameterType.Trigger
+        );
+
+        hasSheatheWeapon = HasParameter(
+            SheatheWeaponTrigger,
+            AnimatorControllerParameterType.Trigger
+        );
+
+        hasReloadWeapon = HasParameter(
+            ReloadWeaponTrigger,
+            AnimatorControllerParameterType.Trigger
+        );
+
+        hasCycleWeapon = HasParameter(
+            CycleWeaponTrigger,
+            AnimatorControllerParameterType.Trigger
+        );
+    }
+
+    private bool HasParameter(
+        int parameterHash,
+        AnimatorControllerParameterType expectedType
+    )
+    {
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (
+                parameter.nameHash == parameterHash &&
+                parameter.type == expectedType
+            )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void UpdateWeaponStowedParameter()
+    {
+        if (!hasWeaponStowed)
+        {
+            return;
+        }
+
+        bool isStablyStowed =
+            State == PowerSuitWeaponPresentationState.Stowed;
+
+        animator.SetBool(
+            WeaponStowedParameter,
+            isStablyStowed
+        );
+    }
+
+    private void UpdateWeaponAvailability()
+    {
+        if (weapon != null)
+        {
+            weapon.PresentationAllowsFire = CanUseWeapon;
+            // Reload is an upper-body weapon action. Flight locomotion stays on
+            // the base layer, so a stable ready weapon can reload in the air
+            // without forcing a landing or interrupting hover movement.
+            weapon.PresentationAllowsReload = CanUseWeapon;
+        }
+
+        controller?.RefreshAimAvailability();
+    }
+
+    private bool IsWeaponBusy()
+    {
+        return IsTransitioning ||
+            (weapon != null && (weapon.IsReloading || weapon.IsCycling));
+    }
+
+    private void ResetAnimatorLayer(string layerName, string neutralStateName)
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        int layerIndex = animator.GetLayerIndex(layerName);
+        if (layerIndex < 0)
+        {
+            return;
+        }
+
+        int neutralState = Animator.StringToHash(neutralStateName);
+        if (animator.HasState(layerIndex, neutralState))
+        {
+            animator.Play(neutralState, layerIndex, 0f);
+        }
+        animator.SetLayerWeight(layerIndex, 0f);
+    }
+
+    private void SetOptionalTrigger(int triggerHash, bool isAvailable)
+    {
+        if (isAvailable)
+        {
+            weaponAnimationDriver?.BeginWeaponAction();
+            animator.SetTrigger(triggerHash);
+        }
+    }
+
+    private void ResetOptionalTrigger(int triggerHash, bool isAvailable)
+    {
+        if (isAvailable)
+        {
+            animator.ResetTrigger(triggerHash);
+        }
+    }
+
+    private bool WasTogglePressed()
+    {
+        return ReadInputSnapshot().CarryTogglePressed;
+    }
+
+    private PowerSuitInputSnapshot ReadInputSnapshot()
+    {
+        if (
+            inputRouter != null &&
+            inputRouter.TryGetCurrentSnapshot(
+                out PowerSuitInputSnapshot routedInput
+            )
+        )
+        {
+            return routedInput;
+        }
+
+        int frame = Time.frameCount;
+        if (fallbackInputFrame != frame)
+        {
+            fallbackInputSnapshot =
+                PowerSuitInputRouter.ReadFallbackSnapshot();
+            fallbackInputFrame = frame;
+        }
+
+        return fallbackInputSnapshot;
+    }
+
+    private void OnValidate()
+    {
+        drawDuration = Mathf.Max(MinimumTransitionDuration, drawDuration);
+        sheatheDuration = Mathf.Max(MinimumTransitionDuration, sheatheDuration);
+    }
+}

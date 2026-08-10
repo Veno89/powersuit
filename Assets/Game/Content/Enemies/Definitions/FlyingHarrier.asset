@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f46d19be5f06244e8899a06a9007829, type: 3}
+  m_Name: FlyingHarrier
+  m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyArchetypeDefinition
+  archetypeId: flying-harrier
+  displayName: Flying Harrier
+  role: 4
+  movementMode: 4
+  maximumHealth: 95
+  movementSpeed: 5.6
+  turnSpeedDegrees: 210
+  acceleration: 13
+  preferredMinimumDistance: 14
+  preferredMaximumDistance: 27
+  aggroRange: 46
+  loseTargetRange: 62
+  fieldOfViewDegrees: 190
+  patrolRadius: 0
+  minimumFlightAltitude: 6
+  maximumFlightAltitude: 13
+  lateralMovementStrength: 0.7
+  abilityResistance: 0.2
+  spawnWeight: 0.8
+  threatCost: 2.1
+  attackId: harrier-air-burst
+  projectileId: enemy-air-round
+  attackStyle: 1
+  damageType: 0
+  ownerFaction: 2
+  damage: 7
+  fireIntervalSeconds: 1.35
+  burstCount: 2
+  burstShotIntervalSeconds: 0.14
+  projectileSpeed: 29
+  telegraphSeconds: 0.18
+  spreadDegrees: 2.2
+  minimumRange: 5
+  maximumRange: 44
+  requiresLineOfSight: 1

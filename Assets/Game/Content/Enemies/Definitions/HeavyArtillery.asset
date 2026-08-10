@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f46d19be5f06244e8899a06a9007829, type: 3}
+  m_Name: HeavyArtillery
+  m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyArchetypeDefinition
+  archetypeId: heavy-artillery
+  displayName: Heavy Artillery
+  role: 3
+  movementMode: 2
+  maximumHealth: 280
+  movementSpeed: 1.65
+  turnSpeedDegrees: 95
+  acceleration: 5
+  preferredMinimumDistance: 22
+  preferredMaximumDistance: 38
+  aggroRange: 54
+  loseTargetRange: 66
+  fieldOfViewDegrees: 115
+  patrolRadius: 0
+  minimumFlightAltitude: 0
+  maximumFlightAltitude: 0
+  lateralMovementStrength: 0
+  abilityResistance: 0.55
+  spawnWeight: 0.35
+  threatCost: 4
+  attackId: heavy-artillery-shell
+  projectileId: enemy-heavy-shell
+  attackStyle: 2
+  damageType: 1
+  ownerFaction: 2
+  damage: 42
+  fireIntervalSeconds: 4.6
+  burstCount: 1
+  burstShotIntervalSeconds: 0
+  projectileSpeed: 12
+  telegraphSeconds: 1.25
+  spreadDegrees: 0.6
+  minimumRange: 8
+  maximumRange: 56
+  requiresLineOfSight: 1

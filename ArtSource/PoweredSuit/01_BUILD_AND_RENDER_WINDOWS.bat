@@ -87,7 +87,8 @@ if not exist "renders\validation_report.json" (
 
 echo.
 echo Build and validation renders completed.
-echo Inspect all PNG files in renders\aim_validation and renders\rifle_validation.
+echo Inspect all PNG files in renders\aim_validation, renders\rifle_validation,
+echo and renders\weapon_animation_validation.
 echo Do not run approval/export until the images are genuinely acceptable.
 pause
 exit /b 0

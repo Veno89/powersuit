@@ -1,0 +1,18 @@
+{
+    "name": "Powersuit.Abilities.Unity",
+    "rootNamespace": "Powersuit.Abilities.UnityAdapters",
+    "references": [
+        "Powersuit.Abilities.Runtime",
+        "Powersuit.Combat.Runtime",
+        "Powersuit.Core.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
