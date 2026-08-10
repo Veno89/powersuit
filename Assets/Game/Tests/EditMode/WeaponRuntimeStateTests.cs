@@ -249,6 +249,60 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
+        public void ResetTransientState_CancelsReloadWithoutChangingAmmo()
+        {
+            WeaponRuntimeState state = CreateState(
+                roundsPerMinute: 600f,
+                reloadDuration: 2f,
+                reloadCommitNormalizedTime: 0.75f
+            );
+            int cancellationCount = 0;
+            state.ReloadCancelled += () => cancellationCount++;
+
+            state.TryFire();
+            state.Advance(0.1f);
+            state.TryStartReload();
+            state.Advance(0.5f);
+            int magazineBeforeReset = state.CurrentMagazineAmmo;
+            int reserveBeforeReset = state.CurrentReserveAmmo;
+
+            state.ResetTransientState();
+
+            Assert.That(state.IsReloading, Is.False);
+            Assert.That(state.ReloadElapsed, Is.Zero);
+            Assert.That(state.FireCooldownRemaining, Is.Zero);
+            Assert.That(state.CurrentMagazineAmmo, Is.EqualTo(magazineBeforeReset));
+            Assert.That(state.CurrentReserveAmmo, Is.EqualTo(reserveBeforeReset));
+            Assert.That(cancellationCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ResetTransientState_CancelsManualCycleAndClearsCadence()
+        {
+            WeaponRuntimeState state = CreateState(
+                roundsPerMinute: 600f,
+                requiresManualCycle: true,
+                manualCycleDuration: 0.5f
+            );
+            int cancellationCount = 0;
+            int completionCount = 0;
+            state.ManualCycleCancelled += () => cancellationCount++;
+            state.ManualCycleCompleted += () => completionCount++;
+
+            state.TryFire();
+            int magazineBeforeReset = state.CurrentMagazineAmmo;
+
+            state.ResetTransientState();
+
+            Assert.That(state.IsManualCycleInProgress, Is.False);
+            Assert.That(state.ManualCycleRemaining, Is.Zero);
+            Assert.That(state.FireCooldownRemaining, Is.Zero);
+            Assert.That(state.CurrentMagazineAmmo, Is.EqualTo(magazineBeforeReset));
+            Assert.That(cancellationCount, Is.EqualTo(1));
+            Assert.That(completionCount, Is.Zero);
+        }
+
+        [Test]
         public void LargeAdvance_CommitsAndCompletesReloadExactlyOnce()
         {
             WeaponRuntimeState state = CreateState(

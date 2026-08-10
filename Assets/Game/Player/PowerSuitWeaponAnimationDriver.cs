@@ -29,10 +29,14 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     private static readonly int NoBoltCycleState =
         Animator.StringToHash(NoBoltCycleStateName);
 
+    private static readonly int AimLocomotionState =
+        Animator.StringToHash("Aim Locomotion");
+
     private bool hasReloadTrigger;
     private bool hasCycleTrigger;
     private bool subscribed;
     private bool actionRequestedThisFrame;
+    private bool forceWeaponActionLayerNeutral;
     private bool cycleRequestedThisFrame;
     private bool cycleInProgress;
     private float forwardPoseHoldRemaining;
@@ -90,6 +94,7 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         // give the layer weight while an action is actually playing.
         ReleaseWeaponActionLayer();
         ReleaseBoltCycleLayer();
+        forceWeaponActionLayerNeutral = false;
         cycleInProgress = weapon != null && weapon.IsCycling;
         if (cycleInProgress)
         {
@@ -136,6 +141,7 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         ReleaseBoltCycleLayer();
         cycleInProgress = false;
         forwardPoseHoldRemaining = 0f;
+        forceWeaponActionLayerNeutral = false;
     }
 
     private void OnReloadStarted()
@@ -148,6 +154,25 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
             BeginWeaponAction();
             animator.SetTrigger(ReloadTrigger);
         }
+    }
+
+    private void OnReloadCancelled()
+    {
+        if (animator != null && hasReloadTrigger)
+        {
+            animator.ResetTrigger(ReloadTrigger);
+        }
+
+        forceWeaponActionLayerNeutral = true;
+        if (animator != null && weaponActionLayerIndex >= 0)
+        {
+            animator.Play(
+                NoWeaponActionStateName,
+                weaponActionLayerIndex,
+                0f
+            );
+        }
+        ReleaseWeaponActionLayer();
     }
 
     private void OnCycleStarted()
@@ -181,10 +206,10 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     }
 
     /// <summary>
-    /// Gives a non-aim input shot one Animator evaluation with the rifle in its
-    /// forward pose before gameplay samples the animated muzzle. Returns false
-    /// when the generated forward-pose layer is not available, allowing the
-    /// weapon adapter to fall back to immediate fire.
+    /// Gives an input shot one Animator evaluation with the rifle in its forward
+    /// pose before gameplay samples the animated muzzle. This also covers the
+    /// first frame of an aim transition. Returns false when the generated layer
+    /// is unavailable, allowing the weapon adapter to fall back to immediate fire.
     /// </summary>
     public bool PrepareForwardWeaponPose()
     {
@@ -196,6 +221,38 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         RefreshForwardWeaponPose();
         animator.SetLayerWeight(forwardWeaponPoseLayerIndex, 1f);
         return true;
+    }
+
+    /// <summary>
+    /// Reports whether the evaluated Animator is already presenting a forward
+    /// firing pose. Stable ground aim can fire immediately; a newly requested
+    /// aim, hip fire, or a partially blended overlay still stages for one
+    /// Animator evaluation before the muzzle is sampled.
+    /// </summary>
+    public bool IsForwardWeaponPoseReady(bool isAiming)
+    {
+        if (RequiresForwardWeaponPose)
+        {
+            return true;
+        }
+
+        if (animator == null || !animator.isInitialized)
+        {
+            return false;
+        }
+
+        if (
+            forwardWeaponPoseLayerIndex >= 0 &&
+            animator.GetLayerWeight(forwardWeaponPoseLayerIndex) >= 0.999f
+        )
+        {
+            return true;
+        }
+
+        return isAiming &&
+            !animator.IsInTransition(0) &&
+            animator.GetCurrentAnimatorStateInfo(0).shortNameHash ==
+                AimLocomotionState;
     }
 
     /// <summary>
@@ -211,6 +268,7 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         }
 
         actionRequestedThisFrame = true;
+        forceWeaponActionLayerNeutral = false;
         animator.SetLayerWeight(weaponActionLayerIndex, 1f);
     }
 
@@ -229,6 +287,18 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     {
         if (animator == null || weaponActionLayerIndex < 0)
         {
+            return;
+        }
+
+        if (forceWeaponActionLayerNeutral)
+        {
+            bool reachedNeutral =
+                animator.isInitialized &&
+                !animator.IsInTransition(weaponActionLayerIndex) &&
+                animator.GetCurrentAnimatorStateInfo(weaponActionLayerIndex)
+                    .shortNameHash == NoWeaponActionState;
+            animator.SetLayerWeight(weaponActionLayerIndex, 0f);
+            forceWeaponActionLayerNeutral = !reachedNeutral;
             return;
         }
 
@@ -317,8 +387,10 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         }
 
         weapon.ReloadStarted += OnReloadStarted;
+        weapon.ReloadCancelled += OnReloadCancelled;
         weapon.CycleStarted += OnCycleStarted;
         weapon.CycleCompleted += OnCycleCompleted;
+        weapon.CycleCancelled += OnCycleCompleted;
         weapon.ShotAccepted += OnShotAccepted;
         subscribed = true;
     }
@@ -331,8 +403,10 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         }
 
         weapon.ReloadStarted -= OnReloadStarted;
+        weapon.ReloadCancelled -= OnReloadCancelled;
         weapon.CycleStarted -= OnCycleStarted;
         weapon.CycleCompleted -= OnCycleCompleted;
+        weapon.CycleCancelled -= OnCycleCompleted;
         weapon.ShotAccepted -= OnShotAccepted;
         subscribed = false;
     }

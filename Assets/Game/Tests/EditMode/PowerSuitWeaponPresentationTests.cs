@@ -90,6 +90,92 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
+        public void Reset_CancelsTransitionAtRequestedStableEndpoint()
+        {
+            object machine = CreateMachine(0.5f, 0.75f, true);
+            Assert.That(InvokeBool(machine, "RequestDraw"), Is.True);
+
+            machine.GetType()
+                .GetMethod("Reset", BindingFlags.Public | BindingFlags.Instance)
+                .Invoke(machine, new object[] { true });
+
+            Assert.That(StateName(machine), Is.EqualTo("Stowed"));
+            Assert.That(GetBool(machine, "IsTransitioning"), Is.False);
+            Assert.That(
+                machine.GetType().GetProperty("RemainingTransitionTime").GetValue(machine),
+                Is.EqualTo(0f)
+            );
+
+            machine.GetType()
+                .GetMethod("Reset", BindingFlags.Public | BindingFlags.Instance)
+                .Invoke(machine, new object[] { false });
+
+            Assert.That(StateName(machine), Is.EqualTo("Ready"));
+            Assert.That(GetBool(machine, "CanUseWeapon"), Is.True);
+        }
+
+        [Test]
+        public void AirborneStowedAim_CanDrawBeforeEffectiveAimActivates()
+        {
+            CursorLockMode originalLockState = Cursor.lockState;
+            bool originalVisibility = Cursor.visible;
+            GameObject cameraHost = new GameObject("Presentation Test Camera");
+            GameObject playerHost = new GameObject("Airborne Presentation Test");
+
+            try
+            {
+                Camera camera = cameraHost.AddComponent<Camera>();
+                camera.tag = "MainCamera";
+
+                Component controller = playerHost.AddComponent(
+                    FindType("PowerSuitController")
+                );
+                Component presentation = playerHost.AddComponent(
+                    FindType("PowerSuitWeaponPresentation")
+                );
+
+                SetField(presentation, "controller", controller);
+                SetField(presentation, "startsStowed", true);
+                presentation.GetType().GetMethod("ResetForRespawn").Invoke(
+                    presentation,
+                    null
+                );
+                SetField(controller, "isFlying", true);
+                SetField(controller, "aimRequested", true);
+                controller.GetType().GetMethod("RefreshAimAvailability").Invoke(
+                    controller,
+                    null
+                );
+
+                Assert.That(GetBool(controller, "AimRequested"), Is.True);
+                Assert.That(GetBool(controller, "IsAiming"), Is.False);
+
+                presentation.GetType().GetMethod(
+                    "Update",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                )?.Invoke(presentation, null);
+                Assert.That(StateName(presentation), Is.EqualTo("Drawing"));
+
+                object machine = GetField(presentation, "stateMachine");
+                Tick(machine, 2f);
+                presentation.GetType().GetMethod(
+                    "UpdateWeaponAvailability",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                )?.Invoke(presentation, null);
+
+                Assert.That(StateName(presentation), Is.EqualTo("Ready"));
+                Assert.That(GetBool(controller, "IsAiming"), Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(playerHost);
+                UnityEngine.Object.DestroyImmediate(cameraHost);
+                Cursor.lockState = originalLockState;
+                Cursor.visible = originalVisibility;
+            }
+        }
+
+        [Test]
         public void Tick_RejectsNegativeOrNonFiniteTime()
         {
             object machine = CreateMachine(0.5f, 0.5f, true);
@@ -173,6 +259,26 @@ namespace Powersuit.Tests.EditMode
             return (bool)machine.GetType()
                 .GetMethod("Tick", BindingFlags.Public | BindingFlags.Instance)
                 .Invoke(machine, new object[] { deltaTime });
+        }
+
+        private static void SetField(object target, string fieldName, object value)
+        {
+            FieldInfo field = target.GetType().GetField(
+                fieldName,
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            Assert.That(field, Is.Not.Null);
+            field.SetValue(target, value);
+        }
+
+        private static object GetField(object target, string fieldName)
+        {
+            FieldInfo field = target.GetType().GetField(
+                fieldName,
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            Assert.That(field, Is.Not.Null);
+            return field.GetValue(target);
         }
 
         private static void AssertTickThrows(object machine, float deltaTime)

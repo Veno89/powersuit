@@ -1,8 +1,6 @@
+using System;
+using Powersuit.Combat;
 using UnityEngine;
-
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
 
 [RequireComponent(typeof(CharacterController))]
 [DefaultExecutionOrder(-200)]
@@ -12,13 +10,66 @@ public sealed class PowerSuitController : MonoBehaviour
     private const int CameraCollisionHitCapacity = 32;
     private const int AimHitCapacity = 32;
 
+    public const float MinimumSpeedMultiplier = 0f;
+    public const float MaximumSpeedMultiplier = 10f;
+
     public bool IsFlying => isFlying;
+
+    public Camera PlayerCamera => playerCamera;
+
+    public float GroundSpeedMultiplier => groundSpeedMultiplier;
+
+    public float FlightSpeedMultiplier => flightSpeedMultiplier;
+
+    public bool IsBoosting => isBoosting;
+
+    public bool IsGrounded =>
+        groundContactState != null
+            ? groundContactState.IsGrounded
+            : controller != null && controller.isGrounded;
+
+    public float VerticalSpeed => verticalVelocity;
+
+    /// <summary>
+    /// Raised once when a previously unsupported controller contacts ground
+    /// while descending. The value is the pre-collision downward speed.
+    /// </summary>
+    public event Action<float> Landed;
 
     public bool IsMoving =>
         controller != null &&
-        controller.velocity.sqrMagnitude > 0.05f;
+        PowerSuitLocomotionMath.ProjectOntoGroundPlane(
+            controller.velocity
+        ).sqrMagnitude > 0.05f;
 
     public bool IsAiming => isAiming;
+
+    public bool IsScoped =>
+        weaponAimState != null && weaponAimState.IsScoped;
+
+    public WeaponAimMode AimMode =>
+        weaponAimState != null
+            ? weaponAimState.Mode
+            : isAiming
+                ? WeaponAimMode.ShoulderAim
+                : WeaponAimMode.Exploration;
+
+    public float ScopeBlend => weaponAimState?.ScopeBlend ?? 0f;
+
+    /// <summary>
+    /// Raw player intent to aim. Presentation can use this request to draw a
+    /// stowed weapon while <see cref="IsAiming"/> remains false until the
+    /// weapon has reached its usable ready state.
+    /// </summary>
+    public bool AimRequested => aimRequested;
+
+    /// <summary>
+    /// True after an unlocked primary click has been consumed to recapture the
+    /// cursor and until that button is released. Weapon input must ignore the
+    /// same physical click.
+    /// </summary>
+    public bool IsPrimaryFireSuppressed =>
+        !cursorLocked || suppressPrimaryFireUntilReleased;
 
     /// <summary>
     /// The controller's actual planar velocity in suit-local space, normalized
@@ -59,6 +110,17 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float flightAcceleration = 12f;
     [SerializeField] private float turningSpeed = 12f;
 
+    [Header("Runtime Tuning")]
+    [SerializeField, Range(MinimumSpeedMultiplier, MaximumSpeedMultiplier)]
+    private float groundSpeedMultiplier = 1f;
+    [SerializeField, Range(MinimumSpeedMultiplier, MaximumSpeedMultiplier)]
+    private float flightSpeedMultiplier = 1f;
+
+    [Header("Movement Feel")]
+    [SerializeField]
+    private PowerSuitMovementSettings movementSettings =
+        new PowerSuitMovementSettings();
+
     [Header("Camera")]
     [SerializeField] private float cameraDistance = 9.5f;
     [SerializeField] private float cameraHeight = 1.5f;
@@ -75,6 +137,9 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float flightCameraDistance = 11f;
     [SerializeField] private float flightCameraHeight = 1.75f;
     [SerializeField] private float flightFieldOfView = 74f;
+    [SerializeField] private float boostCameraDistance = 12f;
+    [SerializeField] private float boostCameraHeight = 1.8f;
+    [SerializeField] private float boostFieldOfView = 82f;
 
     [Header("Third-Person Aim Mode")]
     [SerializeField] private float aimCameraDistance = 4.3f;
@@ -86,9 +151,23 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float maxReticleOffset = 140f;
     [SerializeField] private float aimMaxDistance = 200f;
 
+    [Header("Precision Scope")]
+    [SerializeField] private Transform scopePoint;
+    [SerializeField, Min(0f)] private float scopeEyeRelief = 0.045f;
+    [SerializeField, Min(0.001f)] private float scopedNearClipPlane = 0.02f;
+    [SerializeField] private ScopeActivationPolicy scopeActivationPolicy =
+        ScopeActivationPolicy.Toggle;
+
     private CharacterController controller;
     private Camera playerCamera;
     private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
+    private PowerSuitWeaponPresentation weaponPresentation;
+    private PowerSuitWeapon weapon;
+    private PlayerHealth playerHealth;
+    private WeaponAimState weaponAimState;
+    private WeaponDefinition weaponAimDefinition;
+    private bool weaponAimStateUsesFallback;
+    private PowerSuitInputRouter inputRouter;
 
     private Vector3 horizontalVelocity;
     private float verticalVelocity;
@@ -100,8 +179,17 @@ public sealed class PowerSuitController : MonoBehaviour
     private float smoothedCameraPitch;
 
     private bool isFlying;
+    private bool isBoosting;
     private bool isAiming;
+    private bool aimRequested;
     private bool cursorLocked;
+    private bool suppressPrimaryFireUntilReleased;
+    private int fallbackInputFrame = -1;
+    private PowerSuitInputSnapshot fallbackInputSnapshot;
+    private float flightTakeoffGraceRemaining;
+    private float flightToggleCooldownRemaining;
+    private float flightLandingIntentRemaining;
+    private PowerSuitGroundContactState groundContactState;
 
     private float currentCameraDistance;
     private float currentCameraHeight;
@@ -110,6 +198,10 @@ public sealed class PowerSuitController : MonoBehaviour
     private float currentCollisionDistance;
     private bool cameraOccluded;
     private Vector2 currentReticleOffset;
+    private bool scopeHeld;
+    private bool scopePressedThisFrame;
+    private int scopePressEvaluatedFrame = -1;
+    private float defaultNearClipPlane;
 
     private readonly RaycastHit[] cameraCollisionHits =
         new RaycastHit[CameraCollisionHitCapacity];
@@ -123,8 +215,40 @@ public sealed class PowerSuitController : MonoBehaviour
     public void AddRecoil(float pitchKick, float yawKick)
     {
         currentRecoilOffset.y += pitchKick;
-        currentRecoilOffset.x += Random.Range(-yawKick, yawKick);
+        currentRecoilOffset.x += UnityEngine.Random.Range(-yawKick, yawKick);
         currentRecoilOffset = Vector2.ClampMagnitude(currentRecoilOffset, maxAccumulatedRecoil);
+    }
+
+    public Transform ScopePoint
+    {
+        get => scopePoint;
+        set => scopePoint = value;
+    }
+
+    /// <summary>
+    /// Applies a bounded runtime multiplier to ground movement speed. NaN
+    /// leaves the current value unchanged; infinities clamp to the safe range.
+    /// </summary>
+    public float SetGroundSpeedMultiplier(float value)
+    {
+        groundSpeedMultiplier = ClampRuntimeSpeedMultiplier(
+            value,
+            groundSpeedMultiplier
+        );
+        return groundSpeedMultiplier;
+    }
+
+    /// <summary>
+    /// Applies a bounded runtime multiplier to normal flight, boost, and
+    /// vertical flight speed while leaving acceleration tuning authoritative.
+    /// </summary>
+    public float SetFlightSpeedMultiplier(float value)
+    {
+        flightSpeedMultiplier = ClampRuntimeSpeedMultiplier(
+            value,
+            flightSpeedMultiplier
+        );
+        return flightSpeedMultiplier;
     }
 
     /// <summary>
@@ -159,6 +283,13 @@ public sealed class PowerSuitController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         playerCamera = Camera.main;
         weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
+        weaponPresentation = GetComponent<PowerSuitWeaponPresentation>();
+        weapon = GetComponent<PowerSuitWeapon>();
+        playerHealth = GetComponent<PlayerHealth>();
+        inputRouter = GetComponent<PowerSuitInputRouter>();
+        EnsureWeaponAimState();
+        GetMovementSettings().Sanitize();
+        InitializeGroundContactState();
 
         if (playerCamera == null)
         {
@@ -180,12 +311,30 @@ public sealed class PowerSuitController : MonoBehaviour
         currentFOV = defaultFieldOfView;
         currentCollisionDistance = cameraDistance;
         playerCamera.fieldOfView = defaultFieldOfView;
+        defaultNearClipPlane = playerCamera.nearClipPlane;
 
         SetCursorLocked(true);
     }
 
     private void Update()
     {
+        flightToggleCooldownRemaining = Mathf.Max(
+            0f,
+            flightToggleCooldownRemaining - Time.deltaTime
+        );
+        flightLandingIntentRemaining = Mathf.Max(
+            0f,
+            flightLandingIntentRemaining - Time.deltaTime
+        );
+
+        if (
+            suppressPrimaryFireUntilReleased &&
+            !IsPrimaryClickHeld()
+        )
+        {
+            suppressPrimaryFireUntilReleased = false;
+        }
+
         HandleCursor();
 
         if (!cursorLocked)
@@ -196,10 +345,14 @@ public sealed class PowerSuitController : MonoBehaviour
         HandleAimingState();
         HandleCameraInput();
 
-        if (WasFlightTogglePressed())
+        if (
+            WasFlightTogglePressed() &&
+            flightToggleCooldownRemaining <= 0f
+        )
         {
-            isFlying = !isFlying;
-            verticalVelocity = 0f;
+            SetFlightEnabled(!isFlying);
+            flightToggleCooldownRemaining =
+                GetMovementSettings().FlightToggleCooldownSeconds;
         }
 
         if (isFlying)
@@ -232,6 +385,25 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private void HandleGroundMovement()
     {
+        float deltaTime = Time.deltaTime;
+        PowerSuitMovementSettings tuning = GetMovementSettings();
+        EnsureGroundContactState();
+        groundContactState.Advance(controller.isGrounded, deltaTime);
+        if (WasJumpPressed())
+        {
+            groundContactState.BufferJump();
+        }
+
+        isBoosting = false;
+        flightTakeoffGraceRemaining = 0f;
+        flightLandingIntentRemaining = 0f;
+
+        // Planar and vertical velocity have separate owners. Sanitize legacy
+        // or externally injected values before applying ground control.
+        horizontalVelocity = PowerSuitLocomotionMath.ProjectOntoGroundPlane(
+            horizontalVelocity
+        );
+
         Vector2 input = ReadMovementInput();
 
         Vector3 cameraForward = Vector3.ProjectOnPlane(
@@ -253,39 +425,66 @@ public sealed class PowerSuitController : MonoBehaviour
             1f
         );
 
+        float effectiveWalkSpeed = walkSpeed * groundSpeedMultiplier;
         Vector3 desiredVelocity =
-            desiredDirection * walkSpeed;
+            desiredDirection * effectiveWalkSpeed;
 
-        horizontalVelocity = Vector3.MoveTowards(
+        bool hasStableSupport = groundContactState.IsGrounded;
+        horizontalVelocity = PowerSuitLocomotionMath.ApproachVelocity(
             horizontalVelocity,
             desiredVelocity,
-            groundAcceleration * Time.deltaTime
+            hasStableSupport
+                ? groundAcceleration
+                : tuning.AirAcceleration,
+            hasStableSupport
+                ? tuning.GroundDeceleration
+                : tuning.AirDeceleration,
+            hasStableSupport
+                ? tuning.GroundBrakingAcceleration
+                : tuning.AirBrakingAcceleration,
+            deltaTime
         );
 
-        if (controller.isGrounded)
+        bool didJump = groundContactState.TryConsumeBufferedJump();
+        if (didJump)
         {
-            if (verticalVelocity < 0f)
-            {
-                verticalVelocity = -2f;
-            }
-
-            if (WasJumpPressed())
-            {
-                verticalVelocity = Mathf.Sqrt(
-                    jumpHeight * -2f * gravity
-                );
-            }
+            verticalVelocity = PowerSuitLocomotionMath.CalculateJumpSpeed(
+                jumpHeight,
+                gravity
+            );
+        }
+        else if (hasStableSupport)
+        {
+            verticalVelocity = Mathf.Min(
+                0f,
+                tuning.GroundedStickVelocity
+            );
         }
         else
         {
-            verticalVelocity += gravity * Time.deltaTime;
+            verticalVelocity = PowerSuitLocomotionMath.ApplyGravity(
+                verticalVelocity,
+                gravity,
+                tuning.TerminalFallSpeed,
+                deltaTime
+            );
         }
 
         Vector3 movement =
             horizontalVelocity +
             Vector3.up * verticalVelocity;
 
-        controller.Move(movement * Time.deltaTime);
+        bool hadGroundSupportBeforeMove = controller.isGrounded;
+        float preMoveVerticalSpeed = verticalVelocity;
+        CollisionFlags collisionFlags = controller.Move(
+            movement * deltaTime
+        );
+        RaiseLandingContactIfNeeded(
+            collisionFlags,
+            hadGroundSupportBeforeMove,
+            preMoveVerticalSpeed
+        );
+        ReconcileVelocityAfterMove(collisionFlags);
 
         Vector3 facingDirection = PowerSuitLocomotionMath.ResolveFacingDirection(
             input,
@@ -296,47 +495,95 @@ public sealed class PowerSuitController : MonoBehaviour
         );
 
         RotateTowardsMovement(facingDirection);
-        UpdateLocalMovement(walkSpeed);
+        UpdateLocalMovement(effectiveWalkSpeed);
     }
 
     private void HandleFlight()
     {
+        float deltaTime = Time.deltaTime;
+        PowerSuitMovementSettings tuning = GetMovementSettings();
+        flightTakeoffGraceRemaining = Mathf.Max(
+            0f,
+            flightTakeoffGraceRemaining - deltaTime
+        );
+
         Vector2 input = ReadMovementInput();
 
-        Vector3 desiredDirection =
+        Vector3 cameraRelativeInput =
             playerCamera.transform.forward * input.y +
             playerCamera.transform.right * input.x;
 
         float verticalInput = ReadVerticalFlightInput();
-        desiredDirection += Vector3.up * verticalInput;
-
-        desiredDirection = Vector3.ClampMagnitude(
-            desiredDirection,
+        if (verticalInput < -tuning.FlightLandingInputThreshold)
+        {
+            flightLandingIntentRemaining =
+                tuning.FlightLandingIntentGraceSeconds;
+        }
+        Vector3 desiredPlanarDirection = Vector3.ClampMagnitude(
+            PowerSuitLocomotionMath.ProjectOntoGroundPlane(
+                cameraRelativeInput
+            ),
+            1f
+        );
+        float desiredVerticalInput = Mathf.Clamp(
+            cameraRelativeInput.y + verticalInput,
+            -1f,
             1f
         );
 
-        float selectedSpeed =
-            IsBoostHeld() ? boostSpeed : flightSpeed;
+        bool hasFlightIntent =
+            desiredPlanarDirection.sqrMagnitude > 0.0001f ||
+            Mathf.Abs(desiredVerticalInput) > 0.0001f;
+        isBoosting = IsBoostHeld() && hasFlightIntent;
 
-        Vector3 desiredVelocity =
-            desiredDirection * selectedSpeed;
+        float selectedPlanarSpeed =
+            (isBoosting ? boostSpeed : flightSpeed) * flightSpeedMultiplier;
+        float selectedVerticalSpeed = isBoosting
+            ? tuning.BoostVerticalSpeed
+            : tuning.FlightVerticalSpeed;
+        selectedVerticalSpeed *= flightSpeedMultiplier;
+        float accelerationMultiplier = isBoosting
+            ? tuning.BoostAccelerationMultiplier
+            : 1f;
 
-        horizontalVelocity = Vector3.MoveTowards(
+        Vector3 desiredPlanarVelocity =
+            desiredPlanarDirection * selectedPlanarSpeed;
+        horizontalVelocity = PowerSuitLocomotionMath.ApproachVelocity(
             horizontalVelocity,
-            desiredVelocity,
-            flightAcceleration * Time.deltaTime
+            desiredPlanarVelocity,
+            flightAcceleration * accelerationMultiplier,
+            tuning.FlightDeceleration,
+            tuning.FlightBrakingAcceleration,
+            deltaTime
         );
 
-        verticalVelocity = 0f;
-
-        controller.Move(
-            horizontalVelocity * Time.deltaTime
+        float desiredVerticalVelocity =
+            desiredVerticalInput * selectedVerticalSpeed;
+        verticalVelocity = PowerSuitLocomotionMath.ApproachVelocity(
+            verticalVelocity,
+            desiredVerticalVelocity,
+            tuning.FlightVerticalAcceleration * accelerationMultiplier,
+            tuning.FlightVerticalDeceleration,
+            tuning.FlightVerticalBrakingAcceleration,
+            deltaTime
         );
 
-        Vector3 planarDirection = Vector3.ProjectOnPlane(
-            desiredDirection,
-            Vector3.up
+        bool hadGroundSupportBeforeMove = controller.isGrounded;
+        float preMoveVerticalSpeed = verticalVelocity;
+        CollisionFlags collisionFlags = controller.Move(
+            (
+                horizontalVelocity +
+                Vector3.up * verticalVelocity
+            ) * deltaTime
         );
+        RaiseLandingContactIfNeeded(
+            collisionFlags,
+            hadGroundSupportBeforeMove,
+            preMoveVerticalSpeed
+        );
+        ReconcileVelocityAfterMove(collisionFlags);
+
+        Vector3 planarDirection = desiredPlanarDirection;
 
         if (ShouldFaceCameraForCombat())
         {
@@ -348,16 +595,16 @@ public sealed class PowerSuitController : MonoBehaviour
             RotateTowardsMovement(planarDirection);
         }
 
-        UpdateLocalMovement(selectedSpeed);
+        UpdateLocalMovement(selectedPlanarSpeed);
 
         if (
-            controller.isGrounded &&
-            verticalInput < -0.1f
+            (collisionFlags & CollisionFlags.Below) != 0 &&
+            flightTakeoffGraceRemaining <= 0f &&
+            flightLandingIntentRemaining > 0f &&
+            preMoveVerticalSpeed <= 0f
         )
         {
-            isFlying = false;
-            horizontalVelocity = Vector3.zero;
-            verticalVelocity = -2f;
+            CompleteFlightLanding();
         }
     }
 
@@ -417,16 +664,25 @@ public sealed class PowerSuitController : MonoBehaviour
     {
         Vector2 mouseLook = ReadMouseLook();
         Vector2 controllerLook = ReadControllerLook();
+        float sensitivityMultiplier = weaponAimState != null
+            ? weaponAimState.Profile.GetLookSensitivityMultiplier(
+                weaponAimState.Mode
+            )
+            : isAiming
+                ? 0.75f
+                : 1f;
 
-        cameraYaw += mouseLook.x * mouseSensitivity;
-        cameraPitch -= mouseLook.y * mouseSensitivity;
+        cameraYaw += mouseLook.x * mouseSensitivity * sensitivityMultiplier;
+        cameraPitch -= mouseLook.y * mouseSensitivity * sensitivityMultiplier;
 
         cameraYaw += controllerLook.x *
                      controllerLookSpeed *
+                     sensitivityMultiplier *
                      Time.deltaTime;
 
         cameraPitch -= controllerLook.y *
                        controllerLookSpeed *
+                       sensitivityMultiplier *
                        Time.deltaTime;
 
         cameraPitch = Mathf.Clamp(
@@ -435,16 +691,18 @@ public sealed class PowerSuitController : MonoBehaviour
             maximumPitch
         );
 
-        if (isAiming)
-        {
-            currentReticleOffset += mouseLook * (mouseSensitivity * 15f);
-            currentReticleOffset = Vector2.ClampMagnitude(currentReticleOffset, maxReticleOffset);
-        }
+        // Mouse delta already rotates the camera. Applying the same delta to
+        // the reticle made small aim corrections move twice and caused the
+        // camera-derived trajectory to drift away from screen centre.
     }
 
     private void HandleAimingState()
     {
-        isAiming = cursorLocked && IsAimHeld();
+        PowerSuitInputSnapshot input = ReadInputSnapshot();
+        aimRequested = cursorLocked && input.AimHeld;
+        scopeHeld = input.ScopeHeld;
+        scopePressedThisFrame = input.ScopePressed;
+        EvaluateWeaponAimState(advancePresentation: true);
 
         if (!isAiming)
         {
@@ -458,15 +716,22 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private void UpdateCamera()
     {
-        float explorationDistance = isFlying
-            ? flightCameraDistance
-            : cameraDistance;
-        float explorationHeight = isFlying
-            ? flightCameraHeight
-            : cameraHeight;
-        float explorationFov = isFlying
-            ? flightFieldOfView
-            : defaultFieldOfView;
+        bool useBoostProfile = isFlying && isBoosting;
+        float explorationDistance = useBoostProfile
+            ? boostCameraDistance
+            : isFlying
+                ? flightCameraDistance
+                : cameraDistance;
+        float explorationHeight = useBoostProfile
+            ? boostCameraHeight
+            : isFlying
+                ? flightCameraHeight
+                : cameraHeight;
+        float explorationFov = useBoostProfile
+            ? boostFieldOfView
+            : isFlying
+                ? flightFieldOfView
+                : defaultFieldOfView;
 
         float targetDistance = isAiming
             ? aimCameraDistance
@@ -475,7 +740,14 @@ public sealed class PowerSuitController : MonoBehaviour
             ? aimCameraHeight
             : explorationHeight;
         Vector3 targetShoulder = isAiming ? aimShoulderOffset : Vector3.zero;
-        float targetFOV = isAiming ? aimFieldOfView : explorationFov;
+        float targetFOV = isAiming
+            ? weaponAimState != null
+                ? weaponAimState.Profile.GetFieldOfView(
+                    weaponAimState.Mode,
+                    explorationFov
+                )
+                : aimFieldOfView
+            : explorationFov;
         float cameraDeltaTime = Time.unscaledDeltaTime;
         float transitionFactor = PowerSuitCameraMath.ExponentialDampingFactor(
             aimTransitionSpeed,
@@ -554,6 +826,27 @@ public sealed class PowerSuitController : MonoBehaviour
             + (cameraRight * currentShoulderOffset.x)
             + (cameraUp * currentShoulderOffset.y)
             - (cameraForward * currentCameraDistance);
+
+        float scopeBlend = ScopeBlend;
+        if (scopePoint != null && scopeBlend > 0f)
+        {
+            Vector3 scopedPosition =
+                scopePoint.position - scopePoint.forward * scopeEyeRelief;
+            desiredPosition = Vector3.Lerp(
+                desiredPosition,
+                scopedPosition,
+                scopeBlend
+            );
+        }
+
+        if (playerCamera != null)
+        {
+            playerCamera.nearClipPlane = Mathf.Lerp(
+                defaultNearClipPlane,
+                scopedNearClipPlane,
+                scopeBlend
+            );
+        }
 
         Vector3 rayDirection = desiredPosition - pivot;
         float distance = rayDirection.magnitude;
@@ -787,6 +1080,7 @@ public sealed class PowerSuitController : MonoBehaviour
 
         if (!cursorLocked && WasPrimaryClickPressed())
         {
+            suppressPrimaryFireUntilReleased = true;
             SetCursorLocked(true);
         }
     }
@@ -797,7 +1091,12 @@ public sealed class PowerSuitController : MonoBehaviour
 
         if (!locked)
         {
+            aimRequested = false;
             isAiming = false;
+            scopeHeld = false;
+            scopePressedThisFrame = false;
+            weaponAimState?.Reset();
+            suppressPrimaryFireUntilReleased = true;
         }
 
         Cursor.lockState = locked
@@ -807,212 +1106,561 @@ public sealed class PowerSuitController : MonoBehaviour
         Cursor.visible = !locked;
     }
 
+    /// <summary>
+    /// Enters or leaves flight while keeping planar and vertical momentum in
+    /// their explicit channels. Ground takeoff receives lift; airborne entry
+    /// and exit preserve their current vertical motion.
+    /// </summary>
+    public void SetFlightEnabled(bool enabled)
+    {
+        if (enabled == isFlying)
+        {
+            return;
+        }
+
+        PowerSuitMovementSettings tuning = GetMovementSettings();
+        EnsureGroundContactState();
+        horizontalVelocity = PowerSuitLocomotionMath.ProjectOntoGroundPlane(
+            horizontalVelocity
+        );
+
+        if (enabled)
+        {
+            bool takingOffFromGround =
+                groundContactState.IsGrounded ||
+                (controller != null && controller.isGrounded);
+
+            isFlying = true;
+            isBoosting = false;
+            flightLandingIntentRemaining = 0f;
+            flightTakeoffGraceRemaining =
+                tuning.FlightTakeoffGraceSeconds;
+            if (takingOffFromGround)
+            {
+                verticalVelocity = Mathf.Max(
+                    verticalVelocity,
+                    tuning.FlightTakeoffSpeed
+                );
+            }
+
+            groundContactState.ForceAirborneUntilSeparated();
+            return;
+        }
+
+        if (controller != null && controller.isGrounded)
+        {
+            CompleteFlightLanding();
+            return;
+        }
+
+        isFlying = false;
+        isBoosting = false;
+        flightTakeoffGraceRemaining = 0f;
+        flightLandingIntentRemaining = 0f;
+        verticalVelocity = Mathf.Max(
+            verticalVelocity,
+            -tuning.TerminalFallSpeed
+        );
+        groundContactState.ForceAirborneUntilSeparated();
+    }
+
+    private void CompleteFlightLanding()
+    {
+        PowerSuitMovementSettings tuning = GetMovementSettings();
+        EnsureGroundContactState();
+        isFlying = false;
+        isBoosting = false;
+        flightTakeoffGraceRemaining = 0f;
+        flightLandingIntentRemaining = 0f;
+        horizontalVelocity = PowerSuitLocomotionMath.ProjectOntoGroundPlane(
+            horizontalVelocity
+        );
+        verticalVelocity = Mathf.Min(
+            0f,
+            tuning.GroundedStickVelocity
+        );
+        groundContactState.Reset(grounded: true);
+    }
+
+    private void InitializeGroundContactState()
+    {
+        PowerSuitMovementSettings tuning = GetMovementSettings();
+        groundContactState = new PowerSuitGroundContactState(
+            tuning.GroundedReleaseGraceSeconds,
+            tuning.CoyoteTimeSeconds,
+            tuning.JumpBufferSeconds
+        );
+        groundContactState.Reset(
+            controller != null && controller.isGrounded
+        );
+    }
+
+    private void EnsureGroundContactState()
+    {
+        if (groundContactState == null)
+        {
+            InitializeGroundContactState();
+        }
+    }
+
+    private PowerSuitMovementSettings GetMovementSettings()
+    {
+        if (movementSettings == null)
+        {
+            movementSettings = new PowerSuitMovementSettings();
+        }
+
+        return movementSettings;
+    }
+
+    private void ReconcileVelocityAfterMove(CollisionFlags collisionFlags)
+    {
+        if (controller == null || Time.deltaTime <= 0f)
+        {
+            return;
+        }
+
+        Vector3 actualVelocity = controller.velocity;
+        horizontalVelocity = PowerSuitLocomotionMath.ProjectOntoGroundPlane(
+            actualVelocity
+        );
+
+        bool hitCeiling =
+            (collisionFlags & CollisionFlags.Above) != 0 &&
+            verticalVelocity > 0f;
+        bool hitGround =
+            (collisionFlags & CollisionFlags.Below) != 0 &&
+            verticalVelocity < 0f;
+        verticalVelocity = hitCeiling || hitGround
+            ? 0f
+            : actualVelocity.y;
+    }
+
+    private void RaiseLandingContactIfNeeded(
+        CollisionFlags collisionFlags,
+        bool hadGroundSupportBeforeMove,
+        float preMoveVerticalSpeed
+    )
+    {
+        if (
+            hadGroundSupportBeforeMove ||
+            (collisionFlags & CollisionFlags.Below) == 0 ||
+            preMoveVerticalSpeed >= 0f
+        )
+        {
+            return;
+        }
+
+        Landed?.Invoke(-preMoveVerticalSpeed);
+    }
+
+    /// <summary>
+    /// Re-evaluates effective aim after weapon presentation changes state.
+    /// </summary>
+    public void RefreshAimAvailability()
+    {
+        if (weaponPresentation == null)
+        {
+            weaponPresentation = GetComponent<PowerSuitWeaponPresentation>();
+        }
+
+        EvaluateWeaponAimState(advancePresentation: false);
+    }
+
+    private void EvaluateWeaponAimState(bool advancePresentation)
+    {
+        EnsureWeaponAimState();
+
+        bool canUseWeapon =
+            weaponPresentation == null || weaponPresentation.CanUseWeapon;
+        bool isAlive = playerHealth == null || !playerHealth.IsDefeated;
+        bool scopePressed =
+            scopePressedThisFrame &&
+            scopePressEvaluatedFrame != Time.frameCount;
+        if (scopePressed)
+        {
+            scopePressEvaluatedFrame = Time.frameCount;
+        }
+
+        weaponAimState.Evaluate(
+            new WeaponAimInput(
+                aimHeld: aimRequested && canUseWeapon,
+                scopeHeld: scopeHeld,
+                scopePressed: scopePressed,
+                isReloading: weapon != null && weapon.IsReloading,
+                isAlive: isAlive
+            )
+        );
+        if (advancePresentation)
+        {
+            weaponAimState.AdvancePresentation(Time.unscaledDeltaTime);
+        }
+
+        isAiming = weaponAimState.IsAiming;
+    }
+
+    private void EnsureWeaponAimState()
+    {
+        if (weapon == null)
+        {
+            weapon = GetComponent<PowerSuitWeapon>();
+        }
+
+        if (playerHealth == null)
+        {
+            playerHealth = GetComponent<PlayerHealth>();
+        }
+
+        WeaponDefinition currentDefinition = weapon != null
+            ? weapon.Definition
+            : null;
+        bool useFallback = currentDefinition == null;
+        if (
+            weaponAimState != null &&
+            weaponAimDefinition == currentDefinition &&
+            weaponAimStateUsesFallback == useFallback
+        )
+        {
+            return;
+        }
+
+        WeaponAimProfile profile = currentDefinition != null
+            ? currentDefinition.CreateAimProfile()
+            : new WeaponAimProfile(
+                supportsScope: false,
+                shoulderFieldOfViewDegrees: aimFieldOfView,
+                scopedFieldOfViewDegrees: Mathf.Min(28f, aimFieldOfView - 1f),
+                shoulderLookSensitivityMultiplier: 0.75f,
+                scopedLookSensitivityMultiplier: 0.35f,
+                transitionSharpness: Mathf.Max(0.01f, aimTransitionSpeed)
+            );
+
+        weaponAimState = new WeaponAimState(
+            profile,
+            scopeActivationPolicy
+        );
+        weaponAimDefinition = currentDefinition;
+        weaponAimStateUsesFallback = useFallback;
+    }
+
+    /// <summary>
+    /// Clears all transient locomotion, aim, camera, and recoil state before a
+    /// respawn. Serialized tuning and cursor ownership are left unchanged.
+    /// </summary>
+    public void ResetForRespawn()
+    {
+        isFlying = false;
+        isBoosting = false;
+        aimRequested = false;
+        isAiming = false;
+        scopeHeld = false;
+        scopePressedThisFrame = false;
+        scopePressEvaluatedFrame = -1;
+        weaponAimState?.Reset();
+        // A held button must be released after respawn before it can request a
+        // new shot. If it is already up, the next Update clears this latch
+        // before the weapon adapter samples input.
+        suppressPrimaryFireUntilReleased = true;
+        flightTakeoffGraceRemaining = 0f;
+        flightToggleCooldownRemaining = 0f;
+        flightLandingIntentRemaining = 0f;
+
+        horizontalVelocity = Vector3.zero;
+        verticalVelocity = 0f;
+        EnsureGroundContactState();
+        groundContactState.Reset(grounded: false);
+        localMovement = Vector2.zero;
+        currentRecoilOffset = Vector2.zero;
+        currentReticleOffset = Vector2.zero;
+
+        cameraYaw = transform.eulerAngles.y;
+        cameraPitch = 15f;
+        smoothedCameraYaw = cameraYaw;
+        smoothedCameraPitch = cameraPitch;
+        currentCameraDistance = cameraDistance;
+        currentCameraHeight = cameraHeight;
+        currentShoulderOffset = Vector3.zero;
+        currentFOV = defaultFieldOfView;
+        currentCollisionDistance = cameraDistance;
+        cameraOccluded = false;
+
+        if (playerCamera != null)
+        {
+            playerCamera.fieldOfView = defaultFieldOfView;
+            playerCamera.nearClipPlane = defaultNearClipPlane;
+        }
+    }
+
+    private void OnValidate()
+    {
+        walkSpeed = Mathf.Max(0f, walkSpeed);
+        groundAcceleration = Mathf.Max(0f, groundAcceleration);
+        jumpHeight = Mathf.Max(0f, jumpHeight);
+        gravity = Mathf.Min(-0.01f, gravity);
+
+        flightSpeed = Mathf.Max(0f, flightSpeed);
+        boostSpeed = Mathf.Max(flightSpeed, boostSpeed);
+        flightAcceleration = Mathf.Max(0f, flightAcceleration);
+        flightCameraDistance = Mathf.Max(0.1f, flightCameraDistance);
+        flightCameraHeight = Mathf.Max(0f, flightCameraHeight);
+        flightFieldOfView = Mathf.Clamp(flightFieldOfView, 1f, 179f);
+        boostCameraDistance = Mathf.Max(
+            flightCameraDistance,
+            boostCameraDistance
+        );
+        boostCameraHeight = Mathf.Max(0f, boostCameraHeight);
+        boostFieldOfView = Mathf.Clamp(
+            Mathf.Max(flightFieldOfView, boostFieldOfView),
+            1f,
+            179f
+        );
+        groundSpeedMultiplier = ClampRuntimeSpeedMultiplier(
+            groundSpeedMultiplier,
+            1f
+        );
+        flightSpeedMultiplier = ClampRuntimeSpeedMultiplier(
+            flightSpeedMultiplier,
+            1f
+        );
+        scopeEyeRelief = Mathf.Max(0f, scopeEyeRelief);
+        scopedNearClipPlane = Mathf.Max(0.001f, scopedNearClipPlane);
+        GetMovementSettings().Sanitize();
+    }
+
+    private static float ClampRuntimeSpeedMultiplier(
+        float value,
+        float fallback
+    )
+    {
+        if (float.IsNaN(value))
+        {
+            return fallback;
+        }
+
+        if (float.IsPositiveInfinity(value))
+        {
+            return MaximumSpeedMultiplier;
+        }
+
+        if (float.IsNegativeInfinity(value))
+        {
+            return MinimumSpeedMultiplier;
+        }
+
+        return Mathf.Clamp(
+            value,
+            MinimumSpeedMultiplier,
+            MaximumSpeedMultiplier
+        );
+    }
+
     private Vector2 ReadMovementInput()
     {
-        Vector2 input = Vector2.zero;
-
-#if ENABLE_INPUT_SYSTEM
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.wKey.isPressed)
-            {
-                input.y += 1f;
-            }
-
-            if (Keyboard.current.sKey.isPressed)
-            {
-                input.y -= 1f;
-            }
-
-            if (Keyboard.current.dKey.isPressed)
-            {
-                input.x += 1f;
-            }
-
-            if (Keyboard.current.aKey.isPressed)
-            {
-                input.x -= 1f;
-            }
-        }
-
-        if (Gamepad.current != null)
-        {
-            input += Gamepad.current.leftStick.ReadValue();
-        }
-#else
-        input = new Vector2(
-            Input.GetAxisRaw("Horizontal"),
-            Input.GetAxisRaw("Vertical")
-        );
-#endif
-
-        return Vector2.ClampMagnitude(input, 1f);
+        return ReadInputSnapshot().Move;
     }
 
     private Vector2 ReadMouseLook()
     {
-#if ENABLE_INPUT_SYSTEM
-        return Mouse.current != null
-            ? Mouse.current.delta.ReadValue()
-            : Vector2.zero;
-#else
-        return new Vector2(
-            Input.GetAxis("Mouse X"),
-            Input.GetAxis("Mouse Y")
-        );
-#endif
+        return ReadInputSnapshot().PointerLook;
     }
 
     private Vector2 ReadControllerLook()
     {
-#if ENABLE_INPUT_SYSTEM
-        return Gamepad.current != null
-            ? Gamepad.current.rightStick.ReadValue()
-            : Vector2.zero;
-#else
-        return Vector2.zero;
-#endif
+        return ReadInputSnapshot().GamepadLook;
     }
 
     private float ReadVerticalFlightInput()
     {
-        float input = 0f;
-
-#if ENABLE_INPUT_SYSTEM
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.spaceKey.isPressed)
-            {
-                input += 1f;
-            }
-
-            if (
-                Keyboard.current.leftCtrlKey.isPressed ||
-                Keyboard.current.cKey.isPressed
-            )
-            {
-                input -= 1f;
-            }
-        }
-
-        if (Gamepad.current != null)
-        {
-            if (Gamepad.current.buttonSouth.isPressed)
-            {
-                input += 1f;
-            }
-
-            if (Gamepad.current.leftShoulder.isPressed)
-            {
-                input -= 1f;
-            }
-        }
-#else
-        if (Input.GetKey(KeyCode.Space))
-        {
-            input += 1f;
-        }
-
-        if (
-            Input.GetKey(KeyCode.LeftControl) ||
-            Input.GetKey(KeyCode.C)
-        )
-        {
-            input -= 1f;
-        }
-#endif
-
-        return Mathf.Clamp(input, -1f, 1f);
+        return ReadInputSnapshot().Vertical;
     }
 
     private bool WasJumpPressed()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            (
-                Keyboard.current != null &&
-                Keyboard.current.spaceKey.wasPressedThisFrame
-            ) ||
-            (
-                Gamepad.current != null &&
-                Gamepad.current.buttonSouth.wasPressedThisFrame
-            );
-#else
-        return Input.GetKeyDown(KeyCode.Space);
-#endif
+        return ReadInputSnapshot().JumpPressed;
     }
 
     private bool WasFlightTogglePressed()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            (
-                Keyboard.current != null &&
-                Keyboard.current.fKey.wasPressedThisFrame
-            ) ||
-            (
-                Gamepad.current != null &&
-                Gamepad.current.buttonWest.wasPressedThisFrame
-            );
-#else
-        return Input.GetKeyDown(KeyCode.F);
-#endif
+        return ReadInputSnapshot().FlightTogglePressed;
     }
 
     private bool IsBoostHeld()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            (
-                Keyboard.current != null &&
-                Keyboard.current.leftShiftKey.isPressed
-            ) ||
-            (
-                Gamepad.current != null &&
-                Gamepad.current.rightShoulder.isPressed
-            );
-#else
-        return Input.GetKey(KeyCode.LeftShift);
-#endif
+        return ReadInputSnapshot().BoostHeld;
     }
 
     private bool IsAimHeld()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            (
-                Mouse.current != null &&
-                Mouse.current.rightButton.isPressed
-            ) ||
-            (
-                Gamepad.current != null &&
-                Gamepad.current.leftTrigger.isPressed
-            );
-#else
-        return Input.GetMouseButton(1);
-#endif
+        return ReadInputSnapshot().AimHeld;
     }
 
     private bool WasEscapePressed()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            Keyboard.current != null &&
-            Keyboard.current.escapeKey.wasPressedThisFrame;
-#else
-        return Input.GetKeyDown(KeyCode.Escape);
-#endif
+        return ReadInputSnapshot().CancelPressed;
     }
 
     private bool WasPrimaryClickPressed()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            Mouse.current != null &&
-            Mouse.current.leftButton.wasPressedThisFrame;
-#else
-        return Input.GetMouseButtonDown(0);
-#endif
+        return ReadInputSnapshot().FirePressed;
+    }
+
+    private bool IsPrimaryClickHeld()
+    {
+        return ReadInputSnapshot().FireHeld;
+    }
+
+    private PowerSuitInputSnapshot ReadInputSnapshot()
+    {
+        if (
+            inputRouter != null &&
+            inputRouter.TryGetCurrentSnapshot(
+                out PowerSuitInputSnapshot routedInput
+            )
+        )
+        {
+            return routedInput;
+        }
+
+        int frame = Time.frameCount;
+        if (fallbackInputFrame != frame)
+        {
+            fallbackInputSnapshot =
+                PowerSuitInputRouter.ReadFallbackSnapshot();
+            fallbackInputFrame = frame;
+        }
+
+        return fallbackInputSnapshot;
+    }
+}
+
+/// <summary>
+/// Phase B response and timing data. The controller keeps its original
+/// speed/jump fields for prefab and generator compatibility, while all added
+/// feel tuning lives in this serializable value object with safe defaults.
+/// </summary>
+[System.Serializable]
+public sealed class PowerSuitMovementSettings
+{
+    [Header("Ground Response")]
+    [SerializeField] private float groundDeceleration = 26f;
+    [SerializeField] private float groundBrakingAcceleration = 38f;
+    [SerializeField] private float airAcceleration = 7f;
+    [SerializeField] private float airDeceleration = 1.5f;
+    [SerializeField] private float airBrakingAcceleration = 10f;
+    [SerializeField] private float terminalFallSpeed = 35f;
+    [SerializeField] private float groundedStickVelocity = -2f;
+
+    [Header("Jump Forgiveness")]
+    [SerializeField] private float groundedReleaseGraceSeconds = 0.06f;
+    [SerializeField] private float coyoteTimeSeconds = 0.12f;
+    [SerializeField] private float jumpBufferSeconds = 0.12f;
+
+    [Header("Flight Response")]
+    [SerializeField] private float flightDeceleration = 9f;
+    [SerializeField] private float flightBrakingAcceleration = 22f;
+    [SerializeField] private float flightVerticalSpeed = 8f;
+    [SerializeField] private float boostVerticalSpeed = 14f;
+    [SerializeField] private float flightVerticalAcceleration = 18f;
+    [SerializeField] private float flightVerticalDeceleration = 14f;
+    [SerializeField] private float flightVerticalBrakingAcceleration = 28f;
+    [SerializeField] private float flightTakeoffSpeed = 5f;
+    [SerializeField] private float flightTakeoffGraceSeconds = 0.12f;
+    [SerializeField] private float flightToggleCooldownSeconds = 0.15f;
+    [SerializeField] private float boostAccelerationMultiplier = 1.5f;
+    [SerializeField] private float flightLandingInputThreshold = 0.1f;
+    [SerializeField] private float flightLandingIntentGraceSeconds = 0.25f;
+
+    public float GroundDeceleration => groundDeceleration;
+    public float GroundBrakingAcceleration => groundBrakingAcceleration;
+    public float AirAcceleration => airAcceleration;
+    public float AirDeceleration => airDeceleration;
+    public float AirBrakingAcceleration => airBrakingAcceleration;
+    public float TerminalFallSpeed => terminalFallSpeed;
+    public float GroundedStickVelocity => groundedStickVelocity;
+    public float GroundedReleaseGraceSeconds =>
+        groundedReleaseGraceSeconds;
+    public float CoyoteTimeSeconds => coyoteTimeSeconds;
+    public float JumpBufferSeconds => jumpBufferSeconds;
+    public float FlightDeceleration => flightDeceleration;
+    public float FlightBrakingAcceleration => flightBrakingAcceleration;
+    public float FlightVerticalSpeed => flightVerticalSpeed;
+    public float BoostVerticalSpeed => boostVerticalSpeed;
+    public float FlightVerticalAcceleration => flightVerticalAcceleration;
+    public float FlightVerticalDeceleration => flightVerticalDeceleration;
+    public float FlightVerticalBrakingAcceleration =>
+        flightVerticalBrakingAcceleration;
+    public float FlightTakeoffSpeed => flightTakeoffSpeed;
+    public float FlightTakeoffGraceSeconds => flightTakeoffGraceSeconds;
+    public float FlightToggleCooldownSeconds => flightToggleCooldownSeconds;
+    public float BoostAccelerationMultiplier => boostAccelerationMultiplier;
+    public float FlightLandingInputThreshold => flightLandingInputThreshold;
+    public float FlightLandingIntentGraceSeconds =>
+        flightLandingIntentGraceSeconds;
+
+    public void Sanitize()
+    {
+        groundDeceleration = Mathf.Max(0f, groundDeceleration);
+        groundBrakingAcceleration = Mathf.Max(
+            0f,
+            groundBrakingAcceleration
+        );
+        airAcceleration = Mathf.Max(0f, airAcceleration);
+        airDeceleration = Mathf.Max(0f, airDeceleration);
+        airBrakingAcceleration = Mathf.Max(
+            0f,
+            airBrakingAcceleration
+        );
+        terminalFallSpeed = Mathf.Max(0.01f, terminalFallSpeed);
+        groundedStickVelocity = Mathf.Min(0f, groundedStickVelocity);
+        groundedReleaseGraceSeconds = Mathf.Max(
+            0f,
+            groundedReleaseGraceSeconds
+        );
+        coyoteTimeSeconds = Mathf.Max(0f, coyoteTimeSeconds);
+        jumpBufferSeconds = Mathf.Max(0f, jumpBufferSeconds);
+
+        flightDeceleration = Mathf.Max(0f, flightDeceleration);
+        flightBrakingAcceleration = Mathf.Max(
+            0f,
+            flightBrakingAcceleration
+        );
+        flightVerticalSpeed = Mathf.Max(0f, flightVerticalSpeed);
+        boostVerticalSpeed = Mathf.Max(
+            flightVerticalSpeed,
+            boostVerticalSpeed
+        );
+        flightVerticalAcceleration = Mathf.Max(
+            0f,
+            flightVerticalAcceleration
+        );
+        flightVerticalDeceleration = Mathf.Max(
+            0f,
+            flightVerticalDeceleration
+        );
+        flightVerticalBrakingAcceleration = Mathf.Max(
+            0f,
+            flightVerticalBrakingAcceleration
+        );
+        flightTakeoffSpeed = Mathf.Max(0f, flightTakeoffSpeed);
+        flightTakeoffGraceSeconds = Mathf.Max(
+            0f,
+            flightTakeoffGraceSeconds
+        );
+        flightToggleCooldownSeconds = Mathf.Max(
+            0f,
+            flightToggleCooldownSeconds
+        );
+        boostAccelerationMultiplier = Mathf.Max(
+            1f,
+            boostAccelerationMultiplier
+        );
+        flightLandingInputThreshold = Mathf.Clamp01(
+            flightLandingInputThreshold
+        );
+        flightLandingIntentGraceSeconds = Mathf.Max(
+            0f,
+            flightLandingIntentGraceSeconds
+        );
     }
 }
 
@@ -1176,6 +1824,155 @@ public static class PowerSuitLocomotionMath
     private const float BackwardInputThreshold = -0.01f;
 
     /// <summary>
+    /// Removes flight-only lift or descent while preserving planar momentum.
+    /// </summary>
+    public static Vector3 ProjectOntoGroundPlane(Vector3 velocity)
+    {
+        return Vector3.ProjectOnPlane(velocity, Vector3.up);
+    }
+
+    /// <summary>
+    /// Approaches a target using distinct acceleration, coasting deceleration,
+    /// and direction-reversal braking rates. All rates are units/second².
+    /// </summary>
+    public static Vector3 ApproachVelocity(
+        Vector3 current,
+        Vector3 target,
+        float acceleration,
+        float deceleration,
+        float brakingAcceleration,
+        float deltaTime
+    )
+    {
+        ValidateRate(acceleration, nameof(acceleration));
+        ValidateRate(deceleration, nameof(deceleration));
+        ValidateRate(brakingAcceleration, nameof(brakingAcceleration));
+        ValidateDeltaTime(deltaTime);
+
+        float selectedRate;
+        if (target.sqrMagnitude <= DirectionEpsilon)
+        {
+            selectedRate = deceleration;
+        }
+        else if (
+            current.sqrMagnitude > DirectionEpsilon &&
+            Vector3.Dot(current, target) < 0f
+        )
+        {
+            selectedRate = brakingAcceleration;
+        }
+        else if (
+            target.sqrMagnitude + DirectionEpsilon < current.sqrMagnitude
+        )
+        {
+            selectedRate = deceleration;
+        }
+        else
+        {
+            selectedRate = acceleration;
+        }
+
+        return Vector3.MoveTowards(
+            current,
+            target,
+            selectedRate * deltaTime
+        );
+    }
+
+    public static float ApproachVelocity(
+        float current,
+        float target,
+        float acceleration,
+        float deceleration,
+        float brakingAcceleration,
+        float deltaTime
+    )
+    {
+        ValidateRate(acceleration, nameof(acceleration));
+        ValidateRate(deceleration, nameof(deceleration));
+        ValidateRate(brakingAcceleration, nameof(brakingAcceleration));
+        ValidateDeltaTime(deltaTime);
+
+        float selectedRate;
+        if (Mathf.Abs(target) <= DirectionEpsilon)
+        {
+            selectedRate = deceleration;
+        }
+        else if (
+            Mathf.Abs(current) > DirectionEpsilon &&
+            current * target < 0f
+        )
+        {
+            selectedRate = brakingAcceleration;
+        }
+        else if (Mathf.Abs(target) + DirectionEpsilon < Mathf.Abs(current))
+        {
+            selectedRate = deceleration;
+        }
+        else
+        {
+            selectedRate = acceleration;
+        }
+
+        return Mathf.MoveTowards(
+            current,
+            target,
+            selectedRate * deltaTime
+        );
+    }
+
+    public static float CalculateJumpSpeed(float jumpHeight, float gravity)
+    {
+        if (
+            float.IsNaN(jumpHeight) ||
+            float.IsInfinity(jumpHeight) ||
+            jumpHeight < 0f ||
+            float.IsNaN(gravity) ||
+            float.IsInfinity(gravity) ||
+            gravity >= 0f
+        )
+        {
+            throw new System.ArgumentOutOfRangeException(
+                nameof(jumpHeight),
+                "Jump height must be finite/non-negative and gravity must be finite/negative."
+            );
+        }
+
+        return Mathf.Sqrt(jumpHeight * -2f * gravity);
+    }
+
+    public static float ApplyGravity(
+        float currentVerticalVelocity,
+        float gravity,
+        float terminalFallSpeed,
+        float deltaTime
+    )
+    {
+        if (
+            float.IsNaN(currentVerticalVelocity) ||
+            float.IsInfinity(currentVerticalVelocity) ||
+            float.IsNaN(gravity) ||
+            float.IsInfinity(gravity) ||
+            gravity >= 0f ||
+            float.IsNaN(terminalFallSpeed) ||
+            float.IsInfinity(terminalFallSpeed) ||
+            terminalFallSpeed <= 0f
+        )
+        {
+            throw new System.ArgumentOutOfRangeException(
+                nameof(terminalFallSpeed),
+                "Gravity inputs must be finite, with negative gravity and a positive terminal speed."
+            );
+        }
+
+        ValidateDeltaTime(deltaTime);
+        return Mathf.Max(
+            -terminalFallSpeed,
+            currentVerticalVelocity + gravity * deltaTime
+        );
+    }
+
+    /// <summary>
     /// Selects the heading the suit should turn toward for the current input.
     /// Backward ground movement faces opposite its travel vector so velocity is
     /// reliably local-backward; aim mode always follows the camera heading.
@@ -1281,5 +2078,198 @@ public static class PowerSuitLocomotionMath
         return planarFallback.sqrMagnitude > DirectionEpsilon
             ? planarFallback.normalized
             : Vector3.zero;
+    }
+
+    private static void ValidateRate(float value, string parameterName)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f)
+        {
+            throw new System.ArgumentOutOfRangeException(
+                parameterName,
+                "Movement rates must be finite and non-negative."
+            );
+        }
+    }
+
+    private static void ValidateDeltaTime(float deltaTime)
+    {
+        if (
+            float.IsNaN(deltaTime) ||
+            float.IsInfinity(deltaTime) ||
+            deltaTime < 0f
+        )
+        {
+            throw new System.ArgumentOutOfRangeException(
+                nameof(deltaTime),
+                "Elapsed time must be finite and non-negative."
+            );
+        }
+    }
+}
+
+/// <summary>
+/// Engine-independent timing state for support hysteresis, coyote time, and
+/// buffered jumps. Raw support owns jump eligibility; hysteresis only
+/// stabilizes the public grounded signal, so the two grace periods never add.
+/// </summary>
+public sealed class PowerSuitGroundContactState
+{
+    private readonly float groundedReleaseGraceSeconds;
+    private readonly float coyoteTimeSeconds;
+    private readonly float jumpBufferSeconds;
+
+    private bool hasRawSupport;
+    private bool isGrounded;
+    private bool waitingForSeparation;
+    private bool hasBufferedJump;
+    private float groundedReleaseRemaining;
+    private float coyoteRemaining;
+    private float jumpBufferRemaining;
+
+    public PowerSuitGroundContactState(
+        float groundedReleaseGraceSeconds,
+        float coyoteTimeSeconds,
+        float jumpBufferSeconds
+    )
+    {
+        ValidateDuration(
+            groundedReleaseGraceSeconds,
+            nameof(groundedReleaseGraceSeconds)
+        );
+        ValidateDuration(coyoteTimeSeconds, nameof(coyoteTimeSeconds));
+        ValidateDuration(jumpBufferSeconds, nameof(jumpBufferSeconds));
+
+        this.groundedReleaseGraceSeconds = groundedReleaseGraceSeconds;
+        this.coyoteTimeSeconds = coyoteTimeSeconds;
+        this.jumpBufferSeconds = jumpBufferSeconds;
+    }
+
+    public bool HasRawSupport => hasRawSupport;
+    public bool IsGrounded => isGrounded;
+    public bool HasBufferedJump => hasBufferedJump;
+    public bool WaitingForSeparation => waitingForSeparation;
+    public float CoyoteRemaining => coyoteRemaining;
+    public float JumpBufferRemaining => jumpBufferRemaining;
+
+    public void Reset(bool grounded)
+    {
+        hasRawSupport = grounded;
+        isGrounded = grounded;
+        waitingForSeparation = false;
+        hasBufferedJump = false;
+        groundedReleaseRemaining = grounded
+            ? groundedReleaseGraceSeconds
+            : 0f;
+        coyoteRemaining = grounded ? coyoteTimeSeconds : 0f;
+        jumpBufferRemaining = 0f;
+    }
+
+    public void Advance(bool rawGrounded, float deltaTime)
+    {
+        ValidateDuration(deltaTime, nameof(deltaTime));
+        AdvanceJumpBuffer(deltaTime);
+
+        if (waitingForSeparation)
+        {
+            hasRawSupport = false;
+            isGrounded = false;
+            groundedReleaseRemaining = 0f;
+            coyoteRemaining = 0f;
+            if (!rawGrounded)
+            {
+                waitingForSeparation = false;
+            }
+            return;
+        }
+
+        hasRawSupport = rawGrounded;
+        if (rawGrounded)
+        {
+            isGrounded = true;
+            groundedReleaseRemaining = groundedReleaseGraceSeconds;
+            coyoteRemaining = coyoteTimeSeconds;
+            return;
+        }
+
+        groundedReleaseRemaining = System.Math.Max(
+            0f,
+            groundedReleaseRemaining - deltaTime
+        );
+        coyoteRemaining = System.Math.Max(
+            0f,
+            coyoteRemaining - deltaTime
+        );
+        isGrounded = groundedReleaseRemaining > 0f;
+    }
+
+    public void BufferJump()
+    {
+        hasBufferedJump = true;
+        jumpBufferRemaining = jumpBufferSeconds;
+    }
+
+    public bool TryConsumeBufferedJump()
+    {
+        bool hasJumpSurface =
+            !waitingForSeparation &&
+            (hasRawSupport || coyoteRemaining > 0f);
+        if (!hasBufferedJump || !hasJumpSurface)
+        {
+            return false;
+        }
+
+        hasBufferedJump = false;
+        jumpBufferRemaining = 0f;
+        hasRawSupport = false;
+        isGrounded = false;
+        groundedReleaseRemaining = 0f;
+        coyoteRemaining = 0f;
+        waitingForSeparation = true;
+        return true;
+    }
+
+    public void ForceAirborneUntilSeparated()
+    {
+        hasRawSupport = false;
+        isGrounded = false;
+        waitingForSeparation = true;
+        hasBufferedJump = false;
+        groundedReleaseRemaining = 0f;
+        coyoteRemaining = 0f;
+        jumpBufferRemaining = 0f;
+    }
+
+    private void AdvanceJumpBuffer(float deltaTime)
+    {
+        if (!hasBufferedJump)
+        {
+            return;
+        }
+
+        if (jumpBufferRemaining <= 0f)
+        {
+            hasBufferedJump = false;
+            return;
+        }
+
+        jumpBufferRemaining = System.Math.Max(
+            0f,
+            jumpBufferRemaining - deltaTime
+        );
+        if (jumpBufferRemaining <= 0f)
+        {
+            hasBufferedJump = false;
+        }
+    }
+
+    private static void ValidateDuration(float value, string parameterName)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f)
+        {
+            throw new System.ArgumentOutOfRangeException(
+                parameterName,
+                "Movement timing values must be finite and non-negative."
+            );
+        }
     }
 }

@@ -187,6 +187,7 @@ namespace Powersuit.Combat
         public event Action ReloadCancelled;
         public event Action ManualCycleStarted;
         public event Action ManualCycleCompleted;
+        public event Action ManualCycleCancelled;
         public event Action<WeaponFireResult> ShotFired;
 
         public WeaponFireResult TryFire()
@@ -368,12 +369,34 @@ namespace Powersuit.Combat
         {
             CurrentMagazineAmmo = Configuration.MagazineCapacity;
             CurrentReserveAmmo = Configuration.StartingReserveAmmo;
+            ResetTransientState();
+            AmmunitionChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Cancels in-progress actions and cadence without changing ammunition.
+        /// Cancellation events keep presentation adapters synchronized.
+        /// </summary>
+        public void ResetTransientState()
+        {
+            bool cancelledReload = IsReloading;
+            bool cancelledManualCycle = IsManualCycleInProgress;
+
             fireCooldownRemaining = 0f;
             reloadElapsed = 0f;
             manualCycleRemaining = 0f;
             reloadCommitted = false;
             IsReloading = false;
-            AmmunitionChanged?.Invoke();
+
+            if (cancelledReload)
+            {
+                ReloadCancelled?.Invoke();
+            }
+
+            if (cancelledManualCycle)
+            {
+                ManualCycleCancelled?.Invoke();
+            }
         }
 
         public void Advance(float deltaSeconds)

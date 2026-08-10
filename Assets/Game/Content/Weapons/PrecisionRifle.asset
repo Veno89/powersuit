@@ -36,3 +36,9 @@ MonoBehaviour:
   aimRecoilYaw: 0.25
   hipRecoilPitch: 1.6
   hipRecoilYaw: 0.5
+  supportsScope: 1
+  shoulderFieldOfViewDegrees: 62
+  scopedFieldOfViewDegrees: 28
+  shoulderLookSensitivityMultiplier: 0.75
+  scopedLookSensitivityMultiplier: 0.35
+  aimTransitionSharpness: 12

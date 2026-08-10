@@ -254,6 +254,16 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
 
     private void OnDisable()
     {
+        ResetForRespawn();
+    }
+
+    /// <summary>
+    /// Immediately clears transient upper-body pose blending. A normal release
+    /// is damped for presentation quality, but death/respawn must not carry a
+    /// partially blended firing pose into the restored player state.
+    /// </summary>
+    public void ResetForRespawn()
+    {
         forwardWeaponPoseLayerWeight = 0f;
         if (animator != null && forwardWeaponPoseLayerIndex >= 0)
         {

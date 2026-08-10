@@ -1,0 +1,22 @@
+{
+    "name": "Powersuit.Enemies.EditModeTests",
+    "rootNamespace": "Powersuit.Enemies.Tests",
+    "references": [
+        "Powersuit.Combat.Runtime",
+        "Powersuit.Enemies.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

@@ -70,6 +70,12 @@ namespace Powersuit.Tests.PlayMode
                     Is.EqualTo(false),
                     "Releasing the cursor must never preserve the zoomed aim state."
                 );
+                Assert.That(
+                    controllerType.GetProperty("IsPrimaryFireSuppressed")
+                        ?.GetValue(controller),
+                    Is.EqualTo(true),
+                    "An unlocked cursor must suppress gameplay fire."
+                );
                 setCursorLocked.Invoke(controller, new object[] { true });
             }
             finally
@@ -306,10 +312,8 @@ namespace Powersuit.Tests.PlayMode
                 Is.EqualTo(true)
             );
 
-            Type pacingPolicyType = Type.GetType(
-                "PowerSuitFramePacingPolicy, Assembly-CSharp",
-                true
-            );
+            Type pacingPolicyType = FindType("PowerSuitFramePacingPolicy");
+            Assert.That(pacingPolicyType, Is.Not.Null);
             MethodInfo shouldUseVSync = pacingPolicyType.GetMethod(
                 "ShouldUseVSync",
                 BindingFlags.Public | BindingFlags.Static
@@ -362,19 +366,14 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(controller, Is.Not.Null);
             Assert.That(camera, Is.Not.Null);
 
-            FieldInfo aimingField = controller.GetType().GetField(
-                "isAiming",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
             MethodInfo updateCamera = controller.GetType().GetMethod(
                 "UpdateCamera",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
-            Assert.That(aimingField, Is.Not.Null);
             Assert.That(updateCamera, Is.Not.Null);
 
             controller.enabled = false;
-            aimingField.SetValue(controller, true);
+            SetAimRequested(controller, true);
             float settleDeadline = Time.realtimeSinceStartup + 1.5f;
             while (
                 Time.realtimeSinceStartup < settleDeadline &&
@@ -463,24 +462,85 @@ namespace Powersuit.Tests.PlayMode
             );
 
             // Preserve the real animation adapter while replacing only live
-            // mouse input with a deterministic held-aim value.
-            FieldInfo aimingField = controller.GetType().GetField(
-                "isAiming",
+            // mouse input with a deterministic held-aim value. Request the
+            // shot before an Animator evaluation so this also guards the
+            // first-frame aim-transition staging contract.
+            controller.enabled = false;
+            SetAimRequested(controller, true);
+
+            Component weapon = player.GetComponent("PowerSuitWeapon");
+            Assert.That(weapon, Is.Not.Null);
+            int magazineBeforeShot = GetIntProperty(
+                weapon,
+                "CurrentMagazineAmmo"
+            );
+            MethodInfo requestFire = weapon.GetType().GetMethod(
+                "RequestFire",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(requestFire, Is.Not.Null);
+            Assert.That(
+                requestFire.Invoke(weapon, null),
+                Is.EqualTo(true),
+                "The public request path must accept and stage the shot."
+            );
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(magazineBeforeShot),
+                "A first-frame aim shot must wait for one Animator evaluation before committing."
+            );
+            Assert.That(
+                GetBoolProperty(weapon, "IsCycling"),
+                Is.False,
+                "The gameplay transaction must not begin before the staged pose is evaluated."
+            );
+            MethodInfo weaponUpdate = weapon.GetType().GetMethod(
+                "Update",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
-            Assert.That(aimingField, Is.Not.Null);
-            aimingField.SetValue(controller, true);
+            Assert.That(weaponUpdate, Is.Not.Null);
+            weaponUpdate.Invoke(weapon, null);
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(magazineBeforeShot),
+                "An early-order caller must not let the weapon consume a staged shot again in the same frame."
+            );
+            Assert.That(GetBoolProperty(weapon, "IsCycling"), Is.False);
+            Assert.That(
+                animator.GetLayerWeight(forwardWeaponPoseLayerIndex),
+                Is.GreaterThan(0.99f),
+                "Staging must raise the forward-pose layer immediately."
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.LessThan(0.01f),
+                "The idle weapon-action layer must not override the staged aim pose."
+            );
 
-            float aimDeadline = Time.realtimeSinceStartup + 1f;
+            float cycleDeadline = Time.realtimeSinceStartup + 1f;
             while (
-                Time.realtimeSinceStartup < aimDeadline &&
-                (!animator.GetBool("IsAiming") ||
-                 !IsInState(animator, baseLayerIndex, "Aim Locomotion"))
+                Time.realtimeSinceStartup < cycleDeadline &&
+                (
+                    GetIntProperty(weapon, "CurrentMagazineAmmo") ==
+                        magazineBeforeShot ||
+                    !animator.GetBool("IsAiming") ||
+                    !IsInState(animator, baseLayerIndex, "Aim Locomotion") ||
+                    !IsStableState(
+                        animator,
+                        boltCycleActionLayerIndex,
+                        "Bolt Cycle"
+                    )
+                )
             )
             {
                 yield return null;
             }
 
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(magazineBeforeShot - 1),
+                "The staged request must commit exactly one accepted shot."
+            );
             Assert.That(animator.GetBool("IsAiming"), Is.True);
             Assert.That(
                 IsInState(animator, baseLayerIndex, "Aim Locomotion"),
@@ -488,43 +548,11 @@ namespace Powersuit.Tests.PlayMode
                 "The real controller-to-driver path must enter Aim Locomotion."
             );
             Assert.That(
-                animator.GetLayerWeight(forwardWeaponPoseLayerIndex),
-                Is.LessThan(0.01f),
-                "Grounded aim uses the base Aim state until a shot requests the forward overlay."
-            );
-            Assert.That(
-                animator.GetLayerWeight(weaponActionsLayerIndex),
-                Is.LessThan(0.01f),
-                "The idle weapon-action layer must not override Aim Locomotion."
-            );
-
-            Component weapon = player.GetComponent("PowerSuitWeapon");
-            Assert.That(weapon, Is.Not.Null);
-            MethodInfo tryFireWeapon = weapon.GetType().GetMethod(
-                "TryFireWeapon",
-                BindingFlags.Instance | BindingFlags.Public
-            );
-            Assert.That(tryFireWeapon, Is.Not.Null);
-            object fireResult = tryFireWeapon.Invoke(weapon, null);
-            PropertyInfo firedProperty = fireResult?.GetType().GetProperty("Fired");
-            Assert.That(firedProperty, Is.Not.Null);
-            Assert.That(
-                firedProperty.GetValue(fireResult),
-                Is.EqualTo(true),
-                "The regression must exercise an accepted shot and its real cycle event."
-            );
-
-            float cycleDeadline = Time.realtimeSinceStartup + 1f;
-            while (
-                Time.realtimeSinceStartup < cycleDeadline &&
-                !IsInState(animator, boltCycleActionLayerIndex, "Bolt Cycle")
-            )
-            {
-                yield return null;
-            }
-
-            Assert.That(
-                IsInState(animator, boltCycleActionLayerIndex, "Bolt Cycle"),
+                IsStableState(
+                    animator,
+                    boltCycleActionLayerIndex,
+                    "Bolt Cycle"
+                ),
                 Is.True,
                 "An accepted shot must enter the additive bolt-cycle presentation."
             );
@@ -604,6 +632,26 @@ namespace Powersuit.Tests.PlayMode
                 Is.GreaterThan(0.9f),
                 "The rifle must return to its forward aim pose after a shot."
             );
+
+            float fireReadyDeadline = Time.realtimeSinceStartup + 2f;
+            while (
+                Time.realtimeSinceStartup < fireReadyDeadline &&
+                !GetBoolProperty(weapon, "CanFire")
+            )
+            {
+                yield return null;
+            }
+            Assert.That(GetBoolProperty(weapon, "CanFire"), Is.True);
+            int stableAimMagazine = GetIntProperty(
+                weapon,
+                "CurrentMagazineAmmo"
+            );
+            Assert.That(requestFire.Invoke(weapon, null), Is.EqualTo(true));
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(stableAimMagazine - 1),
+                "A fully evaluated forward aim pose must fire immediately without adding input latency."
+            );
         }
 
         [UnityTest]
@@ -679,14 +727,9 @@ namespace Powersuit.Tests.PlayMode
                 "isFlying",
                 BindingFlags.Instance | BindingFlags.NonPublic
             );
-            FieldInfo aimingField = controller.GetType().GetField(
-                "isAiming",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
             Assert.That(flyingField, Is.Not.Null);
-            Assert.That(aimingField, Is.Not.Null);
             flyingField.SetValue(controller, true);
-            aimingField.SetValue(controller, true);
+            SetAimRequested(controller, true);
 
             float airborneAimDeadline = Time.realtimeSinceStartup + 1.5f;
             while (
@@ -1095,6 +1138,195 @@ namespace Powersuit.Tests.PlayMode
                 animator.GetLayerWeight(forwardPoseLayerIndex),
                 Is.LessThan(0.01f),
                 "The temporary hip-fire pose must release after cycle recovery."
+            );
+        }
+
+        [UnityTest]
+        public IEnumerator PoweredSuitAimDemo_RespawnCancelsTransientPlayerState()
+        {
+            AsyncOperation loadOperation;
+#if UNITY_EDITOR
+            loadOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(
+                "Assets/Scenes/PoweredSuitAimDemo.unity",
+                new LoadSceneParameters(LoadSceneMode.Single)
+            );
+#else
+            loadOperation = SceneManager.LoadSceneAsync(
+                "PoweredSuitAimDemo",
+                LoadSceneMode.Single
+            );
+#endif
+            Assert.That(loadOperation, Is.Not.Null);
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+
+            yield return null;
+            yield return null;
+
+            GameObject player = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Generator 109 Player"
+            );
+            Assert.That(player, Is.Not.Null);
+            GameObject enemies = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Test Enemies"
+            );
+            if (enemies != null)
+            {
+                enemies.SetActive(false);
+            }
+
+            Component controller = player.GetComponent("PowerSuitController");
+            Component weapon = player.GetComponent("PowerSuitWeapon");
+            Component presentation = player.GetComponent(
+                "PowerSuitWeaponPresentation"
+            );
+            Component health = player.GetComponent("PlayerHealth");
+            Animator animator = player.GetComponentInChildren<Animator>(true);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(weapon, Is.Not.Null);
+            Assert.That(presentation, Is.Not.Null);
+            Assert.That(health, Is.Not.Null);
+            Assert.That(animator, Is.Not.Null);
+            int forwardPoseLayerIndex = RequireLayerIndex(
+                animator,
+                ForwardWeaponPoseLayerName
+            );
+            int boltCycleLayerIndex = RequireLayerIndex(
+                animator,
+                BoltCycleActionLayerName
+            );
+            int weaponActionsLayerIndex = RequireLayerIndex(
+                animator,
+                WeaponActionsLayerName
+            );
+
+            SetPrivateField(health, "respawnDelay", 0.05f);
+            controller.GetType().GetMethod("SetFlightEnabled")?.Invoke(
+                controller,
+                new object[] { true }
+            );
+            SetAimRequested(controller, true);
+
+            object fireResult = weapon.GetType().GetMethod("TryFireWeapon")
+                ?.Invoke(weapon, null);
+            Assert.That(
+                fireResult?.GetType().GetProperty("Fired")?.GetValue(fireResult),
+                Is.EqualTo(true)
+            );
+            Assert.That(GetBoolProperty(weapon, "IsCycling"), Is.True);
+
+            float cycleEntryDeadline = Time.realtimeSinceStartup + 0.75f;
+            while (
+                Time.realtimeSinceStartup < cycleEntryDeadline &&
+                !IsStableState(animator, boltCycleLayerIndex, "Bolt Cycle")
+            )
+            {
+                yield return null;
+            }
+            Assert.That(
+                IsStableState(animator, boltCycleLayerIndex, "Bolt Cycle"),
+                Is.True,
+                "The player must be visibly mid-cycle before defeat resets presentation."
+            );
+            Assert.That(
+                animator.GetLayerWeight(boltCycleLayerIndex),
+                Is.GreaterThan(0.99f)
+            );
+            Assert.That(
+                animator.GetLayerWeight(forwardPoseLayerIndex),
+                Is.GreaterThan(0.99f)
+            );
+
+            int restoredCount = 0;
+            int respawnedCount = 0;
+            bool restoredWasDamageable = false;
+            Action<float, float> onRestored = (_, __) =>
+            {
+                restoredCount++;
+                restoredWasDamageable = GetBoolProperty(
+                    health,
+                    "CanReceiveDamage"
+                );
+            };
+            Action onRespawned = () => respawnedCount++;
+            health.GetType().GetEvent("OnHealthRestored")?.AddEventHandler(
+                health,
+                onRestored
+            );
+            health.GetType().GetEvent("OnRespawned")?.AddEventHandler(
+                health,
+                onRespawned
+            );
+
+            health.GetType().GetMethod("TakeDamage")?.Invoke(
+                health,
+                new object[] { 1000f }
+            );
+
+            float deadline = Time.realtimeSinceStartup + 2f;
+            while (
+                Time.realtimeSinceStartup < deadline &&
+                respawnedCount == 0
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(respawnedCount, Is.EqualTo(1));
+            Assert.That(restoredCount, Is.EqualTo(1));
+            Assert.That(restoredWasDamageable, Is.True);
+            Assert.That(GetBoolProperty(controller, "IsFlying"), Is.False);
+            Assert.That(GetBoolProperty(controller, "IsAiming"), Is.False);
+            Assert.That(GetBoolProperty(weapon, "IsCycling"), Is.False);
+            Assert.That(GetBoolProperty(weapon, "IsReloading"), Is.False);
+            Assert.That(((Behaviour)controller).enabled, Is.True);
+            Assert.That(((Behaviour)weapon).enabled, Is.True);
+            Assert.That(((Behaviour)presentation).enabled, Is.True);
+            Assert.That(
+                presentation.GetType().GetProperty("State")
+                    ?.GetValue(presentation)?.ToString(),
+                Is.EqualTo("Ready")
+            );
+            Assert.That(
+                animator.GetLayerWeight(forwardPoseLayerIndex),
+                Is.LessThan(0.01f),
+                "Respawn must release the transient forward-pose layer."
+            );
+            Assert.That(
+                animator.GetLayerWeight(boltCycleLayerIndex),
+                Is.LessThan(0.01f),
+                "Respawn must release the bolt-cycle layer."
+            );
+            Assert.That(
+                animator.GetLayerWeight(weaponActionsLayerIndex),
+                Is.LessThan(0.01f),
+                "Respawn must release the general weapon-action layer."
+            );
+            Assert.That(
+                IsStableState(animator, boltCycleLayerIndex, "No Bolt Cycle"),
+                Is.True,
+                "Respawn must restore the bolt layer's neutral state."
+            );
+            Assert.That(
+                IsStableState(
+                    animator,
+                    weaponActionsLayerIndex,
+                    "No Weapon Action"
+                ),
+                Is.True,
+                "Respawn must restore the action layer's neutral state."
+            );
+            Assert.That(
+                (float)health.GetType().GetProperty("CurrentHealth")
+                    ?.GetValue(health),
+                Is.EqualTo(
+                    (float)health.GetType().GetProperty("MaximumHealth")
+                        ?.GetValue(health)
+                )
             );
         }
 
@@ -1520,6 +1752,40 @@ namespace Powersuit.Tests.PlayMode
                 animator.GetCurrentAnimatorStateInfo(layerIndex).IsName(stateName);
         }
 
+        private static void SetAimRequested(
+            Component controller,
+            bool requested
+        )
+        {
+            FieldInfo requestField = controller.GetType().GetField(
+                "aimRequested",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            MethodInfo refreshMethod = controller.GetType().GetMethod(
+                "RefreshAimAvailability",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(requestField, Is.Not.Null, "aimRequested");
+            Assert.That(refreshMethod, Is.Not.Null, "RefreshAimAvailability");
+
+            requestField.SetValue(controller, requested);
+            refreshMethod.Invoke(controller, null);
+        }
+
+        private static void SetPrivateField(
+            object target,
+            string fieldName,
+            object value
+        )
+        {
+            FieldInfo field = target.GetType().GetField(
+                fieldName,
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            Assert.That(field, Is.Not.Null, fieldName);
+            field.SetValue(target, value);
+        }
+
         private static bool GetBoolProperty(Component component, string propertyName)
         {
             PropertyInfo property = component.GetType().GetProperty(
@@ -1702,6 +1968,20 @@ namespace Powersuit.Tests.PlayMode
             {
                 behaviour.enabled = false;
             }
+        }
+
+        private static Type FindType(string typeName)
+        {
+            foreach (System.Reflection.Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type type = assembly.GetType(typeName, false);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+
+            return null;
         }
 
         private static GameObject FindRoot(Scene scene, string name)

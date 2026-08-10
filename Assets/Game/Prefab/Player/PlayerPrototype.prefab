@@ -117,6 +117,30 @@ MonoBehaviour:
   boostSpeed: 20
   flightAcceleration: 12
   turningSpeed: 12
+  movementSettings:
+    groundDeceleration: 26
+    groundBrakingAcceleration: 38
+    airAcceleration: 7
+    airDeceleration: 1.5
+    airBrakingAcceleration: 10
+    terminalFallSpeed: 35
+    groundedStickVelocity: -2
+    groundedReleaseGraceSeconds: 0.06
+    coyoteTimeSeconds: 0.12
+    jumpBufferSeconds: 0.12
+    flightDeceleration: 9
+    flightBrakingAcceleration: 22
+    flightVerticalSpeed: 8
+    boostVerticalSpeed: 14
+    flightVerticalAcceleration: 18
+    flightVerticalDeceleration: 14
+    flightVerticalBrakingAcceleration: 28
+    flightTakeoffSpeed: 5
+    flightTakeoffGraceSeconds: 0.12
+    flightToggleCooldownSeconds: 0.15
+    boostAccelerationMultiplier: 1.5
+    flightLandingInputThreshold: 0.1
+    flightLandingIntentGraceSeconds: 0.25
   cameraDistance: 9.5
   cameraHeight: 1.5
   mouseSensitivity: 0.15
@@ -130,6 +154,9 @@ MonoBehaviour:
   flightCameraDistance: 11
   flightCameraHeight: 1.75
   flightFieldOfView: 74
+  boostCameraDistance: 12
+  boostCameraHeight: 1.8
+  boostFieldOfView: 82
   aimCameraDistance: 4.3
   aimCameraHeight: 1.45
   aimShoulderOffset: {x: -1.2, y: 0.05, z: 0}
@@ -138,6 +165,10 @@ MonoBehaviour:
   aimTransitionSpeed: 12
   maxReticleOffset: 140
   aimMaxDistance: 200
+  scopePoint: {fileID: 0}
+  scopeEyeRelief: 0.045
+  scopedNearClipPlane: 0.02
+  scopeActivationPolicy: 1
   recoilRecoverySpeed: 15
   maxAccumulatedRecoil: 4
 --- !u!114 &7646132019645809869
@@ -190,6 +221,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maximumHealth: 100
   respawnDelay: 2
+  faction: 1
+  allowFriendlyFire: 0
 --- !u!114 &4114279548440960474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,7 +255,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ReticleHitMarker
   markerColor: {r: 1, g: 0.25, b: 0.25, a: 1}
+  killMarkerColor: {r: 1, g: 0.82, b: 0.2, a: 1}
   displayDuration: 0.15
+  killDisplayDuration: 0.28
   startSize: 10
   endSize: 20
   lineThickness: 2.5

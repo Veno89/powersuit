@@ -49,6 +49,18 @@ namespace Powersuit.Combat
         [SerializeField, Min(0f)] private float hipRecoilPitch = 1.6f;
         [SerializeField, Min(0f)] private float hipRecoilYaw = 0.5f;
 
+        [Header("Aim Camera")]
+        [SerializeField] private bool supportsScope = true;
+        [SerializeField, Range(1.01f, 178.99f)]
+        private float shoulderFieldOfViewDegrees = 62f;
+        [SerializeField, Range(1.01f, 178.99f)]
+        private float scopedFieldOfViewDegrees = 28f;
+        [SerializeField, Range(0.01f, 1f)]
+        private float shoulderLookSensitivityMultiplier = 0.75f;
+        [SerializeField, Range(0.01f, 1f)]
+        private float scopedLookSensitivityMultiplier = 0.35f;
+        [SerializeField, Min(0.01f)] private float aimTransitionSharpness = 12f;
+
         public string WeaponId => weaponId;
         public string DisplayName => displayName;
         public WeaponClass WeaponClass => weaponClass;
@@ -73,6 +85,14 @@ namespace Powersuit.Combat
         public float AimRecoilYaw => aimRecoilYaw;
         public float HipRecoilPitch => hipRecoilPitch;
         public float HipRecoilYaw => hipRecoilYaw;
+        public bool SupportsScope => supportsScope;
+        public float ShoulderFieldOfViewDegrees => shoulderFieldOfViewDegrees;
+        public float ScopedFieldOfViewDegrees => scopedFieldOfViewDegrees;
+        public float ShoulderLookSensitivityMultiplier =>
+            shoulderLookSensitivityMultiplier;
+        public float ScopedLookSensitivityMultiplier =>
+            scopedLookSensitivityMultiplier;
+        public float AimTransitionSharpness => aimTransitionSharpness;
 
         public WeaponRuntimeConfig CreateRuntimeConfig()
         {
@@ -105,9 +125,24 @@ namespace Powersuit.Combat
             );
         }
 
+        public WeaponAimProfile CreateAimProfile()
+        {
+            return new WeaponAimProfile(
+                supportsScope: supportsScope,
+                shoulderFieldOfViewDegrees: shoulderFieldOfViewDegrees,
+                scopedFieldOfViewDegrees: scopedFieldOfViewDegrees,
+                shoulderLookSensitivityMultiplier: shoulderLookSensitivityMultiplier,
+                scopedLookSensitivityMultiplier: scopedLookSensitivityMultiplier,
+                transitionSharpness: aimTransitionSharpness
+            );
+        }
+
         public IReadOnlyList<string> GetValidationErrors()
         {
-            return CreateRuntimeConfig().GetValidationErrors();
+            List<string> errors = new List<string>();
+            errors.AddRange(CreateRuntimeConfig().GetValidationErrors());
+            errors.AddRange(CreateAimProfile().GetValidationErrors());
+            return errors.ToArray();
         }
     }
 }

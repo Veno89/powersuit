@@ -2,16 +2,17 @@ using System;
 using Powersuit.Combat;
 using UnityEngine;
 
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
-
 public sealed class PowerSuitWeapon : MonoBehaviour
 {
+    public const float MinimumDamageMultiplier = 0f;
+    public const float MaximumDamageMultiplier = 100f;
+    public const float MaximumResolvedDamage = 1000000f;
+
     [Header("Weapon Configuration")]
     [SerializeField] private Transform muzzleTransform;
     [SerializeField] private PlayerProjectile projectilePrefab;
     [SerializeField] private WeaponDefinition weaponDefinition;
+    [SerializeField, Min(0)] private int projectilePrewarmCount = 8;
 
     [Header("Legacy Projectile Parameters")]
     [Tooltip("Used only while no Weapon Definition is assigned.")]
@@ -51,8 +52,13 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     [SerializeField] private Color normalCrosshairColor = Color.white;
     [SerializeField] private Color aimingReticleColor = new Color(0.2f, 0.9f, 1f, 1f);
 
+    [Header("Runtime Tuning")]
+    [SerializeField, Range(MinimumDamageMultiplier, MaximumDamageMultiplier)]
+    private float damageMultiplier = 1f;
+
     private PowerSuitController controller;
     private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
+    private PowerSuitInputRouter inputRouter;
     private Camera playerCamera;
     private Light muzzleFlashLight;
     private float muzzleLightTimer;
@@ -61,7 +67,11 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private GUIStyle ammoHudStyle;
     private GUIStyle ammoCountStyle;
     private GUIStyle ammoStatusStyle;
-    private bool hipFireQueuedForForwardPose;
+    private bool fireQueuedForForwardPose;
+    private int fireQueuedFrame = -1;
+    private int fallbackInputFrame = -1;
+    private PowerSuitInputSnapshot fallbackInputSnapshot;
+    private GameObject fallbackProjectileTemplate;
 
     public Transform MuzzleTransform
     {
@@ -106,6 +116,45 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public bool IsReloading => runtimeState != null && runtimeState.IsReloading;
     public bool IsCycling => runtimeState != null && runtimeState.IsManualCycleInProgress;
     public bool CanFire => CurrentFireBlockReason == WeaponFireBlockReason.None;
+    public float DamageMultiplier => damageMultiplier;
+    public int ProjectilePrewarmCount => projectilePrewarmCount;
+
+    /// <summary>
+    /// Sets the player weapon's outgoing damage multiplier. NaN preserves the
+    /// current value and infinities clamp to the documented finite bounds.
+    /// </summary>
+    public float SetDamageMultiplier(float value)
+    {
+        damageMultiplier = ClampDamageMultiplier(value, damageMultiplier);
+        return damageMultiplier;
+    }
+
+    /// <summary>
+    /// Resolves authored shot damage through the runtime multiplier. Exposed
+    /// so console tooling and tests can preview the exact gameplay result.
+    /// </summary>
+    public float CalculateOutgoingDamage(float authoredDamage)
+    {
+        if (
+            float.IsNaN(authoredDamage) ||
+            float.IsNegativeInfinity(authoredDamage) ||
+            authoredDamage <= 0f
+        )
+        {
+            return 0f;
+        }
+
+        if (float.IsPositiveInfinity(authoredDamage))
+        {
+            return damageMultiplier > 0f ? MaximumResolvedDamage : 0f;
+        }
+
+        return Mathf.Clamp(
+            authoredDamage * damageMultiplier,
+            0f,
+            MaximumResolvedDamage
+        );
+    }
 
     /// <summary>
     /// Presentation systems can close this gate during draw, sheathe, or other states
@@ -135,13 +184,18 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public event Action ReloadCancelled;
     public event Action CycleStarted;
     public event Action CycleCompleted;
+    public event Action CycleCancelled;
+    public event Action<DamageResult> DamageResolved;
 
     private void Awake()
     {
+        damageMultiplier = ClampDamageMultiplier(damageMultiplier, 1f);
+        projectilePrewarmCount = Mathf.Max(0, projectilePrewarmCount);
         RebuildRuntimeState();
 
         controller = GetComponent<PowerSuitController>();
         weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
+        inputRouter = GetComponent<PowerSuitInputRouter>();
         playerCamera = Camera.main;
 
         if (playerCamera == null)
@@ -155,12 +209,25 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             audioSource = GetComponent<AudioSource>();
         }
 
+        if (projectilePrefab != null && projectilePrewarmCount > 0)
+        {
+            CombatFeedbackPool.Prewarm(
+                projectilePrefab.gameObject,
+                projectilePrewarmCount
+            );
+        }
+
         EnsureMuzzleFlashLight();
     }
 
     private void OnDestroy()
     {
         DetachRuntimeEvents();
+        if (fallbackProjectileTemplate != null)
+        {
+            Destroy(fallbackProjectileTemplate);
+            fallbackProjectileTemplate = null;
+        }
     }
 
     private void Update()
@@ -173,9 +240,13 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
 
         bool fireRequested = IsFireRequested();
-        if (hipFireQueuedForForwardPose)
+        if (
+            fireQueuedForForwardPose &&
+            Time.frameCount > fireQueuedFrame
+        )
         {
-            hipFireQueuedForForwardPose = false;
+            fireQueuedForForwardPose = false;
+            fireQueuedFrame = -1;
             TryFireWeapon();
         }
         else if (fireRequested)
@@ -195,28 +266,31 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
     private void OnDisable()
     {
-        hipFireQueuedForForwardPose = false;
+        fireQueuedForForwardPose = false;
+        fireQueuedFrame = -1;
     }
 
     /// <summary>
-    /// Requests a gameplay shot. Non-aim fire is staged for one Animator
-    /// evaluation when necessary so projectile and muzzle feedback sample the
-    /// forward firing pose rather than the diagonal carry pose. Returns true
-    /// when the request fired immediately or was accepted for staging.
+    /// Requests a gameplay shot. A shot is staged for one Animator evaluation
+    /// whenever the forward pose is not already held, including the first frame
+    /// of an aim transition. Projectile and muzzle feedback therefore never
+    /// sample the diagonal carry pose. Returns true when the request fired
+    /// immediately or was accepted for staging.
     /// </summary>
     public bool RequestFire()
     {
-        if (hipFireQueuedForForwardPose)
+        if (fireQueuedForForwardPose)
         {
             return false;
         }
 
         bool queuedForForwardPose =
             controller != null &&
-            !controller.IsAiming &&
             CanFire &&
             weaponAnimationDriver != null &&
-            !weaponAnimationDriver.RequiresForwardWeaponPose &&
+            !weaponAnimationDriver.IsForwardWeaponPoseReady(
+                controller.IsAiming
+            ) &&
             weaponAnimationDriver.PrepareForwardWeaponPose();
         if (!queuedForForwardPose)
         {
@@ -224,7 +298,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
 
         controller.FaceCameraForWeaponFire();
-        hipFireQueuedForForwardPose = true;
+        fireQueuedForForwardPose = true;
+        fireQueuedFrame = Time.frameCount;
         return true;
     }
 
@@ -251,7 +326,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
 
         controller?.FaceCameraForWeaponFire();
-        FireProjectileAndFeedback(result.Damage);
+        FireProjectileAndFeedback(result);
         ShotAccepted?.Invoke(result);
         return result;
     }
@@ -293,8 +368,38 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         return runtimeState.AddReserveAmmo(amount);
     }
 
-    private void FireProjectileAndFeedback(float resolvedDamage)
+    /// <summary>
+    /// Cancels transient combat and feedback state for a clean respawn without
+    /// silently refilling or otherwise changing the equipped weapon's ammo.
+    /// </summary>
+    public void ResetForRespawn()
     {
+        fireQueuedForForwardPose = false;
+        fireQueuedFrame = -1;
+        runtimeState?.ResetTransientState();
+
+        muzzleLightTimer = 0f;
+        if (muzzleFlashLight != null)
+        {
+            muzzleFlashLight.enabled = false;
+        }
+
+        PresentationAllowsFire = true;
+        PresentationAllowsReload = true;
+
+        // The animation driver owns nonserialized action/hold state. Cycling
+        // it through its normal lifecycle clears those values and restores its
+        // subscriptions without exposing Animator internals to combat logic.
+        if (weaponAnimationDriver != null && weaponAnimationDriver.enabled)
+        {
+            weaponAnimationDriver.enabled = false;
+            weaponAnimationDriver.enabled = true;
+        }
+    }
+
+    private void FireProjectileAndFeedback(WeaponFireResult result)
+    {
+        float resolvedDamage = CalculateOutgoingDamage(result.Damage);
         Vector3 muzzlePos = GetMuzzlePosition();
         Vector3 aimPoint = controller != null
             ? controller.GetAimPoint(muzzlePos)
@@ -320,24 +425,44 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
         if (projectilePrefab != null)
         {
-            PlayerProjectile proj = Instantiate(
-                projectilePrefab,
+            GameObject projectileObject = CombatFeedbackPool.Spawn(
+                projectilePrefab.gameObject,
                 muzzlePos,
                 Quaternion.LookRotation(fireDirection)
             );
-
-            proj.Initialize(
-                fireDirection,
-                activeConfiguration.ProjectileSpeed,
-                resolvedDamage,
-                activeConfiguration.ProjectileLifetimeSeconds,
-                activeConfiguration.ProjectileRadius,
-                transform
-            );
+            PlayerProjectile proj = projectileObject != null
+                ? projectileObject.GetComponent<PlayerProjectile>()
+                : null;
+            if (proj != null)
+            {
+                proj.DamageResolved += RaiseDamageResolved;
+                proj.Initialize(
+                    fireDirection,
+                    activeConfiguration.ProjectileSpeed,
+                    resolvedDamage,
+                    activeConfiguration.ProjectileLifetimeSeconds,
+                    activeConfiguration.ProjectileRadius,
+                    transform,
+                    result.IsCritical
+                );
+            }
+            else if (projectileObject != null)
+            {
+                Debug.LogError(
+                    "The configured projectile prefab has no PlayerProjectile component.",
+                    projectileObject
+                );
+                CombatFeedbackPool.Recycle(projectileObject);
+            }
         }
         else
         {
-            SpawnFallbackProjectile(muzzlePos, fireDirection, resolvedDamage);
+            SpawnFallbackProjectile(
+                muzzlePos,
+                fireDirection,
+                resolvedDamage,
+                result.IsCritical
+            );
         }
 
         TriggerMuzzleFlash(muzzlePos, muzzleRot);
@@ -420,6 +545,30 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             : fallback;
     }
 
+    private static float ClampDamageMultiplier(float value, float fallback)
+    {
+        if (float.IsNaN(value))
+        {
+            return fallback;
+        }
+
+        if (float.IsPositiveInfinity(value))
+        {
+            return MaximumDamageMultiplier;
+        }
+
+        if (float.IsNegativeInfinity(value))
+        {
+            return MinimumDamageMultiplier;
+        }
+
+        return Mathf.Clamp(
+            value,
+            MinimumDamageMultiplier,
+            MaximumDamageMultiplier
+        );
+    }
+
     private void EnsureRuntimeState()
     {
         if (runtimeState == null)
@@ -442,6 +591,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         runtimeState.ReloadCancelled += HandleReloadCancelled;
         runtimeState.ManualCycleStarted += HandleCycleStarted;
         runtimeState.ManualCycleCompleted += HandleCycleCompleted;
+        runtimeState.ManualCycleCancelled += HandleCycleCancelled;
     }
 
     private void DetachRuntimeEvents()
@@ -458,6 +608,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         runtimeState.ReloadCancelled -= HandleReloadCancelled;
         runtimeState.ManualCycleStarted -= HandleCycleStarted;
         runtimeState.ManualCycleCompleted -= HandleCycleCompleted;
+        runtimeState.ManualCycleCancelled -= HandleCycleCancelled;
     }
 
     private void RaiseAmmunitionChanged()
@@ -493,6 +644,11 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private void HandleCycleCompleted()
     {
         CycleCompleted?.Invoke();
+    }
+
+    private void HandleCycleCancelled()
+    {
+        CycleCancelled?.Invoke();
     }
 
     private void TriggerMuzzleFlash(Vector3 position, Quaternion rotation)
@@ -577,65 +733,118 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private void SpawnFallbackProjectile(
         Vector3 position,
         Vector3 direction,
-        float resolvedDamage
+        float resolvedDamage,
+        bool isCritical
     )
     {
-        GameObject projObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        projObj.name = "Player Projectile";
-        projObj.transform.position = position;
-        projObj.transform.rotation = Quaternion.LookRotation(direction);
+        GameObject template = GetOrCreateFallbackProjectileTemplate();
+        GameObject projObj = CombatFeedbackPool.Spawn(
+            template,
+            position,
+            Quaternion.LookRotation(direction)
+        );
+        if (projObj == null)
+        {
+            return;
+        }
+
         projObj.transform.localScale =
             Vector3.one * (activeConfiguration.ProjectileRadius * 2f);
 
-        SphereCollider col = projObj.GetComponent<SphereCollider>();
-        if (col != null)
+        PlayerProjectile proj = projObj.GetComponent<PlayerProjectile>();
+        if (proj == null)
         {
-            col.isTrigger = true;
+            CombatFeedbackPool.Recycle(projObj);
+            return;
         }
 
-        Renderer rend = projObj.GetComponent<Renderer>();
-        if (rend != null)
-        {
-            rend.material.color = aimingReticleColor;
-        }
-
-        PlayerProjectile proj = projObj.AddComponent<PlayerProjectile>();
         proj.Initialize(
             direction,
             activeConfiguration.ProjectileSpeed,
             resolvedDamage,
             activeConfiguration.ProjectileLifetimeSeconds,
             activeConfiguration.ProjectileRadius,
-            transform
+            transform,
+            isCritical
         );
+        proj.DamageResolved += RaiseDamageResolved;
+    }
+
+    private void RaiseDamageResolved(DamageResult result)
+    {
+        DamageResolved?.Invoke(result);
+    }
+
+    private GameObject GetOrCreateFallbackProjectileTemplate()
+    {
+        if (fallbackProjectileTemplate != null)
+        {
+            return fallbackProjectileTemplate;
+        }
+
+        GameObject template = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        template.name = "PlayerProjectileFallbackTemplate";
+        template.hideFlags = HideFlags.HideAndDontSave;
+
+        Collider collider = template.GetComponent<Collider>();
+        if (collider != null)
+        {
+            collider.enabled = false;
+        }
+
+        Renderer rend = template.GetComponent<Renderer>();
+        if (rend != null)
+        {
+            rend.material.color = aimingReticleColor;
+        }
+
+        template.AddComponent<PlayerProjectile>();
+        template.SetActive(false);
+        fallbackProjectileTemplate = template;
+        return fallbackProjectileTemplate;
     }
 
     private bool IsFireRequested()
     {
-        bool semiAutomatic =
-            activeConfiguration?.TriggerMode == WeaponTriggerMode.SemiAutomatic;
-
-#if ENABLE_INPUT_SYSTEM
-        if (Mouse.current == null)
+        if (controller != null && controller.IsPrimaryFireSuppressed)
         {
             return false;
         }
 
+        bool semiAutomatic =
+            activeConfiguration?.TriggerMode == WeaponTriggerMode.SemiAutomatic;
+        PowerSuitInputSnapshot input = ReadInputSnapshot();
         return semiAutomatic
-            ? Mouse.current.leftButton.wasPressedThisFrame
-            : Mouse.current.leftButton.isPressed;
-#else
-        return semiAutomatic ? Input.GetMouseButtonDown(0) : Input.GetMouseButton(0);
-#endif
+            ? input.FirePressed
+            : input.FireHeld;
     }
 
-    private static bool IsReloadPressed()
+    private bool IsReloadPressed()
     {
-#if ENABLE_INPUT_SYSTEM
-        return Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
-#else
-        return Input.GetKeyDown(KeyCode.R);
-#endif
+        return ReadInputSnapshot().ReloadPressed;
+    }
+
+    private PowerSuitInputSnapshot ReadInputSnapshot()
+    {
+        if (
+            inputRouter != null &&
+            inputRouter.TryGetCurrentSnapshot(
+                out PowerSuitInputSnapshot routedInput
+            )
+        )
+        {
+            return routedInput;
+        }
+
+        int frame = Time.frameCount;
+        if (fallbackInputFrame != frame)
+        {
+            fallbackInputSnapshot =
+                PowerSuitInputRouter.ReadFallbackSnapshot();
+            fallbackInputFrame = frame;
+        }
+
+        return fallbackInputSnapshot;
     }
 
     private void OnGUI()

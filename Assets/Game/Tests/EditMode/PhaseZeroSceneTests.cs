@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -11,11 +12,40 @@ namespace Powersuit.Tests.EditMode
         private const string ScenePath = "Assets/Scenes/FlightPrototype.unity";
 
         [Test]
-        public void FlightPrototype_IsEnabledAsFirstBuildScene()
+        public void PhaseZeroBuilder_IsExplicitOnly()
         {
-            Assert.That(EditorBuildSettings.scenes, Is.Not.Empty);
-            Assert.That(EditorBuildSettings.scenes[0].path, Is.EqualTo(ScenePath));
-            Assert.That(EditorBuildSettings.scenes[0].enabled, Is.True);
+            Type builderType = GetEditorType(
+                "Powersuit.Editor.PhaseZeroSceneBuilder"
+            );
+
+            Assert.That(
+                Attribute.IsDefined(
+                    builderType,
+                    typeof(InitializeOnLoadAttribute)
+                ),
+                Is.False,
+                "Phase 0 setup must not run automatically when editor assemblies load."
+            );
+        }
+
+        [Test]
+        public void PhaseZeroDevelopmentBuildOptions_DoNotMutateBuildProfile()
+        {
+            string[] before = CaptureBuildProfile();
+            Type builderType = GetEditorType(
+                "Powersuit.Editor.PhaseZeroSceneBuilder"
+            );
+
+            object result = builderType
+                .GetMethod("CreateDevelopmentBuildOptions")
+                ?.Invoke(null, new object[] { "Build/Windows/Powersuit.exe" });
+            Assert.That(result, Is.TypeOf<BuildPlayerOptions>());
+            BuildPlayerOptions options = (BuildPlayerOptions)result;
+
+            Assert.That(options.scenes, Is.EqualTo(new[] { ScenePath }));
+            Assert.That(options.target, Is.EqualTo(BuildTarget.StandaloneWindows64));
+            Assert.That(options.options, Is.EqualTo(BuildOptions.Development));
+            Assert.That(CaptureBuildProfile(), Is.EqualTo(before));
         }
 
         [Test]
@@ -75,6 +105,25 @@ namespace Powersuit.Tests.EditMode
             }
 
             return null;
+        }
+
+        private static string[] CaptureBuildProfile()
+        {
+            EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
+            string[] snapshot = new string[scenes.Length];
+            for (int index = 0; index < scenes.Length; index++)
+            {
+                snapshot[index] = $"{scenes[index].path}|{scenes[index].enabled}";
+            }
+
+            return snapshot;
+        }
+
+        private static Type GetEditorType(string fullName)
+        {
+            Type type = Type.GetType($"{fullName}, Assembly-CSharp-Editor");
+            Assert.That(type, Is.Not.Null, fullName);
+            return type;
         }
     }
 }

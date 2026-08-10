@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
@@ -29,6 +30,38 @@ namespace Powersuit.Tests.EditMode
 
         private const string DemoScenePath =
             "Assets/Scenes/PoweredSuitAimDemo.unity";
+
+        [Test]
+        public void Generator109_DemoSceneOwnershipPolicyIsNonDestructive()
+        {
+            Type integrationType = Type.GetType(
+                "Powersuit.Editor.PoweredSuitGenerator109Integration, " +
+                "Assembly-CSharp-Editor"
+            );
+            Assert.That(integrationType, Is.Not.Null);
+
+            System.Reflection.MethodInfo resolveMethod =
+                integrationType.GetMethod("ResolveDemoSceneHandling");
+            Assert.That(resolveMethod, Is.Not.Null);
+
+            object preserveExisting = resolveMethod.Invoke(
+                null,
+                new object[] { true }
+            );
+            object createAndPopulate = resolveMethod.Invoke(
+                null,
+                new object[] { false }
+            );
+
+            Assert.That(
+                preserveExisting?.ToString(),
+                Is.EqualTo("PreserveExisting")
+            );
+            Assert.That(
+                createAndPopulate?.ToString(),
+                Is.EqualTo("CreateAndPopulate")
+            );
+        }
 
         [Test]
         public void Generator109_ImporterContainsOnlyRequiredGameplayContent()
@@ -274,6 +307,18 @@ namespace Powersuit.Tests.EditMode
                 Is.EqualTo(74f).Within(0.001f)
             );
             Assert.That(
+                controllerSettings.FindProperty("boostCameraDistance").floatValue,
+                Is.EqualTo(12f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("boostCameraHeight").floatValue,
+                Is.EqualTo(1.8f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("boostFieldOfView").floatValue,
+                Is.EqualTo(82f).Within(0.001f)
+            );
+            Assert.That(
                 controllerSettings.FindProperty("cameraCollisionPadding").floatValue,
                 Is.EqualTo(0.05f).Within(0.001f)
             );
@@ -301,6 +346,15 @@ namespace Powersuit.Tests.EditMode
                 controllerSettings.FindProperty("aimFieldOfView").floatValue,
                 Is.EqualTo(62f).Within(0.001f)
             );
+            Assert.That(
+                controllerSettings.FindProperty("scopeEyeRelief").floatValue,
+                Is.EqualTo(0.045f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("scopedNearClipPlane").floatValue,
+                Is.EqualTo(0.02f).Within(0.001f)
+            );
+            Assert.That(player.GetComponent("PowerSuitInputRouter"), Is.Not.Null);
 
             GameObject basePlayer =
                 AssetDatabase.LoadAssetAtPath<GameObject>(BasePlayerPrefabPath);
@@ -336,6 +390,15 @@ namespace Powersuit.Tests.EditMode
 
             Transform visual = player.transform.Find("PowerSuitVisual_Generator109");
             Assert.That(visual, Is.Not.Null);
+            Component visualResponse =
+                player.GetComponent("PowerSuitVisualFlightResponse");
+            Assert.That(visualResponse, Is.Not.Null);
+            Assert.That(
+                visualResponse.GetType().GetProperty("VisualRoot")
+                    ?.GetValue(visualResponse),
+                Is.EqualTo(visual),
+                "Flight attitude must affect only the dedicated visual wrapper."
+            );
             Assert.That(
                 Quaternion.Angle(
                     visual.localRotation,
@@ -395,6 +458,15 @@ namespace Powersuit.Tests.EditMode
                 definition.GetType().GetProperty("MagazineCapacity")?.GetValue(definition),
                 Is.EqualTo(5)
             );
+            Assert.That(
+                definition.GetType().GetProperty("SupportsScope")?.GetValue(definition),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                definition.GetType().GetProperty("ScopedFieldOfViewDegrees")
+                    ?.GetValue(definition),
+                Is.EqualTo(28f).Within(0.001f)
+            );
             Assert.That(player.GetComponent("PowerSuitWeaponPresentation"), Is.Not.Null);
             Assert.That(player.GetComponent("PowerSuitWeaponAnimationDriver"), Is.Not.Null);
             Transform muzzle = weapon.GetType()
@@ -410,21 +482,55 @@ namespace Powersuit.Tests.EditMode
                 Is.LessThan(0.1f),
                 "The muzzle adapter must map the imported +Y bore to Unity forward."
             );
+
+            Transform scopePoint = suitController.GetType()
+                .GetProperty("ScopePoint")
+                ?.GetValue(suitController) as Transform;
+            Assert.That(scopePoint, Is.Not.Null);
+            Assert.That(scopePoint.name, Is.EqualTo("WeaponScopePoint"));
+            Assert.That(scopePoint.parent, Is.Not.Null);
+            Assert.That(scopePoint.parent.name, Is.EqualTo("Rifle_SightOcular"));
+            Assert.That(scopePoint.localPosition, Is.EqualTo(Vector3.zero));
+            Assert.That(
+                Quaternion.Angle(
+                    scopePoint.localRotation,
+                    Quaternion.Euler(-90f, 0f, 0f)
+                ),
+                Is.LessThan(0.1f),
+                "The scope adapter must map the imported +Y optic axis to Unity forward."
+            );
         }
 
         [Test]
-        public void Generator109_DemoHasSafeSpawnsAndRequiredObjects()
+        public void Generator109_DemoRetainsCanonicalPlayerVariantAndSafeSpawns()
         {
-            Scene scene = EditorSceneManager.OpenScene(DemoScenePath, OpenSceneMode.Additive);
+            Scene scene = SceneManager.GetSceneByPath(DemoScenePath);
+            bool closeWhenFinished = !scene.IsValid() || !scene.isLoaded;
+            if (closeWhenFinished)
+            {
+                scene = EditorSceneManager.OpenScene(
+                    DemoScenePath,
+                    OpenSceneMode.Additive
+                );
+            }
+
             try
             {
                 GameObject player = FindRoot(scene, "Generator 109 Player");
                 GameObject enemies = FindRoot(scene, "Test Enemies");
 
                 Assert.That(player, Is.Not.Null);
-                Assert.That(enemies, Is.Not.Null);
-                Assert.That(enemies.transform.childCount, Is.EqualTo(3));
                 Assert.That(FindRoot(scene, "Main Camera")?.GetComponent<Camera>(), Is.Not.Null);
+
+                Assert.That(
+                    PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(player),
+                    Is.EqualTo(PlayerVariantPath)
+                );
+
+                if (enemies == null)
+                {
+                    return;
+                }
 
                 foreach (Transform enemy in enemies.transform)
                 {
@@ -437,7 +543,7 @@ namespace Powersuit.Tests.EditMode
             }
             finally
             {
-                if (scene.IsValid() && scene.isLoaded)
+                if (closeWhenFinished && scene.IsValid() && scene.isLoaded)
                 {
                     EditorSceneManager.CloseScene(scene, true);
                 }

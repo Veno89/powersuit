@@ -8,13 +8,23 @@ using UnityEditor.Animations;
 using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Powersuit.Abilities.UnityAdapters;
 using Powersuit.Combat;
+using Powersuit.DeveloperConsole.Integration;
+using Powersuit.DeveloperConsole.UnityAdapters;
 
 namespace Powersuit.Editor
 {
     public static class PoweredSuitGenerator109Integration
     {
+        public enum DemoSceneHandling
+        {
+            PreserveExisting,
+            CreateAndPopulate
+        }
+
         public const string ModelPath =
             "Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx";
 
@@ -43,6 +53,17 @@ namespace Powersuit.Editor
 
         private const string PrecisionRifleDefinitionPath =
             "Assets/Game/Content/Weapons/PrecisionRifle.asset";
+
+        private const string AbilityPrefabFolder =
+            "Assets/Game/Prefab/Abilities";
+        private const string RocketPrefabPath =
+            AbilityPrefabFolder + "/ShoulderRocketProjectile.prefab";
+        private const string LightningPrefabPath =
+            AbilityPrefabFolder + "/LightningStrikeActor.prefab";
+        private const string VoidPrefabPath =
+            AbilityPrefabFolder + "/VoidOrbFieldActor.prefab";
+        private const string TargetIndicatorPrefabPath =
+            AbilityPrefabFolder + "/AbilityTargetIndicator.prefab";
 
         // Generator 111's carrier-bone FBX imports Blender up as Unity -Z and
         // Blender forward as Unity +Y. Correct both axes on a wrapper above the
@@ -159,26 +180,125 @@ namespace Powersuit.Editor
             }
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            ConfigurePrecisionRifleDefinition();
+            SceneAsset importedDemoScene =
+                AssetDatabase.LoadAssetAtPath<SceneAsset>(DemoScenePath);
+            bool demoSceneExistsOnDisk = File.Exists(
+                Path.Combine(
+                    Directory.GetParent(Application.dataPath)?.FullName ?? ".",
+                    DemoScenePath
+                )
+            );
+            if (demoSceneExistsOnDisk && importedDemoScene == null)
+            {
+                throw new InvalidOperationException(
+                    "PoweredSuitAimDemo exists on disk but Unity cannot import it. " +
+                    "Integration stopped rather than overwriting that scene."
+                );
+            }
+
+            bool demoSceneExists = importedDemoScene != null;
+            DemoSceneHandling sceneHandling = ResolveDemoSceneHandling(
+                demoSceneExists
+            );
+
+            ConfigurePrecisionRifleDefinition(overwriteExisting: false);
             ConfigureModelImporter();
             Dictionary<string, AnimationClip> clips = LoadRequiredClips();
             AnimatorController controller = UpdateAnimatorController(clips);
 
-            CreateEmptyDemoScene();
-            CombatFeedbackSetup.SetUpCombatFeedback();
-            ValidateCombatFeedbackAssets();
+            Scene previousActiveScene = SceneManager.GetActiveScene();
+            Scene generatedDemoScene = default;
+            bool integrationSucceeded = false;
+            try
+            {
+                // Integration validates its dependencies but never invokes the
+                // broad legacy setup command, which also rewrites loaded scenes
+                // and unrelated prefabs. Missing feedback assets must be created
+                // explicitly before integration.
+                ValidateCombatFeedbackAssets();
 
-            ConfigureBasePlayerCamera();
-            GameObject variant = CreatePlayerVariant(controller);
-            PopulateDemoScene(variant);
+                AbilityPrefabSet abilityPrefabs =
+                    CreateOrUpdateAbilityPrefabs();
+                PowerSuitDemoEnemyContentGenerator.GeneratedContent
+                    enemyContent =
+                        PowerSuitDemoEnemyContentGenerator.Generate();
+                GameObject variant = CreatePlayerVariant(
+                    controller,
+                    abilityPrefabs,
+                    enemyContent.CombatSandboxPrefab
+                );
+                if (sceneHandling == DemoSceneHandling.CreateAndPopulate)
+                {
+                    // Defer creation until every required generated asset and
+                    // prefab has succeeded. A failed run therefore cannot leave
+                    // an empty scene that later runs mistake for user content.
+                    generatedDemoScene = CreateEmptyDemoScene();
+                    PopulateDemoScene(variant, generatedDemoScene);
+                }
 
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            ValidateIntegratedAssets();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                ValidateIntegratedAssets();
+                integrationSucceeded = true;
+            }
+            finally
+            {
+                if (
+                    previousActiveScene.IsValid() &&
+                    previousActiveScene.isLoaded
+                )
+                {
+                    SceneManager.SetActiveScene(previousActiveScene);
+                }
+
+                if (
+                    generatedDemoScene.IsValid() &&
+                    generatedDemoScene.isLoaded
+                )
+                {
+                    EditorSceneManager.CloseScene(generatedDemoScene, true);
+                }
+
+                if (
+                    sceneHandling == DemoSceneHandling.CreateAndPopulate &&
+                    !integrationSucceeded &&
+                    (
+                        AssetDatabase.LoadAssetAtPath<SceneAsset>(DemoScenePath) !=
+                        null ||
+                        File.Exists(
+                            Path.Combine(
+                                Directory.GetParent(Application.dataPath)?.FullName ?? ".",
+                                DemoScenePath
+                            )
+                        )
+                    )
+                )
+                {
+                    AssetDatabase.DeleteAsset(DemoScenePath);
+                }
+            }
 
             Debug.Log(
                 "[Powersuit] Generator 109 integration complete. " +
-                $"Demo scene: {DemoScenePath}"
+                $"Demo scene: {DemoScenePath} ({sceneHandling})."
+            );
+        }
+
+        public static DemoSceneHandling ResolveDemoSceneHandling(
+            bool demoSceneExists
+        )
+        {
+            return demoSceneExists
+                ? DemoSceneHandling.PreserveExisting
+                : DemoSceneHandling.CreateAndPopulate;
+        }
+
+        [MenuItem("Tools/Powered Suit/Apply Recommended Camera And Rifle Tuning")]
+        public static void ApplyRecommendedTuning()
+        {
+            ConfigurePrecisionRifleDefinition(overwriteExisting: true);
+            ConfigureBasePlayerCamera();
+            Debug.Log(
+                "[Powersuit] Applied the recommended camera and Precision Rifle tuning."
             );
         }
 
@@ -282,7 +402,9 @@ namespace Powersuit.Editor
             importer.SaveAndReimport();
         }
 
-        private static void ConfigurePrecisionRifleDefinition()
+        private static void ConfigurePrecisionRifleDefinition(
+            bool overwriteExisting
+        )
         {
             WeaponDefinition definition =
                 AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
@@ -292,6 +414,10 @@ namespace Powersuit.Editor
             {
                 definition = ScriptableObject.CreateInstance<WeaponDefinition>();
                 AssetDatabase.CreateAsset(definition, PrecisionRifleDefinitionPath);
+            }
+            else if (!overwriteExisting)
+            {
+                return;
             }
 
             SerializedObject serialized = new SerializedObject(definition);
@@ -319,9 +445,23 @@ namespace Powersuit.Editor
             SetFloat(serialized, "aimRecoilYaw", 0.25f);
             SetFloat(serialized, "hipRecoilPitch", 1.6f);
             SetFloat(serialized, "hipRecoilYaw", 0.5f);
+            SetBool(serialized, "supportsScope", true);
+            SetFloat(serialized, "shoulderFieldOfViewDegrees", 62f);
+            SetFloat(serialized, "scopedFieldOfViewDegrees", 28f);
+            SetFloat(
+                serialized,
+                "shoulderLookSensitivityMultiplier",
+                0.75f
+            );
+            SetFloat(
+                serialized,
+                "scopedLookSensitivityMultiplier",
+                0.35f
+            );
+            SetFloat(serialized, "aimTransitionSharpness", 12f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(definition);
         }
 
         private static bool MatchesImportedClipName(
@@ -721,7 +861,7 @@ namespace Powersuit.Editor
             AddExitTransition(cycle, noBoltCycle);
 
             EditorUtility.SetDirty(controller);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(controller);
             return controller;
         }
 
@@ -796,6 +936,7 @@ namespace Powersuit.Editor
             }
 
             EditorUtility.SetDirty(target);
+            AssetDatabase.SaveAssetIfDirty(target);
             return target;
         }
 
@@ -812,7 +953,7 @@ namespace Powersuit.Editor
             settings.additiveReferencePoseTime = 0f;
             AnimationUtility.SetAnimationClipSettings(target, settings);
             EditorUtility.SetDirty(target);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(target);
             return target;
         }
 
@@ -889,6 +1030,7 @@ namespace Powersuit.Editor
             }
 
             EditorUtility.SetDirty(mask);
+            AssetDatabase.SaveAssetIfDirty(mask);
             return mask;
         }
 
@@ -999,16 +1141,181 @@ namespace Powersuit.Editor
             transition.orderedInterruption = true;
         }
 
-        private static void CreateEmptyDemoScene()
+        private static Scene CreateEmptyDemoScene()
         {
-            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            Scene scene = EditorSceneManager.NewScene(
+                NewSceneSetup.EmptyScene,
+                NewSceneMode.Additive
+            );
             if (!EditorSceneManager.SaveScene(scene, DemoScenePath))
             {
+                EditorSceneManager.CloseScene(scene, true);
                 throw new InvalidOperationException("Could not create the Generator 109 demo scene.");
+            }
+
+            return scene;
+        }
+
+        private static AbilityPrefabSet CreateOrUpdateAbilityPrefabs()
+        {
+            EnsureAssetFolder(AbilityPrefabFolder);
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
+
+            try
+            {
+                GameObject rocketObject = GameObject.CreatePrimitive(
+                    PrimitiveType.Capsule
+                );
+                SceneManager.MoveGameObjectToScene(
+                    rocketObject,
+                    previewScene
+                );
+                rocketObject.name = "ShoulderRocketProjectile";
+                rocketObject.transform.localScale =
+                    new Vector3(0.14f, 0.28f, 0.14f);
+                UnityEngine.Object.DestroyImmediate(
+                    rocketObject.GetComponent<Collider>()
+                );
+                ShoulderRocketProjectile rocket =
+                    rocketObject.AddComponent<ShoulderRocketProjectile>();
+                TrailRenderer rocketTrail =
+                    rocketObject.AddComponent<TrailRenderer>();
+                rocketTrail.time = 0.28f;
+                rocketTrail.startWidth = 0.12f;
+                rocketTrail.endWidth = 0.01f;
+                GameObject rocketPrefab = PrefabUtility.SaveAsPrefabAsset(
+                    rocketObject,
+                    RocketPrefabPath
+                );
+                UnityEngine.Object.DestroyImmediate(rocketObject);
+
+                GameObject lightningObject = new GameObject(
+                    "LightningStrikeActor"
+                );
+                SceneManager.MoveGameObjectToScene(
+                    lightningObject,
+                    previewScene
+                );
+                GameObject lightningVisual = GameObject.CreatePrimitive(
+                    PrimitiveType.Cylinder
+                );
+                SceneManager.MoveGameObjectToScene(
+                    lightningVisual,
+                    previewScene
+                );
+                lightningVisual.name = "LightningAreaVisual";
+                lightningVisual.transform.SetParent(
+                    lightningObject.transform,
+                    false
+                );
+                lightningVisual.transform.localScale =
+                    new Vector3(1f, 0.02f, 1f);
+                UnityEngine.Object.DestroyImmediate(
+                    lightningVisual.GetComponent<Collider>()
+                );
+                LightningStrikeActor lightning =
+                    lightningObject.AddComponent<LightningStrikeActor>();
+                SetObjectReference(
+                    new SerializedObject(lightning),
+                    "visualRoot",
+                    lightningVisual.transform
+                );
+                GameObject lightningPrefab = PrefabUtility.SaveAsPrefabAsset(
+                    lightningObject,
+                    LightningPrefabPath
+                );
+                UnityEngine.Object.DestroyImmediate(lightningObject);
+
+                GameObject voidObject = new GameObject("VoidOrbFieldActor");
+                SceneManager.MoveGameObjectToScene(voidObject, previewScene);
+                GameObject voidVisual = GameObject.CreatePrimitive(
+                    PrimitiveType.Sphere
+                );
+                SceneManager.MoveGameObjectToScene(voidVisual, previewScene);
+                voidVisual.name = "VoidOrbVisual";
+                voidVisual.transform.SetParent(voidObject.transform, false);
+                UnityEngine.Object.DestroyImmediate(
+                    voidVisual.GetComponent<Collider>()
+                );
+                VoidOrbFieldActor voidActor =
+                    voidObject.AddComponent<VoidOrbFieldActor>();
+                SetObjectReference(
+                    new SerializedObject(voidActor),
+                    "visualRoot",
+                    voidVisual.transform
+                );
+                GameObject voidPrefab = PrefabUtility.SaveAsPrefabAsset(
+                    voidObject,
+                    VoidPrefabPath
+                );
+                UnityEngine.Object.DestroyImmediate(voidObject);
+
+                GameObject indicatorObject = GameObject.CreatePrimitive(
+                    PrimitiveType.Cylinder
+                );
+                SceneManager.MoveGameObjectToScene(
+                    indicatorObject,
+                    previewScene
+                );
+                indicatorObject.name = "AbilityTargetIndicator";
+                indicatorObject.transform.localScale =
+                    new Vector3(1f, 0.02f, 1f);
+                UnityEngine.Object.DestroyImmediate(
+                    indicatorObject.GetComponent<Collider>()
+                );
+                AbilityTargetIndicator indicator =
+                    indicatorObject.AddComponent<AbilityTargetIndicator>();
+                GameObject indicatorPrefab = PrefabUtility.SaveAsPrefabAsset(
+                    indicatorObject,
+                    TargetIndicatorPrefabPath
+                );
+                UnityEngine.Object.DestroyImmediate(indicatorObject);
+
+                if (
+                    rocketPrefab == null ||
+                    lightningPrefab == null ||
+                    voidPrefab == null ||
+                    indicatorPrefab == null
+                )
+                {
+                    throw new InvalidOperationException(
+                        "Could not create one or more ability prefabs."
+                    );
+                }
+
+                return new AbilityPrefabSet(
+                    rocketPrefab.GetComponent<ShoulderRocketProjectile>(),
+                    lightningPrefab.GetComponent<LightningStrikeActor>(),
+                    voidPrefab.GetComponent<VoidOrbFieldActor>(),
+                    indicatorPrefab.GetComponent<AbilityTargetIndicator>()
+                );
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(previewScene);
             }
         }
 
-        private static GameObject CreatePlayerVariant(AnimatorController controller)
+        private static void EnsureAssetFolder(string folderPath)
+        {
+            string[] segments = folderPath.Split('/');
+            string current = segments[0];
+            for (int index = 1; index < segments.Length; index++)
+            {
+                string next = current + "/" + segments[index];
+                if (!AssetDatabase.IsValidFolder(next))
+                {
+                    AssetDatabase.CreateFolder(current, segments[index]);
+                }
+                current = next;
+            }
+        }
+
+        private static GameObject CreatePlayerVariant(
+            AnimatorController controller,
+            AbilityPrefabSet abilityPrefabs,
+            GameObject demoWorldPrefab
+        )
         {
             GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BasePlayerPrefabPath);
             GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
@@ -1017,14 +1324,22 @@ namespace Powersuit.Editor
                 throw new InvalidOperationException("The base player prefab or Generator 109 model is missing.");
             }
 
-            GameObject instance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
-            if (instance == null)
-            {
-                throw new InvalidOperationException("Could not instantiate the base player prefab.");
-            }
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
+            GameObject instance = null;
 
             try
             {
+                instance = PrefabUtility.InstantiatePrefab(
+                    basePrefab,
+                    previewScene
+                ) as GameObject;
+                if (instance == null)
+                {
+                    throw new InvalidOperationException(
+                        "Could not instantiate the base player prefab."
+                    );
+                }
+
                 instance.name = "PlayerPrototype_Generator109";
                 RemoveLegacyVisuals(instance.transform);
 
@@ -1067,10 +1382,24 @@ namespace Powersuit.Editor
 
                 Transform muzzle = FindChildRecursive(modelInstance.transform, "Rifle_Muzzle");
                 Transform rifleRoot = FindChildRecursive(modelInstance.transform, "RifleRoot");
-                if (muzzle == null || rifleRoot == null)
+                Transform sightOcular = FindChildRecursive(
+                    modelInstance.transform,
+                    "Rifle_SightOcular"
+                );
+                Transform shoulder = FindChildRecursive(
+                    modelInstance.transform,
+                    "Shoulder.R"
+                );
+                if (
+                    muzzle == null ||
+                    rifleRoot == null ||
+                    sightOcular == null ||
+                    shoulder == null
+                )
                 {
                     throw new InvalidOperationException(
-                        "The imported Generator 111 hierarchy does not expose RifleRoot/Rifle_Muzzle."
+                        "The imported Generator 111 hierarchy does not expose " +
+                        "RifleRoot/Rifle_Muzzle/Rifle_SightOcular/Shoulder.R."
                     );
                 }
 
@@ -1087,6 +1416,13 @@ namespace Powersuit.Editor
                 }
 
                 ConfigureAimCamera(suitController, 2.2f);
+                suitController.ScopePoint = CreateScopeAdapter(sightOcular);
+                PowerSuitInputRouter inputRouter =
+                    instance.GetComponent<PowerSuitInputRouter>();
+                if (inputRouter == null)
+                {
+                    inputRouter = instance.AddComponent<PowerSuitInputRouter>();
+                }
                 PowerSuitFramePacing framePacing =
                     instance.GetComponent<PowerSuitFramePacing>();
                 if (framePacing == null)
@@ -1121,6 +1457,134 @@ namespace Powersuit.Editor
                     weaponAnimationDriver =
                         instance.AddComponent<PowerSuitWeaponAnimationDriver>();
                 }
+
+                PowerSuitVisualFlightResponse visualFlightResponse =
+                    instance.GetComponent<PowerSuitVisualFlightResponse>();
+                if (visualFlightResponse == null)
+                {
+                    visualFlightResponse =
+                        instance.AddComponent<PowerSuitVisualFlightResponse>();
+                }
+                visualFlightResponse.VisualRoot = visualWrapper.transform;
+
+                ShoulderRocketAbility shoulderRocket =
+                    instance.GetComponent<ShoulderRocketAbility>();
+                if (shoulderRocket == null)
+                {
+                    shoulderRocket =
+                        instance.AddComponent<ShoulderRocketAbility>();
+                }
+                LightningStrikeAbility lightningStrike =
+                    instance.GetComponent<LightningStrikeAbility>();
+                if (lightningStrike == null)
+                {
+                    lightningStrike =
+                        instance.AddComponent<LightningStrikeAbility>();
+                }
+                VoidUltimateAbility voidUltimate =
+                    instance.GetComponent<VoidUltimateAbility>();
+                if (voidUltimate == null)
+                {
+                    voidUltimate = instance.AddComponent<VoidUltimateAbility>();
+                }
+
+                Transform shoulderMuzzle = CreateShoulderMuzzle(shoulder);
+                GameObject indicatorObject = PrefabUtility.InstantiatePrefab(
+                    abilityPrefabs.TargetIndicator.gameObject,
+                    instance.transform
+                ) as GameObject;
+                AbilityTargetIndicator targetIndicator =
+                    indicatorObject != null
+                        ? indicatorObject.GetComponent<AbilityTargetIndicator>()
+                        : null;
+                if (targetIndicator == null)
+                {
+                    throw new InvalidOperationException(
+                        "Could not instantiate the ability target indicator."
+                    );
+                }
+                indicatorObject.name = "AbilityTargetIndicator";
+
+                PowerSuitAbilityController abilityController =
+                    instance.GetComponent<PowerSuitAbilityController>();
+                if (abilityController == null)
+                {
+                    abilityController =
+                        instance.AddComponent<PowerSuitAbilityController>();
+                }
+                abilityController.Configure(
+                    suitController,
+                    inputRouter,
+                    instance.GetComponent<PlayerHealth>(),
+                    weapon,
+                    shoulderRocket,
+                    lightningStrike,
+                    voidUltimate,
+                    shoulderMuzzle,
+                    targetIndicator,
+                    abilityPrefabs.Rocket,
+                    abilityPrefabs.Lightning,
+                    abilityPrefabs.VoidField
+                );
+
+                PowerSuitHudPresenter hudPresenter = CreatePlayerHud(
+                    instance,
+                    instance.GetComponent<PlayerHealth>(),
+                    weapon,
+                    shoulderRocket,
+                    lightningStrike,
+                    voidUltimate
+                );
+                if (demoWorldPrefab == null)
+                {
+                    throw new InvalidOperationException(
+                        "The generated PowerSuit combat sandbox prefab is missing."
+                    );
+                }
+
+                PowerSuitDemoBootstrap demoBootstrap =
+                    instance.GetComponent<PowerSuitDemoBootstrap>();
+                if (demoBootstrap == null)
+                {
+                    demoBootstrap = instance.AddComponent<
+                        PowerSuitDemoBootstrap
+                    >();
+                }
+                demoBootstrap.ConfigureForPlayerPrefab(
+                    demoWorldPrefab,
+                    instance.transform,
+                    hudPresenter,
+                    shouldInitializeOnStart: true
+                );
+                DeveloperConsoleOverlay consoleOverlay =
+                    ConfigureDeveloperConsole(
+                    instance,
+                    inputRouter,
+                    suitController,
+                    weapon,
+                    presentation,
+                    abilityController
+                );
+                DeveloperConsoleGameplayCommandPack consoleCommands =
+                    instance.GetComponent<
+                        DeveloperConsoleGameplayCommandPack
+                    >();
+                if (consoleCommands == null)
+                {
+                    consoleCommands = instance.AddComponent<
+                        DeveloperConsoleGameplayCommandPack
+                    >();
+                }
+                consoleCommands.Configure(
+                    consoleOverlay,
+                    instance.GetComponent<PlayerHealth>(),
+                    suitController,
+                    weapon,
+                    abilityController,
+                    shoulderRocket,
+                    lightningStrike,
+                    voidUltimate
+                );
 
                 SerializedObject driverObject = new SerializedObject(animationDriver);
                 driverObject.FindProperty("controller").objectReferenceValue = suitController;
@@ -1160,7 +1624,12 @@ namespace Powersuit.Editor
             }
             finally
             {
-                UnityEngine.Object.DestroyImmediate(instance);
+                if (instance != null)
+                {
+                    UnityEngine.Object.DestroyImmediate(instance);
+                }
+
+                EditorSceneManager.ClosePreviewScene(previewScene);
             }
         }
 
@@ -1223,6 +1692,26 @@ namespace Powersuit.Editor
             return adapter.transform;
         }
 
+        private static Transform CreateScopeAdapter(Transform importedOcular)
+        {
+            GameObject adapter = new GameObject("WeaponScopePoint");
+            adapter.transform.SetParent(importedOcular, false);
+            adapter.transform.localPosition = Vector3.zero;
+            adapter.transform.localRotation = MuzzleAdapterRotation;
+            adapter.transform.localScale = Vector3.one;
+            return adapter.transform;
+        }
+
+        private static Transform CreateShoulderMuzzle(Transform shoulder)
+        {
+            GameObject muzzle = new GameObject("ShoulderMuzzle");
+            muzzle.transform.SetParent(shoulder, false);
+            muzzle.transform.localPosition = Vector3.zero;
+            muzzle.transform.localRotation = Quaternion.identity;
+            muzzle.transform.localScale = Vector3.one;
+            return muzzle.transform;
+        }
+
         private static void ConfigureAimCamera(
             PowerSuitController controller,
             float walkSpeed
@@ -1236,6 +1725,9 @@ namespace Powersuit.Editor
             SetFloat(serialized, "flightCameraDistance", 11f);
             SetFloat(serialized, "flightCameraHeight", 1.75f);
             SetFloat(serialized, "flightFieldOfView", 74f);
+            SetFloat(serialized, "boostCameraDistance", 12f);
+            SetFloat(serialized, "boostCameraHeight", 1.8f);
+            SetFloat(serialized, "boostFieldOfView", 82f);
             SetFloat(serialized, "cameraCollisionPadding", 0.05f);
             SetFloat(serialized, "cameraCollisionReleaseSharpness", 14f);
             SetFloat(serialized, "cameraLookSharpness", 28f);
@@ -1247,6 +1739,8 @@ namespace Powersuit.Editor
             SetVector(serialized, "aimShoulderOffset", new Vector3(-1.2f, 0.05f, 0f));
             SetFloat(serialized, "aimFieldOfView", 62f);
             SetFloat(serialized, "aimTransitionSpeed", 12f);
+            SetFloat(serialized, "scopeEyeRelief", 0.045f);
+            SetFloat(serialized, "scopedNearClipPlane", 0.02f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1257,6 +1751,251 @@ namespace Powersuit.Editor
             SetBool(serialized, "synchronizeToDisplay", true);
             SetInt(serialized, "fallbackTargetFrameRate", 60);
             serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static PowerSuitHudPresenter CreatePlayerHud(
+            GameObject player,
+            PlayerHealth health,
+            PowerSuitWeapon weapon,
+            ShoulderRocketAbility rocket,
+            LightningStrikeAbility lightning,
+            VoidUltimateAbility ultimate
+        )
+        {
+            Transform existing = player.transform.Find("PowerSuitHUD");
+            if (existing != null)
+            {
+                UnityEngine.Object.DestroyImmediate(existing.gameObject);
+            }
+
+            GameObject hudObject = new GameObject(
+                "PowerSuitHUD",
+                typeof(RectTransform),
+                typeof(Canvas),
+                typeof(CanvasScaler),
+                typeof(GraphicRaycaster),
+                typeof(PowerSuitHudPresenter)
+            );
+            hudObject.transform.SetParent(player.transform, false);
+            Canvas canvas = hudObject.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 30;
+            CanvasScaler scaler = hudObject.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            HudWidget healthWidget = CreateHudWidget(
+                hudObject.transform,
+                "Health",
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(30f, -30f),
+                new Vector2(280f, 48f),
+                TextAnchor.MiddleLeft
+            );
+            HudWidget ammoWidget = CreateHudWidget(
+                hudObject.transform,
+                "Ammunition",
+                new Vector2(1f, 0f),
+                new Vector2(1f, 0f),
+                new Vector2(-30f, 30f),
+                new Vector2(260f, 52f),
+                TextAnchor.MiddleCenter
+            );
+            HudWidget reloadWidget = CreateHudWidget(
+                hudObject.transform,
+                "Reload",
+                new Vector2(1f, 0f),
+                new Vector2(1f, 0f),
+                new Vector2(-30f, 90f),
+                new Vector2(260f, 38f),
+                TextAnchor.MiddleCenter
+            );
+            HudWidget rocketWidget = CreateHudWidget(
+                hudObject.transform,
+                "Rocket",
+                new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f),
+                new Vector2(-240f, 30f),
+                new Vector2(210f, 44f),
+                TextAnchor.MiddleCenter
+            );
+            HudWidget lightningWidget = CreateHudWidget(
+                hudObject.transform,
+                "Lightning",
+                new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f),
+                new Vector2(0f, 30f),
+                new Vector2(210f, 44f),
+                TextAnchor.MiddleCenter
+            );
+            HudWidget ultimateWidget = CreateHudWidget(
+                hudObject.transform,
+                "Ultimate",
+                new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f),
+                new Vector2(240f, 30f),
+                new Vector2(210f, 44f),
+                TextAnchor.MiddleCenter
+            );
+
+            PowerSuitHudPresenter presenter =
+                hudObject.GetComponent<PowerSuitHudPresenter>();
+            SerializedObject serialized = new SerializedObject(presenter);
+            SetObjectReference(serialized, "healthSource", health);
+            SetObjectReference(serialized, "weaponSource", weapon);
+            SetObjectReference(serialized, "shoulderRocketSource", rocket);
+            SetObjectReference(serialized, "lightningSource", lightning);
+            SetObjectReference(serialized, "ultimateSource", ultimate);
+            ConfigureHudWidget(
+                serialized,
+                "health",
+                healthWidget
+            );
+            ConfigureHudWidget(
+                serialized,
+                "ammunition",
+                ammoWidget,
+                includeFill: false
+            );
+            ConfigureHudWidget(
+                serialized,
+                "reload",
+                reloadWidget
+            );
+            ConfigureHudWidget(
+                serialized,
+                "shoulderRocket",
+                rocketWidget
+            );
+            ConfigureHudWidget(
+                serialized,
+                "lightning",
+                lightningWidget
+            );
+            ConfigureHudWidget(
+                serialized,
+                "ultimate",
+                ultimateWidget
+            );
+            return presenter;
+        }
+
+        private static HudWidget CreateHudWidget(
+            Transform parent,
+            string name,
+            Vector2 anchor,
+            Vector2 pivot,
+            Vector2 anchoredPosition,
+            Vector2 size,
+            TextAnchor alignment
+        )
+        {
+            GameObject root = new GameObject(
+                name,
+                typeof(RectTransform),
+                typeof(Image)
+            );
+            RectTransform rootRect = root.GetComponent<RectTransform>();
+            rootRect.SetParent(parent, false);
+            rootRect.anchorMin = anchor;
+            rootRect.anchorMax = anchor;
+            rootRect.pivot = pivot;
+            rootRect.anchoredPosition = anchoredPosition;
+            rootRect.sizeDelta = size;
+            Image background = root.GetComponent<Image>();
+            background.color = new Color(0.015f, 0.035f, 0.06f, 0.78f);
+
+            GameObject fillObject = new GameObject(
+                "Fill",
+                typeof(RectTransform),
+                typeof(Image)
+            );
+            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.SetParent(rootRect, false);
+            fillRect.anchorMin = new Vector2(0f, 0f);
+            fillRect.anchorMax = new Vector2(1f, 0f);
+            fillRect.pivot = new Vector2(0f, 0f);
+            fillRect.anchoredPosition = Vector2.zero;
+            fillRect.sizeDelta = new Vector2(0f, 6f);
+            Image fill = fillObject.GetComponent<Image>();
+            fill.color = new Color(0.15f, 0.82f, 1f, 0.95f);
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = 0;
+            fill.fillAmount = 1f;
+
+            GameObject labelObject = new GameObject(
+                "Label",
+                typeof(RectTransform),
+                typeof(Text)
+            );
+            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+            labelRect.SetParent(rootRect, false);
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = new Vector2(10f, 6f);
+            labelRect.offsetMax = new Vector2(-10f, 0f);
+            Text label = labelObject.GetComponent<Text>();
+            label.font = Resources.GetBuiltinResource<Font>(
+                "LegacyRuntime.ttf"
+            );
+            label.fontSize = 17;
+            label.alignment = alignment;
+            label.color = Color.white;
+            label.raycastTarget = false;
+
+            return new HudWidget(root, fill, label);
+        }
+
+        private static void ConfigureHudWidget(
+            SerializedObject serialized,
+            string prefix,
+            HudWidget widget,
+            bool includeFill = true
+        )
+        {
+            SetObjectReference(serialized, prefix + "Root", widget.Root);
+            if (includeFill)
+            {
+                SetObjectReference(serialized, prefix + "Fill", widget.Fill);
+            }
+            SetObjectReference(serialized, prefix + "Label", widget.Label);
+        }
+
+        private static DeveloperConsoleOverlay ConfigureDeveloperConsole(
+            GameObject player,
+            PowerSuitInputRouter inputRouter,
+            PowerSuitController controller,
+            PowerSuitWeapon weapon,
+            PowerSuitWeaponPresentation presentation,
+            PowerSuitAbilityController abilityController
+        )
+        {
+            DeveloperConsoleOverlay overlay =
+                player.GetComponent<DeveloperConsoleOverlay>();
+            if (overlay == null)
+            {
+                overlay = player.AddComponent<DeveloperConsoleOverlay>();
+            }
+
+            SerializedObject serialized = new SerializedObject(overlay);
+            SerializedProperty behaviours = serialized.FindProperty(
+                "gameplayInputBehaviours"
+            );
+            behaviours.arraySize = 5;
+            behaviours.GetArrayElementAtIndex(0).objectReferenceValue =
+                inputRouter;
+            behaviours.GetArrayElementAtIndex(1).objectReferenceValue =
+                controller;
+            behaviours.GetArrayElementAtIndex(2).objectReferenceValue = weapon;
+            behaviours.GetArrayElementAtIndex(3).objectReferenceValue =
+                presentation;
+            behaviours.GetArrayElementAtIndex(4).objectReferenceValue =
+                abilityController;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return overlay;
         }
 
         private static void SetFloat(SerializedObject serialized, string propertyName, float value)
@@ -1339,12 +2078,40 @@ namespace Powersuit.Editor
             property.vector3Value = value;
         }
 
-        private static void PopulateDemoScene(GameObject playerVariant)
+        private static void SetObjectReference(
+            SerializedObject serialized,
+            string propertyName,
+            UnityEngine.Object value
+        )
         {
-            Scene scene = SceneManager.GetActiveScene();
+            SerializedProperty property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException(
+                    $"Missing serialized property: {propertyName}"
+                );
+            }
+            property.objectReferenceValue = value;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void PopulateDemoScene(
+            GameObject playerVariant,
+            Scene scene
+        )
+        {
             if (!scene.IsValid() || scene.path != DemoScenePath)
             {
-                throw new InvalidOperationException("The Generator 109 demo scene is not active.");
+                throw new InvalidOperationException(
+                    "The Generator 109 demo scene is unavailable."
+                );
+            }
+
+            if (!SceneManager.SetActiveScene(scene))
+            {
+                throw new InvalidOperationException(
+                    "Could not activate the isolated Generator 109 demo scene."
+                );
             }
 
             Material groundMaterial = AssetDatabase.LoadAssetAtPath<Material>(
@@ -1751,12 +2518,22 @@ namespace Powersuit.Editor
                 controllerSettings.FindProperty("flightCameraHeight");
             SerializedProperty flightFov =
                 controllerSettings.FindProperty("flightFieldOfView");
+            SerializedProperty boostDistance =
+                controllerSettings.FindProperty("boostCameraDistance");
+            SerializedProperty boostHeight =
+                controllerSettings.FindProperty("boostCameraHeight");
+            SerializedProperty boostFov =
+                controllerSettings.FindProperty("boostFieldOfView");
             SerializedProperty aimDistance =
                 controllerSettings.FindProperty("aimCameraDistance");
             SerializedProperty aimShoulder =
                 controllerSettings.FindProperty("aimShoulderOffset");
             SerializedProperty aimFov =
                 controllerSettings.FindProperty("aimFieldOfView");
+            SerializedProperty scopeEyeRelief =
+                controllerSettings.FindProperty("scopeEyeRelief");
+            SerializedProperty scopedNearClip =
+                controllerSettings.FindProperty("scopedNearClipPlane");
             if (
                 normalDistance == null ||
                 normalHeight == null ||
@@ -1764,9 +2541,14 @@ namespace Powersuit.Editor
                 flightDistance == null ||
                 flightHeight == null ||
                 flightFov == null ||
+                boostDistance == null ||
+                boostHeight == null ||
+                boostFov == null ||
                 aimDistance == null ||
                 aimShoulder == null ||
                 aimFov == null ||
+                scopeEyeRelief == null ||
+                scopedNearClip == null ||
                 normalDistance.floatValue < 9.4f ||
                 normalHeight.floatValue < 1.45f ||
                 normalFov.floatValue < 71f ||
@@ -1775,12 +2557,18 @@ namespace Powersuit.Editor
                 flightHeight.floatValue < normalHeight.floatValue ||
                 flightFov.floatValue < 73f ||
                 flightFov.floatValue < normalFov.floatValue ||
+                boostDistance.floatValue < flightDistance.floatValue ||
+                boostHeight.floatValue < flightHeight.floatValue ||
+                boostFov.floatValue <= flightFov.floatValue ||
                 aimDistance.floatValue < 4.2f ||
                 aimDistance.floatValue >= normalDistance.floatValue ||
                 aimShoulder.vector3Value.x > -1.1f ||
                 Mathf.Abs(aimShoulder.vector3Value.y) > 0.1f ||
                 aimFov.floatValue < 61f ||
-                aimFov.floatValue >= normalFov.floatValue
+                aimFov.floatValue >= normalFov.floatValue ||
+                scopeEyeRelief.floatValue < 0.02f ||
+                scopeEyeRelief.floatValue > 0.1f ||
+                scopedNearClip.floatValue > 0.05f
             )
             {
                 throw new InvalidOperationException(
@@ -1836,6 +2624,94 @@ namespace Powersuit.Editor
                 );
             }
 
+            Transform scopePoint = suitController.ScopePoint;
+            if (
+                scopePoint == null ||
+                scopePoint.name != "WeaponScopePoint" ||
+                scopePoint.parent == null ||
+                scopePoint.parent.name != "Rifle_SightOcular" ||
+                scopePoint.localPosition.sqrMagnitude > 0.000001f ||
+                Quaternion.Angle(
+                    scopePoint.localRotation,
+                    MuzzleAdapterRotation
+                ) > 0.1f ||
+                variant.GetComponent<PowerSuitInputRouter>() == null ||
+                !precisionRifle.SupportsScope ||
+                precisionRifle.ScopedFieldOfViewDegrees >=
+                    precisionRifle.ShoulderFieldOfViewDegrees
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 precision-scope anchor, input router, or " +
+                    "weapon aim profile is invalid."
+                );
+            }
+
+            PowerSuitAbilityController abilityController =
+                variant.GetComponent<PowerSuitAbilityController>();
+            ShoulderRocketAbility rocketAbility =
+                variant.GetComponent<ShoulderRocketAbility>();
+            LightningStrikeAbility lightningAbility =
+                variant.GetComponent<LightningStrikeAbility>();
+            VoidUltimateAbility ultimateAbility =
+                variant.GetComponent<VoidUltimateAbility>();
+            if (
+                abilityController == null ||
+                rocketAbility == null ||
+                lightningAbility == null ||
+                ultimateAbility == null ||
+                abilityController.ShoulderMuzzle == null ||
+                abilityController.ShoulderMuzzle.name != "ShoulderMuzzle" ||
+                abilityController.TargetIndicator == null ||
+                abilityController.RocketProjectilePrefab == null ||
+                abilityController.LightningActorPrefab == null ||
+                abilityController.VoidFieldPrefab == null ||
+                rocketAbility.LaunchPoint != abilityController.ShoulderMuzzle
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 player is missing its configured rocket, " +
+                    "lightning, void, or ability-presentation references."
+                );
+            }
+
+            PowerSuitHudPresenter hud =
+                variant.GetComponentInChildren<PowerSuitHudPresenter>(true);
+            PowerSuitDemoBootstrap demoBootstrap =
+                variant.GetComponent<PowerSuitDemoBootstrap>();
+            GameObject expectedDemoWorld =
+                AssetDatabase.LoadAssetAtPath<GameObject>(
+                    PowerSuitDemoEnemyContentGenerator
+                        .CombatSandboxPrefabPath
+                );
+            DeveloperConsoleOverlay console =
+                variant.GetComponent<DeveloperConsoleOverlay>();
+            DeveloperConsoleGameplayCommandPack commandPack =
+                variant.GetComponent<DeveloperConsoleGameplayCommandPack>();
+            if (
+                hud == null ||
+                hud.HealthSource != variant.GetComponent<PlayerHealth>() ||
+                hud.WeaponSource != weapon ||
+                hud.ShoulderRocketSource != rocketAbility ||
+                hud.LightningSource != lightningAbility ||
+                hud.UltimateSource != ultimateAbility ||
+                demoBootstrap == null ||
+                expectedDemoWorld == null ||
+                demoBootstrap.DemoWorldPrefab != expectedDemoWorld ||
+                demoBootstrap.OwningPlayer != variant.transform ||
+                demoBootstrap.HudPresenter != hud ||
+                console == null ||
+                commandPack == null ||
+                commandPack.ConsoleOverlay != console ||
+                commandPack.AbilityController != abilityController
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 HUD or developer-console command pack is " +
+                    "missing required gameplay bindings."
+                );
+            }
+
             if (
                 variant.GetComponent<PowerSuitWeaponPresentation>() == null ||
                 variant.GetComponent<PowerSuitWeaponAnimationDriver>() == null
@@ -1854,6 +2730,19 @@ namespace Powersuit.Editor
             {
                 throw new InvalidOperationException(
                     "Generator 109 visual wrapper must preserve its runtime facing correction."
+                );
+            }
+
+            PowerSuitVisualFlightResponse visualFlightResponse =
+                variant.GetComponent<PowerSuitVisualFlightResponse>();
+            if (
+                visualFlightResponse == null ||
+                visualFlightResponse.VisualRoot != visual
+            )
+            {
+                throw new InvalidOperationException(
+                    "Generator 109 player must apply flight attitude only to " +
+                    "its dedicated visual wrapper."
                 );
             }
 
@@ -1885,6 +2774,87 @@ namespace Powersuit.Editor
             {
                 throw new InvalidOperationException("Generator 109 demo scene is missing.");
             }
+
+            ValidateDemoSceneContents();
+        }
+
+        private static void ValidateDemoSceneContents()
+        {
+            Scene scene = SceneManager.GetSceneByPath(DemoScenePath);
+            bool closeWhenFinished = !scene.IsValid() || !scene.isLoaded;
+            if (closeWhenFinished)
+            {
+                scene = EditorSceneManager.OpenScene(
+                    DemoScenePath,
+                    OpenSceneMode.Additive
+                );
+            }
+
+            try
+            {
+                GameObject player = scene.GetRootGameObjects()
+                    .FirstOrDefault(root => root.name == "Generator 109 Player");
+                Camera mainCamera = scene.GetRootGameObjects()
+                    .Select(root => root.GetComponent<Camera>())
+                    .FirstOrDefault(camera => camera != null);
+                string playerSourcePath = player != null
+                    ? PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(player)
+                    : string.Empty;
+
+                if (
+                    player == null ||
+                    mainCamera == null ||
+                    playerSourcePath != PlayerVariantPath
+                )
+                {
+                    throw new InvalidOperationException(
+                        "Generator 109 demo scene must retain its main camera " +
+                        "and generated player-variant instance."
+                    );
+                }
+            }
+            finally
+            {
+                if (closeWhenFinished && scene.IsValid() && scene.isLoaded)
+                {
+                    EditorSceneManager.CloseScene(scene, true);
+                }
+            }
+        }
+
+        private readonly struct AbilityPrefabSet
+        {
+            public AbilityPrefabSet(
+                ShoulderRocketProjectile rocket,
+                LightningStrikeActor lightning,
+                VoidOrbFieldActor voidField,
+                AbilityTargetIndicator targetIndicator
+            )
+            {
+                Rocket = rocket;
+                Lightning = lightning;
+                VoidField = voidField;
+                TargetIndicator = targetIndicator;
+            }
+
+            public ShoulderRocketProjectile Rocket { get; }
+            public LightningStrikeActor Lightning { get; }
+            public VoidOrbFieldActor VoidField { get; }
+            public AbilityTargetIndicator TargetIndicator { get; }
+        }
+
+        private readonly struct HudWidget
+        {
+            public HudWidget(GameObject root, Image fill, Text label)
+            {
+                Root = root;
+                Fill = fill;
+                Label = label;
+            }
+
+            public GameObject Root { get; }
+            public Image Fill { get; }
+            public Text Label { get; }
         }
 
         private static Transform FindChildRecursive(Transform root, string name)

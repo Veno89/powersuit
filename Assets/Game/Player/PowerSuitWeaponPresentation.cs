@@ -1,10 +1,6 @@
 using System;
 using UnityEngine;
 
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
-
 public enum PowerSuitWeaponPresentationState
 {
     Ready,
@@ -86,6 +82,18 @@ public sealed class PowerSuitWeaponPresentationStateMachine
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Cancels an active transition and returns directly to a configured stable
+    /// endpoint without replaying draw or sheathe timing.
+    /// </summary>
+    public void Reset(bool resetToStowed)
+    {
+        State = resetToStowed
+            ? PowerSuitWeaponPresentationState.Stowed
+            : PowerSuitWeaponPresentationState.Ready;
+        remainingTransitionTime = 0f;
     }
 
     /// <summary>
@@ -172,13 +180,24 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
     private static readonly int SheatheWeaponTrigger =
         Animator.StringToHash(SheatheWeaponTriggerName);
 
+    private static readonly int ReloadWeaponTrigger =
+        Animator.StringToHash(PowerSuitWeaponAnimationDriver.ReloadTriggerName);
+
+    private static readonly int CycleWeaponTrigger =
+        Animator.StringToHash(PowerSuitWeaponAnimationDriver.CycleTriggerName);
+
     private static readonly int StowedLocomotionState =
         Animator.StringToHash(StowedLocomotionStateName);
 
     private PowerSuitWeaponPresentationStateMachine stateMachine;
+    private PowerSuitInputRouter inputRouter;
+    private int fallbackInputFrame = -1;
+    private PowerSuitInputSnapshot fallbackInputSnapshot;
     private bool hasWeaponStowed;
     private bool hasDrawWeapon;
     private bool hasSheatheWeapon;
+    private bool hasReloadWeapon;
+    private bool hasCycleWeapon;
 
     public PowerSuitWeaponPresentationState State
     {
@@ -242,6 +261,11 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
             weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
         }
 
+        if (inputRouter == null)
+        {
+            inputRouter = GetComponent<PowerSuitInputRouter>();
+        }
+
         CacheAnimatorParameters();
         if (stateMachine == null)
         {
@@ -283,7 +307,7 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
 
         if (
             controller != null &&
-            controller.IsAiming &&
+            controller.AimRequested &&
             State == PowerSuitWeaponPresentationState.Stowed
         )
         {
@@ -345,6 +369,42 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Cancels presentation transitions and action-layer residue so the player
+    /// returns at the component's configured stable carry state.
+    /// </summary>
+    public void ResetForRespawn()
+    {
+        EnsureStateMachine();
+        stateMachine.Reset(startsStowed);
+
+        ResetOptionalTrigger(DrawWeaponTrigger, hasDrawWeapon);
+        ResetOptionalTrigger(SheatheWeaponTrigger, hasSheatheWeapon);
+        ResetOptionalTrigger(ReloadWeaponTrigger, hasReloadWeapon);
+        ResetOptionalTrigger(CycleWeaponTrigger, hasCycleWeapon);
+
+        ResetAnimatorLayer(
+            PowerSuitWeaponAnimationDriver.WeaponActionLayerName,
+            PowerSuitWeaponAnimationDriver.NoWeaponActionStateName
+        );
+        ResetAnimatorLayer(
+            PowerSuitWeaponAnimationDriver.BoltCycleLayerName,
+            PowerSuitWeaponAnimationDriver.NoBoltCycleStateName
+        );
+
+        UpdateWeaponStowedParameter();
+        if (
+            startsStowed &&
+            animator != null &&
+            animator.HasState(0, StowedLocomotionState)
+        )
+        {
+            animator.Play(StowedLocomotionState, 0, 0f);
+        }
+
+        UpdateWeaponAvailability();
+    }
+
     private void EnsureStateMachine()
     {
         if (stateMachine != null)
@@ -378,6 +438,16 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
 
         hasSheatheWeapon = HasParameter(
             SheatheWeaponTrigger,
+            AnimatorControllerParameterType.Trigger
+        );
+
+        hasReloadWeapon = HasParameter(
+            ReloadWeaponTrigger,
+            AnimatorControllerParameterType.Trigger
+        );
+
+        hasCycleWeapon = HasParameter(
+            CycleWeaponTrigger,
             AnimatorControllerParameterType.Trigger
         );
     }
@@ -427,12 +497,35 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
             // without forcing a landing or interrupting hover movement.
             weapon.PresentationAllowsReload = CanUseWeapon;
         }
+
+        controller?.RefreshAimAvailability();
     }
 
     private bool IsWeaponBusy()
     {
-        return (controller != null && controller.IsFlying) ||
+        return IsTransitioning ||
             (weapon != null && (weapon.IsReloading || weapon.IsCycling));
+    }
+
+    private void ResetAnimatorLayer(string layerName, string neutralStateName)
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        int layerIndex = animator.GetLayerIndex(layerName);
+        if (layerIndex < 0)
+        {
+            return;
+        }
+
+        int neutralState = Animator.StringToHash(neutralStateName);
+        if (animator.HasState(layerIndex, neutralState))
+        {
+            animator.Play(neutralState, layerIndex, 0f);
+        }
+        animator.SetLayerWeight(layerIndex, 0f);
     }
 
     private void SetOptionalTrigger(int triggerHash, bool isAvailable)
@@ -452,15 +545,32 @@ public sealed class PowerSuitWeaponPresentation : MonoBehaviour
         }
     }
 
-    private static bool WasTogglePressed()
+    private bool WasTogglePressed()
     {
-#if ENABLE_INPUT_SYSTEM
-        return
-            Keyboard.current != null &&
-            Keyboard.current.qKey.wasPressedThisFrame;
-#else
-        return Input.GetKeyDown(KeyCode.Q);
-#endif
+        return ReadInputSnapshot().CarryTogglePressed;
+    }
+
+    private PowerSuitInputSnapshot ReadInputSnapshot()
+    {
+        if (
+            inputRouter != null &&
+            inputRouter.TryGetCurrentSnapshot(
+                out PowerSuitInputSnapshot routedInput
+            )
+        )
+        {
+            return routedInput;
+        }
+
+        int frame = Time.frameCount;
+        if (fallbackInputFrame != frame)
+        {
+            fallbackInputSnapshot =
+                PowerSuitInputRouter.ReadFallbackSnapshot();
+            fallbackInputFrame = frame;
+        }
+
+        return fallbackInputSnapshot;
     }
 
     private void OnValidate()

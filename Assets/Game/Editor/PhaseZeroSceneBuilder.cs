@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 
 namespace Powersuit.Editor
 {
-    [InitializeOnLoad]
     public static class PhaseZeroSceneBuilder
     {
         public const string ScenePath = "Assets/Scenes/FlightPrototype.unity";
@@ -34,11 +33,6 @@ namespace Powersuit.Editor
             "Documentation"
         };
 
-        static PhaseZeroSceneBuilder()
-        {
-            EditorApplication.delayCall += EnsurePhaseZeroFoundation;
-        }
-
         [MenuItem("Tools/Powersuit/Phase 0/Create or Repair Foundation")]
         public static void EnsurePhaseZeroFoundation()
         {
@@ -48,7 +42,7 @@ namespace Powersuit.Editor
             }
 
             EnsureFolders();
-            ConfigureProject();
+            ConfigureProjectDefaults();
 
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) == null)
             {
@@ -92,13 +86,9 @@ namespace Powersuit.Editor
             string outputPath = Path.Combine(projectRoot, "Build", "Windows", "Powersuit.exe");
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? projectRoot);
 
-            BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
-            {
-                scenes = new[] { ScenePath },
-                locationPathName = outputPath,
-                target = BuildTarget.StandaloneWindows64,
-                options = BuildOptions.Development
-            });
+            BuildReport report = BuildPipeline.BuildPlayer(
+                CreateDevelopmentBuildOptions(outputPath)
+            );
 
             if (report.summary.result != BuildResult.Succeeded)
             {
@@ -107,6 +97,27 @@ namespace Powersuit.Editor
             }
 
             Debug.Log($"Windows development build created at {outputPath}");
+        }
+
+        public static BuildPlayerOptions CreateDevelopmentBuildOptions(
+            string outputPath
+        )
+        {
+            if (string.IsNullOrWhiteSpace(outputPath))
+            {
+                throw new ArgumentException(
+                    "A development-build output path is required.",
+                    nameof(outputPath)
+                );
+            }
+
+            return new BuildPlayerOptions
+            {
+                scenes = new[] { ScenePath },
+                locationPathName = outputPath,
+                target = BuildTarget.StandaloneWindows64,
+                options = BuildOptions.Development
+            };
         }
 
         private static void EnsureFolders()
@@ -139,15 +150,9 @@ namespace Powersuit.Editor
             AssetDatabase.CreateFolder(parent, Path.GetFileName(path));
         }
 
-        private static void ConfigureProject()
+        private static void ConfigureProjectDefaults()
         {
             EditorSettings.serializationMode = SerializationMode.ForceText;
-            PlayerSettings.companyName = "Powersuit";
-            PlayerSettings.productName = "Powersuit";
-            EditorBuildSettings.scenes = new[]
-            {
-                new EditorBuildSettingsScene(ScenePath, true)
-            };
         }
 
         private static void BuildGreybox(Scene scene)
