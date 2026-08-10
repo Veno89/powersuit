@@ -4,9 +4,10 @@ using Powersuit.Combat;
 using UnityEngine;
 
 /// <summary>
-/// Reversible, screen-space precision-scope presentation. It keeps the optic's
-/// decorative meshes out of the player camera while the camera is inside the
-/// ocular housing and draws an aspect-safe reticle aligned to the gameplay ray.
+/// Reversible, screen-space precision-scope presentation. It keeps the complete
+/// rifle render hierarchy out of the player camera while scoped and draws an
+/// aspect-safe reticle aligned to the gameplay ray. Gameplay transforms remain
+/// active, so muzzle origin, recoil, and ballistics are unchanged.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class PowerSuitScopeSight : MonoBehaviour
@@ -29,7 +30,7 @@ public sealed class PowerSuitScopeSight : MonoBehaviour
     private PowerSuitWeapon weapon;
     private Transform cachedScopePoint;
     private Texture2D scopeMask;
-    private bool opticRenderersHidden;
+    private bool rifleRenderersHidden;
 
     public bool IsScopeEligible =>
         weapon != null &&
@@ -85,7 +86,7 @@ public sealed class PowerSuitScopeSight : MonoBehaviour
         bool shouldHide = IsScopeEligible &&
                           (controller.IsScoped ||
                            controller.ScopeBlend > MinimumVisibleBlend);
-        SetOpticRenderersHidden(shouldHide);
+        SetRifleRenderersHidden(shouldHide);
     }
 
     private void OnDisable()
@@ -167,49 +168,32 @@ public sealed class PowerSuitScopeSight : MonoBehaviour
             rifleRoot = rifleRoot.parent;
         }
 
-        Transform searchRoot = rifleRoot != null
-            ? rifleRoot
-            : cachedScopePoint.root;
-        Renderer[] renderers = searchRoot.GetComponentsInChildren<Renderer>(true);
-        foreach (Renderer opticRenderer in renderers)
-        {
-            if (!IsOpticRenderer(opticRenderer))
-            {
-                continue;
-            }
-
-            hiddenRenderers.Add(
-                new RendererState(opticRenderer, opticRenderer.enabled)
-            );
-        }
-    }
-
-    private static bool IsOpticRenderer(Renderer candidate)
-    {
-        if (candidate == null)
-        {
-            return false;
-        }
-
-        string objectName = candidate.gameObject.name;
-        return objectName.StartsWith(
-                   "Rifle_Scope",
-                   StringComparison.OrdinalIgnoreCase
-               ) ||
-               objectName.Equals(
-                   "Rifle_SightOcular",
-                   StringComparison.OrdinalIgnoreCase
-               );
-    }
-
-    private void SetOpticRenderersHidden(bool hidden)
-    {
-        if (opticRenderersHidden == hidden)
+        // Never fall back to the player root: a malformed weapon hierarchy
+        // must not make the entire suit disappear. The canonical precision
+        // rifle always exposes RifleRoot and generator validation enforces it.
+        if (rifleRoot == null)
         {
             return;
         }
 
-        opticRenderersHidden = hidden;
+        Transform searchRoot = rifleRoot;
+        Renderer[] renderers = searchRoot.GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer rifleRenderer in renderers)
+        {
+            hiddenRenderers.Add(
+                new RendererState(rifleRenderer, rifleRenderer.enabled)
+            );
+        }
+    }
+
+    private void SetRifleRenderersHidden(bool hidden)
+    {
+        if (rifleRenderersHidden == hidden)
+        {
+            return;
+        }
+
+        rifleRenderersHidden = hidden;
         foreach (RendererState state in hiddenRenderers)
         {
             if (state.Renderer != null)
@@ -225,7 +209,7 @@ public sealed class PowerSuitScopeSight : MonoBehaviour
     {
         if (hiddenRenderers.Count == 0)
         {
-            opticRenderersHidden = false;
+            rifleRenderersHidden = false;
             return;
         }
 
@@ -237,7 +221,7 @@ public sealed class PowerSuitScopeSight : MonoBehaviour
             }
         }
 
-        opticRenderersHidden = false;
+        rifleRenderersHidden = false;
     }
 
     private Texture2D GetOrCreateScopeMask()

@@ -4,29 +4,29 @@ This directory is the authoritative Blender authoring source and deterministic t
 
 ## Current status
 
-Approved Generator 112 candidate:
+Approved Generator 113 candidate:
 
 - Blender: 5.2 LTS
 - rifle generator: 111
 - weapon contract: v3; rigid signature: v6
-- animation contract: v3
+- animation contract: v4
 - automated validation: `PASS`
 - technical visual validation: `APPROVED`
 - export allowed: `true`
 - required renders: 13 aim + 5 rifle + 15 weapon-animation = 33
 - exported clips: 18 exact armature actions
-- generated blend SHA-256: `0295acb528b0ca8c0f3ec68f642ad6c56c3f4ddaf9fe2f5a0ab84adae9311876`
-- exported FBX SHA-256: `054b5a1875730b225cbb9192bbf760a75919126043ce3ae1503308d21fa8e409`
+- generated blend SHA-256: `a5054d65af2cb6a04836216456a1a3162f8d860c6c421533a7ac08a9f70d2d4b`
+- exported FBX SHA-256: `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`
 
-The clean build passed with no automated blockers. All 33 mandatory renders were technically reviewed and hash-locked before the gated export on 2026-08-10. The exact report, approval, images, export manifest, and FBX are archived under `Validation/Generator112`.
+The clean Generator113 build passed with no automated blockers. All 33 mandatory renders were technically reviewed and hash-locked before the gated export on 2026-08-10. The exact report, approval, images, export manifest, and FBX are archived under `Validation/Generator113`.
 
-Generator 110 remains the winding/closed-geometry repair baseline, and Generator 111 remains the 17-action rollback candidate. Generator 112 preserves their geometry, rig, weapon controls, and original action ranges while adding the synchronized `PS_Run_Forward` loop. The run uses frames 1-21 at 30 FPS, a 20-frame cycle with a native cadence of 180 steps per minute.
+Generator 110 remains the winding/closed-geometry repair baseline, Generator 111 remains the 17-action rollback candidate, and Generator 112 remains the first sprint candidate. Generator 113 preserves their geometry, rig, weapon controls, 18 action names, and action ranges while lengthening the stance-aware powered gait. The run still uses frames 1-21 at 30 FPS, a 20-frame cycle with a native cadence of 180 steps per minute.
 
 ## What is authoritative
 
 - `source/powersuit_source.blend` — immutable audited recovered input
 - `scripts/` — active build, animation, validation, approval, and export tools
-- `Validation/Generator109/` through `Validation/Generator112/` — immutable candidate evidence and rollback artifacts
+- `Validation/Generator109/` through `Validation/Generator113/` — immutable candidate evidence and rollback artifacts
 - `WEAPON_FRAMEWORK.md` — weapon/stance architecture reference
 - `PROVENANCE.md` — exact lineage and historical Reset06 diagnosis
 - `UNITY_INTEGRATION.md` — safe Unity integration procedure
@@ -46,9 +46,11 @@ Active `powersuit_pipeline.blend`, working `renders/`, working `exports/`, Blend
 
 The build launcher resets the working scene from the audited source, runs all modelling/rig/pose/animation stages, renders all three validation sets, and writes the aggregate report. It does not depend on a hand-edited intermediate `.blend`.
 
+If headless Workbench rendering crashes inside a Windows display driver while Unity is open, set `POWERSUIT_VALIDATION_RENDER_ENGINE=cycles_cpu` before launching the pipeline. The fallback uses deterministic 8-sample CPU rendering and the same structural, image-content, review, hash, and export gates. `POWERSUIT_REUSE_VALIDATION_RENDERS=1` is only for an interrupted pass; it reuses a PNG only after the canonical content validator accepts it.
+
 ## Animation set
 
-Generator 112 exports exactly:
+Generator 113 exports exactly:
 
 - `PS_Idle`, `PS_Walk`, `PS_Hover`, `PS_Aim`
 - `PS_WeaponReady_Idle`, `PS_WeaponStowed_Idle`, `PS_WeaponStowed_Hover`

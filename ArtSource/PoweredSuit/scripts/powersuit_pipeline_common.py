@@ -43,6 +43,56 @@ REQUIRED_RIG_UPGRADE_VERSION = 2
 REQUIRED_HAND_GEOMETRY_VERSION = 3
 
 
+def configure_validation_render_engine(scene: bpy.types.Scene) -> str:
+    """Select deterministic validation rendering with a CPU-safe fallback.
+
+    Workbench remains the canonical fast path. Some Windows NVIDIA drivers can
+    stack-overflow in headless Workbench rendering while Unity also owns a GPU
+    context; POWERSUIT_VALIDATION_RENDER_ENGINE=cycles_cpu avoids that driver
+    path without skipping or weakening any image gate.
+    """
+    requested = os.environ.get(
+        "POWERSUIT_VALIDATION_RENDER_ENGINE",
+        "workbench",
+    ).strip().lower()
+    if requested == "cycles_cpu":
+        scene.render.engine = "CYCLES"
+        scene.cycles.device = "CPU"
+        scene.cycles.samples = 8
+        scene.cycles.use_denoising = False
+        scene.cycles.use_adaptive_sampling = True
+        if scene.world is None:
+            scene.world = bpy.data.worlds.new(
+                PIPELINE_TEMP_PREFIX + "ValidationWorld"
+            )
+        scene.world.use_nodes = True
+        background = scene.world.node_tree.nodes.get("Background")
+        if background is not None:
+            background.inputs["Color"].default_value = (0.42, 0.46, 0.52, 1.0)
+            background.inputs["Strength"].default_value = 0.85
+        return "CYCLES_CPU_8_SAMPLES"
+    if requested not in {"", "workbench"}:
+        raise RuntimeError(
+            "POWERSUIT_VALIDATION_RENDER_ENGINE must be 'workbench' or "
+            "'cycles_cpu'."
+        )
+    scene.render.engine = "BLENDER_WORKBENCH"
+    return "BLENDER_WORKBENCH"
+
+
+def can_reuse_validation_render(path: Path) -> bool:
+    """Allow explicit crash-resume without silently accepting stale evidence."""
+    requested = os.environ.get(
+        "POWERSUIT_REUSE_VALIDATION_RENDERS",
+        "",
+    ).strip().lower()
+    return (
+        requested in {"1", "true", "yes"}
+        and path.is_file()
+        and path.stat().st_size >= 4096
+    )
+
+
 def require_blender_52() -> None:
     if tuple(bpy.app.version[:2]) < (5, 2):
         raise RuntimeError(

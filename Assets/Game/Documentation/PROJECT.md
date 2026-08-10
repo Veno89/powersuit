@@ -4,7 +4,7 @@ This document describes the current **Feel-First Combat and Flight Tech Demo** i
 
 ## Runtime composition
 
-`PlayerPrototype_Generator109.prefab` is the canonical player variant. The retained `Generator109` filename preserves GUID continuity while the nested suit and animation content comes from the later Generator112 asset pass. Generator112 contains 18 animation clips and 33 mandatory validation renders, including the dedicated `PS_Run_Forward` cycle.
+`PlayerPrototype_Generator109.prefab` is the canonical player variant. The retained `Generator109` filename preserves GUID continuity while the nested suit and animation content comes from the later Generator113 asset pass. Generator113 preserves the 18 animation names/ranges and 33 mandatory validation renders while advancing the powered-gait contract to version 4.
 
 At runtime, `PowerSuitDemoBootstrap`:
 
@@ -52,13 +52,13 @@ Keyboard/mouse bindings are:
 
 There is no `F` flight binding. A jump-to-flight hold must begin with a consumed ground/coyote jump; pressing and holding `Space` only after the player is already falling cannot arm flight. Releasing early or landing before the threshold cancels the sequence, and feet-level touchdown exits flight automatically.
 
-The scope uses the Precision Rifle's configured `ScopePoint` and aim profile. `V` is accepted only when the ready weapon is both `PrecisionRifle` class and scope-enabled; RMB remains the over-shoulder profile. While scoped, obstructing `Rifle_Scope*` and ocular renderers are hidden and the presenter draws an aspect-safe circular sight, center crosshair, mil ticks, and range stadia against the same aim-ray point used by the weapon. Flight does not remove weapon reload, shoulder aim, scope, or ability ownership.
+The scope uses the Precision Rifle's configured `ScopePoint` and aim profile. `V` is accepted only when the ready weapon is both `PrecisionRifle` class and scope-enabled; RMB remains the over-shoulder profile. While scoped, every renderer beneath `RifleRoot` is reversibly suppressed so receiver, barrel, and optic geometry cannot enter the sight picture. Weapon transforms and ballistics continue evaluating, and the presenter draws an aspect-safe circular sight, center crosshair, mil ticks, and range stadia against the same aim-ray point used by the weapon. Flight does not remove weapon reload, shoulder aim, scope, or ability ownership.
 
 ## Player, camera, animation, and weapon
 
 `PowerSuitController` adapts a CharacterController to plain-C# movement helpers: acceleration/deceleration, signed camera-relative movement, grounding hysteresis, coyote time, buffered jump, air control, landing, hold-to-flight, hover/braking, vertical flight, boost, banking, and safe ground/flight transitions. The focused player prefab persists the responsive profile (6.5 m/s ground, 14 m/s flight, 28 m/s boost), with piecewise zero-crossing reversal, stronger braking, 20/32 free/combat turning sharpness, 1.65x stable-ground sprint, a 0.9-second accepted-jump flight threshold, and 0.55 held-jump gravity scale. The rollback base prefab retains its legacy 5 m/s tune.
 
-Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. Visual banking/squash is presentation-only and does not become movement authority.
+Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps banking/squash presentation-only. `PowerSuitThrusterPresentation` builds four cached blue-white jets (outer plume plus core per nozzle) and two unshadowed backpack glows, driven only by sprint/flight/boost state. Neither component owns movement or the planned heat resource.
 
 The generated Animator uses four layers in this order:
 
@@ -67,7 +67,7 @@ The generated Animator uses four layers in this order:
 3. masked additive `Bolt Cycle Action`
 4. masked override `Weapon Actions`
 
-The base layer owns locomotion/flight, including a dedicated `Run Locomotion` state driven by `IsRunning`. Generator112's looping `PS_Run_Forward` clip uses 1.35x state playback (approximately 243 steps/minute) rather than inheriting the walk state's 4.5x speed parameter. Sprint is limited to stable-ground forward/lateral ready-carry movement; aim, backpedal, stowed locomotion, and flight keep their dedicated states. Forward pose keeps accepted hip/flight fire pointed forward without forcing aim FOV. The additive layer cycles the articulated bolt, while the highest override owns draw, sheathe, and reload. Code controls commit/cancel/reset behavior.
+The base layer owns locomotion/flight, including a dedicated `Run Locomotion` state driven by `IsRunning`. Generator113 lengthens every stance-aware locomotion stride and lowers ordinary full-speed playback from 4.5x to 2.75x while leaving controller speeds unchanged. Its looping `PS_Run_Forward` clip stays at 1.35x state playback (approximately 243 steps/minute); propulsion feedback intentionally communicates powered assistance instead of demanding impossible human-scale no-slip steps at 10.725 m/s. Sprint is limited to stable-ground forward/lateral ready-carry movement; aim, backpedal, stowed locomotion, and flight keep their dedicated states. Forward pose keeps accepted hip/flight fire pointed forward without forcing aim FOV. The additive layer cycles the articulated bolt, while the highest override owns draw, sheathe, and reload. Code controls commit/cancel/reset behavior.
 
 `WeaponDefinition` owns authored rifle tuning, empty-magazine auto-reload policy, and ground/shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
 
@@ -126,9 +126,9 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 Current 2026-08-10 results:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- EditMode: 222/222 passed.
+- EditMode: 228/228 passed.
 - PlayMode: 12/12 passed.
-- Generator112 source validation passed for all 18 animation clips and 33 mandatory renders; generated run state/importer data and the Precision Rifle scope presenter also passed integration validation.
+- Generator113 source validation passed for all 18 animation clips and 33 mandatory renders, with powered strides of 0.8379 m walk / 0.9341 m run and 0.0365 m run clearance; generated gait playback, thruster presenter, complete-rifle scope suppression, and importer/prefab data passed integration validation.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
 - Windows x64 Development Build succeeded at 2026-08-10 17:50. Its package-level Sentis shader warnings were non-blocking.
 - A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
@@ -142,11 +142,12 @@ Before accepting the milestone, still perform:
 3. Capture real Unity Profiler evidence at representative and stress loads, including CPU/render/GC, pool misses, and 30/60/120+ frame-rate behavior.
 4. Run an extended lifecycle soak with repeated pooled reuse, reloads, seed/spawner changes, scene reload, malformed console commands, and player/enemy death cycles.
 5. Validate a replacement humanoid/retargeting path and complete final animation, character, enemy, world, UI, VFX, and audio content polish.
+6. After sprint/flight propulsion feel is accepted, add a testable overheat/stamina state, cooldown behavior, and HUD bar without coupling it to the visual exhaust adapter.
 
 Automated checks establish technical correctness of the current batch; they do not prove subjective feel, a sustained 60 FPS target on representative hardware, or production-quality content.
 
 ## Known limitations and exclusions
 
-Open gaps are owner/manual feel acceptance, profiler captures and performance tuning under representative stress, long lifecycle evidence, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, audio hooks, and UI are suitable for a tech demo, not final production art.
+Open gaps are owner/manual feel acceptance, directional start/stop/strafe and contact-aware footwork polish, the later sprint/flight overheat resource, profiler captures and performance tuning under representative stress, long lifecycle evidence, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, silent audio hooks, and UI are suitable for a tech demo, not final production art. No external audio assets were added.
 
 Excluded are multiplayer/networking, loot/inventory/rarity, progression/skill trees, crafting, missions/quests/dialogue/story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, and final Asset Store publication.

@@ -79,6 +79,126 @@ namespace Powersuit.Tests.EditMode
             );
         }
 
+        [TestCase(false, false, false, 0f)]
+        [TestCase(true, false, false, 0.82f)]
+        [TestCase(false, true, false, 0.48f)]
+        [TestCase(true, true, true, 1f)]
+        public void ThrusterIntensity_CommunicatesPoweredMovementPriority(
+            bool isRunning,
+            bool isFlying,
+            bool isBoosting,
+            float expected
+        )
+        {
+            Type thrusterMath = FindType("PowerSuitThrusterMath");
+            MethodInfo resolve = thrusterMath.GetMethod(
+                "ResolveTargetIntensity",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(resolve, Is.Not.Null);
+
+            float actual = (float)resolve.Invoke(
+                null,
+                new object[]
+                {
+                    isRunning,
+                    isFlying,
+                    isBoosting,
+                    0.82f,
+                    0.48f,
+                    1f
+                }
+            );
+            Assert.That(actual, Is.EqualTo(expected).Within(0.0001f));
+        }
+
+        [Test]
+        public void ThrusterIntensity_FailsClosedForNonFiniteTuning()
+        {
+            Type thrusterMath = FindType("PowerSuitThrusterMath");
+            MethodInfo resolve = thrusterMath.GetMethod(
+                "ResolveTargetIntensity",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(resolve, Is.Not.Null);
+            Assert.That(
+                resolve.Invoke(
+                    null,
+                    new object[]
+                    {
+                        true,
+                        false,
+                        false,
+                        float.NaN,
+                        0.5f,
+                        1f
+                    }
+                ),
+                Is.EqualTo(0f)
+            );
+        }
+
+        [Test]
+        public void ThrusterPresentation_BuildsFourCachedBlueWhiteJets()
+        {
+            GameObject host = new GameObject("Thruster Presentation Test");
+            host.SetActive(false);
+            try
+            {
+                GameObject visual = new GameObject("PowerSuitVisual_Generator109");
+                visual.transform.SetParent(host.transform, false);
+                foreach (string name in new[]
+                {
+                    "Thruster_Nozzle.L",
+                    "Thruster_Nozzle.R",
+                    "Heavy_Boot.L",
+                    "Heavy_Boot.R"
+                })
+                {
+                    GameObject anchor = new GameObject(name);
+                    anchor.transform.SetParent(visual.transform, false);
+                }
+
+                Type presentationType = FindType("PowerSuitThrusterPresentation");
+                Component presentation = host.AddComponent(presentationType);
+                presentationType.GetProperty("VisualRoot")?.SetValue(
+                    presentation,
+                    visual.transform
+                );
+                MethodInfo awake = presentationType.GetMethod(
+                    "Awake",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                Assert.That(awake, Is.Not.Null);
+                awake.Invoke(presentation, null);
+
+                Assert.That(
+                    presentationType.GetProperty("CachedJetCount")
+                        ?.GetValue(presentation),
+                    Is.EqualTo(4)
+                );
+                Assert.That(
+                    host.GetComponentsInChildren<LineRenderer>(true),
+                    Has.Length.EqualTo(8),
+                    "Each nozzle needs an outer plume and white-hot core."
+                );
+                Assert.That(
+                    host.GetComponentsInChildren<Light>(true),
+                    Has.Length.EqualTo(2),
+                    "Only backpack nozzles carry cached point-light glows."
+                );
+                Assert.That(
+                    host.GetComponentsInChildren<LineRenderer>(true),
+                    Has.All.Property("enabled").False,
+                    "Jets must be hidden before sprint/flight demand."
+                );
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(host);
+            }
+        }
+
         private static float Simulate(int frameRate, float seconds)
         {
             float value = 0f;

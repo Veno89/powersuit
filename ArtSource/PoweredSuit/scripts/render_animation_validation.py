@@ -29,6 +29,7 @@ from powersuit_pipeline_common import (  # noqa: E402
     body_basis,
     bone_head_world,
     bone_tail_world,
+    can_reuse_validation_render,
     ensure_directory,
     expected_transform_curve_count,
     ensure_object_mode,
@@ -42,6 +43,7 @@ from powersuit_pipeline_common import (  # noqa: E402
     quaternion_angle_degrees,
     remove_pipeline_temps,
     create_static_render_scene,
+    configure_validation_render_engine,
     detach_rifle_for_validation,
     remove_static_render_scene,
     restore_rifle_after_validation,
@@ -983,6 +985,13 @@ def _render_one(
 
     set_camera_look_at(camera, location, target)
     _position_lights(lights, target, right, forward, up)
+    if can_reuse_validation_render(output_path):
+        _validate_render_content(output_path)
+        print(
+            f"Reused validated render after interrupted pass: {output_path}",
+            flush=True,
+        )
+        return
     render_scene.render.filepath = str(output_path)
     print(
         f"[Aim validation] Render {output_path.name}: "
@@ -1053,7 +1062,7 @@ def _render_all(
     armature: bpy.types.Object,
     root: bpy.types.Object,
     rifle_state: dict[str, object],
-) -> list[Path]:
+) -> tuple[list[Path], str]:
     output_dir = ensure_directory("renders", "aim_validation")
 
     suit_sources = _upper_body_meshes(armature, root, include_rifle=False)
@@ -1073,7 +1082,7 @@ def _render_all(
             source_objects,
         )
         camera, lights = _create_camera_and_lights(render_scene, render_collection)
-        render_scene.render.engine = "BLENDER_WORKBENCH"
+        render_backend = configure_validation_render_engine(render_scene)
         render_scene.display.shading.color_type = "OBJECT"
         render_scene.display.shading.light = "STUDIO"
         render_scene.display.shading.show_shadows = True
@@ -1111,7 +1120,7 @@ def _render_all(
             )
             paths.append(path)
             print(f"Rendered: {path}", flush=True)
-        return paths
+        return paths, render_backend
     finally:
         remove_static_render_scene(render_scene, render_collection, proxies)
         remove_pipeline_temps()
@@ -1177,7 +1186,7 @@ def main() -> None:
                 print(f"  - {blocker}", flush=True)
 
         print("[Aim validation] Rendering mandatory close-ups...", flush=True)
-        render_paths = _render_all(armature, root, rifle_state)
+        render_paths, render_backend = _render_all(armature, root, rifle_state)
         names = {path.name for path in render_paths}
         if names != set(REQUIRED_AIM_RENDERS):
             raise RuntimeError("Mandatory aim render set is incomplete.")
@@ -1188,6 +1197,7 @@ def main() -> None:
             "blend_file": blend_path.name,
             "blend_sha256_at_validation": _file_sha256(blend_path),
             "automated_validation": ("PASS" if not automated_blockers else "REVIEW_BLOCKED"),
+            "validation_render_backend": render_backend,
             "automated_blockers": automated_blockers,
             "visual_validation": "NOT_REVIEWED",
             "export_allowed": False,

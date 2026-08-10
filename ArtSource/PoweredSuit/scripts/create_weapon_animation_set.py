@@ -69,7 +69,7 @@ from weapon_handling_contract import (  # noqa: E402
 )
 
 FPS = 30
-ANIMATION_CONTRACT_VERSION = 3
+ANIMATION_CONTRACT_VERSION = 4
 REQUIRED_GENERATOR_VERSION = 111
 WEAPON_ROOT_BONE = "WeaponRoot"
 MAGAZINE_BONE = "WeaponMagazine"
@@ -83,14 +83,15 @@ LOWER_BODY_BONES = (
 )
 WALK_SAMPLE_FRAMES = (1, 5, 9, 13, 17, 21, 25, 29, 31)
 RUN_SAMPLE_FRAMES = (1, 4, 6, 9, 11, 14, 16, 19, 21)
-RUN_STRIDE_SCALE = 1.30
+POWERED_GAIT_STRIDE_SCALE = 1.65
+RUN_STRIDE_SCALE = 1.90
 RUN_FLIGHT_LIFT_METRES = {
-    4: 0.018,
-    6: 0.060,
-    9: 0.018,
-    14: 0.018,
-    16: 0.060,
-    19: 0.018,
+    4: 0.030,
+    6: 0.100,
+    9: 0.030,
+    14: 0.030,
+    16: 0.100,
+    19: 0.030,
 }
 LOOP_ACTIONS = {
     "PS_WeaponReady_Idle",
@@ -833,7 +834,12 @@ def main() -> None:
             source_frame = (
                 WALK_SAMPLE_FRAMES[-1 - index] if backwards else output_frame
             )
-            pose = _combine_upper_and_lower(upper, walk_sources[source_frame])
+            lower = _amplify_lower_body(
+                idle,
+                walk_sources[source_frame],
+                POWERED_GAIT_STRIDE_SCALE,
+            )
+            pose = _combine_upper_and_lower(upper, lower)
             if stowed:
                 _apply_basis_snapshot(armature, pose)
                 pose = _pose_weapon_at_world(

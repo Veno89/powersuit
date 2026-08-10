@@ -26,7 +26,9 @@ from powersuit_pipeline_common import (  # noqa: E402
     activate_action,
     body_basis,
     bone_head_world,
+    can_reuse_validation_render,
     create_static_render_scene,
+    configure_validation_render_engine,
     ensure_directory,
     ensure_object_mode,
     find_action_slot,
@@ -55,7 +57,7 @@ from weapon_handling_contract import (  # noqa: E402
 from render_animation_validation import _validate_render_content  # noqa: E402
 
 CONTROL_BONES = ("WeaponRoot", "WeaponMagazine", "WeaponBolt")
-EXPECTED_ANIMATION_CONTRACT_VERSION = 3
+EXPECTED_ANIMATION_CONTRACT_VERSION = 4
 EXPECTED_RANGES = {
     "PS_WeaponReady_Idle": (1, 61),
     "PS_WeaponStowed_Idle": (1, 61),
@@ -266,7 +268,12 @@ def _validate(
         left = bone_head_world(armature, "Foot.L")
         right_foot = bone_head_world(armature, "Foot.R")
         walk_stride = max(walk_stride, abs((left - right_foot).dot(forward)))
-    if run_stride < walk_stride + 0.025:
+    if walk_stride < 0.80:
+        blockers.append(
+            "powered gait stride is too short for the current movement tune "
+            f"({walk_stride:.3f} m)"
+        )
+    if run_stride < walk_stride + 0.060:
         blockers.append(
             "run stride is not visibly longer than walk "
             f"({run_stride:.3f} m vs {walk_stride:.3f} m)"
@@ -413,6 +420,13 @@ def _render_one(
         raise ValueError(view)
 
     set_camera_look_at(camera, location, target)
+    if can_reuse_validation_render(path):
+        _validate_render_content(path)
+        print(
+            f"Reused validated render after interrupted pass: {path}",
+            flush=True,
+        )
+        return
     render_scene.render.filepath = str(path)
     print(
         f"[Weapon animation validation] {path.name}: "
@@ -444,7 +458,7 @@ def _render_all(armature: bpy.types.Object, root: bpy.types.Object) -> list[Path
             PIPELINE_TEMP_PREFIX + "WeaponAnimationRenderScene", sources
         )
         camera = _create_camera(render_scene, collection)
-        render_scene.render.engine = "BLENDER_WORKBENCH"
+        configure_validation_render_engine(render_scene)
         render_scene.display.shading.color_type = "OBJECT"
         render_scene.display.shading.light = "STUDIO"
         render_scene.display.shading.show_shadows = True

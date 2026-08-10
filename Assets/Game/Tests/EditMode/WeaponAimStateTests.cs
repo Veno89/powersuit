@@ -211,7 +211,7 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
-        public void ScopeSight_RestoresEachOpticRendererAndRejectsNonPrecisionData()
+        public void ScopeSight_HidesCompleteRifleAndRestoresEveryRenderer()
         {
             Type controllerType = Type.GetType(
                 "PowerSuitController, Assembly-CSharp",
@@ -249,6 +249,14 @@ namespace Powersuit.Tests.EditMode
                 MeshRenderer originallyDisabled = tube.AddComponent<MeshRenderer>();
                 originallyDisabled.enabled = false;
 
+                GameObject receiver = new GameObject("Rifle_Receiver");
+                receiver.transform.SetParent(rifleRoot.transform);
+                MeshRenderer receiverRenderer = receiver.AddComponent<MeshRenderer>();
+
+                GameObject suitChest = new GameObject("ChestPlate");
+                suitChest.transform.SetParent(host.transform);
+                MeshRenderer suitRenderer = suitChest.AddComponent<MeshRenderer>();
+
                 GameObject point = new GameObject("WeaponScopePoint");
                 point.transform.SetParent(ocular.transform);
                 controllerType.GetProperty("ScopePoint")?.SetValue(
@@ -284,12 +292,22 @@ namespace Powersuit.Tests.EditMode
                 );
 
                 sightType.GetMethod(
-                    "SetOpticRenderersHidden",
+                    "SetRifleRenderersHidden",
                     System.Reflection.BindingFlags.Instance |
                     System.Reflection.BindingFlags.NonPublic
                 )?.Invoke(sight, new object[] { true });
                 Assert.That(originallyEnabled.enabled, Is.False);
                 Assert.That(originallyDisabled.enabled, Is.False);
+                Assert.That(
+                    receiverRenderer.enabled,
+                    Is.False,
+                    "The receiver/barrel hierarchy must not cross the scope view."
+                );
+                Assert.That(
+                    suitRenderer.enabled,
+                    Is.True,
+                    "Scoped suppression must never hide unrelated suit renderers."
+                );
 
                 sightType.GetMethod(
                     "RestoreOpticRenderers",
@@ -297,6 +315,7 @@ namespace Powersuit.Tests.EditMode
                     System.Reflection.BindingFlags.NonPublic
                 )?.Invoke(sight, null);
                 Assert.That(originallyEnabled.enabled, Is.True);
+                Assert.That(receiverRenderer.enabled, Is.True);
                 Assert.That(
                     originallyDisabled.enabled,
                     Is.False,

@@ -1,12 +1,12 @@
 # Unity Integration Record
 
-Generator 112 is the active Unity evaluation candidate. Legacy files at `Assets/Game/Models/powersuit_animated.fbx`, `powersuit_rigged.fbx`, and `powersuit_rifle.fbx` remain unchanged for rollback and GUID stability. Generator 110 and Generator 111 evidence/FBXs are preserved under their named validation archives.
+Generator 113 is the active Unity evaluation candidate. Legacy files at `Assets/Game/Models/powersuit_animated.fbx`, `powersuit_rigged.fbx`, and `powersuit_rifle.fbx` remain unchanged for rollback and GUID stability. Generator 110 through Generator 112 evidence/FBXs are preserved under their named validation archives.
 
-## Generator 112 integration
+## Generator 113 integration
 
 1. The Blender report says `PASS`, `APPROVED`, and `export_allowed: true`; approval covers exactly 33 renders and the export manifest records the validated blend and FBX hashes.
 2. The gated FBX is imported at `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx` using its existing `.meta` GUID `f48464ae4ba58b54f976e658ece758b3`. It uses a Generic rig, disables camera/light import, retains hierarchy, disables optimization, and defines exactly the 18 manifest clips.
-3. The active Unity FBX SHA-256 is `054b5a1875730b225cbb9192bbf760a75919126043ce3ae1503308d21fa8e409`, byte-identical to the approved Generator 112 export and archive.
+3. The active Unity FBX SHA-256 is `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`, byte-identical to the approved Generator 113 export and archive.
 4. `PlayerPrototype_Generator109.prefab` remains the additive variant. Its historical name is retained for GUID/reference continuity; only its nested presentation model, animation wiring, and weapon definition are updated.
 5. The imported armature contains `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt`, so suit, rifle, magazine, and bolt motion remain synchronized in one FBX take per clip.
 6. A non-animated wrapper uses the measured facing correction `AngleAxis(+90 degrees, X) * Euler(0 degrees, 180 degrees, 0 degrees)`. The Animator writes the imported root, so the correction must remain on the wrapper.
@@ -33,7 +33,7 @@ Generator 112 is the active Unity evaluation candidate. Legacy files at `Assets/
 - stable-ready reload works on both ground and in flight
 - prefab/scene wiring, safe spawns, camera composition, controller, HUD, weapon definition, and imported helpers
 - full C# solution: 18 assemblies, 0 warnings, 0 errors
-- EditMode: 222/222 passed
+- EditMode: 228/228 passed
 - PlayMode: 12/12 passed
 - Unity Console: 0 errors
 - Windows x64 Development build: succeeded on 2026-08-10 at 17:50
@@ -43,4 +43,4 @@ Unity's AI Inference/Sentis package emitted non-blocking third-party shader perf
 
 ## Manual promotion check
 
-Open `Assets/Scenes/PoweredSuitAimDemo.unity`, press Play, and run the matrix in the root `ROADMAP.md`: walk/run transitions, forward sprint cadence, W/S, quick jump, held-jump flight entry, automatic landing, ready/stowed, repeated draw/sheathe, aimed W/S, fire/empty fire, partial/empty reload, bolt cycle, flying reload/aim, sniper-only scope/reticle, camera collision, and repeated interruption attempts. Preserve Generators 110 and 111 until that review is accepted.
+Open `Assets/Scenes/PoweredSuitAimDemo.unity`, press Play, and run the matrix in the root `ROADMAP.md`: powered walk/run cadence, blue-white sprint/hover/boost exhaust, residual foot slide, W/S, quick jump, held-jump flight entry, automatic landing, ready/stowed, repeated draw/sheathe, aimed W/S, fire/empty fire, partial/empty/automatic reload, bolt cycle, flying reload/aim, sniper-only scope/reticle with no rifle geometry visible, camera collision, and repeated interruption attempts. Preserve Generators 110 through 112 until that review is accepted.

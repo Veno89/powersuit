@@ -10,7 +10,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | B — Ground movement feel | Implemented with sprint/run | Plain-C# and adapter tests pass | Sprint cadence, slopes, steps, landing and feel review |
 | C — Flight feel | Implemented with hold-to-flight/touchdown | State/adapter tests and smoke pass | Jump/flight timing, hover, boost, landing and frame-rate feel review |
 | D — Camera and aiming | Implemented profiles and true scope | Camera/source validation passes | Fit/1x framing, close cover and scope feel review |
-| E — Animation integration | Generator112 18-clip tech-demo set implemented | Controller/prefab and 33-render source validation pass | Run visual polish, retargeting and replacement character |
+| E — Animation integration | Generator113 18-clip powered-gait set implemented | Controller/prefab and 33-render source validation pass | Directional start/stop/strafe polish, retargeting and replacement character |
 | F — Precision Rifle | Implemented | Runtime/presentation/pooling tests pass | Shot, reload, bolt and scope feel review |
 | G — Three abilities | Implemented | State, targeting and adapter tests pass | Combat tuning and presentation review |
 | H — Enemy architecture | Implemented with six archetypes | Runtime/adapter/content tests pass | Archetype readability and fair-combat review |
@@ -37,14 +37,16 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Add acceleration/deceleration, camera-relative signed movement, backpedal, grounding hysteresis, coyote time, jump buffer, air control, and landing response.
 - [x] Apply the focused fast-response tune: 6.5 m/s ground speed, strong acceleration/deceleration/reversal braking, responsive 14/28 m/s flight/boost, faster combat turning, and stride playback matched closer to the new speed.
 - [x] Add stable-ground `Shift` sprinting for forward/lateral movement with a 1.65x speed multiplier; keep aim and backpedal in their dedicated locomotion states.
-- [x] Add the looping Generator112 `PS_Run_Forward` clip and generated `Run Locomotion` state, using 1.35x state playback rather than the walk state's 4.5x speed parameter.
+- [x] Add the looping `PS_Run_Forward` clip and generated `Run Locomotion` state, using 1.35x state playback rather than the ordinary locomotion speed parameter.
+- [x] Preserve the 6.5 m/s walk and 10.725 m/s sprint speeds while advancing Generator113 to a 0.8379 m powered walk stride, 0.9341 m run stride, 0.0365 m airborne clearance, and a calmer 2.75x full-speed ordinary gait cadence.
+- [x] Add cached blue-white backpack and boot exhaust for sprint, hover, and boost without giving presentation code movement or future heat-resource authority.
 - [x] Replace the `F` flight toggle with tap-versus-hold jump ownership: tap `Space` jumps, while continuously holding an accepted ground/coyote jump for about 0.9 seconds enters flight.
 - [x] Prevent falling + `Space` from arming flight, cancel the hold sequence on early landing/release, and return to ground locomotion automatically when the player's feet touch down.
 - [x] Add hover, vertical control, braking, boost, banking, landing, and flight-compatible weapon/ability actions; `Shift` remains the flight boost while airborne.
 - [x] Add exploration, shoulder, flight, boost, targeting, and weapon-specific scope camera profiles with damped collision response.
 - [x] Raise mouse/pad aim response, camera damping, shoulder/scope sensitivity, and aim transition sharpness without changing ballistic or reticle ownership.
 - [x] Use the rifle `ScopePoint` for actual scoped camera placement; allow `V` only for a scope-enabled Precision Rifle while RMB owns shoulder aim.
-- [x] Hide obstructing scope/ocular geometry while scoped and present a circular sight, crosshair, mil ticks, and range stadia aligned to the same weapon aim ray.
+- [x] Reversibly hide every renderer under `RifleRoot` while scoped, keeping weapon transforms/ballistics active, and present a circular sight, crosshair, mil ticks, and range stadia aligned to the same weapon aim ray.
 - [x] Integrate ready/stowed carry, draw/sheathe, directional locomotion, aim-walk, flight, reload, and additive bolt action through the generated four-layer controller.
 - [x] Keep rifle authority in C#: finite ammo, cadence, criticals, timed manual/empty-magazine automatic reload, physical projectile, bolt gate, death/reset, and action priorities.
 - [x] Keep the rifle forward for accepted hip-fire and flight-fire staging instead of leaving it diagonally across the chest.
@@ -79,10 +81,10 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ## Verification completed
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
-- [x] Full Unity EditMode suite: 222/222 passed.
+- [x] Full Unity EditMode suite: 228/228 passed.
 - [x] Full Unity PlayMode suite: 12/12 passed.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
-- [x] Generator112 source validation: 18 animation clips and 33 mandatory renders, including `PS_Run_Forward`.
+- [x] Generator113 source validation: 18 animation clips, contract version 4, and 33 mandatory renders; deterministic CPU fallback completed after the NVIDIA headless Workbench path crashed.
 - [x] Generated controller/run state, additive bolt clip, scope presenter, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.
 - [x] Clean runtime observation after final pooling/enemy fixes: no Unity gameplay errors or recurring warnings.
 - [x] Windows x64 Development Build completed.
@@ -100,6 +102,8 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [ ] Unity Profiler captures under representative and stress loads. Record CPU, rendering, GC/allocation, pool misses/capacity, projectile counts, and frame pacing at 30/60/120+ FPS and uncapped.
 - [ ] Long lifecycle soak covering repeated enemy/projectile/ability pool reuse, death/respawn, scene reload, seed resets, spawner toggles, malformed console commands, and extended play.
 - [ ] Replacement-humanoid/retargeting validation, hardpoint and IK robustness, and true art, VFX, audio, animation, UI, and world-content polish.
+- [ ] Add a data-driven overheat/stamina resource shared by sprint and flight, with clear HUD/cooldown feedback, after propulsion feel is owner-approved.
+- [ ] Add directional run/strafe, acceleration, braking, and stop transitions plus contact-aware foot planting/IK where it materially reduces remaining slide.
 
 ## Recommended owner test loop
 
@@ -111,5 +115,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 6. Record specific feel issues separately from automated correctness failures; use the tuning commands to establish candidate values before changing authored defaults.
 
 ## Later, explicitly out of scope
+
+- Licensed/owned audio content. Unity provides playback and mixing, not a production SFX library; keep hooks silent until suitable assets are approved.
 
 Multiplayer/networking, loot and inventory, rarity/progression/skill trees, crafting, missions/quests/dialogue/story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, and final Asset Store publication are not part of this milestone.

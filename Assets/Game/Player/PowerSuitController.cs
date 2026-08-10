@@ -2197,9 +2197,9 @@ public static class PowerSuitLocomotionMath
 
     /// <summary>
     /// Keeps the idle cycle at normal speed and increases gait cadence as
-    /// actual movement approaches its configured maximum. The Generator 111
-    /// walk has about 1.08 metres/second of planted-foot travel at 1x, so the
-    /// demo's 2.2 m/s ground speed is matched closely at the default 2x value.
+    /// actual movement approaches its configured maximum. Generator113 uses a
+    /// longer powered stride and a calmer 2.75x full-speed default; procedural
+    /// exhaust communicates the remaining controller-driven assistance.
     /// </summary>
     public static float CalculateLocomotionPlaybackSpeed(
         float normalizedMovementSpeed,

@@ -24,6 +24,8 @@ from powersuit_pipeline_common import (  # noqa: E402
     activate_action,
     body_basis,
     bone_head_world,
+    can_reuse_validation_render,
+    configure_validation_render_engine,
     ensure_directory,
     ensure_object_mode,
     get_armature,
@@ -372,6 +374,12 @@ def _render(
             )
     _position_lights(lights, target, right, forward, up)
     path = output_dir / filename
+    if can_reuse_validation_render(path):
+        print(
+            f"Reused validated render after interrupted pass: {path}",
+            flush=True,
+        )
+        return path
     render_scene.render.filepath = str(path)
     print(f"[Rifle validation] Render {filename}: view {view}", flush=True)
     bpy.ops.render.render(write_still=True, scene=render_scene.name)
@@ -449,7 +457,7 @@ def main() -> None:
                 source_objects,
             )
             camera, lights = _create_camera_and_lights(render_scene, render_collection)
-            render_scene.render.engine = "BLENDER_WORKBENCH"
+            configure_validation_render_engine(render_scene)
             render_scene.display.shading.color_type = "OBJECT"
             render_scene.display.shading.light = "STUDIO"
             render_scene.display.shading.show_shadows = True

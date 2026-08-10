@@ -19,7 +19,7 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
     [SerializeField] private PowerSuitWeaponPresentation weaponPresentation;
     [SerializeField] private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
     [SerializeField, Min(0f)] private float movementDamping = 0.1f;
-    [SerializeField, Min(1f)] private float fullSpeedLocomotionPlayback = 4.5f;
+    [SerializeField, Min(1f)] private float fullSpeedLocomotionPlayback = 2.75f;
     [FormerlySerializedAs("airborneAimBlendSharpness")]
     [SerializeField, Min(0f)] private float forwardPoseBlendSharpness = 12f;
 

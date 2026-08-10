@@ -1555,6 +1555,15 @@ namespace Powersuit.Editor
                 }
                 visualFlightResponse.VisualRoot = visualWrapper.transform;
 
+                PowerSuitThrusterPresentation thrusterPresentation =
+                    instance.GetComponent<PowerSuitThrusterPresentation>();
+                if (thrusterPresentation == null)
+                {
+                    thrusterPresentation =
+                        instance.AddComponent<PowerSuitThrusterPresentation>();
+                }
+                thrusterPresentation.VisualRoot = visualWrapper.transform;
+
                 ShoulderRocketAbility shoulderRocket =
                     instance.GetComponent<ShoulderRocketAbility>();
                 if (shoulderRocket == null)
@@ -1935,7 +1944,7 @@ namespace Powersuit.Editor
         {
             SerializedObject serialized = new SerializedObject(animationDriver);
             SetFloat(serialized, "movementDamping", 0.06f);
-            SetFloat(serialized, "fullSpeedLocomotionPlayback", 4.5f);
+            SetFloat(serialized, "fullSpeedLocomotionPlayback", 2.75f);
             SetFloat(serialized, "forwardPoseBlendSharpness", 22f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -3057,14 +3066,18 @@ namespace Powersuit.Editor
 
             PowerSuitVisualFlightResponse visualFlightResponse =
                 variant.GetComponent<PowerSuitVisualFlightResponse>();
+            PowerSuitThrusterPresentation thrusterPresentation =
+                variant.GetComponent<PowerSuitThrusterPresentation>();
             if (
                 visualFlightResponse == null ||
-                visualFlightResponse.VisualRoot != visual
+                visualFlightResponse.VisualRoot != visual ||
+                thrusterPresentation == null ||
+                thrusterPresentation.VisualRoot != visual
             )
             {
                 throw new InvalidOperationException(
-                    "Generator 109 player must apply flight attitude only to " +
-                    "its dedicated visual wrapper."
+                    "Generator 109 player must bind flight attitude and powered " +
+                    "thruster feedback to its dedicated visual wrapper."
                 );
             }
 

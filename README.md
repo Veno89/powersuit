@@ -38,9 +38,9 @@ The centralized `PowerSuitInputRouter` arbitrates gameplay, targeting, scope, co
 
 ## Current demo content
 
-- Ground locomotion has acceleration/deceleration, signed directional movement, coyote time, jump buffering, air control, landing response, backpedalling, and a dedicated run state. Holding `Shift` while moving forward or sideways on stable ground applies the 1.65x sprint profile and the Generator112 `PS_Run_Forward` animation; aiming and backpedalling retain their dedicated movement poses.
+- Ground locomotion has acceleration/deceleration, signed directional movement, coyote time, jump buffering, air control, landing response, backpedalling, and a dedicated run state. Holding `Shift` while moving forward or sideways on stable ground applies the unchanged 1.65x sprint profile and the Generator113 `PS_Run_Forward` animation. Generator113 lengthens all stance-aware gait strides, lowers ordinary full-speed leg playback from 4.5x to 2.75x, and adds cached blue-white backpack/boot propulsion for sprint, hover, and boost; aiming and backpedalling retain their dedicated poses.
 - A quick `Space` press performs a normal jump. Keeping that accepted jump held for about 0.9 seconds enters flight; simply holding `Space` while already falling cannot arm flight. Flight includes hover, ascend/descend, braking, boost, banking, automatic touchdown, and flight-compatible aiming, firing, reloading, and abilities. Its 14 m/s cruise and 28 m/s boost profiles use deliberately faster acceleration and release response. `F` is no longer a flight binding.
-- Camera profiles cover exploration, shoulder aim, flight, boost, ability targeting, and the Precision Rifle's actual `ScopePoint`. `V` scope access is restricted to scope-enabled Precision Rifles; the scoped presentation hides obstructing optic geometry and supplies a circular sight, crosshair, mil ticks, and range stadia aligned to the weapon aim ray. Collision pull-in and damped release avoid recurrent camera clipping; mouse/pad look, aim sensitivity, camera damping, and aim transitions use the responsive demo profile.
+- Camera profiles cover exploration, shoulder aim, flight, boost, ability targeting, and the Precision Rifle's actual `ScopePoint`. `V` scope access is restricted to scope-enabled Precision Rifles; the scoped presentation reversibly suppresses the complete `RifleRoot` render hierarchy so no barrel, receiver, or optic can cross the sight picture, while transforms and ballistics remain active. Its circular sight, crosshair, mil ticks, and range stadia align to the weapon aim ray. Collision pull-in and damped release avoid recurrent camera clipping; mouse/pad look, aim sensitivity, camera damping, and aim transitions use the responsive demo profile.
 - The data-driven Precision Rifle owns finite ammunition, manual and empty-magazine automatic reload, cadence, critical hits, physical pooled projectiles, bolt cycling, weapon-ready presentation, and shoulder/scope aim profiles.
 - Shoulder rocket, projected lightning strike, and meter-gated void-orb ultimate use shared cooldown, targeting, faction-safe radial damage, external-force, pooling, and lifecycle boundaries without a monolithic ability framework. Rocket and lightning now render their full damage radius, expanding shockwave/rays, impact flash, and—in lightning's case—a vertical bolt; the targeting ring pulses before release.
 - Six generated, data-driven enemies are available: Stationary Sentry, Patrol Rifleman, Pursuer, Heavy Artillery, Flying Harrier, and Skirmisher. Their shared runtime/controller/emitter architecture supports distinct movement and attack profiles, telegraphs, health bars, force response, death, and pool reset.
@@ -65,7 +65,7 @@ The console is gated to the Editor and Development Builds and routes changes thr
 - Unity-facing components under `Combat`, `Abilities/Unity`, `Enemies/Unity`, `Player`, `UI`, and `Demo` adapt those rules to physics, input, animation, presentation, and scene lifecycle.
 - Definitions live under `Assets/Game/Content`; generated enemy, ability, player, and world prefabs live under `Assets/Game/Prefab`.
 - `PoweredSuitGenerator109Integration` updates generated assets/prefabs and validates an existing AimDemo without recreating or overwriting it. Enemy definition assets are preserved once authored.
-- The Generator112 animation contract contains 18 clips and 33 mandatory validation renders, adding the looping `PS_Run_Forward` source and generated controller state while preserving the established clip ranges.
+- The Generator113 animation contract contains the same 18 clips and 33 mandatory validation renders. It preserves every Generator112 action name/range while advancing the powered-gait contract to version 4: walk stride 0.8379 m, run stride 0.9341 m, and run airborne clearance 0.0365 m.
 - `PowerSuitValidationRunner` runs the full Unity suites and writes ignored summaries under `Temp/`.
 
 See [ROADMAP.md](ROADMAP.md) for acceptance status and [PROJECT.md](Assets/Game/Documentation/PROJECT.md) for subsystem ownership and validation workflow.
@@ -75,9 +75,9 @@ See [ROADMAP.md](ROADMAP.md) for acceptance status and [PROJECT.md](Assets/Game/
 Current workspace evidence from 2026-08-10:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- Unity EditMode: 222/222 passed.
+- Unity EditMode: 228/228 passed.
 - Unity PlayMode: 12/12 passed, including a 1,000-projectile spawn/recycle pool exercise.
-- Generated controller/run state, 18-clip importer contract, scope presenter, ability prefabs, six enemy prefabs/definitions, projectile prefab, player prefab, HUD/bootstrap references, SpawnDirector, and three-zone world validation passed.
+- Generated controller/run state, Generator113 18-clip importer contract, full-rifle scope suppression, four-jet thruster presenter, ability prefabs, six enemy prefabs/definitions, projectile prefab, player prefab, HUD/bootstrap references, SpawnDirector, and three-zone world validation passed.
 - Windows x64 Development Build completed successfully at 2026-08-10 17:50. Only non-blocking package-level Sentis shader warnings were reported.
 - A 15-second headless player smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. Expected offline Unity cloud `curl` failures were unrelated to gameplay, and final Unity Console inspection reported 0 errors.
 
@@ -87,9 +87,10 @@ These checks prove the current automated compile/test/build path. They do **not*
 
 - Owner/manual feel acceptance at Game view Fit/1x, including combined ground/flight/aim/scope/fire/reload/ability inputs, slopes, steps, close cover, and camera framing.
 - Owner/manual acceptance of sprint cadence, tap-jump versus hold-to-flight timing, touchdown transitions, and the unobstructed Precision Rifle scope presentation.
+- Data-driven sprint/flight overheat (stamina) resource, cooldown, HUD bar, and tuning remain a later gameplay slice; the current exhaust presenter intentionally has no resource authority.
 - Real profiler captures at representative and stress loads, including 30/60/120+ FPS checks, CPU/render/GC observations, and pool-capacity tuning.
 - Long lifecycle validation across death/respawn, scene reload, repeated pool reuse, malformed console input, and extended play.
-- Replacement-character/retargeting validation and true art/content polish. The current generated powered suit, enemies, VFX/audio hooks, and three-zone environment remain tech-demo content rather than final production art.
+- Replacement-character/retargeting validation and true art/content polish. The current generated powered suit, enemies, VFX/audio hooks, and three-zone environment remain tech-demo content rather than final production art. Audio hooks stay silent until owned or explicitly approved licensed SFX are available; no external audio was added in this pass.
 
 ## Scope exclusions
 

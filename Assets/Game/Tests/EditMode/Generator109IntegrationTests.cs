@@ -491,7 +491,7 @@ namespace Powersuit.Tests.EditMode
                 responsiveAnimationSettings.FindProperty(
                     "fullSpeedLocomotionPlayback"
                 ).floatValue,
-                Is.EqualTo(4.5f).Within(0.001f)
+                Is.EqualTo(2.75f).Within(0.001f)
             );
             Assert.That(
                 responsiveAnimationSettings.FindProperty(
@@ -536,12 +536,21 @@ namespace Powersuit.Tests.EditMode
             Assert.That(visual, Is.Not.Null);
             Component visualResponse =
                 player.GetComponent("PowerSuitVisualFlightResponse");
+            Component thrusterPresentation =
+                player.GetComponent("PowerSuitThrusterPresentation");
             Assert.That(visualResponse, Is.Not.Null);
+            Assert.That(thrusterPresentation, Is.Not.Null);
             Assert.That(
                 visualResponse.GetType().GetProperty("VisualRoot")
                     ?.GetValue(visualResponse),
                 Is.EqualTo(visual),
                 "Flight attitude must affect only the dedicated visual wrapper."
+            );
+            Assert.That(
+                thrusterPresentation.GetType().GetProperty("VisualRoot")
+                    ?.GetValue(thrusterPresentation),
+                Is.EqualTo(visual),
+                "Powered exhaust must follow the animated visual hierarchy."
             );
             Assert.That(
                 Quaternion.Angle(

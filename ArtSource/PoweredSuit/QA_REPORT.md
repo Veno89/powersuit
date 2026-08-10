@@ -1,4 +1,4 @@
-# Generator 112 Approved QA Report
+# Generator 113 Approved QA Report
 
 Date: 2026-08-10
 
@@ -9,11 +9,11 @@ Formal asset state: automated `PASS`, technical visual `APPROVED`, export allowe
 ## Packaged candidate
 
 - immutable source blend SHA-256: `49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4`
-- generated `powersuit_pipeline.blend` SHA-256: `0295acb528b0ca8c0f3ec68f642ad6c56c3f4ddaf9fe2f5a0ab84adae9311876`
-- approved `validation_report.json` SHA-256: `a7f3a487f3f549bbc8b3ac55c6a43f90a4ce67a5e42f9e6720a806c600442546`
-- `visual_approval.json` SHA-256: `1f7a4554c4a4290a803769f5492f526a76b1840fa45992013430909871e9fd37`
-- `export_manifest.json` SHA-256: `417c69c0ba33e69f19e9363e64992fd0a4747fc6fb7ef6380ba3aeda852474e4`
-- exported FBX SHA-256: `054b5a1875730b225cbb9192bbf760a75919126043ce3ae1503308d21fa8e409`
+- generated `powersuit_pipeline.blend` SHA-256: `a5054d65af2cb6a04836216456a1a3162f8d860c6c421533a7ac08a9f70d2d4b`
+- approved `validation_report.json` SHA-256: `a6d8c7bd98659f2cee33c906ca845d6e01e2d060dbc906b31de647ab664bf4ee`
+- `visual_approval.json` SHA-256: `7d6cc01a5ecce4067d1ae4409cb3dd23df68ed48da2ec3fa5acf279a8ee66d9b`
+- `export_manifest.json` SHA-256: `0a14ed949eba508857de4a004c317769eb1d6449f050318fd3c82b493815813d`
+- exported FBX SHA-256: `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`
 - Unity FBX hash matches the approved export: yes
 - required renders: 13 aim + 5 rifle + 15 weapon animation = 33/33
 - automated blockers: 0
@@ -23,7 +23,7 @@ Formal asset state: automated `PASS`, technical visual `APPROVED`, export allowe
 - rifle generator: 111
 - weapon contract: v3
 - rigid signature: v6
-- animation contract: v3
+- animation contract: v4
 - rig upgrade: v2
 - hand geometry: v3 on both hands
 - exact exported armature actions: 18
@@ -46,9 +46,9 @@ Selected aim/contact metrics:
 - trigger/support hand-grip overlap pairs: `18 / 6`
 - stock/shoulder overlap pairs: `22`
 - non-stock weapon/torso overlap pairs: `0`
-- forward/backward foot phase delta: `0.12655 m`
-- run/walk stride: `0.68534 / 0.54052 m`
-- run airborne clearance: `0.03428 m`
+- forward/backward foot phase delta: `0.21299 m`
+- run/walk stride: `0.93411 / 0.83793 m`
+- run airborne clearance: `0.03650 m`
 - run/ready torso forward projection: `0.10809 / -0.01189 m`
 - run trigger/support wrist error: below `0.000053 m`
 
@@ -63,7 +63,7 @@ Selected aim/contact metrics:
 
 ## Unity verification
 
-- active Unity FBX SHA-256 matches the approved Generator 112 export exactly
+- active Unity FBX SHA-256 matches the approved Generator 113 export exactly
 - retained FBX GUID `f48464ae4ba58b54f976e658ece758b3`
 - imported with Generic rig, cameras/lights disabled, hierarchy retained, and optimization disabled
 - ModelImporter contains exactly 18 configured clips with unique matching takes
@@ -73,13 +73,13 @@ Selected aim/contact metrics:
 - regenerated controller and player/world assets completed successfully
 - C# solution: 18 assemblies, 0 warnings, 0 errors
 - Unity Console after verification: 0 errors
-- EditMode: 222/222 passed
+- EditMode: 228/228 passed
 - PlayMode: 12/12 passed
-- Windows x64 Development build: succeeded on 2026-08-10 at 17:50
+- Windows x64 Development build: succeeded on 2026-08-10 at 21:01
 - 15-second headless smoke: no gameplay exception, assertion, or missing-reference patterns
 
 Unity's AI Inference/Sentis package emitted non-blocking third-party shader performance warnings during the Development build. No compiler, test, scene-load, smoke, or build failure resulted.
 
 ## Acceptance boundary
 
-Generator 112 is technically approved and integrated for hands-on evaluation. The exact evidence is frozen under `Validation/Generator112`; Generators 110 and 111 remain immutable rollback candidates. User play acceptance of powered-sprint cadence and foot slide, transitions, camera feel, reload contact, bolt feel, jump-to-flight timing, and scoped sight feel remains a separate gate in the repository `ROADMAP.md`.
+Generator 113 is technically approved and integrated for hands-on evaluation. The exact evidence is frozen under `Validation/Generator113`; Generators 110 through 112 remain immutable rollback candidates. Generator113 records 0.8379 m walk stride, 0.9341 m run stride, 0.0365 m run airborne clearance, animation contract version 4, and the deterministic Cycles CPU validation fallback used after the NVIDIA headless Workbench crash. User play acceptance of powered gait/propulsion, residual foot slide, transitions, camera feel, reload contact, bolt feel, jump-to-flight timing, and scoped sight feel remains a separate gate in the repository `ROADMAP.md`.
