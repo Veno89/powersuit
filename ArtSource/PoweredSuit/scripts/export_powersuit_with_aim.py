@@ -3,7 +3,7 @@
 
 Export is intentionally blocked unless:
 - automated validation passed
-- all 18 mandatory renders still exist and match their approved hashes
+- all 33 mandatory renders still exist and match their approved hashes
 - the user explicitly approved the visual result
 - the Action/Slot and rifle hierarchy remain valid
 """
@@ -77,6 +77,7 @@ EXPECTED_RENDER_FILES = {
     "renders/weapon_animation_validation/bolt_frame_012_close.png",
     "renders/weapon_animation_validation/stowed_walk_frame_009_rear_3q.png",
     "renders/weapon_animation_validation/stowed_hover_frame_031_rear_3q.png",
+    "renders/weapon_animation_validation/run_forward_frame_006_side.png",
 }
 
 
@@ -111,7 +112,7 @@ def _load_and_verify_approval(root_dir: Path) -> tuple[dict, dict]:
         for relative, expected_hash in approval.get("render_sha256", {}).items()
     }
     if set(approved_hashes) != EXPECTED_RENDER_FILES:
-        raise RuntimeError("Visual approval does not cover the canonical 32-render set.")
+        raise RuntimeError("Visual approval does not cover the canonical 33-render set.")
     report_files = {
         str(relative).replace("\\", "/")
         for relative in (
@@ -125,7 +126,7 @@ def _load_and_verify_approval(root_dir: Path) -> tuple[dict, dict]:
         or report.get("rifle_render_set_complete") is not True
         or report.get("weapon_animation_render_set_complete") is not True
     ):
-        raise RuntimeError("Validation report does not describe the canonical 32-render set.")
+        raise RuntimeError("Validation report does not describe the canonical 33-render set.")
     for relative, expected_hash in approved_hashes.items():
         path = root_dir / relative
         if not path.exists() or _sha256(path) != expected_hash:
@@ -332,6 +333,9 @@ def main() -> None:
             for name in REQUIRED_ACTIONS
         },
         "animation_fps": int(bpy.context.scene.render.fps),
+        "animation_contract_version": int(
+            rifle_root.get("ps_weapon_animation_contract_version", 0)
+        ),
         "gameplay_timing_markers": {
             "reload_commit_frame": int(
                 rifle_root.get("ps_reload_commit_frame", 75)

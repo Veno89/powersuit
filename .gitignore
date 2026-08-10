@@ -50,6 +50,8 @@ crashlytics-build.properties
 !/ArtSource/PoweredSuit/Validation/Generator110/renders/**
 !/ArtSource/PoweredSuit/Validation/Generator111/renders/
 !/ArtSource/PoweredSuit/Validation/Generator111/renders/**
+!/ArtSource/PoweredSuit/Validation/Generator112/renders/
+!/ArtSource/PoweredSuit/Validation/Generator112/renders/**
 
 # Local downloadable handoff packages
 /Deliverables/

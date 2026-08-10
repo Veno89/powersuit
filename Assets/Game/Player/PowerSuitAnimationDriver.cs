@@ -12,6 +12,7 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         "LocomotionPlaybackSpeed";
     public const string IsBackpedalingParameterName = "IsBackpedaling";
     public const string IsAimWalkingParameterName = "IsAimWalking";
+    public const string IsRunningParameterName = "IsRunning";
 
     [SerializeField] private PowerSuitController controller;
     [SerializeField] private Animator animator;
@@ -49,12 +50,16 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
     private static readonly int IsAimWalkingParameter =
         Animator.StringToHash(IsAimWalkingParameterName);
 
+    private static readonly int IsRunningParameter =
+        Animator.StringToHash(IsRunningParameterName);
+
     private bool hasMovementX;
     private bool hasMovementY;
     private bool hasMovementSpeed;
     private bool hasLocomotionPlaybackSpeed;
     private bool hasIsBackpedaling;
     private bool hasIsAimWalking;
+    private bool hasIsRunning;
     private int forwardWeaponPoseLayerIndex = -1;
     private float forwardWeaponPoseLayerWeight;
 
@@ -122,6 +127,7 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         );
         hasIsBackpedaling = HasParameter(IsBackpedalingParameter, AnimatorControllerParameterType.Bool);
         hasIsAimWalking = HasParameter(IsAimWalkingParameter, AnimatorControllerParameterType.Bool);
+        hasIsRunning = HasParameter(IsRunningParameter, AnimatorControllerParameterType.Bool);
         forwardWeaponPoseLayerIndex = animator.GetLayerIndex(
             ForwardWeaponPoseLayerName
         );
@@ -202,6 +208,14 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
             animator.SetBool(
                 IsAimWalkingParameter,
                 controller.IsAimWalking && canAnimateAim
+            );
+        }
+
+        if (hasIsRunning)
+        {
+            animator.SetBool(
+                IsRunningParameter,
+                controller.IsRunning
             );
         }
     }

@@ -89,6 +89,7 @@ namespace Powersuit.Editor
             "PS_Weapon_Sheathe",
             "PS_Walk_Forward",
             "PS_Walk_Backward",
+            "PS_Run_Forward",
             "PS_Aim_Walk_Forward",
             "PS_Aim_Walk_Backward",
             "PS_WeaponStowed_Walk_Forward",
@@ -109,6 +110,7 @@ namespace Powersuit.Editor
                 "PS_WeaponStowed_Idle",
                 "PS_Walk_Forward",
                 "PS_Walk_Backward",
+                "PS_Run_Forward",
                 "PS_Aim_Walk_Forward",
                 "PS_Aim_Walk_Backward",
                 "PS_WeaponStowed_Walk_Forward",
@@ -546,6 +548,7 @@ namespace Powersuit.Editor
             }
 
             controller.AddParameter("IsMoving", AnimatorControllerParameterType.Bool);
+            controller.AddParameter("IsRunning", AnimatorControllerParameterType.Bool);
             controller.AddParameter("IsFlying", AnimatorControllerParameterType.Bool);
             controller.AddParameter("IsAiming", AnimatorControllerParameterType.Bool);
             controller.AddParameter("MovementX", AnimatorControllerParameterType.Float);
@@ -657,6 +660,16 @@ namespace Powersuit.Editor
                 aimLocomotion,
                 new Vector3(500f, 40f)
             );
+            AnimatorState run = AddState(
+                stateMachine,
+                "Run Locomotion",
+                clips["PS_Run_Forward"],
+                new Vector3(500f, -100f)
+            );
+            // The authored clip is already a 180-steps/minute gait. A modest
+            // super-suit cadence boost reads fast without the leg blur caused
+            // by inheriting the walk state's 4.5x playback parameter.
+            run.speed = 1.35f;
             AnimatorState hover = AddState(
                 stateMachine,
                 "Hover",
@@ -688,6 +701,35 @@ namespace Powersuit.Editor
                 Condition("IsAiming", false),
                 Condition("IsFlying", false)
             );
+            AddTransition(
+                ready,
+                run,
+                Condition("IsRunning", true),
+                Condition("IsAiming", false),
+                Condition("IsFlying", false),
+                Condition("WeaponStowed", false)
+            );
+            AddTransition(
+                run,
+                ready,
+                Condition("IsRunning", false),
+                Condition("IsAiming", false),
+                Condition("IsFlying", false),
+                Condition("WeaponStowed", false)
+            );
+            AddTransition(
+                run,
+                aim,
+                Condition("IsAiming", true),
+                Condition("IsFlying", false)
+            );
+            AddTransition(
+                run,
+                stowed,
+                Condition("WeaponStowed", true),
+                Condition("IsFlying", false)
+            );
+            AddTransition(run, hover, Condition("IsFlying", true));
             AddTransition(
                 ready,
                 stowed,
@@ -1094,6 +1136,25 @@ namespace Powersuit.Editor
             }
         }
 
+        private static bool HasBoolTransition(
+            AnimatorState source,
+            AnimatorState destination,
+            params AnimatorCondition[] requiredConditions
+        )
+        {
+            return source.transitions.Any(
+                transition =>
+                    transition.destinationState == destination &&
+                    requiredConditions.All(
+                        required => transition.conditions.Any(
+                            actual =>
+                                actual.parameter == required.parameter &&
+                                actual.mode == required.mode
+                        )
+                    )
+            );
+        }
+
         private static void AddAnyStateTrigger(
             AnimatorStateMachine stateMachine,
             AnimatorState destination,
@@ -1453,6 +1514,14 @@ namespace Powersuit.Editor
                 weapon.Definition = weaponDefinition;
                 weapon.ShowLegacyAmmoHud = false;
 
+                PowerSuitScopeSight scopeSight =
+                    instance.GetComponent<PowerSuitScopeSight>();
+                if (scopeSight == null)
+                {
+                    scopeSight = instance.AddComponent<PowerSuitScopeSight>();
+                }
+                scopeSight.Bind(suitController, weapon);
+
                 PlayerHealth playerHealth = instance.GetComponent<PlayerHealth>();
                 if (playerHealth == null)
                 {
@@ -1801,6 +1870,21 @@ namespace Powersuit.Editor
                     serialized,
                     "movementSettings.boostAccelerationMultiplier",
                     1.7f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.groundRunSpeedMultiplier",
+                    1.65f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.jumpHoldFlightDelaySeconds",
+                    0.9f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.jumpHoldGravityScale",
+                    0.55f
                 );
             }
             SetFloat(serialized, "cameraDistance", 9.5f);
@@ -2398,6 +2482,7 @@ namespace Powersuit.Editor
                 "Ready Locomotion",
                 "Stowed Locomotion",
                 "Aim Locomotion",
+                "Run Locomotion",
                 "Hover",
                 "Stowed Hover",
                 "Forward Weapon Pose",
@@ -2410,6 +2495,71 @@ namespace Powersuit.Editor
             {
                 throw new InvalidOperationException(
                     "PowerSuitAnimator is missing one or more combat-animation states."
+                );
+            }
+
+            AnimatorState runState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Run Locomotion");
+            AnimatorState readyState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Ready Locomotion");
+            AnimatorState aimState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Aim Locomotion");
+            AnimatorState stowedState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Stowed Locomotion");
+            AnimatorState hoverState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Hover");
+            if (
+                runState == null ||
+                readyState == null ||
+                aimState == null ||
+                stowedState == null ||
+                hoverState == null ||
+                runState.motion != clips["PS_Run_Forward"] ||
+                runState.speedParameterActive ||
+                Mathf.Abs(runState.speed - 1.35f) > 0.001f ||
+                !HasBoolTransition(
+                    readyState,
+                    runState,
+                    Condition("IsRunning", true),
+                    Condition("IsAiming", false),
+                    Condition("IsFlying", false),
+                    Condition("WeaponStowed", false)
+                ) ||
+                !HasBoolTransition(
+                    runState,
+                    readyState,
+                    Condition("IsRunning", false),
+                    Condition("IsAiming", false),
+                    Condition("IsFlying", false),
+                    Condition("WeaponStowed", false)
+                ) ||
+                !HasBoolTransition(
+                    runState,
+                    aimState,
+                    Condition("IsAiming", true),
+                    Condition("IsFlying", false)
+                ) ||
+                !HasBoolTransition(
+                    runState,
+                    stowedState,
+                    Condition("WeaponStowed", true),
+                    Condition("IsFlying", false)
+                ) ||
+                !HasBoolTransition(
+                    runState,
+                    hoverState,
+                    Condition("IsFlying", true)
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    "Run Locomotion must use the authored PS_Run_Forward clip " +
+                    "at its validated powered-sprint cadence and retain every locomotion exit."
                 );
             }
 
@@ -2455,6 +2605,19 @@ namespace Powersuit.Editor
                 throw new InvalidOperationException(
                     "PowerSuitAnimator must layer Base, Forward Weapon Pose, " +
                     "additive Bolt Cycle Action, then override Weapon Actions."
+                );
+            }
+
+            if (
+                !controller.parameters.Any(
+                    parameter =>
+                        parameter.name == PowerSuitAnimationDriver.IsRunningParameterName &&
+                        parameter.type == AnimatorControllerParameterType.Bool
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    "PowerSuitAnimator is missing the IsRunning bool parameter."
                 );
             }
 
@@ -2649,6 +2812,18 @@ namespace Powersuit.Editor
                 controllerSettings.FindProperty("scopeEyeRelief");
             SerializedProperty scopedNearClip =
                 controllerSettings.FindProperty("scopedNearClipPlane");
+            SerializedProperty runSpeedMultiplier =
+                controllerSettings.FindProperty(
+                    "movementSettings.groundRunSpeedMultiplier"
+                );
+            SerializedProperty jumpHoldFlightDelay =
+                controllerSettings.FindProperty(
+                    "movementSettings.jumpHoldFlightDelaySeconds"
+                );
+            SerializedProperty jumpHoldGravityScale =
+                controllerSettings.FindProperty(
+                    "movementSettings.jumpHoldGravityScale"
+                );
             if (
                 normalDistance == null ||
                 normalHeight == null ||
@@ -2664,6 +2839,9 @@ namespace Powersuit.Editor
                 aimFov == null ||
                 scopeEyeRelief == null ||
                 scopedNearClip == null ||
+                runSpeedMultiplier == null ||
+                jumpHoldFlightDelay == null ||
+                jumpHoldGravityScale == null ||
                 normalDistance.floatValue < 9.4f ||
                 normalHeight.floatValue < 1.45f ||
                 normalFov.floatValue < 71f ||
@@ -2683,7 +2861,10 @@ namespace Powersuit.Editor
                 aimFov.floatValue >= normalFov.floatValue ||
                 scopeEyeRelief.floatValue < 0.02f ||
                 scopeEyeRelief.floatValue > 0.1f ||
-                scopedNearClip.floatValue > 0.05f
+                scopedNearClip.floatValue > 0.05f ||
+                Mathf.Abs(runSpeedMultiplier.floatValue - 1.65f) > 0.001f ||
+                Mathf.Abs(jumpHoldFlightDelay.floatValue - 0.9f) > 0.001f ||
+                Mathf.Abs(jumpHoldGravityScale.floatValue - 0.55f) > 0.001f
             )
             {
                 throw new InvalidOperationException(
@@ -2752,6 +2933,7 @@ namespace Powersuit.Editor
                     MuzzleAdapterRotation
                 ) > 0.1f ||
                 variant.GetComponent<PowerSuitInputRouter>() == null ||
+                variant.GetComponent<PowerSuitScopeSight>() == null ||
                 !precisionRifle.SupportsScope ||
                 precisionRifle.ScopedFieldOfViewDegrees >=
                     precisionRifle.ShoulderFieldOfViewDegrees ||

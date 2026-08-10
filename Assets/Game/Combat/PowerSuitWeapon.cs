@@ -212,6 +212,14 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         inputRouter = GetComponent<PowerSuitInputRouter>();
         playerCamera = Camera.main;
 
+        PowerSuitScopeSight scopeSight = GetComponent<PowerSuitScopeSight>();
+        if (scopeSight == null)
+        {
+            scopeSight = gameObject.AddComponent<PowerSuitScopeSight>();
+        }
+
+        scopeSight.Bind(controller, this);
+
         if (playerCamera == null)
         {
             Debug.LogError("No Main Camera found.", this);
@@ -888,6 +896,16 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             {
                 DrawAmmoHud();
             }
+            return;
+        }
+
+        if (controller.IsScoped || controller.ScopeBlend > 0.01f)
+        {
+            if (showLegacyAmmoHud)
+            {
+                DrawAmmoHud();
+            }
+
             return;
         }
 

@@ -8,7 +8,7 @@ BLENDER="${BLENDER_EXE:-blender}"
   >/dev/null
 
 [[ -f powersuit_pipeline.blend ]] || { echo "Run 01_build_and_render.sh first."; exit 1; }
-read -r -p "After inspecting all 18 PNGs, type APPROVE to export: " confirm
+read -r -p "After inspecting all 33 PNGs, type APPROVE to export: " confirm
 [[ "$confirm" == "APPROVE" ]] || { echo "Approval cancelled; no FBX exported."; exit 1; }
 
 "$BLENDER" --background powersuit_pipeline.blend --python-exit-code 1 --python scripts/approve_validation.py -- --approve

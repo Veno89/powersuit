@@ -88,7 +88,8 @@ namespace Powersuit.Combat
         public float AimRecoilYaw => aimRecoilYaw;
         public float HipRecoilPitch => hipRecoilPitch;
         public float HipRecoilYaw => hipRecoilYaw;
-        public bool SupportsScope => supportsScope;
+        public bool SupportsScope =>
+            WeaponScopeEligibility.CanUseMagnifiedScope(weaponClass, supportsScope);
         public float ShoulderFieldOfViewDegrees => shoulderFieldOfViewDegrees;
         public float ScopedFieldOfViewDegrees => scopedFieldOfViewDegrees;
         public float ShoulderLookSensitivityMultiplier =>
@@ -131,7 +132,7 @@ namespace Powersuit.Combat
         public WeaponAimProfile CreateAimProfile()
         {
             return new WeaponAimProfile(
-                supportsScope: supportsScope,
+                supportsScope: SupportsScope,
                 shoulderFieldOfViewDegrees: shoulderFieldOfViewDegrees,
                 scopedFieldOfViewDegrees: scopedFieldOfViewDegrees,
                 shoulderLookSensitivityMultiplier: shoulderLookSensitivityMultiplier,

@@ -14,7 +14,7 @@ import traceback
 from pathlib import Path
 
 import bpy  # type: ignore
-from mathutils import Matrix, Vector  # type: ignore
+from mathutils import Matrix, Quaternion, Vector  # type: ignore
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
@@ -69,7 +69,7 @@ from weapon_handling_contract import (  # noqa: E402
 )
 
 FPS = 30
-ANIMATION_CONTRACT_VERSION = 2
+ANIMATION_CONTRACT_VERSION = 3
 REQUIRED_GENERATOR_VERSION = 111
 WEAPON_ROOT_BONE = "WeaponRoot"
 MAGAZINE_BONE = "WeaponMagazine"
@@ -82,6 +82,16 @@ LOWER_BODY_BONES = (
     "UpperLeg.R", "LowerLeg.R", "Foot.R",
 )
 WALK_SAMPLE_FRAMES = (1, 5, 9, 13, 17, 21, 25, 29, 31)
+RUN_SAMPLE_FRAMES = (1, 4, 6, 9, 11, 14, 16, 19, 21)
+RUN_STRIDE_SCALE = 1.30
+RUN_FLIGHT_LIFT_METRES = {
+    4: 0.018,
+    6: 0.060,
+    9: 0.018,
+    14: 0.018,
+    16: 0.060,
+    19: 0.018,
+}
 LOOP_ACTIONS = {
     "PS_WeaponReady_Idle",
     "PS_WeaponStowed_Idle",
@@ -92,6 +102,7 @@ LOOP_ACTIONS = {
     "PS_WeaponStowed_Walk_Forward",
     "PS_WeaponStowed_Walk_Backward",
     "PS_WeaponStowed_Hover",
+    "PS_Run_Forward",
 }
 
 
@@ -135,6 +146,55 @@ def _combine_upper_and_lower(
     for name in LOWER_BODY_BONES:
         result[name] = lower[name].copy()
     return result
+
+
+def _extrapolate_matrix(
+    reference: Matrix,
+    animated: Matrix,
+    factor: float,
+) -> Matrix:
+    """Scale an authored local-space motion delta without changing its rest basis."""
+    reference_location, reference_rotation, reference_scale = reference.decompose()
+    animated_location, animated_rotation, animated_scale = animated.decompose()
+    delta_rotation = reference_rotation.rotation_difference(animated_rotation)
+    axis, angle = delta_rotation.to_axis_angle()
+    scaled_delta = (
+        Quaternion(axis, angle * factor)
+        if abs(angle) > 1.0e-8
+        else Quaternion()
+    )
+    return Matrix.LocRotScale(
+        reference_location + (animated_location - reference_location) * factor,
+        reference_rotation @ scaled_delta,
+        reference_scale + (animated_scale - reference_scale) * factor,
+    )
+
+
+def _amplify_lower_body(
+    reference: dict[str, Matrix],
+    animated: dict[str, Matrix],
+    factor: float,
+) -> dict[str, Matrix]:
+    result = _copy_pose(animated)
+    for name in LOWER_BODY_BONES:
+        result[name] = _extrapolate_matrix(reference[name], animated[name], factor)
+    return result
+
+
+def _lift_hips_world(
+    armature: bpy.types.Object,
+    pose: dict[str, Matrix],
+    lift_metres: float,
+) -> dict[str, Matrix]:
+    if lift_metres <= 0.0:
+        return _copy_pose(pose)
+    _apply_basis_snapshot(armature, pose)
+    _right, _forward, up = body_basis(armature)
+    offset = armature.matrix_world.inverted_safe().to_3x3() @ (up * lift_metres)
+    hips = armature.pose.bones["Hips"]
+    hips.matrix = Matrix.Translation(offset) @ hips.matrix
+    bpy.context.view_layer.update()
+    return _basis_snapshot(armature)
 
 
 def _matrix_max_delta(first: Matrix, second: Matrix) -> float:
@@ -603,6 +663,13 @@ def _validate_actions(
             expected = expected_transform_curve_count(armature, action, slot)
             if stats["curve_count"] != expected:
                 raise RuntimeError(f"{name} slot is incomplete: {stats}.")
+        if name in WEAPON_ANIMATION_ACTIONS:
+            version = int(action.get("ps_animation_contract_version", 0))
+            if version != ANIMATION_CONTRACT_VERSION:
+                raise RuntimeError(
+                    f"{name} animation contract version is {version}; expected "
+                    f"{ANIMATION_CONTRACT_VERSION}."
+                )
 
     for name in LOOP_ACTIONS:
         action = bpy.data.actions[name]
@@ -725,6 +792,25 @@ def main() -> None:
         armature, _basis_snapshot(armature), hand_to_root, carrier_to_root
     )
 
+    # Run keeps the two-hand chest-ready weapon contract while committing the
+    # upper body farther forward than walk. The lower body is a deliberately
+    # amplified version of the audited gait, retimed to a 20-frame cycle with
+    # two brief airborne phases (180 steps/minute at 30 FPS).
+    _apply_basis_snapshot(armature, ready)
+    run_right = body_basis(armature)[0]
+    rotate_pose_bone_world(
+        armature, "Spine", run_right, math.radians(-8.0)
+    )
+    rotate_pose_bone_world(
+        armature, "Chest", run_right, math.radians(-5.0)
+    )
+    rotate_pose_bone_world(
+        armature, "Head", run_right, math.radians(3.0)
+    )
+    run_upper = _pose_weapon_follow_hand(
+        armature, _basis_snapshot(armature), hand_to_root, carrier_to_root
+    )
+
     ready_idle = {1: ready, 31: ready_mid, 61: ready}
     stowed_idle: dict[int, dict[str, Matrix]] = {}
     for frame, pose in {1: idle, 31: idle_mid, 61: idle_end}.items():
@@ -759,6 +845,19 @@ def main() -> None:
                 )
             poses[output_frame] = pose
         locomotion[name] = poses
+
+    run_forward: dict[int, dict[str, Matrix]] = {}
+    for output_frame, source_frame in zip(RUN_SAMPLE_FRAMES, WALK_SAMPLE_FRAMES):
+        lower = _amplify_lower_body(
+            idle, walk_sources[source_frame], RUN_STRIDE_SCALE
+        )
+        pose = _combine_upper_and_lower(run_upper, lower)
+        pose = _lift_hips_world(
+            armature, pose, RUN_FLIGHT_LIFT_METRES.get(output_frame, 0.0)
+        )
+        run_forward[output_frame] = _pose_weapon_follow_hand(
+            armature, pose, hand_to_root, carrier_to_root
+        )
 
     stowed_hover: dict[int, dict[str, Matrix]] = {}
     for frame in (1, 31, 61):
@@ -898,6 +997,7 @@ def main() -> None:
         "PS_Weapon_Draw": draw,
         "PS_Weapon_Sheathe": sheathe,
         **locomotion,
+        "PS_Run_Forward": run_forward,
         "PS_WeaponStowed_Hover": stowed_hover,
         "PS_Reload": reload_poses,
         "PS_BoltCycle": bolt_poses,
@@ -913,6 +1013,9 @@ def main() -> None:
     root["ps_reload_commit_frame"] = 75
     root["ps_reload_frame_end"] = 84
     root["ps_bolt_cycle_frame_end"] = 20
+    root["ps_run_cycle_frame_end"] = 21
+    root["ps_run_cycle_seconds"] = 20.0 / FPS
+    root["ps_run_step_cadence_per_minute"] = 180
     root["ps_animation_action_names"] = list(WEAPON_ANIMATION_ACTIONS)
     root["ps_stowed_locomotion_actions"] = [
         "PS_WeaponStowed_Walk_Forward",

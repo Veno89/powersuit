@@ -11,7 +11,6 @@ public enum PowerSuitInputButtons : ushort
 {
     None = 0,
     Jump = 1 << 0,
-    FlightToggle = 1 << 1,
     Boost = 1 << 2,
     Aim = 1 << 3,
     Fire = 1 << 4,
@@ -51,8 +50,9 @@ public static class PowerSuitDefaultInputBindings
 {
     /// <summary>
     /// Resolves one physical gamepad control to its discrete gameplay intent.
-    /// Flight is deliberately isolated on the west button; fire is exclusively
-    /// on the right trigger so a flight toggle can never also request a shot.
+    /// Jump/flight is owned by the south button and fire is exclusively on the
+    /// right trigger. The west button is intentionally unassigned now that
+    /// flight is entered by holding Jump instead of a separate toggle.
     /// </summary>
     public static PowerSuitInputButtons GetGamepadIntent(
         PowerSuitGamepadControl control
@@ -65,7 +65,7 @@ public static class PowerSuitDefaultInputBindings
             case PowerSuitGamepadControl.ButtonEast:
                 return PowerSuitInputButtons.Cancel;
             case PowerSuitGamepadControl.ButtonWest:
-                return PowerSuitInputButtons.FlightToggle;
+                return PowerSuitInputButtons.None;
             case PowerSuitGamepadControl.ButtonNorth:
                 return PowerSuitInputButtons.Reload;
             case PowerSuitGamepadControl.RightShoulder:
@@ -143,9 +143,8 @@ public readonly struct PowerSuitInputSnapshot
     public PowerSuitInputButtons Pressed { get; }
     public PowerSuitInputButtons Released { get; }
 
+    public bool JumpHeld => IsHeld(PowerSuitInputButtons.Jump);
     public bool JumpPressed => WasPressed(PowerSuitInputButtons.Jump);
-    public bool FlightTogglePressed =>
-        WasPressed(PowerSuitInputButtons.FlightToggle);
     public bool BoostHeld => IsHeld(PowerSuitInputButtons.Boost);
     public bool AimHeld => IsHeld(PowerSuitInputButtons.Aim);
     public bool FireHeld => IsHeld(PowerSuitInputButtons.Fire);
@@ -422,13 +421,6 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 ref held,
                 ref pressed,
                 ref released,
-                PowerSuitInputButtons.FlightToggle,
-                keyboard.fKey
-            );
-            AddButton(
-                ref held,
-                ref pressed,
-                ref released,
                 PowerSuitInputButtons.Boost,
                 keyboard.leftShiftKey
             );
@@ -554,13 +546,6 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 ref held,
                 ref pressed,
                 ref released,
-                PowerSuitGamepadControl.ButtonWest,
-                gamepad.buttonWest
-            );
-            AddGamepadButton(
-                ref held,
-                ref pressed,
-                ref released,
                 PowerSuitGamepadControl.ButtonNorth,
                 gamepad.buttonNorth
             );
@@ -649,18 +634,6 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 Input.GetKeyDown(KeyCode.JoystickButton0),
             Input.GetKeyUp(KeyCode.Space) ||
                 Input.GetKeyUp(KeyCode.JoystickButton0)
-        );
-        AddButton(
-            ref held,
-            ref pressed,
-            ref released,
-            PowerSuitInputButtons.FlightToggle,
-            Input.GetKey(KeyCode.F) ||
-                Input.GetKey(KeyCode.JoystickButton2),
-            Input.GetKeyDown(KeyCode.F) ||
-                Input.GetKeyDown(KeyCode.JoystickButton2),
-            Input.GetKeyUp(KeyCode.F) ||
-                Input.GetKeyUp(KeyCode.JoystickButton2)
         );
         AddButton(
             ref held,

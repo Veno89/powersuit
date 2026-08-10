@@ -34,8 +34,9 @@ The active lineage preserves Reset06's useful clean-source runner, semantic weap
 - Unity back-face culling exposed inward primitive face winding that Blender's normal two-sided display had hidden.
 - Generator 110 corrected suit/rifle winding and added a signed-volume export gate. Its 18-view evidence and FBX remain archived as the rollback baseline.
 - Generator 111 extends the contract to v3/signature v6, introduces explicit articulated magazine and bolt components, and exports 17 synchronized armature actions. Its clean build produced 32 mandatory views, passed automated validation with zero blockers, received technical visual approval, and exported on 2026-08-09.
+- Generator 112 preserves Generator 111's geometry, weapon contract, controls, and all 17 original action ranges while advancing the animation contract to v3 and adding `PS_Run_Forward`. Its clean build produced 33 mandatory views, passed automated validation with zero blockers, received technical visual approval, and exported on 2026-08-10.
 
-Generator 111 guarantees include:
+Generator 111 framework guarantees retained by Generator 112 include:
 
 - explicit wrist-head target semantics and signed contact-offset vectors
 - corrected stock-side convention and intended-target stock validation
@@ -44,12 +45,21 @@ Generator 111 guarantees include:
 - bounded deterministic head settling and explicit sight-axis/eye-ray metrics
 - grip, stock, torso, framing, and articulated-component checks
 - three validation render sets that are produced even when review blockers exist
-- exact 32-render hashing before approval and export
+- exact validation-render hashing before approval and export
 - outward face winding and signed-volume rejection for Unity back-face culling
-- exactly 17 armature actions, with `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt` synchronization
+- one synchronized armature Action Slot per exported action, with `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt` synchronization
+
+Generator 112 adds these verified guarantees:
+
+- exactly 18 armature actions and 33 approved render hashes
+- `PS_Run_Forward` frames 1-21 at 30 FPS, closing a 20-frame loop at 180 native steps per minute
+- run stride `0.6853 m` versus walk stride `0.5405 m`
+- airborne clearance `0.0343 m`, forward torso projection `0.1081 m`, and sub-0.1 mm two-hand grip errors
+- generated blend SHA-256 `0295acb528b0ca8c0f3ec68f642ad6c56c3f4ddaf9fe2f5a0ab84adae9311876`
+- exported FBX SHA-256 `054b5a1875730b225cbb9192bbf760a75919126043ce3ae1503308d21fa8e409`
 
 ## Artifact policy
 
 Canonical inputs are the audited source blend, scripts, launchers, documentation, and provenance records. Working blends/renders/exports are regenerable and ignored. Important candidates are frozen under named validation directories rather than silently replacing history.
 
-Generator 110 remains available under `Validation/Generator110`. Generator 111 evidence and the exact exported FBX are under `Validation/Generator111`; the same FBX is imported additively in Unity. Existing `Generator109` Unity asset names remain in place for GUID/reference continuity.
+Generator 110 remains available under `Validation/Generator110`, and Generator 111 remains frozen under `Validation/Generator111`. Generator 112 evidence and its exact exported FBX are under `Validation/Generator112`; the same FBX binary is active in Unity. Existing `Generator109` and `Generator111` Unity object/asset names remain in place for GUID and reference continuity.

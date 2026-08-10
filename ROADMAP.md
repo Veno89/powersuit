@@ -7,10 +7,10 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | Phase | Implementation | Automated evidence | Open acceptance |
 | --- | --- | --- | --- |
 | A — Audit and stabilize | Complete for current batch | Compile, suites, generated-content validation, build, smoke | Owner combined-input review |
-| B — Ground movement feel | Implemented | Plain-C# and adapter tests pass | Slopes, steps, landing and feel review |
-| C — Flight feel | Implemented | State/adapter tests and smoke pass | Takeoff, hover, boost, landing and frame-rate feel review |
+| B — Ground movement feel | Implemented with sprint/run | Plain-C# and adapter tests pass | Sprint cadence, slopes, steps, landing and feel review |
+| C — Flight feel | Implemented with hold-to-flight/touchdown | State/adapter tests and smoke pass | Jump/flight timing, hover, boost, landing and frame-rate feel review |
 | D — Camera and aiming | Implemented profiles and true scope | Camera/source validation passes | Fit/1x framing, close cover and scope feel review |
-| E — Animation integration | Implemented tech-demo set | Controller/prefab validation passes | Visual polish, retargeting and replacement character |
+| E — Animation integration | Generator112 18-clip tech-demo set implemented | Controller/prefab and 33-render source validation pass | Run visual polish, retargeting and replacement character |
 | F — Precision Rifle | Implemented | Runtime/presentation/pooling tests pass | Shot, reload, bolt and scope feel review |
 | G — Three abilities | Implemented | State, targeting and adapter tests pass | Combat tuning and presentation review |
 | H — Enemy architecture | Implemented with six archetypes | Runtime/adapter/content tests pass | Archetype readability and fair-combat review |
@@ -36,10 +36,15 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 
 - [x] Add acceleration/deceleration, camera-relative signed movement, backpedal, grounding hysteresis, coyote time, jump buffer, air control, and landing response.
 - [x] Apply the focused fast-response tune: 6.5 m/s ground speed, strong acceleration/deceleration/reversal braking, responsive 14/28 m/s flight/boost, faster combat turning, and stride playback matched closer to the new speed.
-- [x] Add takeoff, hover, vertical control, braking, boost, banking, landing, and flight-compatible weapon/ability actions.
+- [x] Add stable-ground `Shift` sprinting for forward/lateral movement with a 1.65x speed multiplier; keep aim and backpedal in their dedicated locomotion states.
+- [x] Add the looping Generator112 `PS_Run_Forward` clip and generated `Run Locomotion` state, using 1.35x state playback rather than the walk state's 4.5x speed parameter.
+- [x] Replace the `F` flight toggle with tap-versus-hold jump ownership: tap `Space` jumps, while continuously holding an accepted ground/coyote jump for about 0.9 seconds enters flight.
+- [x] Prevent falling + `Space` from arming flight, cancel the hold sequence on early landing/release, and return to ground locomotion automatically when the player's feet touch down.
+- [x] Add hover, vertical control, braking, boost, banking, landing, and flight-compatible weapon/ability actions; `Shift` remains the flight boost while airborne.
 - [x] Add exploration, shoulder, flight, boost, targeting, and weapon-specific scope camera profiles with damped collision response.
 - [x] Raise mouse/pad aim response, camera damping, shoulder/scope sensitivity, and aim transition sharpness without changing ballistic or reticle ownership.
-- [x] Use the rifle `ScopePoint` for actual scoped camera placement; keep `V` scope ownership distinct from held RMB shoulder aim.
+- [x] Use the rifle `ScopePoint` for actual scoped camera placement; allow `V` only for a scope-enabled Precision Rifle while RMB owns shoulder aim.
+- [x] Hide obstructing scope/ocular geometry while scoped and present a circular sight, crosshair, mil ticks, and range stadia aligned to the same weapon aim ray.
 - [x] Integrate ready/stowed carry, draw/sheathe, directional locomotion, aim-walk, flight, reload, and additive bolt action through the generated four-layer controller.
 - [x] Keep rifle authority in C#: finite ammo, cadence, criticals, timed manual/empty-magazine automatic reload, physical projectile, bolt gate, death/reset, and action priorities.
 - [x] Keep the rifle forward for accepted hip-fire and flight-fire staging instead of leaving it diagonally across the chest.
@@ -74,20 +79,22 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ## Verification completed
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
-- [x] Full Unity EditMode suite: 197/197 passed.
+- [x] Full Unity EditMode suite: 222/222 passed.
 - [x] Full Unity PlayMode suite: 12/12 passed.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
-- [x] Generated controller, additive bolt clip, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.
+- [x] Generator112 source validation: 18 animation clips and 33 mandatory renders, including `PS_Run_Forward`.
+- [x] Generated controller/run state, additive bolt clip, scope presenter, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.
 - [x] Clean runtime observation after final pooling/enemy fixes: no Unity gameplay errors or recurring warnings.
 - [x] Windows x64 Development Build completed.
-- [x] Fifteen-second headless build smoke: no gameplay exception, assertion, or crash-pattern match. Non-blocking third-party Sentis shader warnings may appear in build logs.
+- [x] Fifteen-second headless build smoke started successfully and remained alive until the intentional stop, with no gameplay exception, assertion, or missing-reference pattern. Only expected offline Unity cloud `curl` failures appeared; package-level Sentis shader warnings in the build were non-blocking.
+- [x] Final Unity Console inspection: 0 errors.
 
 ## Manual and measurement gates still open
 
 - [ ] Owner acceptance at **Game view Fit/1x** for camera framing and perceived zoom. A saved local `2x`/`4x` or panned Game view is not a gameplay camera setting.
-- [ ] Ground matrix: walk/run responsiveness, reverse/backpedal, diagonal movement, jump buffer/coyote behavior, slopes, steps, walls, landing recovery, and rapid direction changes.
-- [ ] Flight matrix: takeoff/landing, hover, ascend/descend, braking, boost, banking, terrain proximity, and rapid ground/flight transitions.
-- [ ] Combat matrix on ground and in flight: shoulder aim, `V` scope, hip fire, reload, bolt cycle, draw/stow, rocket, lightning target/cancel/cast, void cast, and conflicting-input priority.
+- [ ] Ground matrix: walk/sprint responsiveness and cadence, reverse/backpedal, diagonal movement, jump buffer/coyote behavior, slopes, steps, walls, landing recovery, and rapid direction changes.
+- [ ] Flight matrix: quick-tap jump versus roughly 0.9-second hold-to-flight, automatic touchdown, hover, ascend/descend, braking, boost, banking, terrain proximity, and rapid ground/flight transitions.
+- [ ] Combat matrix on ground and in flight: shoulder aim, Precision-Rifle-only RMB + `V` scope, scope readability/reticle alignment, hip fire, reload, bolt cycle, draw/stow, rocket, lightning target/cancel/cast, void cast, and conflicting-input priority.
 - [ ] Camera matrix: exploration/shoulder/flight/boost/target/scope transitions, close cover, vertical aim, recoil, and keeping player/weapon readable.
 - [ ] Encounter feel: six archetypes are distinguishable and fair; spawn pacing, telegraphs, threat mix, damage, cooldowns, meter gain, and readability suit the intended loop.
 - [ ] Unity Profiler captures under representative and stress loads. Record CPU, rendering, GC/allocation, pool misses/capacity, projectile counts, and frame pacing at 30/60/120+ FPS and uncapped.
@@ -97,8 +104,8 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ## Recommended owner test loop
 
 1. Set Game view to Fit/1x and start `PoweredSuitAimDemo`.
-2. Move and jump through the central zone, take off, boost into the open zone, then transition through the vertical zone.
-3. Test shoulder aim and `V` scope on ground and in flight; fire, cycle, reload, stow/draw, and check close-cover framing.
+2. Move through the central zone, hold `Shift` to sprint, tap `Space` for a normal jump, then hold an accepted jump for about 0.9 seconds to enter flight; boost into the open zone and touch down again.
+3. Test shoulder aim and RMB + `V` with the Precision Rifle on ground and in flight; confirm non-precision weapons cannot scope, then fire, cycle, reload, stow/draw, and check sight and close-cover framing.
 4. Use rocket, hold/release lightning, and charge/cast void against mixed enemy groups.
 5. Open the console and use `showstats on`, `pools`, `projectiles`, `enemies`, `spawn.list`, and controlled `spawn`/`despawnall`/`seed` commands.
 6. Record specific feel issues separately from automated correctness failures; use the tuning commands to establish candidate values before changing authored defaults.

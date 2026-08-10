@@ -70,6 +70,7 @@ REQUIRED_WEAPON_ANIMATION_RENDERS = {
     "bolt_frame_012_close.png",
     "stowed_walk_frame_009_rear_3q.png",
     "stowed_hover_frame_031_rear_3q.png",
+    "run_forward_frame_006_side.png",
 }
 
 

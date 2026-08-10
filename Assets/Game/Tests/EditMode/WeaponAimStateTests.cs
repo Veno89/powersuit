@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Powersuit.Combat;
 using UnityEditor;
+using UnityEngine;
 
 namespace Powersuit.Tests.EditMode
 {
@@ -152,6 +153,165 @@ namespace Powersuit.Tests.EditMode
                 profile.GetFieldOfView(WeaponAimMode.ScopedAds, 72f),
                 Is.EqualTo(profile.ShoulderFieldOfViewDegrees)
             );
+        }
+
+        [TestCase(WeaponClass.PrecisionRifle, true, true)]
+        [TestCase(WeaponClass.PrecisionRifle, false, false)]
+        [TestCase(WeaponClass.AssaultRifle, true, false)]
+        [TestCase(WeaponClass.Carbine, true, false)]
+        [TestCase(WeaponClass.Shotgun, true, false)]
+        [TestCase(WeaponClass.Sidearm, true, false)]
+        [TestCase(WeaponClass.HeavyWeapon, true, false)]
+        public void ScopeEligibility_IsExclusiveToAuthoredPrecisionRifles(
+            WeaponClass weaponClass,
+            bool authoredSupport,
+            bool expected
+        )
+        {
+            Assert.That(
+                WeaponScopeEligibility.CanUseMagnifiedScope(
+                    weaponClass,
+                    authoredSupport
+                ),
+                Is.EqualTo(expected)
+            );
+        }
+
+        [Test]
+        public void MisconfiguredNonPrecisionDefinition_CannotCreateScopedProfile()
+        {
+            Type definitionType = Type.GetType(
+                "Powersuit.Combat.WeaponDefinition, Assembly-CSharp",
+                throwOnError: true
+            );
+            ScriptableObject definition =
+                ScriptableObject.CreateInstance(definitionType);
+            try
+            {
+                SerializedObject serialized = new SerializedObject(definition);
+                serialized.FindProperty("weaponClass").enumValueIndex =
+                    (int)WeaponClass.AssaultRifle;
+                serialized.FindProperty("supportsScope").boolValue = true;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+
+                Assert.That(
+                    definitionType.GetProperty("SupportsScope")?.GetValue(definition),
+                    Is.False
+                );
+                WeaponAimProfile profile = definitionType
+                    .GetMethod("CreateAimProfile")
+                    ?.Invoke(definition, null) as WeaponAimProfile;
+                Assert.That(profile, Is.Not.Null);
+                Assert.That(profile.SupportsScope, Is.False);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(definition);
+            }
+        }
+
+        [Test]
+        public void ScopeSight_RestoresEachOpticRendererAndRejectsNonPrecisionData()
+        {
+            Type controllerType = Type.GetType(
+                "PowerSuitController, Assembly-CSharp",
+                throwOnError: true
+            );
+            Type weaponType = Type.GetType(
+                "PowerSuitWeapon, Assembly-CSharp",
+                throwOnError: true
+            );
+            Type sightType = Type.GetType(
+                "PowerSuitScopeSight, Assembly-CSharp",
+                throwOnError: true
+            );
+            Type definitionType = Type.GetType(
+                "Powersuit.Combat.WeaponDefinition, Assembly-CSharp",
+                throwOnError: true
+            );
+
+            GameObject host = new GameObject("Scope Sight Test Host");
+            ScriptableObject definition = null;
+            try
+            {
+                Component controller = host.AddComponent(controllerType);
+                Component weapon = host.AddComponent(weaponType);
+                Component sight = host.AddComponent(sightType);
+
+                GameObject rifleRoot = new GameObject("RifleRoot");
+                rifleRoot.transform.SetParent(host.transform);
+                GameObject ocular = new GameObject("Rifle_ScopeOcular");
+                ocular.transform.SetParent(rifleRoot.transform);
+                MeshRenderer originallyEnabled = ocular.AddComponent<MeshRenderer>();
+
+                GameObject tube = new GameObject("Rifle_ScopeTube");
+                tube.transform.SetParent(rifleRoot.transform);
+                MeshRenderer originallyDisabled = tube.AddComponent<MeshRenderer>();
+                originallyDisabled.enabled = false;
+
+                GameObject point = new GameObject("WeaponScopePoint");
+                point.transform.SetParent(ocular.transform);
+                controllerType.GetProperty("ScopePoint")?.SetValue(
+                    controller,
+                    point.transform
+                );
+
+                definition = ScriptableObject.CreateInstance(definitionType);
+                SerializedObject serialized = new SerializedObject(definition);
+                serialized.FindProperty("weaponClass").enumValueIndex =
+                    (int)WeaponClass.AssaultRifle;
+                serialized.FindProperty("supportsScope").boolValue = true;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                weaponType.GetProperty("Definition")?.SetValue(weapon, definition);
+
+                sightType.GetMethod("Bind")?.Invoke(
+                    sight,
+                    new object[] { controller, weapon }
+                );
+                Assert.That(
+                    sightType.GetProperty("IsScopeEligible")?.GetValue(sight),
+                    Is.False,
+                    "Authored scope support must not bypass weapon-class eligibility."
+                );
+
+                serialized.Update();
+                serialized.FindProperty("weaponClass").enumValueIndex =
+                    (int)WeaponClass.PrecisionRifle;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                Assert.That(
+                    sightType.GetProperty("IsScopeEligible")?.GetValue(sight),
+                    Is.True
+                );
+
+                sightType.GetMethod(
+                    "SetOpticRenderersHidden",
+                    System.Reflection.BindingFlags.Instance |
+                    System.Reflection.BindingFlags.NonPublic
+                )?.Invoke(sight, new object[] { true });
+                Assert.That(originallyEnabled.enabled, Is.False);
+                Assert.That(originallyDisabled.enabled, Is.False);
+
+                sightType.GetMethod(
+                    "RestoreOpticRenderers",
+                    System.Reflection.BindingFlags.Instance |
+                    System.Reflection.BindingFlags.NonPublic
+                )?.Invoke(sight, null);
+                Assert.That(originallyEnabled.enabled, Is.True);
+                Assert.That(
+                    originallyDisabled.enabled,
+                    Is.False,
+                    "Restoration must preserve a renderer that started disabled."
+                );
+            }
+            finally
+            {
+                if (definition != null)
+                {
+                    UnityEngine.Object.DestroyImmediate(definition);
+                }
+
+                UnityEngine.Object.DestroyImmediate(host);
+            }
         }
 
         [Test]

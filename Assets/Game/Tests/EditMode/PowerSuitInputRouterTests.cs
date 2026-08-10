@@ -65,15 +65,15 @@ namespace Powersuit.Tests.EditMode
         public void FrameBuffer_FirstSampleForFrameWinsForEveryConsumer()
         {
             object buffer = Activator.CreateInstance(FrameBufferType);
-            object flight = Button("FlightToggle");
+            object jump = Button("Jump");
 
             object first = Sample(
                 buffer,
                 25,
                 Raw(
                     move: new Vector2(0.75f, -0.25f),
-                    held: flight,
-                    pressed: flight
+                    held: jump,
+                    pressed: jump
                 )
             );
             object second = Sample(
@@ -91,9 +91,10 @@ namespace Powersuit.Tests.EditMode
                 Is.EqualTo(GetProperty<Vector2>(first, "Move"))
             );
             Assert.That(
-                GetBool(second, "FlightTogglePressed"),
+                GetBool(second, "JumpHeld"),
                 Is.True
             );
+            Assert.That(GetBool(second, "JumpPressed"), Is.True);
             Assert.That(GetBool(second, "FirePressed"), Is.False);
             Assert.That(GetProperty<int>(second, "SampleFrame"), Is.EqualTo(25));
         }
@@ -120,8 +121,13 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
-        public void DefaultGamepadMap_FlightAndAttackCannotConflict()
+        public void DefaultGamepadMap_JumpHoldOwnsFlightAndWestIsUnassigned()
         {
+            Assert.That(
+                Enum.GetNames(ButtonsType),
+                Does.Not.Contain("FlightToggle")
+            );
+
             Type mapType = FindRuntimeType("PowerSuitDefaultInputBindings");
             Type controlType = FindRuntimeType("PowerSuitGamepadControl");
             MethodInfo getIntent = mapType.GetMethod(
@@ -138,13 +144,26 @@ namespace Powersuit.Tests.EditMode
                 new[] { rightTrigger }
             );
 
-            Assert.That(HasButton(westIntent, "FlightToggle"), Is.True);
-            Assert.That(HasButton(westIntent, "Fire"), Is.False);
-            Assert.That(HasButton(triggerIntent, "Fire"), Is.True);
             Assert.That(
-                HasButton(triggerIntent, "FlightToggle"),
-                Is.False
+                Convert.ToUInt64(westIntent),
+                Is.EqualTo(Convert.ToUInt64(Button("None")))
             );
+            Assert.That(HasButton(triggerIntent, "Fire"), Is.True);
+
+            object south = Enum.Parse(controlType, "ButtonSouth");
+            object southIntent = getIntent.Invoke(null, new[] { south });
+            Assert.That(HasButton(southIntent, "Jump"), Is.True);
+
+            object rightShoulder = Enum.Parse(
+                controlType,
+                "RightShoulder"
+            );
+            object shoulderIntent = getIntent.Invoke(
+                null,
+                new[] { rightShoulder }
+            );
+            Assert.That(HasButton(shoulderIntent, "Boost"), Is.True);
+            Assert.That(HasButton(shoulderIntent, "Jump"), Is.False);
 
             object stickPress = Enum.Parse(controlType, "RightStickPress");
             object scopeIntent = getIntent.Invoke(

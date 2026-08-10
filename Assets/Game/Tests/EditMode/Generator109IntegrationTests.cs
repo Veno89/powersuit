@@ -92,6 +92,7 @@ namespace Powersuit.Tests.EditMode
                         "PS_Hover",
                         "PS_Idle",
                         "PS_Reload",
+                        "PS_Run_Forward",
                         "PS_Walk",
                         "PS_Walk_Backward",
                         "PS_Walk_Forward",
@@ -121,10 +122,45 @@ namespace Powersuit.Tests.EditMode
             Assert.That(states, Does.Contain("Ready Locomotion"));
             Assert.That(states, Does.Contain("Stowed Locomotion"));
             Assert.That(states, Does.Contain("Aim Locomotion"));
+            Assert.That(states, Does.Contain("Run Locomotion"));
             Assert.That(states, Does.Contain("Stowed Hover"));
             Assert.That(states, Does.Contain("Forward Weapon Pose"));
             Assert.That(states, Does.Contain("Reload"));
             Assert.That(states, Does.Contain("Bolt Cycle"));
+
+            AnimatorState runState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Run Locomotion");
+            Assert.That(runState, Is.Not.Null);
+            Assert.That(runState.motion, Is.TypeOf<AnimationClip>());
+            Assert.That(runState.motion.name, Is.EqualTo("PS_Run_Forward"));
+            Assert.That(
+                runState.speedParameterActive,
+                Is.False,
+                "The authored 180-steps/minute run must not inherit the walk playback multiplier."
+            );
+            Assert.That(
+                runState.speed,
+                Is.EqualTo(1.35f).Within(0.001f),
+                "Powered sprint uses the validated 243-steps/minute presentation cadence."
+            );
+            AnimatorState readyState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .Single(state => state.name == "Ready Locomotion");
+            AnimatorState aimState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .Single(state => state.name == "Aim Locomotion");
+            AnimatorState stowedState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .Single(state => state.name == "Stowed Locomotion");
+            AnimatorState hoverState = controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .Single(state => state.name == "Hover");
+            AssertBoolTransition(readyState, runState, "IsRunning", true);
+            AssertBoolTransition(runState, readyState, "IsRunning", false);
+            AssertBoolTransition(runState, aimState, "IsAiming", true);
+            AssertBoolTransition(runState, stowedState, "WeaponStowed", true);
+            AssertBoolTransition(runState, hoverState, "IsFlying", true);
 
             Assert.That(controller.layers, Has.Length.EqualTo(4));
             Assert.That(
@@ -265,6 +301,7 @@ namespace Powersuit.Tests.EditMode
                     new[]
                     {
                         "IsAiming",
+                        "IsRunning",
                         "MovementY",
                         "LocomotionPlaybackSpeed",
                         "WeaponStowed",
@@ -409,6 +446,24 @@ namespace Powersuit.Tests.EditMode
                     "movementSettings.flightBrakingAcceleration"
                 ).floatValue,
                 Is.EqualTo(55f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.groundRunSpeedMultiplier"
+                ).floatValue,
+                Is.EqualTo(1.65f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.jumpHoldFlightDelaySeconds"
+                ).floatValue,
+                Is.EqualTo(0.9f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.jumpHoldGravityScale"
+                ).floatValue,
+                Is.EqualTo(0.55f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("scopeEyeRelief").floatValue,
@@ -558,6 +613,7 @@ namespace Powersuit.Tests.EditMode
             );
             Assert.That(player.GetComponent("PowerSuitWeaponPresentation"), Is.Not.Null);
             Assert.That(player.GetComponent("PowerSuitWeaponAnimationDriver"), Is.Not.Null);
+            Assert.That(player.GetComponent("PowerSuitScopeSight"), Is.Not.Null);
             Transform muzzle = weapon.GetType()
                 .GetProperty("MuzzleTransform")
                 ?.GetValue(weapon) as Transform;
@@ -650,6 +706,32 @@ namespace Powersuit.Tests.EditMode
         )
         {
             return controller.layers.SingleOrDefault(layer => layer.name == layerName);
+        }
+
+        private static void AssertBoolTransition(
+            AnimatorState source,
+            AnimatorState destination,
+            string parameter,
+            bool expectedValue
+        )
+        {
+            AnimatorConditionMode expectedMode = expectedValue
+                ? AnimatorConditionMode.If
+                : AnimatorConditionMode.IfNot;
+            Assert.That(
+                source.transitions.Any(
+                    transition =>
+                        transition.destinationState == destination &&
+                        transition.conditions.Any(
+                            condition =>
+                                condition.parameter == parameter &&
+                                condition.mode == expectedMode
+                        )
+                ),
+                Is.True,
+                $"{source.name} must transition to {destination.name} when " +
+                $"{parameter} is {expectedValue}."
+            );
         }
 
         private static void AssertLayerSafeClip(AnimationClip clip, string context)

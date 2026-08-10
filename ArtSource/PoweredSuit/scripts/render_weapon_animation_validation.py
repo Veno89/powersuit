@@ -55,6 +55,7 @@ from weapon_handling_contract import (  # noqa: E402
 from render_animation_validation import _validate_render_content  # noqa: E402
 
 CONTROL_BONES = ("WeaponRoot", "WeaponMagazine", "WeaponBolt")
+EXPECTED_ANIMATION_CONTRACT_VERSION = 3
 EXPECTED_RANGES = {
     "PS_WeaponReady_Idle": (1, 61),
     "PS_WeaponStowed_Idle": (1, 61),
@@ -69,6 +70,7 @@ EXPECTED_RANGES = {
     "PS_WeaponStowed_Walk_Forward": (1, 31),
     "PS_WeaponStowed_Walk_Backward": (1, 31),
     "PS_WeaponStowed_Hover": (1, 61),
+    "PS_Run_Forward": (1, 21),
 }
 REQUIRED_RENDERS = (
     "ready_idle_front_3q.png",
@@ -85,6 +87,7 @@ REQUIRED_RENDERS = (
     "bolt_frame_012_close.png",
     "stowed_walk_frame_009_rear_3q.png",
     "stowed_hover_frame_031_rear_3q.png",
+    "run_forward_frame_006_side.png",
 )
 
 
@@ -142,6 +145,22 @@ def _validate(
             raise RuntimeError(
                 f"{name} range is {actual}; expected {EXPECTED_RANGES[name]}."
             )
+        version = int(action.get("ps_animation_contract_version", 0))
+        if version != EXPECTED_ANIMATION_CONTRACT_VERSION:
+            raise RuntimeError(
+                f"{name} contract version is {version}; expected "
+                f"{EXPECTED_ANIMATION_CONTRACT_VERSION}."
+            )
+
+    root_contract_version = int(
+        root.get("ps_weapon_animation_contract_version", 0)
+    )
+    if root_contract_version != EXPECTED_ANIMATION_CONTRACT_VERSION:
+        raise RuntimeError(
+            "RifleRoot animation contract version is "
+            f"{root_contract_version}; expected "
+            f"{EXPECTED_ANIMATION_CONTRACT_VERSION}."
+        )
 
     missing_controls = [name for name in CONTROL_BONES if name not in armature.data.bones]
     if missing_controls:
@@ -164,6 +183,11 @@ def _validate(
 
     _evaluate(armature, "PS_WeaponReady_Idle", 1)
     ready_root = root.matrix_world.copy()
+    _ready_right, ready_forward, ready_up = body_basis(armature)
+    ready_torso_forward = (
+        bone_head_world(armature, "Head")
+        - bone_head_world(armature, "Hips")
+    ).dot(ready_forward)
     right_error = (
         bone_head_world(armature, "Hand.R")
         - require_weapon_helper(root, ROLE_PRIMARY_GRIP).matrix_world.translation
@@ -225,8 +249,63 @@ def _validate(
             f"forward/backpedal foot phases too similar={directional_foot_delta:.3f} m"
         )
 
+    forward = ready_forward
+    up = ready_up
+    run_stride = 0.0
+    walk_stride = 0.0
+    run_contact_heights: dict[str, list[float]] = {"Foot.L": [], "Foot.R": []}
+    for frame in (1, 11):
+        _evaluate(armature, "PS_Run_Forward", frame)
+        left = bone_head_world(armature, "Foot.L")
+        right_foot = bone_head_world(armature, "Foot.R")
+        run_stride = max(run_stride, abs((left - right_foot).dot(forward)))
+        run_contact_heights["Foot.L"].append(left.dot(up))
+        run_contact_heights["Foot.R"].append(right_foot.dot(up))
+    for frame in (1, 17):
+        _evaluate(armature, "PS_Walk_Forward", frame)
+        left = bone_head_world(armature, "Foot.L")
+        right_foot = bone_head_world(armature, "Foot.R")
+        walk_stride = max(walk_stride, abs((left - right_foot).dot(forward)))
+    if run_stride < walk_stride + 0.025:
+        blockers.append(
+            "run stride is not visibly longer than walk "
+            f"({run_stride:.3f} m vs {walk_stride:.3f} m)"
+        )
+
+    _evaluate(armature, "PS_Run_Forward", 6)
+    run_flight_clearance = min(
+        bone_head_world(armature, name).dot(up) - min(run_contact_heights[name])
+        for name in ("Foot.L", "Foot.R")
+    )
+    if run_flight_clearance < 0.025:
+        blockers.append(
+            f"run airborne-phase foot clearance={run_flight_clearance:.3f} m"
+        )
+    run_torso_forward = (
+        bone_head_world(armature, "Head")
+        - bone_head_world(armature, "Hips")
+    ).dot(forward)
+    if run_torso_forward < ready_torso_forward + 0.060:
+        blockers.append(
+            "run torso does not commit forward relative to ready "
+            f"({run_torso_forward:.3f} m vs {ready_torso_forward:.3f} m)"
+        )
+    run_right_error = (
+        bone_head_world(armature, "Hand.R")
+        - require_weapon_helper(root, ROLE_PRIMARY_GRIP).matrix_world.translation
+    ).length
+    run_left_error = (
+        bone_head_world(armature, "Hand.L")
+        - require_weapon_helper(root, ROLE_SUPPORT_GRIP).matrix_world.translation
+    ).length
+    if run_right_error > 0.020:
+        blockers.append(f"run trigger-hand contact={run_right_error:.3f} m")
+    if run_left_error > 0.020:
+        blockers.append(f"run support-hand contact={run_left_error:.3f} m")
+
     return {
         "fps": 30,
+        "animation_contract_version": root_contract_version,
         "action_ranges": {name: list(values) for name, values in EXPECTED_RANGES.items()},
         "control_bones": list(CONTROL_BONES),
         "single_armature_slot_per_action": True,
@@ -238,6 +317,16 @@ def _validate(
         "reload_magazine_travel_m": magazine_travel,
         "bolt_travel_m": bolt_travel,
         "forward_backward_foot_phase_delta_m": directional_foot_delta,
+        "run_cycle_frames": 20,
+        "run_cycle_seconds": 20.0 / 30.0,
+        "run_step_cadence_per_minute": 180,
+        "run_stride_m": run_stride,
+        "walk_stride_m": walk_stride,
+        "run_flight_clearance_m": run_flight_clearance,
+        "ready_torso_forward_projection_m": ready_torso_forward,
+        "run_torso_forward_projection_m": run_torso_forward,
+        "run_right_wrist_error_m": run_right_error,
+        "run_left_wrist_error_m": run_left_error,
         "automated_blockers": blockers,
     }
 
@@ -380,6 +469,7 @@ def _render_all(armature: bpy.types.Object, root: bpy.types.Object) -> list[Path
             ("PS_BoltCycle", 12, "bolt_close", REQUIRED_RENDERS[11]),
             ("PS_WeaponStowed_Walk_Forward", 9, "rear_3q", REQUIRED_RENDERS[12]),
             ("PS_WeaponStowed_Hover", 31, "rear_3q", REQUIRED_RENDERS[13]),
+            ("PS_Run_Forward", 6, "side", REQUIRED_RENDERS[14]),
         )
         paths: list[Path] = []
         for action, frame, view, filename in jobs:
@@ -430,6 +520,7 @@ def _append_report(paths: list[Path], metrics: dict[str, object]) -> Path:
         "reload hand follows the magazine through removal and insertion",
         "bolt hand and bolt mechanism move together",
         "stowed walk and hover keep the rifle on the back",
+        "forward run has a committed lean, longer stride, and airborne phase",
     ]:
         if requirement not in visual_review_required:
             visual_review_required.append(requirement)

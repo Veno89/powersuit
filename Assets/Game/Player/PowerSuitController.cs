@@ -23,6 +23,8 @@ public sealed class PowerSuitController : MonoBehaviour
 
     public bool IsBoosting => isBoosting;
 
+    public bool IsRunning => isRunning;
+
     public bool IsGrounded =>
         groundContactState != null
             ? groundContactState.IsGrounded
@@ -181,6 +183,7 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private bool isFlying;
     private bool isBoosting;
+    private bool isRunning;
     private bool isAiming;
     private bool aimRequested;
     private bool cursorLocked;
@@ -188,9 +191,8 @@ public sealed class PowerSuitController : MonoBehaviour
     private int fallbackInputFrame = -1;
     private PowerSuitInputSnapshot fallbackInputSnapshot;
     private float flightTakeoffGraceRemaining;
-    private float flightToggleCooldownRemaining;
-    private float flightLandingIntentRemaining;
     private PowerSuitGroundContactState groundContactState;
+    private PowerSuitJumpFlightState jumpFlightState;
 
     private float currentCameraDistance;
     private float currentCameraHeight;
@@ -319,15 +321,6 @@ public sealed class PowerSuitController : MonoBehaviour
 
     private void Update()
     {
-        flightToggleCooldownRemaining = Mathf.Max(
-            0f,
-            flightToggleCooldownRemaining - Time.deltaTime
-        );
-        flightLandingIntentRemaining = Mathf.Max(
-            0f,
-            flightLandingIntentRemaining - Time.deltaTime
-        );
-
         if (
             suppressPrimaryFireUntilReleased &&
             !IsPrimaryClickHeld()
@@ -345,16 +338,6 @@ public sealed class PowerSuitController : MonoBehaviour
 
         HandleAimingState();
         HandleCameraInput();
-
-        if (
-            WasFlightTogglePressed() &&
-            flightToggleCooldownRemaining <= 0f
-        )
-        {
-            SetFlightEnabled(!isFlying);
-            flightToggleCooldownRemaining =
-                GetMovementSettings().FlightToggleCooldownSeconds;
-        }
 
         if (isFlying)
         {
@@ -396,8 +379,8 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         isBoosting = false;
+        isRunning = false;
         flightTakeoffGraceRemaining = 0f;
-        flightLandingIntentRemaining = 0f;
 
         // Planar and vertical velocity have separate owners. Sanitize legacy
         // or externally injected values before applying ground control.
@@ -426,11 +409,23 @@ public sealed class PowerSuitController : MonoBehaviour
             1f
         );
 
-        float effectiveWalkSpeed = walkSpeed * groundSpeedMultiplier;
+        bool hasStableSupport = groundContactState.IsGrounded;
+        isRunning = PowerSuitLocomotionMath.ShouldRun(
+            hasStableSupport,
+            IsBoostHeld(),
+            aimRequested,
+            isAiming,
+            input
+        );
+        float effectiveWalkSpeed =
+            PowerSuitLocomotionMath.CalculateGroundTargetSpeed(
+                walkSpeed,
+                isRunning,
+                tuning.GroundRunSpeedMultiplier
+            ) * groundSpeedMultiplier;
         Vector3 desiredVelocity =
             desiredDirection * effectiveWalkSpeed;
 
-        bool hasStableSupport = groundContactState.IsGrounded;
         horizontalVelocity = PowerSuitLocomotionMath.ApproachVelocity(
             horizontalVelocity,
             desiredVelocity,
@@ -453,6 +448,9 @@ public sealed class PowerSuitController : MonoBehaviour
                 jumpHeight,
                 gravity
             );
+            isRunning = false;
+            EnsureJumpFlightState();
+            jumpFlightState.Arm(IsJumpHeld());
         }
         else if (hasStableSupport)
         {
@@ -463,9 +461,15 @@ public sealed class PowerSuitController : MonoBehaviour
         }
         else
         {
+            float jumpGravityScale =
+                jumpFlightState != null &&
+                jumpFlightState.IsArmed &&
+                IsJumpHeld()
+                    ? tuning.JumpHoldGravityScale
+                    : 1f;
             verticalVelocity = PowerSuitLocomotionMath.ApplyGravity(
                 verticalVelocity,
-                gravity,
+                gravity * jumpGravityScale,
                 tuning.TerminalFallSpeed,
                 deltaTime
             );
@@ -497,6 +501,21 @@ public sealed class PowerSuitController : MonoBehaviour
 
         RotateTowardsMovement(facingDirection);
         UpdateLocalMovement(effectiveWalkSpeed);
+
+        EnsureJumpFlightState();
+        bool isPhysicallyAirborne =
+            (collisionFlags & CollisionFlags.Below) == 0 &&
+            !controller.isGrounded;
+        if (
+            jumpFlightState.Advance(
+                IsJumpHeld(),
+                isPhysicallyAirborne,
+                deltaTime
+            )
+        )
+        {
+            SetFlightEnabled(true);
+        }
     }
 
     private void HandleFlight()
@@ -515,11 +534,6 @@ public sealed class PowerSuitController : MonoBehaviour
             playerCamera.transform.right * input.x;
 
         float verticalInput = ReadVerticalFlightInput();
-        if (verticalInput < -tuning.FlightLandingInputThreshold)
-        {
-            flightLandingIntentRemaining =
-                tuning.FlightLandingIntentGraceSeconds;
-        }
         Vector3 desiredPlanarDirection = Vector3.ClampMagnitude(
             PowerSuitLocomotionMath.ProjectOntoGroundPlane(
                 cameraRelativeInput
@@ -599,10 +613,11 @@ public sealed class PowerSuitController : MonoBehaviour
         UpdateLocalMovement(selectedPlanarSpeed);
 
         if (
-            (collisionFlags & CollisionFlags.Below) != 0 &&
-            flightTakeoffGraceRemaining <= 0f &&
-            flightLandingIntentRemaining > 0f &&
-            preMoveVerticalSpeed <= 0f
+            PowerSuitLocomotionMath.ShouldCompleteFlightLanding(
+                collisionFlags,
+                flightTakeoffGraceRemaining,
+                preMoveVerticalSpeed
+            )
         )
         {
             CompleteFlightLanding();
@@ -1136,7 +1151,7 @@ public sealed class PowerSuitController : MonoBehaviour
 
             isFlying = true;
             isBoosting = false;
-            flightLandingIntentRemaining = 0f;
+            isRunning = false;
             flightTakeoffGraceRemaining =
                 tuning.FlightTakeoffGraceSeconds;
             if (takingOffFromGround)
@@ -1148,6 +1163,8 @@ public sealed class PowerSuitController : MonoBehaviour
             }
 
             groundContactState.ForceAirborneUntilSeparated();
+            EnsureJumpFlightState();
+            jumpFlightState.Reset();
             return;
         }
 
@@ -1159,8 +1176,8 @@ public sealed class PowerSuitController : MonoBehaviour
 
         isFlying = false;
         isBoosting = false;
+        isRunning = false;
         flightTakeoffGraceRemaining = 0f;
-        flightLandingIntentRemaining = 0f;
         verticalVelocity = Mathf.Max(
             verticalVelocity,
             -tuning.TerminalFallSpeed
@@ -1174,8 +1191,8 @@ public sealed class PowerSuitController : MonoBehaviour
         EnsureGroundContactState();
         isFlying = false;
         isBoosting = false;
+        isRunning = false;
         flightTakeoffGraceRemaining = 0f;
-        flightLandingIntentRemaining = 0f;
         horizontalVelocity = PowerSuitLocomotionMath.ProjectOntoGroundPlane(
             horizontalVelocity
         );
@@ -1184,6 +1201,8 @@ public sealed class PowerSuitController : MonoBehaviour
             tuning.GroundedStickVelocity
         );
         groundContactState.Reset(grounded: true);
+        EnsureJumpFlightState();
+        jumpFlightState.Reset();
     }
 
     private void InitializeGroundContactState()
@@ -1204,6 +1223,16 @@ public sealed class PowerSuitController : MonoBehaviour
         if (groundContactState == null)
         {
             InitializeGroundContactState();
+        }
+    }
+
+    private void EnsureJumpFlightState()
+    {
+        if (jumpFlightState == null)
+        {
+            jumpFlightState = new PowerSuitJumpFlightState(
+                GetMovementSettings().JumpHoldFlightDelaySeconds
+            );
         }
     }
 
@@ -1355,6 +1384,7 @@ public sealed class PowerSuitController : MonoBehaviour
     {
         isFlying = false;
         isBoosting = false;
+        isRunning = false;
         aimRequested = false;
         isAiming = false;
         scopeHeld = false;
@@ -1366,8 +1396,8 @@ public sealed class PowerSuitController : MonoBehaviour
         // before the weapon adapter samples input.
         suppressPrimaryFireUntilReleased = true;
         flightTakeoffGraceRemaining = 0f;
-        flightToggleCooldownRemaining = 0f;
-        flightLandingIntentRemaining = 0f;
+        EnsureJumpFlightState();
+        jumpFlightState.Reset();
 
         horizontalVelocity = Vector3.zero;
         verticalVelocity = 0f;
@@ -1483,9 +1513,9 @@ public sealed class PowerSuitController : MonoBehaviour
         return ReadInputSnapshot().JumpPressed;
     }
 
-    private bool WasFlightTogglePressed()
+    private bool IsJumpHeld()
     {
-        return ReadInputSnapshot().FlightTogglePressed;
+        return ReadInputSnapshot().JumpHeld;
     }
 
     private bool IsBoostHeld()
@@ -1546,6 +1576,7 @@ public sealed class PowerSuitController : MonoBehaviour
 public sealed class PowerSuitMovementSettings
 {
     [Header("Ground Response")]
+    [SerializeField, Min(1f)] private float groundRunSpeedMultiplier = 1.65f;
     [SerializeField] private float groundDeceleration = 65f;
     [SerializeField] private float groundBrakingAcceleration = 105f;
     [SerializeField] private float airAcceleration = 16f;
@@ -1558,6 +1589,8 @@ public sealed class PowerSuitMovementSettings
     [SerializeField] private float groundedReleaseGraceSeconds = 0.06f;
     [SerializeField] private float coyoteTimeSeconds = 0.12f;
     [SerializeField] private float jumpBufferSeconds = 0.12f;
+    [SerializeField, Min(0f)] private float jumpHoldFlightDelaySeconds = 0.9f;
+    [SerializeField, Range(0.01f, 1f)] private float jumpHoldGravityScale = 0.55f;
 
     [Header("Flight Response")]
     [SerializeField] private float flightDeceleration = 30f;
@@ -1569,11 +1602,9 @@ public sealed class PowerSuitMovementSettings
     [SerializeField] private float flightVerticalBrakingAcceleration = 55f;
     [SerializeField] private float flightTakeoffSpeed = 5f;
     [SerializeField] private float flightTakeoffGraceSeconds = 0.12f;
-    [SerializeField] private float flightToggleCooldownSeconds = 0.15f;
     [SerializeField] private float boostAccelerationMultiplier = 1.7f;
-    [SerializeField] private float flightLandingInputThreshold = 0.1f;
-    [SerializeField] private float flightLandingIntentGraceSeconds = 0.25f;
 
+    public float GroundRunSpeedMultiplier => groundRunSpeedMultiplier;
     public float GroundDeceleration => groundDeceleration;
     public float GroundBrakingAcceleration => groundBrakingAcceleration;
     public float AirAcceleration => airAcceleration;
@@ -1585,6 +1616,8 @@ public sealed class PowerSuitMovementSettings
         groundedReleaseGraceSeconds;
     public float CoyoteTimeSeconds => coyoteTimeSeconds;
     public float JumpBufferSeconds => jumpBufferSeconds;
+    public float JumpHoldFlightDelaySeconds => jumpHoldFlightDelaySeconds;
+    public float JumpHoldGravityScale => jumpHoldGravityScale;
     public float FlightDeceleration => flightDeceleration;
     public float FlightBrakingAcceleration => flightBrakingAcceleration;
     public float FlightVerticalSpeed => flightVerticalSpeed;
@@ -1595,14 +1628,11 @@ public sealed class PowerSuitMovementSettings
         flightVerticalBrakingAcceleration;
     public float FlightTakeoffSpeed => flightTakeoffSpeed;
     public float FlightTakeoffGraceSeconds => flightTakeoffGraceSeconds;
-    public float FlightToggleCooldownSeconds => flightToggleCooldownSeconds;
     public float BoostAccelerationMultiplier => boostAccelerationMultiplier;
-    public float FlightLandingInputThreshold => flightLandingInputThreshold;
-    public float FlightLandingIntentGraceSeconds =>
-        flightLandingIntentGraceSeconds;
 
     public void Sanitize()
     {
+        groundRunSpeedMultiplier = Mathf.Max(1f, groundRunSpeedMultiplier);
         groundDeceleration = Mathf.Max(0f, groundDeceleration);
         groundBrakingAcceleration = Mathf.Max(
             0f,
@@ -1622,6 +1652,15 @@ public sealed class PowerSuitMovementSettings
         );
         coyoteTimeSeconds = Mathf.Max(0f, coyoteTimeSeconds);
         jumpBufferSeconds = Mathf.Max(0f, jumpBufferSeconds);
+        jumpHoldFlightDelaySeconds = Mathf.Max(
+            0f,
+            jumpHoldFlightDelaySeconds
+        );
+        jumpHoldGravityScale = Mathf.Clamp(
+            jumpHoldGravityScale,
+            0.01f,
+            1f
+        );
 
         flightDeceleration = Mathf.Max(0f, flightDeceleration);
         flightBrakingAcceleration = Mathf.Max(
@@ -1650,20 +1689,9 @@ public sealed class PowerSuitMovementSettings
             0f,
             flightTakeoffGraceSeconds
         );
-        flightToggleCooldownSeconds = Mathf.Max(
-            0f,
-            flightToggleCooldownSeconds
-        );
         boostAccelerationMultiplier = Mathf.Max(
             1f,
             boostAccelerationMultiplier
-        );
-        flightLandingInputThreshold = Mathf.Clamp01(
-            flightLandingInputThreshold
-        );
-        flightLandingIntentGraceSeconds = Mathf.Max(
-            0f,
-            flightLandingIntentGraceSeconds
         );
     }
 }
@@ -1833,6 +1861,67 @@ public static class PowerSuitLocomotionMath
     public static Vector3 ProjectOntoGroundPlane(Vector3 velocity)
     {
         return Vector3.ProjectOnPlane(velocity, Vector3.up);
+    }
+
+    /// <summary>
+    /// Selects the configured walk or run speed without coupling input state to
+    /// the movement adapter.
+    /// </summary>
+    public static float CalculateGroundTargetSpeed(
+        float walkSpeed,
+        bool isRunning,
+        float runSpeedMultiplier
+    )
+    {
+        if (
+            float.IsNaN(walkSpeed) ||
+            float.IsInfinity(walkSpeed) ||
+            walkSpeed < 0f ||
+            float.IsNaN(runSpeedMultiplier) ||
+            float.IsInfinity(runSpeedMultiplier) ||
+            runSpeedMultiplier < 1f
+        )
+        {
+            throw new System.ArgumentOutOfRangeException(
+                nameof(runSpeedMultiplier),
+                "Ground speeds must be finite/non-negative and the run multiplier must be at least one."
+            );
+        }
+
+        return walkSpeed * (isRunning ? runSpeedMultiplier : 1f);
+    }
+
+    /// <summary>
+    /// Sprint is a deliberate supported forward/lateral action. Backpedal keeps
+    /// its dedicated reverse pose, and any aim request wins immediately.
+    /// </summary>
+    public static bool ShouldRun(
+        bool hasStableSupport,
+        bool runHeld,
+        bool aimRequested,
+        bool isAiming,
+        Vector2 movementInput
+    )
+    {
+        return
+            hasStableSupport &&
+            runHeld &&
+            !aimRequested &&
+            !isAiming &&
+            movementInput.y >= -0.01f &&
+            movementInput.sqrMagnitude > 0.0001f;
+    }
+
+    public static bool ShouldCompleteFlightLanding(
+        CollisionFlags collisionFlags,
+        float takeoffGraceRemaining,
+        float preMoveVerticalSpeed
+    )
+    {
+        return
+            (collisionFlags & CollisionFlags.Below) != 0 &&
+            takeoffGraceRemaining <= 0f &&
+            preMoveVerticalSpeed <= 0f;
     }
 
     /// <summary>
@@ -2345,6 +2434,92 @@ public sealed class PowerSuitGroundContactState
             throw new System.ArgumentOutOfRangeException(
                 parameterName,
                 "Movement timing values must be finite and non-negative."
+            );
+        }
+    }
+}
+
+/// <summary>
+/// Plain timing state which distinguishes a quick jump tap from a deliberate
+/// hold-to-fly gesture. Only a successfully consumed ground/coyote jump can arm
+/// flight, so holding Jump while falling cannot unexpectedly enable it.
+/// </summary>
+public sealed class PowerSuitJumpFlightState
+{
+    private readonly float holdDelaySeconds;
+    private bool isArmed;
+    private bool hasSeparatedFromGround;
+    private float heldSeconds;
+
+    public PowerSuitJumpFlightState(float holdDelaySeconds)
+    {
+        ValidateDuration(holdDelaySeconds, nameof(holdDelaySeconds));
+        this.holdDelaySeconds = holdDelaySeconds;
+    }
+
+    public bool IsArmed => isArmed;
+    public bool HasSeparatedFromGround => hasSeparatedFromGround;
+    public float HeldSeconds => heldSeconds;
+
+    public void Arm(bool jumpHeld)
+    {
+        Reset();
+        isArmed = jumpHeld;
+    }
+
+    /// <summary>
+    /// Returns true exactly once when a continuously held, accepted jump has
+    /// separated from its launch surface and reached the configured delay.
+    /// </summary>
+    public bool Advance(bool jumpHeld, bool isAirborne, float deltaTime)
+    {
+        ValidateDuration(deltaTime, nameof(deltaTime));
+        if (!isArmed)
+        {
+            return false;
+        }
+
+        if (!jumpHeld)
+        {
+            Reset();
+            return false;
+        }
+
+        heldSeconds += deltaTime;
+        if (isAirborne)
+        {
+            hasSeparatedFromGround = true;
+        }
+
+        if (hasSeparatedFromGround && !isAirborne)
+        {
+            Reset();
+            return false;
+        }
+
+        if (!hasSeparatedFromGround || heldSeconds < holdDelaySeconds)
+        {
+            return false;
+        }
+
+        Reset();
+        return true;
+    }
+
+    public void Reset()
+    {
+        isArmed = false;
+        hasSeparatedFromGround = false;
+        heldSeconds = 0f;
+    }
+
+    private static void ValidateDuration(float value, string parameterName)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f)
+        {
+            throw new System.ArgumentOutOfRangeException(
+                parameterName,
+                "Jump/flight timing values must be finite and non-negative."
             );
         }
     }

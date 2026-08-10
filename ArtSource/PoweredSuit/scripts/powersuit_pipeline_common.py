@@ -35,6 +35,7 @@ WEAPON_ANIMATION_ACTIONS = (
     "PS_WeaponStowed_Walk_Forward",
     "PS_WeaponStowed_Walk_Backward",
     "PS_WeaponStowed_Hover",
+    "PS_Run_Forward",
 )
 REQUIRED_ACTIONS = (*LEGACY_ACTIONS, *WEAPON_ANIMATION_ACTIONS)
 PIPELINE_TEMP_PREFIX = "PS_PIPELINE_TEMP_"

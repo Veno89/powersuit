@@ -17,6 +17,9 @@ namespace Powersuit.Tests.EditMode
         private static Type GroundContactStateType =>
             FindRuntimeType("PowerSuitGroundContactState");
 
+        private static Type JumpFlightStateType =>
+            FindRuntimeType("PowerSuitJumpFlightState");
+
         private static Type MovementSettingsType =>
             FindRuntimeType("PowerSuitMovementSettings");
 
@@ -279,6 +282,231 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
+        public void GroundTargetSpeed_ShiftRunUsesConfiguredMultiplier()
+        {
+            MethodInfo method = LocomotionMathType.GetMethod(
+                "CalculateGroundTargetSpeed",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(method, Is.Not.Null);
+
+            Assert.That(
+                method.Invoke(null, new object[] { 6.5f, false, 1.65f }),
+                Is.EqualTo(6.5f)
+            );
+            Assert.That(
+                method.Invoke(null, new object[] { 6.5f, true, 1.65f }),
+                Is.EqualTo(10.725f).Within(0.0001f)
+            );
+        }
+
+        [TestCase(0f, 1f, true)]
+        [TestCase(1f, 0f, true)]
+        [TestCase(-1f, 0f, true)]
+        [TestCase(0f, -1f, false)]
+        [TestCase(0f, 0f, false)]
+        public void ShouldRun_AllowsSupportedForwardOrLateralButNotBackpedal(
+            float movementX,
+            float movementY,
+            bool expected
+        )
+        {
+            MethodInfo method = LocomotionMathType.GetMethod(
+                "ShouldRun",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(method, Is.Not.Null);
+
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[]
+                    {
+                        true,
+                        true,
+                        false,
+                        false,
+                        new Vector2(movementX, movementY)
+                    }
+                ),
+                Is.EqualTo(expected)
+            );
+        }
+
+        [Test]
+        public void ShouldRun_AimRequestAndAirborneStateWinImmediately()
+        {
+            MethodInfo method = LocomotionMathType.GetMethod(
+                "ShouldRun",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(method, Is.Not.Null);
+            Vector2 forward = Vector2.up;
+
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[] { false, true, false, false, forward }
+                ),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[] { true, true, true, false, forward }
+                ),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[] { true, true, false, true, forward }
+                ),
+                Is.EqualTo(false)
+            );
+        }
+
+        [Test]
+        public void JumpFlight_QuickTapRemainsAJumpOnly()
+        {
+            object state = Activator.CreateInstance(JumpFlightStateType, 0.9f);
+            Invoke(state, "Arm", true);
+
+            Assert.That(
+                Invoke(state, "Advance", true, true, 0.15f),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                Invoke(state, "Advance", false, true, 0.01f),
+                Is.EqualTo(false)
+            );
+            Assert.That(GetProperty(state, "IsArmed"), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void JumpFlight_ContinuousHoldEntersFlightOnceAfterDelay()
+        {
+            object state = Activator.CreateInstance(JumpFlightStateType, 0.9f);
+            Invoke(state, "Arm", true);
+
+            Assert.That(
+                Invoke(state, "Advance", true, true, 0.45f),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                Invoke(state, "Advance", true, true, 0.46f),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                Invoke(state, "Advance", true, true, 1f),
+                Is.EqualTo(false)
+            );
+        }
+
+        [Test]
+        public void JumpFlight_LandingBeforeThresholdCancelsPendingFlight()
+        {
+            object state = Activator.CreateInstance(JumpFlightStateType, 0.9f);
+            Invoke(state, "Arm", true);
+
+            Assert.That(
+                Invoke(state, "Advance", true, true, 0.45f),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                Invoke(state, "Advance", true, false, 0.46f),
+                Is.EqualTo(false)
+            );
+            Assert.That(GetProperty(state, "IsArmed"), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void JumpFlight_ReleaseAndRepressNeedsAnotherAcceptedJump()
+        {
+            object state = Activator.CreateInstance(JumpFlightStateType, 0.9f);
+            Invoke(state, "Arm", true);
+
+            Assert.That(
+                Invoke(state, "Advance", true, true, 0.3f),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                Invoke(state, "Advance", false, true, 0.01f),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                Invoke(state, "Advance", true, true, 1f),
+                Is.EqualTo(false),
+                "A repress while falling must not arm flight without another accepted jump."
+            );
+            Assert.That(GetProperty(state, "IsArmed"), Is.EqualTo(false));
+        }
+
+        [TestCase(30)]
+        [TestCase(60)]
+        [TestCase(120)]
+        public void JumpFlight_DefaultPoweredHoldRemainsAirborneAtThreshold(
+            int frameRate
+        )
+        {
+            float height = SimulateHeldJumpHeight(
+                frameRate,
+                holdSeconds: 0.9f,
+                gravityScale: 0.55f
+            );
+
+            Assert.That(
+                height,
+                Is.GreaterThan(1.8f),
+                "The accepted held jump must still be physically airborne when flight engages."
+            );
+        }
+
+        [Test]
+        public void JumpFlight_HeldSpaceWhileFallingCannotArmFlight()
+        {
+            object state = Activator.CreateInstance(JumpFlightStateType, 0.9f);
+
+            Assert.That(
+                Invoke(state, "Advance", true, true, 2f),
+                Is.EqualTo(false)
+            );
+            Assert.That(GetProperty(state, "IsArmed"), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void FlightLanding_RequiresFeetContactAfterTakeoffGrace()
+        {
+            MethodInfo method = LocomotionMathType.GetMethod(
+                "ShouldCompleteFlightLanding",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(method, Is.Not.Null);
+
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[] { CollisionFlags.Below, 0f, -0.1f }
+                ),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[] { CollisionFlags.Below, 0.01f, -4f }
+                ),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                method.Invoke(
+                    null,
+                    new object[] { CollisionFlags.None, 0f, -4f }
+                ),
+                Is.EqualTo(false)
+            );
+        }
+
+        [Test]
         public void GroundContact_CoyoteWindowUsesRawSupportTime()
         {
             object insideWindow = CreateGroundContactState();
@@ -397,6 +625,11 @@ namespace Powersuit.Tests.EditMode
             object settings = Activator.CreateInstance(MovementSettingsType);
 
             Assert.That(
+                GetProperty(settings, "GroundRunSpeedMultiplier"),
+                Is.EqualTo(1.65f)
+            );
+
+            Assert.That(
                 GetProperty(settings, "GroundDeceleration"),
                 Is.EqualTo(65f)
             );
@@ -409,16 +642,20 @@ namespace Powersuit.Tests.EditMode
                 Is.EqualTo(0.12f)
             );
             Assert.That(
+                GetProperty(settings, "JumpHoldFlightDelaySeconds"),
+                Is.EqualTo(0.9f)
+            );
+            Assert.That(
+                GetProperty(settings, "JumpHoldGravityScale"),
+                Is.EqualTo(0.55f)
+            );
+            Assert.That(
                 GetProperty(settings, "FlightTakeoffSpeed"),
                 Is.EqualTo(5f)
             );
             Assert.That(
                 GetProperty(settings, "BoostAccelerationMultiplier"),
                 Is.EqualTo(1.7f)
-            );
-            Assert.That(
-                GetProperty(settings, "FlightLandingIntentGraceSeconds"),
-                Is.EqualTo(0.25f)
             );
         }
 
@@ -836,6 +1073,48 @@ namespace Powersuit.Tests.EditMode
             }
 
             return velocity;
+        }
+
+        private static float SimulateHeldJumpHeight(
+            int frameRate,
+            float holdSeconds,
+            float gravityScale
+        )
+        {
+            MethodInfo gravityMethod = LocomotionMathType.GetMethod(
+                "ApplyGravity",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            MethodInfo jumpMethod = LocomotionMathType.GetMethod(
+                "CalculateJumpSpeed",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(gravityMethod, Is.Not.Null);
+            Assert.That(jumpMethod, Is.Not.Null);
+
+            float velocity = (float)jumpMethod.Invoke(
+                null,
+                new object[] { 1.5f, -25f }
+            );
+            float height = 0f;
+            float deltaTime = 1f / frameRate;
+            int frameCount = Mathf.RoundToInt(holdSeconds * frameRate);
+            for (int frame = 0; frame < frameCount; frame++)
+            {
+                velocity = (float)gravityMethod.Invoke(
+                    null,
+                    new object[]
+                    {
+                        velocity,
+                        -25f * gravityScale,
+                        35f,
+                        deltaTime
+                    }
+                );
+                height += velocity * deltaTime;
+            }
+
+            return height;
         }
 
         private static object CreateGroundContactState(
