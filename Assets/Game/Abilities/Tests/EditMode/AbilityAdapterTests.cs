@@ -7,6 +7,100 @@ namespace Powersuit.Abilities.UnityAdapters.Tests
     public sealed class AbilityAdapterTests
     {
         [Test]
+        public void AreaPresentation_UsesCachedGeometryAndExplicitLifecycle()
+        {
+            GameObject host = new GameObject("Area Presentation Test");
+            try
+            {
+                AbilityAreaEffectPresentation presentation =
+                    host.AddComponent<AbilityAreaEffectPresentation>();
+
+                Assert.That(presentation.Phase, Is.EqualTo(
+                    AbilityAreaPresentationPhase.Hidden
+                ));
+
+                presentation.ShowTarget(6f, isValid: true);
+                presentation.AdvancePresentation(0.25f);
+                Assert.That(presentation.CachedLineRendererCount, Is.EqualTo(4));
+                Assert.That(presentation.IsVisible, Is.True);
+                Assert.That(presentation.Radius, Is.EqualTo(6f));
+                Assert.That(presentation.Style, Is.EqualTo(
+                    AbilityAreaPresentationStyle.TargetValid
+                ));
+
+                presentation.BeginTelegraph(
+                    7f,
+                    0.2f,
+                    AbilityAreaPresentationStyle.Lightning
+                );
+                presentation.AdvancePresentation(0.2f);
+                Assert.That(presentation.Phase, Is.EqualTo(
+                    AbilityAreaPresentationPhase.Telegraph
+                ));
+                Assert.That(presentation.NormalizedTime, Is.EqualTo(1f));
+
+                presentation.PlayImpact(
+                    4f,
+                    0.5f,
+                    AbilityAreaPresentationStyle.Rocket
+                );
+                presentation.AdvancePresentation(5f);
+                Assert.That(presentation.Phase, Is.EqualTo(
+                    AbilityAreaPresentationPhase.Impact
+                ));
+                Assert.That(presentation.NormalizedTime, Is.EqualTo(1f));
+
+                presentation.ResetPresentation();
+                Assert.That(presentation.IsVisible, Is.False);
+            }
+            finally
+            {
+                Object.DestroyImmediate(host);
+            }
+        }
+
+        [Test]
+        public void LightningActor_DrivesAreaPresentationAcrossPoolLifecycle()
+        {
+            GameObject host = new GameObject("Lightning Presentation Test");
+            try
+            {
+                LightningStrikeActor actor =
+                    host.AddComponent<LightningStrikeActor>();
+                AbilityAreaEffect effect = new AbilityAreaEffect(
+                    source: this,
+                    sourceFaction: CombatFaction.Player,
+                    damageType: DamageType.Lightning,
+                    center: new Vector3(2f, 0f, 3f),
+                    surfaceNormal: Vector3.up,
+                    radius: 6f,
+                    damage: 55f,
+                    minimumDamageMultiplier: 1f,
+                    forceMode: AbilityExternalForceMode.None,
+                    forceMagnitude: 0f
+                );
+
+                actor.Initialize(new LightningAreaCastCommand(effect));
+
+                Assert.That(actor.AreaPresentation, Is.Not.Null);
+                Assert.That(actor.AreaPresentation.Phase, Is.EqualTo(
+                    AbilityAreaPresentationPhase.Telegraph
+                ));
+                Assert.That(actor.AreaPresentation.Radius, Is.EqualTo(6f));
+                Assert.That(actor.AreaPresentation.Style, Is.EqualTo(
+                    AbilityAreaPresentationStyle.Lightning
+                ));
+
+                actor.OnPoolRecycled();
+                Assert.That(actor.AreaPresentation.IsVisible, Is.False);
+            }
+            finally
+            {
+                Object.DestroyImmediate(host);
+            }
+        }
+
+        [Test]
         public void AreaEffect_AppliesDamageAndFactionSafeExternalForce()
         {
             object source = new object();

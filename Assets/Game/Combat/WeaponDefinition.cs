@@ -56,10 +56,10 @@ namespace Powersuit.Combat
         [SerializeField, Range(1.01f, 178.99f)]
         private float scopedFieldOfViewDegrees = 28f;
         [SerializeField, Range(0.01f, 1f)]
-        private float shoulderLookSensitivityMultiplier = 0.75f;
+        private float shoulderLookSensitivityMultiplier = 0.9f;
         [SerializeField, Range(0.01f, 1f)]
-        private float scopedLookSensitivityMultiplier = 0.35f;
-        [SerializeField, Min(0.01f)] private float aimTransitionSharpness = 12f;
+        private float scopedLookSensitivityMultiplier = 0.45f;
+        [SerializeField, Min(0.01f)] private float aimTransitionSharpness = 22f;
 
         public string WeaponId => weaponId;
         public string DisplayName => displayName;

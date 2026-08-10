@@ -14,6 +14,13 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
     [SerializeField] private bool allowFriendlyFire;
     [SerializeField] private bool invulnerable;
 
+    [Header("Legacy HUD")]
+    [Tooltip(
+        "Draws the old immediate-mode health label. Disable when a " +
+        "PowerSuitHudPresenter owns the screen-space HUD."
+    )]
+    [SerializeField] private bool showLegacyHealthHud = true;
+
     private float currentHealth;
     private Vector3 startingPosition;
     private Quaternion startingRotation;
@@ -51,6 +58,11 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
     public bool IsDefeated => defeated;
     public bool IsInvulnerable => invulnerable;
     public bool IsGodMode => godMode;
+    public bool ShowLegacyHealthHud
+    {
+        get => showLegacyHealthHud;
+        set => showLegacyHealthHud = value;
+    }
     public CombatFaction Faction =>
         faction == CombatFaction.None ? CombatFaction.Player : faction;
     public bool CanReceiveDamage => !defeated && !invulnerable && !godMode;
@@ -340,6 +352,11 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
 
     private void OnGUI()
     {
+        if (!showLegacyHealthHud)
+        {
+            return;
+        }
+
         GUI.Label(
             new Rect(20f, 20f, 250f, 30f),
             defeated

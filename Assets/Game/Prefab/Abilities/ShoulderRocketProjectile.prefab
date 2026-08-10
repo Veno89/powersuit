@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2292808299261564451}
   - component: {fileID: 8940739300428194715}
   - component: {fileID: 2138729091185634270}
+  - component: {fileID: 1762050899496822671}
   - component: {fileID: 360622041996078486}
   - component: {fileID: 5210009190987406861}
   m_Layer: 0
@@ -92,6 +93,22 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1762050899496822671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5937769982083981909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2e1325d8c34e1a4bbd9325f701602a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Powersuit.Abilities.Unity::Powersuit.Abilities.UnityAdapters.AbilityAreaEffectPresentation
+  lineWidth: 0.105
+  surfaceOffset: 0.055
+  defaultImpactSeconds: 0.55
+  createImpactLight: 1
 --- !u!114 &360622041996078486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,6 +127,8 @@ MonoBehaviour:
     m_Bits: 4294967295
   areaQueryCapacity: 64
   impactEffectPrefab: {fileID: 0}
+  impactVisibleSeconds: 0.55
+  areaPresentation: {fileID: 0}
 --- !u!96 &5210009190987406861
 TrailRenderer:
   serializedVersion: 4

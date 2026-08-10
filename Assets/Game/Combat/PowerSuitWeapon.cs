@@ -52,6 +52,13 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     [SerializeField] private Color normalCrosshairColor = Color.white;
     [SerializeField] private Color aimingReticleColor = new Color(0.2f, 0.9f, 1f, 1f);
 
+    [Header("Legacy HUD")]
+    [Tooltip(
+        "Draws the old immediate-mode ammunition panel. Disable when a " +
+        "PowerSuitHudPresenter owns the screen-space HUD."
+    )]
+    [SerializeField] private bool showLegacyAmmoHud = true;
+
     [Header("Runtime Tuning")]
     [SerializeField, Range(MinimumDamageMultiplier, MaximumDamageMultiplier)]
     private float damageMultiplier = 1f;
@@ -118,6 +125,11 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public bool CanFire => CurrentFireBlockReason == WeaponFireBlockReason.None;
     public float DamageMultiplier => damageMultiplier;
     public int ProjectilePrewarmCount => projectilePrewarmCount;
+    public bool ShowLegacyAmmoHud
+    {
+        get => showLegacyAmmoHud;
+        set => showLegacyAmmoHud = value;
+    }
 
     /// <summary>
     /// Sets the player weapon's outgoing damage multiplier. NaN preserves the
@@ -851,7 +863,10 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     {
         if (controller == null)
         {
-            DrawAmmoHud();
+            if (showLegacyAmmoHud)
+            {
+                DrawAmmoHud();
+            }
             return;
         }
 
@@ -909,7 +924,10 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
 
         GUI.color = savedColor;
-        DrawAmmoHud();
+        if (showLegacyAmmoHud)
+        {
+            DrawAmmoHud();
+        }
     }
 
     private void DrawAmmoHud()

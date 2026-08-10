@@ -30,9 +30,9 @@ namespace Powersuit.Tests.EditMode
             Assert.That(profile.SupportsScope, Is.True);
             Assert.That(profile.ShoulderFieldOfViewDegrees, Is.EqualTo(62f));
             Assert.That(profile.ScopedFieldOfViewDegrees, Is.EqualTo(28f));
-            Assert.That(profile.ShoulderLookSensitivityMultiplier, Is.EqualTo(0.75f));
-            Assert.That(profile.ScopedLookSensitivityMultiplier, Is.EqualTo(0.35f));
-            Assert.That(profile.TransitionSharpness, Is.EqualTo(12f));
+            Assert.That(profile.ShoulderLookSensitivityMultiplier, Is.EqualTo(0.9f));
+            Assert.That(profile.ScopedLookSensitivityMultiplier, Is.EqualTo(0.45f));
+            Assert.That(profile.TransitionSharpness, Is.EqualTo(22f));
         }
 
         [Test]

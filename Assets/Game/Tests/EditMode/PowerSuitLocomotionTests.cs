@@ -182,6 +182,45 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
+        public void ApproachVelocity_ReversalUsesRemainingFrameTimeForAcceleration()
+        {
+            Vector3 singleStep = ApproachVelocity(
+                Vector3.forward * 6.5f,
+                Vector3.back * 6.5f,
+                55f,
+                65f,
+                105f,
+                0.1f
+            );
+
+            // Braking consumes 6.5 / 105 seconds. The rest of the frame must
+            // accelerate into the new direction rather than being discarded.
+            float expectedReverseSpeed = 55f * (0.1f - (6.5f / 105f));
+            Assert.That(
+                singleStep.z,
+                Is.EqualTo(-expectedReverseSpeed).Within(0.0001f)
+            );
+        }
+
+        [Test]
+        public void ApproachVelocity_ReversalIsEquivalentAtCommonFrameRates()
+        {
+            Vector3 atThirtyHertz = SimulateVelocityReversal(30, 0.2f);
+            Vector3 atSixtyHertz = SimulateVelocityReversal(60, 0.2f);
+            Vector3 atOneTwentyHertz = SimulateVelocityReversal(120, 0.2f);
+
+            Assert.That(atThirtyHertz.z, Is.EqualTo(-6.5f).Within(0.0001f));
+            Assert.That(
+                atSixtyHertz.z,
+                Is.EqualTo(atThirtyHertz.z).Within(0.0001f)
+            );
+            Assert.That(
+                atOneTwentyHertz.z,
+                Is.EqualTo(atThirtyHertz.z).Within(0.0001f)
+            );
+        }
+
+        [Test]
         public void VerticalApproach_SeparatesReleaseAndReversalBraking()
         {
             float released = ApproachVelocity(
@@ -359,7 +398,11 @@ namespace Powersuit.Tests.EditMode
 
             Assert.That(
                 GetProperty(settings, "GroundDeceleration"),
-                Is.EqualTo(26f)
+                Is.EqualTo(65f)
+            );
+            Assert.That(
+                GetProperty(settings, "GroundBrakingAcceleration"),
+                Is.EqualTo(105f)
             );
             Assert.That(
                 GetProperty(settings, "CoyoteTimeSeconds"),
@@ -371,12 +414,40 @@ namespace Powersuit.Tests.EditMode
             );
             Assert.That(
                 GetProperty(settings, "BoostAccelerationMultiplier"),
-                Is.EqualTo(1.5f)
+                Is.EqualTo(1.7f)
             );
             Assert.That(
                 GetProperty(settings, "FlightLandingIntentGraceSeconds"),
                 Is.EqualTo(0.25f)
             );
+        }
+
+        [Test]
+        public void ControllerDefaults_PrioritizeFastGroundFlightAndAimResponse()
+        {
+            GameObject player = new GameObject("Responsiveness Defaults Test");
+            player.SetActive(false);
+            try
+            {
+                Component controller = player.AddComponent(
+                    FindRuntimeType("PowerSuitController")
+                );
+
+                Assert.That(GetPrivateField(controller, "walkSpeed"), Is.EqualTo(6.5f));
+                Assert.That(GetPrivateField(controller, "groundAcceleration"), Is.EqualTo(55f));
+                Assert.That(GetPrivateField(controller, "flightSpeed"), Is.EqualTo(14f));
+                Assert.That(GetPrivateField(controller, "boostSpeed"), Is.EqualTo(28f));
+                Assert.That(GetPrivateField(controller, "flightAcceleration"), Is.EqualTo(38f));
+                Assert.That(GetPrivateField(controller, "turningSpeed"), Is.EqualTo(20f));
+                Assert.That(GetPrivateField(controller, "combatTurningSpeed"), Is.EqualTo(32f));
+                Assert.That(GetPrivateField(controller, "controllerLookSpeed"), Is.EqualTo(180f));
+                Assert.That(GetPrivateField(controller, "cameraLookSharpness"), Is.EqualTo(45f));
+                Assert.That(GetPrivateField(controller, "aimTransitionSpeed"), Is.EqualTo(22f));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(player);
+            }
         }
 
         [Test]
@@ -715,6 +786,29 @@ namespace Powersuit.Tests.EditMode
                     7f,
                     3f,
                     12f,
+                    deltaTime
+                );
+            }
+
+            return velocity;
+        }
+
+        private static Vector3 SimulateVelocityReversal(
+            int frameRate,
+            float seconds
+        )
+        {
+            Vector3 velocity = Vector3.forward * 6.5f;
+            float deltaTime = 1f / frameRate;
+            int frameCount = Mathf.RoundToInt(seconds * frameRate);
+            for (int frame = 0; frame < frameCount; frame++)
+            {
+                velocity = ApproachVelocity(
+                    velocity,
+                    Vector3.back * 6.5f,
+                    55f,
+                    65f,
+                    105f,
                     deltaTime
                 );
             }

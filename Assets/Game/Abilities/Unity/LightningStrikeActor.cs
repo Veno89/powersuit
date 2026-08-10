@@ -16,6 +16,7 @@ namespace Powersuit.Abilities.UnityAdapters
         [SerializeField] private LayerMask recipientMask = ~0;
         [SerializeField, Min(1)] private int queryCapacity = 64;
         [SerializeField] private Transform visualRoot;
+        [SerializeField] private AbilityAreaEffectPresentation areaPresentation;
 
         private AbilityAreaEffectExecutor executor;
         private LightningAreaCastCommand command;
@@ -27,6 +28,12 @@ namespace Powersuit.Abilities.UnityAdapters
 
         public bool IsInitialized => initialized;
         public bool HasResolved => resolved;
+        public AbilityAreaEffectPresentation AreaPresentation => areaPresentation;
+
+        private void Awake()
+        {
+            EnsurePresentation();
+        }
 
         public void Initialize(LightningAreaCastCommand castCommand)
         {
@@ -51,6 +58,12 @@ namespace Powersuit.Abilities.UnityAdapters
                     castCommand.Radius * 2f
                 );
             }
+            EnsurePresentation();
+            areaPresentation.BeginTelegraph(
+                castCommand.Radius,
+                telegraphSeconds,
+                AbilityAreaPresentationStyle.Lightning
+            );
             EnsureExecutor();
         }
 
@@ -70,6 +83,12 @@ namespace Powersuit.Abilities.UnityAdapters
                     recipientMask,
                     QueryTriggerInteraction.Ignore
                 );
+                EnsurePresentation();
+                areaPresentation.PlayImpact(
+                    command.Radius,
+                    visibleSeconds,
+                    AbilityAreaPresentationStyle.Lightning
+                );
                 StrikeResolved?.Invoke(result);
             }
 
@@ -88,11 +107,27 @@ namespace Powersuit.Abilities.UnityAdapters
             }
         }
 
+        private void EnsurePresentation()
+        {
+            if (areaPresentation == null)
+            {
+                areaPresentation = GetComponent<AbilityAreaEffectPresentation>();
+            }
+            if (areaPresentation == null)
+            {
+                areaPresentation = gameObject.AddComponent<
+                    AbilityAreaEffectPresentation
+                >();
+            }
+        }
+
         public void OnPoolSpawned()
         {
             initialized = false;
             resolved = false;
             elapsed = 0f;
+            EnsurePresentation();
+            areaPresentation.ResetPresentation();
         }
 
         public void OnPoolRecycled()
@@ -102,6 +137,10 @@ namespace Powersuit.Abilities.UnityAdapters
             elapsed = 0f;
             command = default;
             StrikeResolved = null;
+            if (areaPresentation != null)
+            {
+                areaPresentation.ResetPresentation();
+            }
         }
 
 #if UNITY_EDITOR

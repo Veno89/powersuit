@@ -451,14 +451,14 @@ namespace Powersuit.Editor
             SetFloat(
                 serialized,
                 "shoulderLookSensitivityMultiplier",
-                0.75f
+                0.9f
             );
             SetFloat(
                 serialized,
                 "scopedLookSensitivityMultiplier",
-                0.35f
+                0.45f
             );
-            SetFloat(serialized, "aimTransitionSharpness", 12f);
+            SetFloat(serialized, "aimTransitionSharpness", 22f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
             AssetDatabase.SaveAssetIfDirty(definition);
@@ -1176,6 +1176,7 @@ namespace Powersuit.Editor
                 UnityEngine.Object.DestroyImmediate(
                     rocketObject.GetComponent<Collider>()
                 );
+                rocketObject.AddComponent<AbilityAreaEffectPresentation>();
                 ShoulderRocketProjectile rocket =
                     rocketObject.AddComponent<ShoulderRocketProjectile>();
                 TrailRenderer rocketTrail =
@@ -1213,6 +1214,7 @@ namespace Powersuit.Editor
                 UnityEngine.Object.DestroyImmediate(
                     lightningVisual.GetComponent<Collider>()
                 );
+                lightningObject.AddComponent<AbilityAreaEffectPresentation>();
                 LightningStrikeActor lightning =
                     lightningObject.AddComponent<LightningStrikeActor>();
                 SetObjectReference(
@@ -1263,6 +1265,7 @@ namespace Powersuit.Editor
                 UnityEngine.Object.DestroyImmediate(
                     indicatorObject.GetComponent<Collider>()
                 );
+                indicatorObject.AddComponent<AbilityAreaEffectPresentation>();
                 AbilityTargetIndicator indicator =
                     indicatorObject.AddComponent<AbilityTargetIndicator>();
                 GameObject indicatorPrefab = PrefabUtility.SaveAsPrefabAsset(
@@ -1415,7 +1418,12 @@ namespace Powersuit.Editor
                     );
                 }
 
-                ConfigureAimCamera(suitController, 2.2f);
+                ConfigureAimCamera(
+                    suitController,
+                    walkSpeed: 6.5f,
+                    applyResponsiveFeel: true
+                );
+                ConfigureResponsiveAnimation(animationDriver);
                 suitController.ScopePoint = CreateScopeAdapter(sightOcular);
                 PowerSuitInputRouter inputRouter =
                     instance.GetComponent<PowerSuitInputRouter>();
@@ -1442,6 +1450,16 @@ namespace Powersuit.Editor
                     );
                 }
                 weapon.Definition = weaponDefinition;
+                weapon.ShowLegacyAmmoHud = false;
+
+                PlayerHealth playerHealth = instance.GetComponent<PlayerHealth>();
+                if (playerHealth == null)
+                {
+                    throw new InvalidOperationException(
+                        "The player variant is missing PlayerHealth."
+                    );
+                }
+                playerHealth.ShowLegacyHealthHud = false;
 
                 PowerSuitWeaponPresentation presentation =
                     instance.GetComponent<PowerSuitWeaponPresentation>();
@@ -1529,7 +1547,7 @@ namespace Powersuit.Editor
 
                 PowerSuitHudPresenter hudPresenter = CreatePlayerHud(
                     instance,
-                    instance.GetComponent<PlayerHealth>(),
+                    playerHealth,
                     weapon,
                     shoulderRocket,
                     lightningStrike,
@@ -1650,7 +1668,11 @@ namespace Powersuit.Editor
                 // The legacy FlightPrototype uses this base prefab at its
                 // original movement tune. Persist the shared camera profiles
                 // without silently applying the focused demo's slower walk.
-                ConfigureAimCamera(controller, 5f);
+                ConfigureAimCamera(
+                    controller,
+                    walkSpeed: 5f,
+                    applyResponsiveFeel: false
+                );
                 PrefabUtility.SaveAsPrefabAsset(root, BasePlayerPrefabPath);
             }
             finally
@@ -1714,11 +1736,72 @@ namespace Powersuit.Editor
 
         private static void ConfigureAimCamera(
             PowerSuitController controller,
-            float walkSpeed
+            float walkSpeed,
+            bool applyResponsiveFeel
         )
         {
             SerializedObject serialized = new SerializedObject(controller);
             SetFloat(serialized, "walkSpeed", walkSpeed);
+            if (applyResponsiveFeel)
+            {
+                SetFloat(serialized, "groundAcceleration", 55f);
+                SetFloat(serialized, "flightSpeed", 14f);
+                SetFloat(serialized, "boostSpeed", 28f);
+                SetFloat(serialized, "flightAcceleration", 38f);
+                SetFloat(serialized, "turningSpeed", 20f);
+                SetFloat(serialized, "combatTurningSpeed", 32f);
+                SetFloat(serialized, "mouseSensitivity", 0.18f);
+                SetFloat(serialized, "controllerLookSpeed", 180f);
+                SetFloat(serialized, "movementSettings.groundDeceleration", 65f);
+                SetFloat(
+                    serialized,
+                    "movementSettings.groundBrakingAcceleration",
+                    105f
+                );
+                SetFloat(serialized, "movementSettings.airAcceleration", 16f);
+                SetFloat(serialized, "movementSettings.airDeceleration", 4f);
+                SetFloat(
+                    serialized,
+                    "movementSettings.airBrakingAcceleration",
+                    22f
+                );
+                SetFloat(serialized, "movementSettings.flightDeceleration", 30f);
+                SetFloat(
+                    serialized,
+                    "movementSettings.flightBrakingAcceleration",
+                    55f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.flightVerticalSpeed",
+                    11f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.boostVerticalSpeed",
+                    18f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.flightVerticalAcceleration",
+                    36f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.flightVerticalDeceleration",
+                    30f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.flightVerticalBrakingAcceleration",
+                    55f
+                );
+                SetFloat(
+                    serialized,
+                    "movementSettings.boostAccelerationMultiplier",
+                    1.7f
+                );
+            }
             SetFloat(serialized, "cameraDistance", 9.5f);
             SetFloat(serialized, "cameraHeight", 1.5f);
             SetFloat(serialized, "defaultFieldOfView", 72f);
@@ -1730,7 +1813,11 @@ namespace Powersuit.Editor
             SetFloat(serialized, "boostFieldOfView", 82f);
             SetFloat(serialized, "cameraCollisionPadding", 0.05f);
             SetFloat(serialized, "cameraCollisionReleaseSharpness", 14f);
-            SetFloat(serialized, "cameraLookSharpness", 28f);
+            SetFloat(
+                serialized,
+                "cameraLookSharpness",
+                applyResponsiveFeel ? 45f : 28f
+            );
             SetFloat(serialized, "aimCameraDistance", 4.3f);
             SetFloat(serialized, "aimCameraHeight", 1.45f);
             // The shouldered rifle sits on player-local -X. Keeping the camera
@@ -1738,7 +1825,11 @@ namespace Powersuit.Editor
             // side and lift slightly to expose the receiver and barrel.
             SetVector(serialized, "aimShoulderOffset", new Vector3(-1.2f, 0.05f, 0f));
             SetFloat(serialized, "aimFieldOfView", 62f);
-            SetFloat(serialized, "aimTransitionSpeed", 12f);
+            SetFloat(
+                serialized,
+                "aimTransitionSpeed",
+                applyResponsiveFeel ? 22f : 12f
+            );
             SetFloat(serialized, "scopeEyeRelief", 0.045f);
             SetFloat(serialized, "scopedNearClipPlane", 0.02f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
@@ -1750,6 +1841,17 @@ namespace Powersuit.Editor
             SetBool(serialized, "runInBackground", true);
             SetBool(serialized, "synchronizeToDisplay", true);
             SetInt(serialized, "fallbackTargetFrameRate", 60);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void ConfigureResponsiveAnimation(
+            PowerSuitAnimationDriver animationDriver
+        )
+        {
+            SerializedObject serialized = new SerializedObject(animationDriver);
+            SetFloat(serialized, "movementDamping", 0.06f);
+            SetFloat(serialized, "fullSpeedLocomotionPlayback", 4.5f);
+            SetFloat(serialized, "forwardPoseBlendSharpness", 22f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -1785,17 +1887,29 @@ namespace Powersuit.Editor
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
+            GameObject safeAreaObject = new GameObject(
+                "SafeArea",
+                typeof(RectTransform),
+                typeof(PowerSuitHudSafeArea)
+            );
+            RectTransform safeArea = safeAreaObject.GetComponent<RectTransform>();
+            safeArea.SetParent(hudObject.transform, false);
+            safeArea.anchorMin = Vector2.zero;
+            safeArea.anchorMax = Vector2.one;
+            safeArea.offsetMin = Vector2.zero;
+            safeArea.offsetMax = Vector2.zero;
+
             HudWidget healthWidget = CreateHudWidget(
-                hudObject.transform,
+                safeArea,
                 "Health",
-                new Vector2(0f, 1f),
-                new Vector2(0f, 1f),
-                new Vector2(30f, -30f),
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(30f, 30f),
                 new Vector2(280f, 48f),
                 TextAnchor.MiddleLeft
             );
             HudWidget ammoWidget = CreateHudWidget(
-                hudObject.transform,
+                safeArea,
                 "Ammunition",
                 new Vector2(1f, 0f),
                 new Vector2(1f, 0f),
@@ -1804,7 +1918,7 @@ namespace Powersuit.Editor
                 TextAnchor.MiddleCenter
             );
             HudWidget reloadWidget = CreateHudWidget(
-                hudObject.transform,
+                safeArea,
                 "Reload",
                 new Vector2(1f, 0f),
                 new Vector2(1f, 0f),
@@ -1813,7 +1927,7 @@ namespace Powersuit.Editor
                 TextAnchor.MiddleCenter
             );
             HudWidget rocketWidget = CreateHudWidget(
-                hudObject.transform,
+                safeArea,
                 "Rocket",
                 new Vector2(0.5f, 0f),
                 new Vector2(0.5f, 0f),
@@ -1822,7 +1936,7 @@ namespace Powersuit.Editor
                 TextAnchor.MiddleCenter
             );
             HudWidget lightningWidget = CreateHudWidget(
-                hudObject.transform,
+                safeArea,
                 "Lightning",
                 new Vector2(0.5f, 0f),
                 new Vector2(0.5f, 0f),
@@ -1831,7 +1945,7 @@ namespace Powersuit.Editor
                 TextAnchor.MiddleCenter
             );
             HudWidget ultimateWidget = CreateHudWidget(
-                hudObject.transform,
+                safeArea,
                 "Ultimate",
                 new Vector2(0.5f, 0f),
                 new Vector2(0.5f, 0f),
@@ -2638,7 +2752,14 @@ namespace Powersuit.Editor
                 variant.GetComponent<PowerSuitInputRouter>() == null ||
                 !precisionRifle.SupportsScope ||
                 precisionRifle.ScopedFieldOfViewDegrees >=
-                    precisionRifle.ShoulderFieldOfViewDegrees
+                    precisionRifle.ShoulderFieldOfViewDegrees ||
+                Mathf.Abs(
+                    precisionRifle.ShoulderLookSensitivityMultiplier - 0.9f
+                ) > 0.001f ||
+                Mathf.Abs(
+                    precisionRifle.ScopedLookSensitivityMultiplier - 0.45f
+                ) > 0.001f ||
+                Mathf.Abs(precisionRifle.AimTransitionSharpness - 22f) > 0.001f
             )
             {
                 throw new InvalidOperationException(
@@ -2666,6 +2787,15 @@ namespace Powersuit.Editor
                 abilityController.RocketProjectilePrefab == null ||
                 abilityController.LightningActorPrefab == null ||
                 abilityController.VoidFieldPrefab == null ||
+                abilityController.TargetIndicator.GetComponent<
+                    AbilityAreaEffectPresentation
+                >() == null ||
+                abilityController.RocketProjectilePrefab.GetComponent<
+                    AbilityAreaEffectPresentation
+                >() == null ||
+                abilityController.LightningActorPrefab.GetComponent<
+                    AbilityAreaEffectPresentation
+                >() == null ||
                 rocketAbility.LaunchPoint != abilityController.ShoulderMuzzle
             )
             {
@@ -2677,6 +2807,9 @@ namespace Powersuit.Editor
 
             PowerSuitHudPresenter hud =
                 variant.GetComponentInChildren<PowerSuitHudPresenter>(true);
+            PowerSuitHudSafeArea hudSafeArea =
+                variant.GetComponentInChildren<PowerSuitHudSafeArea>(true);
+            PlayerHealth playerHealth = variant.GetComponent<PlayerHealth>();
             PowerSuitDemoBootstrap demoBootstrap =
                 variant.GetComponent<PowerSuitDemoBootstrap>();
             GameObject expectedDemoWorld =
@@ -2690,11 +2823,16 @@ namespace Powersuit.Editor
                 variant.GetComponent<DeveloperConsoleGameplayCommandPack>();
             if (
                 hud == null ||
-                hud.HealthSource != variant.GetComponent<PlayerHealth>() ||
+                hudSafeArea == null ||
+                hudSafeArea.transform.parent != hud.transform ||
+                playerHealth == null ||
+                hud.HealthSource != playerHealth ||
                 hud.WeaponSource != weapon ||
                 hud.ShoulderRocketSource != rocketAbility ||
                 hud.LightningSource != lightningAbility ||
                 hud.UltimateSource != ultimateAbility ||
+                weapon.ShowLegacyAmmoHud ||
+                playerHealth.ShowLegacyHealthHud ||
                 demoBootstrap == null ||
                 expectedDemoWorld == null ||
                 demoBootstrap.DemoWorldPrefab != expectedDemoWorld ||

@@ -283,6 +283,42 @@ namespace Powersuit.Tests.EditMode
 
             SerializedObject controllerSettings = new SerializedObject(suitController);
             Assert.That(
+                controllerSettings.FindProperty("walkSpeed").floatValue,
+                Is.EqualTo(6.5f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("groundAcceleration").floatValue,
+                Is.EqualTo(55f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("flightSpeed").floatValue,
+                Is.EqualTo(14f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("boostSpeed").floatValue,
+                Is.EqualTo(28f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("flightAcceleration").floatValue,
+                Is.EqualTo(38f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("turningSpeed").floatValue,
+                Is.EqualTo(20f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("combatTurningSpeed").floatValue,
+                Is.EqualTo(32f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("mouseSensitivity").floatValue,
+                Is.EqualTo(0.18f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty("controllerLookSpeed").floatValue,
+                Is.EqualTo(180f).Within(0.001f)
+            );
+            Assert.That(
                 controllerSettings.FindProperty("cameraDistance").floatValue,
                 Is.EqualTo(9.5f).Within(0.001f)
             );
@@ -328,7 +364,7 @@ namespace Powersuit.Tests.EditMode
             );
             Assert.That(
                 controllerSettings.FindProperty("cameraLookSharpness").floatValue,
-                Is.EqualTo(28f).Within(0.001f)
+                Is.EqualTo(45f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("aimCameraDistance").floatValue,
@@ -347,6 +383,34 @@ namespace Powersuit.Tests.EditMode
                 Is.EqualTo(62f).Within(0.001f)
             );
             Assert.That(
+                controllerSettings.FindProperty("aimTransitionSpeed").floatValue,
+                Is.EqualTo(22f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.groundDeceleration"
+                ).floatValue,
+                Is.EqualTo(65f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.groundBrakingAcceleration"
+                ).floatValue,
+                Is.EqualTo(105f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.flightDeceleration"
+                ).floatValue,
+                Is.EqualTo(30f).Within(0.001f)
+            );
+            Assert.That(
+                controllerSettings.FindProperty(
+                    "movementSettings.flightBrakingAcceleration"
+                ).floatValue,
+                Is.EqualTo(55f).Within(0.001f)
+            );
+            Assert.That(
                 controllerSettings.FindProperty("scopeEyeRelief").floatValue,
                 Is.EqualTo(0.045f).Within(0.001f)
             );
@@ -355,6 +419,31 @@ namespace Powersuit.Tests.EditMode
                 Is.EqualTo(0.02f).Within(0.001f)
             );
             Assert.That(player.GetComponent("PowerSuitInputRouter"), Is.Not.Null);
+
+            Component responsiveAnimation = player.GetComponent(
+                "PowerSuitAnimationDriver"
+            );
+            Assert.That(responsiveAnimation, Is.Not.Null);
+            SerializedObject responsiveAnimationSettings =
+                new SerializedObject(responsiveAnimation);
+            Assert.That(
+                responsiveAnimationSettings.FindProperty(
+                    "movementDamping"
+                ).floatValue,
+                Is.EqualTo(0.06f).Within(0.001f)
+            );
+            Assert.That(
+                responsiveAnimationSettings.FindProperty(
+                    "fullSpeedLocomotionPlayback"
+                ).floatValue,
+                Is.EqualTo(4.5f).Within(0.001f)
+            );
+            Assert.That(
+                responsiveAnimationSettings.FindProperty(
+                    "forwardPoseBlendSharpness"
+                ).floatValue,
+                Is.EqualTo(22f).Within(0.001f)
+            );
 
             GameObject basePlayer =
                 AssetDatabase.LoadAssetAtPath<GameObject>(BasePlayerPrefabPath);

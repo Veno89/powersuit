@@ -23,6 +23,7 @@ namespace Powersuit.Abilities.UnityAdapters
         [SerializeField, Min(0.001f)] private float authoredDiameter = 1f;
 
         private MaterialPropertyBlock propertyBlock;
+        private AbilityAreaEffectPresentation areaPresentation;
         private bool visible;
 
         public bool IsVisible => visible;
@@ -30,6 +31,7 @@ namespace Powersuit.Abilities.UnityAdapters
         private void Awake()
         {
             CachePresentation();
+            EnsureAreaPresentation();
             SetVisible(false);
         }
 
@@ -68,6 +70,8 @@ namespace Powersuit.Abilities.UnityAdapters
                     targetRenderer.SetPropertyBlock(propertyBlock);
                 }
             }
+            EnsureAreaPresentation();
+            areaPresentation.ShowTarget(radius, isValid);
             SetVisible(true);
         }
 
@@ -81,6 +85,11 @@ namespace Powersuit.Abilities.UnityAdapters
                 {
                     targetRenderer.enabled = value;
                 }
+            }
+            EnsureAreaPresentation();
+            if (!value)
+            {
+                areaPresentation.HideTarget();
             }
         }
 
@@ -97,6 +106,20 @@ namespace Powersuit.Abilities.UnityAdapters
             if (propertyBlock == null)
             {
                 propertyBlock = new MaterialPropertyBlock();
+            }
+        }
+
+        private void EnsureAreaPresentation()
+        {
+            if (areaPresentation == null)
+            {
+                areaPresentation = GetComponent<AbilityAreaEffectPresentation>();
+            }
+            if (areaPresentation == null)
+            {
+                areaPresentation = gameObject.AddComponent<
+                    AbilityAreaEffectPresentation
+                >();
             }
         }
 

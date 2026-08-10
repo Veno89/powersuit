@@ -35,8 +35,10 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ### B–F — Player feel, camera, animation, and rifle
 
 - [x] Add acceleration/deceleration, camera-relative signed movement, backpedal, grounding hysteresis, coyote time, jump buffer, air control, and landing response.
+- [x] Apply the focused fast-response tune: 6.5 m/s ground speed, strong acceleration/deceleration/reversal braking, responsive 14/28 m/s flight/boost, faster combat turning, and stride playback matched closer to the new speed.
 - [x] Add takeoff, hover, vertical control, braking, boost, banking, landing, and flight-compatible weapon/ability actions.
 - [x] Add exploration, shoulder, flight, boost, targeting, and weapon-specific scope camera profiles with damped collision response.
+- [x] Raise mouse/pad aim response, camera damping, shoulder/scope sensitivity, and aim transition sharpness without changing ballistic or reticle ownership.
 - [x] Use the rifle `ScopePoint` for actual scoped camera placement; keep `V` scope ownership distinct from held RMB shoulder aim.
 - [x] Integrate ready/stowed carry, draw/sheathe, directional locomotion, aim-walk, flight, reload, and additive bolt action through the generated four-layer controller.
 - [x] Keep rifle authority in C#: finite ammo, cadence, criticals, timed reload commit, physical projectile, bolt gate, death/reset, and action priorities.
@@ -46,6 +48,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 
 - [x] Implement shoulder rocket with hardpoint launch, reticle targeting, cooldown, pooled projectile, radial falloff damage, and impulse.
 - [x] Implement hold/release lightning targeting with projected indicator, validation/cancel, cooldown, warning, and area strike.
+- [x] Visualize rocket and lightning strength with pulsing full-radius boundaries, expanding shockwaves/rays, impact light, and a vertical lightning column.
 - [x] Implement meter-gated void orb with placement, periodic damage, pull, final outward burst, and pooled reset.
 - [x] Share cooldown/meter, target validation, faction-safe radial deduplication, external-force, pool, input, and lifecycle boundaries without a giant generic skill graph.
 
@@ -62,6 +65,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 
 - [x] Add health, ammo/reload, reticle/hit, ability cooldown, and ultimate HUD state; expose encounter counts through console statistics.
 - [x] Avoid redundant HUD string updates through display-quantized snapshot comparison.
+- [x] Remove duplicate legacy health/ammo/reload overlays from the integrated player and parent all Canvas widgets under a tested safe-area root; keep health, abilities, ammo, and reload in separate screen regions.
 - [x] Add an Editor/Development-Build console with parsing, history, help, errors, clamping, cursor/input ownership, runtime tuning APIs, and optional statistics.
 - [x] Add commands for player/weapon/ability/enemy/director tuning, spawn/clear/seed control, reload, FPS, pools, and projectiles.
 - [x] Pool combat feedback, player/enemy/ability projectiles and actors, and enemies with explicit reset hooks and active/inactive/peak diagnostics.
@@ -70,7 +74,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ## Verification completed
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
-- [x] Full Unity EditMode suite: 186/186 passed.
+- [x] Full Unity EditMode suite: 195/195 passed.
 - [x] Full Unity PlayMode suite: 12/12 passed.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
 - [x] Generated controller, additive bolt clip, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.

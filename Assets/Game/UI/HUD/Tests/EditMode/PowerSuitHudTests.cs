@@ -294,6 +294,55 @@ namespace Powersuit.UI.HUD.Tests
             }
         }
 
+        [TestCase(1920, 1080)]
+        [TestCase(2560, 1080)]
+        [TestCase(1024, 768)]
+        public void UnitySafeArea_FullScreenMapsToFullAnchors(
+            int width,
+            int height
+        )
+        {
+            Type safeAreaType = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetType("PowerSuitHudSafeArea"))
+                .FirstOrDefault(type => type != null);
+            Assert.That(safeAreaType, Is.Not.Null);
+
+            MethodInfo calculate = safeAreaType.GetMethod(
+                "CalculateNormalizedSafeArea",
+                BindingFlags.Static | BindingFlags.Public
+            );
+            Assert.That(calculate, Is.Not.Null);
+
+            Rect result = (Rect)calculate.Invoke(
+                null,
+                new object[] { new Rect(0f, 0f, width, height), width, height }
+            );
+            Assert.That(result.min, Is.EqualTo(Vector2.zero));
+            Assert.That(result.max, Is.EqualTo(Vector2.one));
+        }
+
+        [Test]
+        public void UnitySafeArea_NormalizesAndClampsCutouts()
+        {
+            Type safeAreaType = AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetType("PowerSuitHudSafeArea"))
+                .FirstOrDefault(type => type != null);
+            MethodInfo calculate = safeAreaType?.GetMethod(
+                "CalculateNormalizedSafeArea",
+                BindingFlags.Static | BindingFlags.Public
+            );
+            Assert.That(calculate, Is.Not.Null);
+
+            Rect result = (Rect)calculate.Invoke(
+                null,
+                new object[] { new Rect(-20f, 54f, 2000f, 972f), 1920, 1080 }
+            );
+            Assert.That(result.xMin, Is.EqualTo(0f).Within(0.0001f));
+            Assert.That(result.yMin, Is.EqualTo(0.05f).Within(0.0001f));
+            Assert.That(result.xMax, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(result.yMax, Is.EqualTo(0.95f).Within(0.0001f));
+        }
+
         private static PowerSuitHudSnapshot CreateSnapshot(
             HudWeaponState? weapon = null,
             HudAbilityState? lightning = null

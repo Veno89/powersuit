@@ -21,17 +21,32 @@ namespace Powersuit.Abilities.UnityAdapters
         [SerializeField, Min(1)] private int areaQueryCapacity = 64;
         [SerializeField] private GameObject impactEffectPrefab;
 
+        [Header("Area Readability")]
+        [SerializeField, Min(0.05f)] private float impactVisibleSeconds = 0.55f;
+        [SerializeField] private AbilityAreaEffectPresentation areaPresentation;
+
         private RaycastHit[] hitBuffer = new RaycastHit[InitialHitCapacity];
         private AbilityAreaEffectExecutor areaExecutor;
         private ShoulderRocketLaunchCommand command;
         private Transform sourceRoot;
         private float age;
         private bool initialized;
+        private bool displayingImpact;
+        private float impactAge;
         private TrailRenderer trail;
+        private Renderer[] projectileRenderers;
 
         public event Action<AbilityAreaEffectExecutionResult> ExplosionResolved;
 
         public bool IsInitialized => initialized;
+        public bool IsDisplayingImpact => displayingImpact;
+        public AbilityAreaEffectPresentation AreaPresentation => areaPresentation;
+
+        private void Awake()
+        {
+            CacheProjectilePresentation();
+            EnsureAreaPresentation();
+        }
 
         public void Initialize(
             ShoulderRocketLaunchCommand launchCommand,
@@ -54,6 +69,8 @@ namespace Powersuit.Abilities.UnityAdapters
             command = launchCommand;
             sourceRoot = sourceTransform;
             age = 0f;
+            impactAge = 0f;
+            displayingImpact = false;
             initialized = true;
             transform.position = launchCommand.Origin;
             transform.rotation = Quaternion.LookRotation(
@@ -71,6 +88,10 @@ namespace Powersuit.Abilities.UnityAdapters
                 trail.emitting = true;
             }
 
+            SetProjectileVisible(true);
+            EnsureAreaPresentation();
+            areaPresentation.ResetPresentation();
+
             EnsureExecutor();
         }
 
@@ -78,6 +99,17 @@ namespace Powersuit.Abilities.UnityAdapters
         {
             if (!initialized)
             {
+                return;
+            }
+
+
+            if (displayingImpact)
+            {
+                impactAge += Time.deltaTime;
+                if (impactAge >= impactVisibleSeconds)
+                {
+                    RecycleSelf();
+                }
                 return;
             }
 
@@ -187,8 +219,26 @@ namespace Powersuit.Abilities.UnityAdapters
                 );
             }
 
+
+            displayingImpact = true;
+            impactAge = 0f;
+            if (trail != null)
+            {
+                trail.emitting = false;
+            }
+            SetProjectileVisible(false);
+            transform.rotation = Quaternion.FromToRotation(
+                Vector3.up,
+                effect.SurfaceNormal
+            );
+            EnsureAreaPresentation();
+            areaPresentation.PlayImpact(
+                effect.Radius,
+                impactVisibleSeconds,
+                AbilityAreaPresentationStyle.Rocket
+            );
+
             ExplosionResolved?.Invoke(result);
-            RecycleSelf();
         }
 
         private void EnsureExecutor()
@@ -206,10 +256,50 @@ namespace Powersuit.Abilities.UnityAdapters
             CombatFeedbackPool.Recycle(gameObject);
         }
 
+        private void EnsureAreaPresentation()
+        {
+            if (areaPresentation == null)
+            {
+                areaPresentation = GetComponent<AbilityAreaEffectPresentation>();
+            }
+            if (areaPresentation == null)
+            {
+                areaPresentation = gameObject.AddComponent<
+                    AbilityAreaEffectPresentation
+                >();
+            }
+        }
+
+        private void CacheProjectilePresentation()
+        {
+            if (projectileRenderers == null || projectileRenderers.Length == 0)
+            {
+                projectileRenderers = GetComponents<Renderer>();
+            }
+            if (trail == null)
+            {
+                trail = GetComponentInChildren<TrailRenderer>(true);
+            }
+        }
+
+        private void SetProjectileVisible(bool isVisible)
+        {
+            CacheProjectilePresentation();
+            foreach (Renderer projectileRenderer in projectileRenderers)
+            {
+                if (projectileRenderer != null && projectileRenderer != trail)
+                {
+                    projectileRenderer.enabled = isVisible;
+                }
+            }
+        }
+
         public void OnPoolSpawned()
         {
             initialized = false;
             age = 0f;
+            impactAge = 0f;
+            displayingImpact = false;
             sourceRoot = null;
             if (trail == null)
             {
@@ -220,12 +310,17 @@ namespace Powersuit.Abilities.UnityAdapters
                 trail.Clear();
                 trail.emitting = false;
             }
+            SetProjectileVisible(true);
+            EnsureAreaPresentation();
+            areaPresentation.ResetPresentation();
         }
 
         public void OnPoolRecycled()
         {
             initialized = false;
             age = 0f;
+            impactAge = 0f;
+            displayingImpact = false;
             sourceRoot = null;
             command = default;
             ExplosionResolved = null;
@@ -234,6 +329,11 @@ namespace Powersuit.Abilities.UnityAdapters
                 trail.Clear();
                 trail.emitting = false;
             }
+            SetProjectileVisible(true);
+            if (areaPresentation != null)
+            {
+                areaPresentation.ResetPresentation();
+            }
         }
 
 #if UNITY_EDITOR
@@ -241,6 +341,7 @@ namespace Powersuit.Abilities.UnityAdapters
         {
             collisionRadius = Mathf.Max(0.01f, collisionRadius);
             areaQueryCapacity = Mathf.Max(1, areaQueryCapacity);
+            impactVisibleSeconds = Mathf.Max(0.05f, impactVisibleSeconds);
         }
 #endif
     }

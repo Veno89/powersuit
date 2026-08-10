@@ -39,6 +39,6 @@ MonoBehaviour:
   supportsScope: 1
   shoulderFieldOfViewDegrees: 62
   scopedFieldOfViewDegrees: 28
-  shoulderLookSensitivityMultiplier: 0.75
-  scopedLookSensitivityMultiplier: 0.35
-  aimTransitionSharpness: 12
+  shoulderLookSensitivityMultiplier: 0.9
+  scopedLookSensitivityMultiplier: 0.45
+  aimTransitionSharpness: 22

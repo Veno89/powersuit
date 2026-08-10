@@ -99,16 +99,17 @@ public sealed class PowerSuitController : MonoBehaviour
     public Vector2 ReticleOffset => currentReticleOffset;
 
     [Header("Ground Movement")]
-    [SerializeField] private float walkSpeed = 2.2f;
-    [SerializeField] private float groundAcceleration = 20f;
+    [SerializeField] private float walkSpeed = 6.5f;
+    [SerializeField] private float groundAcceleration = 55f;
     [SerializeField] private float jumpHeight = 1.5f;
     [SerializeField] private float gravity = -25f;
 
     [Header("Flight")]
-    [SerializeField] private float flightSpeed = 10f;
-    [SerializeField] private float boostSpeed = 20f;
-    [SerializeField] private float flightAcceleration = 12f;
-    [SerializeField] private float turningSpeed = 12f;
+    [SerializeField] private float flightSpeed = 14f;
+    [SerializeField] private float boostSpeed = 28f;
+    [SerializeField] private float flightAcceleration = 38f;
+    [SerializeField] private float turningSpeed = 20f;
+    [SerializeField] private float combatTurningSpeed = 32f;
 
     [Header("Runtime Tuning")]
     [SerializeField, Range(MinimumSpeedMultiplier, MaximumSpeedMultiplier)]
@@ -124,14 +125,14 @@ public sealed class PowerSuitController : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private float cameraDistance = 9.5f;
     [SerializeField] private float cameraHeight = 1.5f;
-    [SerializeField] private float mouseSensitivity = 0.15f;
-    [SerializeField] private float controllerLookSpeed = 120f;
+    [SerializeField] private float mouseSensitivity = 0.18f;
+    [SerializeField] private float controllerLookSpeed = 180f;
     [SerializeField] private float minimumPitch = -55f;
     [SerializeField] private float maximumPitch = 70f;
     [SerializeField] private float cameraCollisionRadius = 0.2f;
     [SerializeField] private float cameraCollisionPadding = 0.05f;
     [SerializeField] private float cameraCollisionReleaseSharpness = 14f;
-    [SerializeField] private float cameraLookSharpness = 28f;
+    [SerializeField] private float cameraLookSharpness = 45f;
 
     [Header("Flight Camera")]
     [SerializeField] private float flightCameraDistance = 11f;
@@ -147,7 +148,7 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private Vector3 aimShoulderOffset = new Vector3(-1.2f, 0.05f, 0f);
     [SerializeField] private float defaultFieldOfView = 72f;
     [SerializeField] private float aimFieldOfView = 62f;
-    [SerializeField] private float aimTransitionSpeed = 12f;
+    [SerializeField] private float aimTransitionSpeed = 22f;
     [SerializeField] private float maxReticleOffset = 140f;
     [SerializeField] private float aimMaxDistance = 200f;
 
@@ -637,11 +638,14 @@ public sealed class PowerSuitController : MonoBehaviour
             Vector3.up
         );
 
+        float rotationSharpness = ShouldFaceCameraForCombat()
+            ? combatTurningSpeed
+            : turningSpeed;
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             targetRotation,
             PowerSuitCameraMath.ExponentialDampingFactor(
-                turningSpeed,
+                rotationSharpness,
                 Time.deltaTime
             )
         );
@@ -669,7 +673,7 @@ public sealed class PowerSuitController : MonoBehaviour
                 weaponAimState.Mode
             )
             : isAiming
-                ? 0.75f
+                ? 0.9f
                 : 1f;
 
         cameraYaw += mouseLook.x * mouseSensitivity * sensitivityMultiplier;
@@ -1330,8 +1334,8 @@ public sealed class PowerSuitController : MonoBehaviour
                 supportsScope: false,
                 shoulderFieldOfViewDegrees: aimFieldOfView,
                 scopedFieldOfViewDegrees: Mathf.Min(28f, aimFieldOfView - 1f),
-                shoulderLookSensitivityMultiplier: 0.75f,
-                scopedLookSensitivityMultiplier: 0.35f,
+                shoulderLookSensitivityMultiplier: 0.9f,
+                scopedLookSensitivityMultiplier: 0.45f,
                 transitionSharpness: Mathf.Max(0.01f, aimTransitionSpeed)
             );
 
@@ -1542,11 +1546,11 @@ public sealed class PowerSuitController : MonoBehaviour
 public sealed class PowerSuitMovementSettings
 {
     [Header("Ground Response")]
-    [SerializeField] private float groundDeceleration = 26f;
-    [SerializeField] private float groundBrakingAcceleration = 38f;
-    [SerializeField] private float airAcceleration = 7f;
-    [SerializeField] private float airDeceleration = 1.5f;
-    [SerializeField] private float airBrakingAcceleration = 10f;
+    [SerializeField] private float groundDeceleration = 65f;
+    [SerializeField] private float groundBrakingAcceleration = 105f;
+    [SerializeField] private float airAcceleration = 16f;
+    [SerializeField] private float airDeceleration = 4f;
+    [SerializeField] private float airBrakingAcceleration = 22f;
     [SerializeField] private float terminalFallSpeed = 35f;
     [SerializeField] private float groundedStickVelocity = -2f;
 
@@ -1556,17 +1560,17 @@ public sealed class PowerSuitMovementSettings
     [SerializeField] private float jumpBufferSeconds = 0.12f;
 
     [Header("Flight Response")]
-    [SerializeField] private float flightDeceleration = 9f;
-    [SerializeField] private float flightBrakingAcceleration = 22f;
-    [SerializeField] private float flightVerticalSpeed = 8f;
-    [SerializeField] private float boostVerticalSpeed = 14f;
-    [SerializeField] private float flightVerticalAcceleration = 18f;
-    [SerializeField] private float flightVerticalDeceleration = 14f;
-    [SerializeField] private float flightVerticalBrakingAcceleration = 28f;
+    [SerializeField] private float flightDeceleration = 30f;
+    [SerializeField] private float flightBrakingAcceleration = 55f;
+    [SerializeField] private float flightVerticalSpeed = 11f;
+    [SerializeField] private float boostVerticalSpeed = 18f;
+    [SerializeField] private float flightVerticalAcceleration = 36f;
+    [SerializeField] private float flightVerticalDeceleration = 30f;
+    [SerializeField] private float flightVerticalBrakingAcceleration = 55f;
     [SerializeField] private float flightTakeoffSpeed = 5f;
     [SerializeField] private float flightTakeoffGraceSeconds = 0.12f;
     [SerializeField] private float flightToggleCooldownSeconds = 0.15f;
-    [SerializeField] private float boostAccelerationMultiplier = 1.5f;
+    [SerializeField] private float boostAccelerationMultiplier = 1.7f;
     [SerializeField] private float flightLandingInputThreshold = 0.1f;
     [SerializeField] private float flightLandingIntentGraceSeconds = 0.25f;
 
@@ -1859,7 +1863,13 @@ public static class PowerSuitLocomotionMath
             Vector3.Dot(current, target) < 0f
         )
         {
-            selectedRate = brakingAcceleration;
+            return ReverseVelocity(
+                current,
+                target,
+                acceleration,
+                brakingAcceleration,
+                deltaTime
+            );
         }
         else if (
             target.sqrMagnitude + DirectionEpsilon < current.sqrMagnitude
@@ -1903,7 +1913,13 @@ public static class PowerSuitLocomotionMath
             current * target < 0f
         )
         {
-            selectedRate = brakingAcceleration;
+            return ReverseVelocity(
+                current,
+                target,
+                acceleration,
+                brakingAcceleration,
+                deltaTime
+            );
         }
         else if (Mathf.Abs(target) + DirectionEpsilon < Mathf.Abs(current))
         {
@@ -1918,6 +1934,66 @@ public static class PowerSuitLocomotionMath
             current,
             target,
             selectedRate * deltaTime
+        );
+    }
+
+    private static Vector3 ReverseVelocity(
+        Vector3 current,
+        Vector3 target,
+        float acceleration,
+        float brakingAcceleration,
+        float deltaTime
+    )
+    {
+        if (brakingAcceleration <= 0f)
+        {
+            return current;
+        }
+
+        float stopTime = current.magnitude / brakingAcceleration;
+        if (deltaTime <= stopTime)
+        {
+            return Vector3.MoveTowards(
+                current,
+                Vector3.zero,
+                brakingAcceleration * deltaTime
+            );
+        }
+
+        return Vector3.MoveTowards(
+            Vector3.zero,
+            target,
+            acceleration * (deltaTime - stopTime)
+        );
+    }
+
+    private static float ReverseVelocity(
+        float current,
+        float target,
+        float acceleration,
+        float brakingAcceleration,
+        float deltaTime
+    )
+    {
+        if (brakingAcceleration <= 0f)
+        {
+            return current;
+        }
+
+        float stopTime = Mathf.Abs(current) / brakingAcceleration;
+        if (deltaTime <= stopTime)
+        {
+            return Mathf.MoveTowards(
+                current,
+                0f,
+                brakingAcceleration * deltaTime
+            );
+        }
+
+        return Mathf.MoveTowards(
+            0f,
+            target,
+            acceleration * (deltaTime - stopTime)
         );
     }
 
