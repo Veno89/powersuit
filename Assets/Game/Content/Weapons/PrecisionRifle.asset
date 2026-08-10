@@ -23,6 +23,7 @@ MonoBehaviour:
   magazineCapacity: 5
   startingReserveAmmo: 25
   maximumReserveAmmo: 50
+  autoReloadWhenEmpty: 1
   reloadDurationSeconds: 2.8
   reloadCommitNormalizedTime: 0.89
   requiresManualCycle: 1

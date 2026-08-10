@@ -41,7 +41,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Raise mouse/pad aim response, camera damping, shoulder/scope sensitivity, and aim transition sharpness without changing ballistic or reticle ownership.
 - [x] Use the rifle `ScopePoint` for actual scoped camera placement; keep `V` scope ownership distinct from held RMB shoulder aim.
 - [x] Integrate ready/stowed carry, draw/sheathe, directional locomotion, aim-walk, flight, reload, and additive bolt action through the generated four-layer controller.
-- [x] Keep rifle authority in C#: finite ammo, cadence, criticals, timed reload commit, physical projectile, bolt gate, death/reset, and action priorities.
+- [x] Keep rifle authority in C#: finite ammo, cadence, criticals, timed manual/empty-magazine automatic reload, physical projectile, bolt gate, death/reset, and action priorities.
 - [x] Keep the rifle forward for accepted hip-fire and flight-fire staging instead of leaving it diagonally across the chest.
 
 ### G — Combat abilities
@@ -74,7 +74,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ## Verification completed
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
-- [x] Full Unity EditMode suite: 195/195 passed.
+- [x] Full Unity EditMode suite: 197/197 passed.
 - [x] Full Unity PlayMode suite: 12/12 passed.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
 - [x] Generated controller, additive bolt clip, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.

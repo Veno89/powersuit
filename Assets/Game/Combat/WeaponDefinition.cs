@@ -28,6 +28,8 @@ namespace Powersuit.Combat
         [SerializeField, Min(0)] private int maximumReserveAmmo = 50;
 
         [Header("Reload")]
+        [Tooltip("Automatically starts a reload after the magazine reaches zero and the weapon is ready to reload.")]
+        [SerializeField] private bool autoReloadWhenEmpty = true;
         [SerializeField, Min(0f)] private float reloadDurationSeconds = 2.8f;
         [SerializeField, Range(0f, 1f)] private float reloadCommitNormalizedTime = 0.89f;
 
@@ -72,6 +74,7 @@ namespace Powersuit.Combat
         public int MagazineCapacity => magazineCapacity;
         public int StartingReserveAmmo => startingReserveAmmo;
         public int MaximumReserveAmmo => maximumReserveAmmo;
+        public bool AutoReloadWhenEmpty => autoReloadWhenEmpty;
         public float ReloadDurationSeconds => reloadDurationSeconds;
         public float ReloadCommitNormalizedTime => reloadCommitNormalizedTime;
         public bool RequiresManualCycle => requiresManualCycle;

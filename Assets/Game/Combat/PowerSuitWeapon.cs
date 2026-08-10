@@ -122,6 +122,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public int ReserveAmmo => runtimeState?.CurrentReserveAmmo ?? 0;
     public bool IsReloading => runtimeState != null && runtimeState.IsReloading;
     public bool IsCycling => runtimeState != null && runtimeState.IsManualCycleInProgress;
+    public bool AutoReloadWhenEmpty =>
+        weaponDefinition == null || weaponDefinition.AutoReloadWhenEmpty;
     public bool CanFire => CurrentFireBlockReason == WeaponFireBlockReason.None;
     public float DamageMultiplier => damageMultiplier;
     public int ProjectilePrewarmCount => projectilePrewarmCount;
@@ -250,6 +252,10 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         {
             TryStartReload();
         }
+        else
+        {
+            TryStartAutomaticReload();
+        }
 
         bool fireRequested = IsFireRequested();
         if (
@@ -352,6 +358,21 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
 
         return runtimeState.TryStartReload();
+    }
+
+    private void TryStartAutomaticReload()
+    {
+        if (
+            !AutoReloadWhenEmpty ||
+            !PresentationAllowsReload ||
+            runtimeState == null ||
+            !runtimeState.CanStartAutomaticReload
+        )
+        {
+            return;
+        }
+
+        runtimeState.TryStartReload();
     }
 
     public bool CancelReload()

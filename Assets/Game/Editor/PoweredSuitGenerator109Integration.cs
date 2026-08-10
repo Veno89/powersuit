@@ -432,6 +432,7 @@ namespace Powersuit.Editor
             SetInt(serialized, "magazineCapacity", 5);
             SetInt(serialized, "startingReserveAmmo", 25);
             SetInt(serialized, "maximumReserveAmmo", 50);
+            SetBool(serialized, "autoReloadWhenEmpty", true);
             SetFloat(serialized, "reloadDurationSeconds", 2.8f);
             SetFloat(serialized, "reloadCommitNormalizedTime", 0.89f);
             SetBool(serialized, "requiresManualCycle", true);
@@ -2722,6 +2723,7 @@ namespace Powersuit.Editor
                 weapon == null ||
                 precisionRifle == null ||
                 weapon.Definition != precisionRifle ||
+                !precisionRifle.AutoReloadWhenEmpty ||
                 weapon.MuzzleTransform == null ||
                 weapon.MuzzleTransform.name != "WeaponMuzzle" ||
                 weapon.MuzzleTransform.parent == null ||

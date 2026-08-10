@@ -143,6 +143,12 @@ namespace Powersuit.Combat
         public int CurrentReserveAmmo { get; private set; }
         public bool IsReloading { get; private set; }
         public bool IsManualCycleInProgress => manualCycleRemaining > TimeEpsilon;
+        public bool CanStartAutomaticReload =>
+            !Configuration.UsesInfiniteAmmo &&
+            !IsReloading &&
+            !IsManualCycleInProgress &&
+            CurrentMagazineAmmo <= 0 &&
+            CurrentReserveAmmo > 0;
         public bool HasReloadCommitted => IsReloading && reloadCommitted;
         public float FireCooldownRemaining => fireCooldownRemaining;
         public float ManualCycleRemaining => manualCycleRemaining;

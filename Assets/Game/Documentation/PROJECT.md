@@ -66,7 +66,7 @@ The generated Animator uses four layers in this order:
 
 The base layer owns locomotion/flight. Forward pose keeps accepted hip/flight fire pointed forward without forcing aim FOV. The additive layer cycles the articulated bolt, while the highest override owns draw, sheathe, and reload. Code controls commit/cancel/reset behavior.
 
-`WeaponDefinition` owns authored rifle tuning and ground/shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload commit, critical resolution, and manual cycle. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation.
+`WeaponDefinition` owns authored rifle tuning, empty-magazine auto-reload policy, and ground/shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
 
 ## Abilities
 
@@ -123,7 +123,7 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 Current 2026-08-10 results:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- EditMode: 195/195 passed.
+- EditMode: 197/197 passed.
 - PlayMode: 12/12 passed.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
 - Windows x64 Development Build succeeded.

@@ -41,7 +41,7 @@ The centralized `PowerSuitInputRouter` arbitrates gameplay, targeting, scope, co
 - Ground locomotion has acceleration/deceleration, signed directional movement, coyote time, jump buffering, air control, landing response, and backpedalling. The focused demo now uses a fast-response 6.5 m/s profile with stronger acceleration, braking, reversal, turning, and stride playback.
 - Flight includes takeoff, hover, ascend/descend, braking, boost, banking, landing transitions, and flight-compatible aiming, firing, reloading, and abilities. Its 14 m/s cruise and 28 m/s boost profiles use deliberately faster acceleration and release response.
 - Camera profiles cover exploration, shoulder aim, flight, boost, ability targeting, and the Precision Rifle's actual `ScopePoint`. Collision pull-in and damped release avoid recurrent camera clipping; mouse/pad look, aim sensitivity, camera damping, and aim transitions use the responsive demo profile.
-- The data-driven Precision Rifle owns finite ammunition, reload, cadence, critical hits, physical pooled projectiles, bolt cycling, weapon-ready presentation, and shoulder/scope aim profiles.
+- The data-driven Precision Rifle owns finite ammunition, manual and empty-magazine automatic reload, cadence, critical hits, physical pooled projectiles, bolt cycling, weapon-ready presentation, and shoulder/scope aim profiles.
 - Shoulder rocket, projected lightning strike, and meter-gated void-orb ultimate use shared cooldown, targeting, faction-safe radial damage, external-force, pooling, and lifecycle boundaries without a monolithic ability framework. Rocket and lightning now render their full damage radius, expanding shockwave/rays, impact flash, and—in lightning's case—a vertical bolt; the targeting ring pulses before release.
 - Six generated, data-driven enemies are available: Stationary Sentry, Patrol Rifleman, Pursuer, Heavy Artillery, Flying Harrier, and Skirmisher. Their shared runtime/controller/emitter architecture supports distinct movement and attack profiles, telegraphs, health bars, force response, death, and pool reset.
 - `PowerSuitCombatSandbox.prefab` supplies three connected greybox zones, separate ground/flight spawn regions, 19 spawn points, and a deterministic weighted/threat-budget SpawnDirector. The default live cap is eight enemies.
@@ -74,7 +74,7 @@ See [ROADMAP.md](ROADMAP.md) for acceptance status and [PROJECT.md](Assets/Game/
 Current workspace evidence from 2026-08-10:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- Unity EditMode: 195/195 passed.
+- Unity EditMode: 197/197 passed.
 - Unity PlayMode: 12/12 passed, including a 1,000-projectile spawn/recycle pool exercise.
 - Generated controller, ability prefabs, six enemy prefabs/definitions, projectile prefab, player prefab, HUD/bootstrap references, SpawnDirector, and three-zone world validation passed.
 - Windows x64 Development Build completed successfully.

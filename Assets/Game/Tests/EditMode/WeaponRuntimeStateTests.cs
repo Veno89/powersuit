@@ -33,6 +33,10 @@ namespace Powersuit.Tests.EditMode
             Assert.That(config.RoundsPerMinute, Is.EqualTo(45f));
             Assert.That(config.MagazineCapacity, Is.EqualTo(5));
             Assert.That(config.StartingReserveAmmo, Is.EqualTo(25));
+            Assert.That(
+                asset.GetType().GetProperty("AutoReloadWhenEmpty")?.GetValue(asset),
+                Is.EqualTo(true)
+            );
             Assert.That(config.ReloadDurationSeconds, Is.EqualTo(2.8f));
             Assert.That(config.ReloadCommitNormalizedTime, Is.EqualTo(0.89f));
             Assert.That(config.CriticalChance, Is.EqualTo(0.1f));
@@ -246,6 +250,99 @@ namespace Powersuit.Tests.EditMode
 
             Assert.That(state.CompleteManualCycle(), Is.True);
             Assert.That(state.TryFire().Fired, Is.True);
+        }
+
+        [Test]
+        public void AutomaticReload_WaitsForManualCycleAndRequiresReserveAmmo()
+        {
+            WeaponRuntimeState state = CreateState(
+                magazineCapacity: 1,
+                startingReserve: 2,
+                roundsPerMinute: 600f,
+                requiresManualCycle: true,
+                manualCycleDuration: 0.5f
+            );
+
+            Assert.That(state.CanStartAutomaticReload, Is.False);
+            Assert.That(state.TryFire().Fired, Is.True);
+            Assert.That(state.CurrentMagazineAmmo, Is.Zero);
+            Assert.That(
+                state.CanStartAutomaticReload,
+                Is.False,
+                "The bolt cycle must finish before an automatic reload can start."
+            );
+
+            state.Advance(0.5f);
+
+            Assert.That(state.CanStartAutomaticReload, Is.True);
+            Assert.That(
+                state.TryStartReload(),
+                Is.EqualTo(WeaponReloadStartResult.Started)
+            );
+            Assert.That(state.CanStartAutomaticReload, Is.False);
+
+            WeaponRuntimeState noReserve = CreateState(
+                magazineCapacity: 1,
+                startingReserve: 0,
+                roundsPerMinute: 600f
+            );
+            Assert.That(noReserve.TryFire().Fired, Is.True);
+            Assert.That(noReserve.CanStartAutomaticReload, Is.False);
+        }
+
+        [Test]
+        public void PowerSuitWeapon_AutomaticReloadHonorsPresentationGate()
+        {
+            Type weaponType = Type.GetType(
+                "PowerSuitWeapon, Assembly-CSharp",
+                throwOnError: true
+            );
+            UnityEngine.GameObject gameObject = new UnityEngine.GameObject(
+                "Auto Reload Test Weapon"
+            );
+            gameObject.SetActive(false);
+
+            try
+            {
+                UnityEngine.Component weapon = gameObject.AddComponent(weaponType);
+                WeaponRuntimeState state = CreateState(
+                    magazineCapacity: 1,
+                    startingReserve: 2,
+                    roundsPerMinute: 600f
+                );
+                Assert.That(state.TryFire().Fired, Is.True);
+                Assert.That(state.CanStartAutomaticReload, Is.True);
+
+                weaponType.GetField(
+                    "runtimeState",
+                    System.Reflection.BindingFlags.Instance |
+                        System.Reflection.BindingFlags.NonPublic
+                )?.SetValue(weapon, state);
+                System.Reflection.MethodInfo tryAutoReload = weaponType.GetMethod(
+                    "TryStartAutomaticReload",
+                    System.Reflection.BindingFlags.Instance |
+                        System.Reflection.BindingFlags.NonPublic
+                );
+                Assert.That(tryAutoReload, Is.Not.Null);
+
+                weaponType.GetProperty("PresentationAllowsReload")?.SetValue(
+                    weapon,
+                    false
+                );
+                tryAutoReload.Invoke(weapon, null);
+                Assert.That(state.IsReloading, Is.False);
+
+                weaponType.GetProperty("PresentationAllowsReload")?.SetValue(
+                    weapon,
+                    true
+                );
+                tryAutoReload.Invoke(weapon, null);
+                Assert.That(state.IsReloading, Is.True);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
         }
 
         [Test]
