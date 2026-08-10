@@ -217,6 +217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PowerSuitWeaponAnimationDriver
   weapon: {fileID: 7331097523691493382}
   animator: {fileID: 7870674555697902162}
+  postShotPoseHoldDuration: 0.25
 --- !u!114 &7331097523691493382 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7646132019645809869, guid: 73d4807297a4a6d41949449a9cc1d116, type: 3}

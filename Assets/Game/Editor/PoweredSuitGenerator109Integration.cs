@@ -95,12 +95,11 @@ namespace Powersuit.Editor
                 "PS_WeaponStowed_Hover"
             };
 
-        private static readonly string[] WeaponActionClips =
+        private static readonly string[] OverrideWeaponActionClips =
         {
             "PS_Weapon_Draw",
             "PS_Weapon_Sheathe",
-            "PS_Reload",
-            "PS_BoltCycle"
+            "PS_Reload"
         };
 
         [MenuItem("Tools/Powered Suit/Integrate Generator 109")]
@@ -382,13 +381,15 @@ namespace Powersuit.Editor
         )
         {
             Dictionary<string, AnimationClip> layerSafeActionClips =
-                WeaponActionClips.ToDictionary(
+                OverrideWeaponActionClips.ToDictionary(
                     name => name,
                     name => CreateOrUpdateLayerSafeActionClip(clips[name]),
                     StringComparer.Ordinal
                 );
-            AnimationClip layerSafeAirborneAimClip =
+            AnimationClip layerSafeForwardPoseClip =
                 CreateOrUpdateLayerSafeActionClip(clips["PS_Aim"]);
+            AnimationClip layerSafeAdditiveBoltClip =
+                CreateOrUpdateLayerSafeAdditiveClip(clips["PS_BoltCycle"]);
 
             AnimatorController controller =
                 AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
@@ -601,30 +602,30 @@ namespace Powersuit.Editor
             );
 
             AvatarMask upperBodyMask = CreateOrUpdateUpperBodyMask();
-            AnimatorStateMachine airborneAimStateMachine = new AnimatorStateMachine
+            AnimatorStateMachine forwardPoseStateMachine = new AnimatorStateMachine
             {
-                name = "Airborne Aim State Machine",
+                name = "Forward Weapon Pose State Machine",
                 hideFlags = HideFlags.HideInHierarchy
             };
-            AssetDatabase.AddObjectToAsset(airborneAimStateMachine, controller);
-            AnimatorControllerLayer airborneAimLayer = new AnimatorControllerLayer
+            AssetDatabase.AddObjectToAsset(forwardPoseStateMachine, controller);
+            AnimatorControllerLayer forwardPoseLayer = new AnimatorControllerLayer
             {
-                name = PowerSuitAnimationDriver.AirborneAimLayerName,
+                name = PowerSuitAnimationDriver.ForwardWeaponPoseLayerName,
                 defaultWeight = 0f,
                 avatarMask = upperBodyMask,
                 blendingMode = AnimatorLayerBlendingMode.Override,
-                stateMachine = airborneAimStateMachine
+                stateMachine = forwardPoseStateMachine
             };
-            controller.AddLayer(airborneAimLayer);
+            controller.AddLayer(forwardPoseLayer);
 
-            AnimatorState airborneAim = AddState(
-                airborneAimStateMachine,
-                "Airborne Aim Pose",
-                layerSafeAirborneAimClip,
+            AnimatorState forwardPose = AddState(
+                forwardPoseStateMachine,
+                "Forward Weapon Pose",
+                layerSafeForwardPoseClip,
                 new Vector3(180f, 100f)
             );
-            airborneAim.writeDefaultValues = false;
-            airborneAimStateMachine.defaultState = airborneAim;
+            forwardPose.writeDefaultValues = false;
+            forwardPoseStateMachine.defaultState = forwardPose;
 
             AnimatorStateMachine weaponStateMachine = new AnimatorStateMachine
             {
@@ -643,8 +644,6 @@ namespace Powersuit.Editor
                 blendingMode = AnimatorLayerBlendingMode.Override,
                 stateMachine = weaponStateMachine
             };
-            controller.AddLayer(weaponLayer);
-
             AnimatorState empty = AddState(
                 weaponStateMachine,
                 "No Weapon Action",
@@ -670,13 +669,7 @@ namespace Powersuit.Editor
                 layerSafeActionClips["PS_Reload"],
                 new Vector3(360f, 220f)
             );
-            AnimatorState cycle = AddState(
-                weaponStateMachine,
-                "Bolt Cycle",
-                layerSafeActionClips["PS_BoltCycle"],
-                new Vector3(360f, 320f)
-            );
-            foreach (AnimatorState actionState in new[] { draw, sheathe, reload, cycle })
+            foreach (AnimatorState actionState in new[] { draw, sheathe, reload })
             {
                 // The imported actions include axis/root/lower-body curves that
                 // do not belong on this override layer. Layer-safe copies remove
@@ -688,11 +681,44 @@ namespace Powersuit.Editor
             AddAnyStateTrigger(weaponStateMachine, draw, "DrawWeapon");
             AddAnyStateTrigger(weaponStateMachine, sheathe, "SheatheWeapon");
             AddAnyStateTrigger(weaponStateMachine, reload, "ReloadWeapon");
-            AddAnyStateTrigger(weaponStateMachine, cycle, "CycleWeapon");
             AddExitTransition(draw, empty);
             AddExitTransition(sheathe, empty);
             AddExitTransition(reload, empty);
-            AddExitTransition(cycle, empty);
+
+            AnimatorStateMachine boltCycleStateMachine = new AnimatorStateMachine
+            {
+                name = "Bolt Cycle Action State Machine",
+                hideFlags = HideFlags.HideInHierarchy
+            };
+            AssetDatabase.AddObjectToAsset(boltCycleStateMachine, controller);
+            AnimatorControllerLayer boltCycleLayer = new AnimatorControllerLayer
+            {
+                name = PowerSuitWeaponAnimationDriver.BoltCycleLayerName,
+                defaultWeight = 0f,
+                avatarMask = upperBodyMask,
+                blendingMode = AnimatorLayerBlendingMode.Additive,
+                stateMachine = boltCycleStateMachine
+            };
+            controller.AddLayer(boltCycleLayer);
+            controller.AddLayer(weaponLayer);
+
+            AnimatorState noBoltCycle = AddState(
+                boltCycleStateMachine,
+                PowerSuitWeaponAnimationDriver.NoBoltCycleStateName,
+                null,
+                new Vector3(100f, 100f)
+            );
+            noBoltCycle.writeDefaultValues = false;
+            AnimatorState cycle = AddState(
+                boltCycleStateMachine,
+                "Bolt Cycle",
+                layerSafeAdditiveBoltClip,
+                new Vector3(360f, 100f)
+            );
+            cycle.writeDefaultValues = false;
+            boltCycleStateMachine.defaultState = noBoltCycle;
+            AddAnyStateTrigger(boltCycleStateMachine, cycle, "CycleWeapon");
+            AddExitTransition(cycle, noBoltCycle);
 
             EditorUtility.SetDirty(controller);
             AssetDatabase.SaveAssets();
@@ -770,6 +796,23 @@ namespace Powersuit.Editor
             }
 
             EditorUtility.SetDirty(target);
+            return target;
+        }
+
+        private static AnimationClip CreateOrUpdateLayerSafeAdditiveClip(
+            AnimationClip source
+        )
+        {
+            AnimationClip target = CreateOrUpdateLayerSafeActionClip(source);
+            AnimationClipSettings settings =
+                AnimationUtility.GetAnimationClipSettings(target);
+            settings.loopTime = false;
+            settings.hasAdditiveReferencePose = true;
+            settings.additiveReferencePoseClip = source;
+            settings.additiveReferencePoseTime = 0f;
+            AnimationUtility.SetAnimationClipSettings(target, settings);
+            EditorUtility.SetDirty(target);
+            AssetDatabase.SaveAssets();
             return target;
         }
 
@@ -1187,22 +1230,22 @@ namespace Powersuit.Editor
         {
             SerializedObject serialized = new SerializedObject(controller);
             SetFloat(serialized, "walkSpeed", walkSpeed);
-            SetFloat(serialized, "cameraDistance", 7.5f);
-            SetFloat(serialized, "cameraHeight", 1.65f);
-            SetFloat(serialized, "defaultFieldOfView", 68f);
-            SetFloat(serialized, "flightCameraDistance", 9f);
-            SetFloat(serialized, "flightCameraHeight", 1.9f);
-            SetFloat(serialized, "flightFieldOfView", 72f);
+            SetFloat(serialized, "cameraDistance", 9.5f);
+            SetFloat(serialized, "cameraHeight", 1.5f);
+            SetFloat(serialized, "defaultFieldOfView", 72f);
+            SetFloat(serialized, "flightCameraDistance", 11f);
+            SetFloat(serialized, "flightCameraHeight", 1.75f);
+            SetFloat(serialized, "flightFieldOfView", 74f);
             SetFloat(serialized, "cameraCollisionPadding", 0.05f);
             SetFloat(serialized, "cameraCollisionReleaseSharpness", 14f);
             SetFloat(serialized, "cameraLookSharpness", 28f);
-            SetFloat(serialized, "aimCameraDistance", 3.4f);
-            SetFloat(serialized, "aimCameraHeight", 1.5f);
+            SetFloat(serialized, "aimCameraDistance", 4.3f);
+            SetFloat(serialized, "aimCameraHeight", 1.45f);
             // The shouldered rifle sits on player-local -X. Keeping the camera
             // on +X put the suit between the lens and weapon, so use the firing
             // side and lift slightly to expose the receiver and barrel.
-            SetVector(serialized, "aimShoulderOffset", new Vector3(-1.6f, 0.3f, 0f));
-            SetFloat(serialized, "aimFieldOfView", 58f);
+            SetVector(serialized, "aimShoulderOffset", new Vector3(-1.2f, 0.05f, 0f));
+            SetFloat(serialized, "aimFieldOfView", 62f);
             SetFloat(serialized, "aimTransitionSpeed", 12f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -1475,7 +1518,7 @@ namespace Powersuit.Editor
                 "Aim Locomotion",
                 "Hover",
                 "Stowed Hover",
-                "Airborne Aim Pose",
+                "Forward Weapon Pose",
                 "Draw Weapon",
                 "Sheathe Weapon",
                 "Reload",
@@ -1488,45 +1531,68 @@ namespace Powersuit.Editor
                 );
             }
 
-            AnimatorControllerLayer airborneAimLayer = controller.layers
+            AnimatorControllerLayer forwardPoseLayer = controller.layers
                 .SingleOrDefault(
-                    layer => layer.name == PowerSuitAnimationDriver.AirborneAimLayerName
+                    layer => layer.name == PowerSuitAnimationDriver.ForwardWeaponPoseLayerName
                 );
             AnimatorControllerLayer weaponLayer = controller.layers
-                .SingleOrDefault(layer => layer.name == "Weapon Actions");
+                .SingleOrDefault(
+                    layer => layer.name == PowerSuitWeaponAnimationDriver.WeaponActionLayerName
+                );
+            AnimatorControllerLayer boltCycleLayer = controller.layers
+                .SingleOrDefault(
+                    layer => layer.name == PowerSuitWeaponAnimationDriver.BoltCycleLayerName
+                );
             if (
-                controller.layers.Length != 3 ||
-                airborneAimLayer == null ||
-                airborneAimLayer.avatarMask == null ||
-                airborneAimLayer.defaultWeight != 0f ||
+                controller.layers.Length != 4 ||
+                !controller.layers.Select(layer => layer.name).SequenceEqual(
+                    new[]
+                    {
+                        "Base Layer",
+                        PowerSuitAnimationDriver.ForwardWeaponPoseLayerName,
+                        PowerSuitWeaponAnimationDriver.BoltCycleLayerName,
+                        PowerSuitWeaponAnimationDriver.WeaponActionLayerName
+                    }
+                ) ||
+                forwardPoseLayer == null ||
+                forwardPoseLayer.avatarMask == null ||
+                forwardPoseLayer.defaultWeight != 0f ||
+                forwardPoseLayer.blendingMode != AnimatorLayerBlendingMode.Override ||
+                boltCycleLayer == null ||
+                boltCycleLayer.avatarMask == null ||
+                boltCycleLayer.defaultWeight != 0f ||
+                boltCycleLayer.blendingMode != AnimatorLayerBlendingMode.Additive ||
                 weaponLayer == null ||
                 weaponLayer.avatarMask == null ||
-                weaponLayer.defaultWeight != 0f
+                weaponLayer.defaultWeight != 0f ||
+                weaponLayer.blendingMode != AnimatorLayerBlendingMode.Override ||
+                forwardPoseLayer.avatarMask != boltCycleLayer.avatarMask ||
+                forwardPoseLayer.avatarMask != weaponLayer.avatarMask
             )
             {
                 throw new InvalidOperationException(
-                    "PowerSuitAnimator must use neutral masked airborne-aim and " +
-                    "weapon-action upper-body layers."
+                    "PowerSuitAnimator must layer Base, Forward Weapon Pose, " +
+                    "additive Bolt Cycle Action, then override Weapon Actions."
                 );
             }
 
-            AnimatorState airborneAimState = airborneAimLayer.stateMachine.states
+            AnimatorState forwardPoseState = forwardPoseLayer.stateMachine.states
                 .Select(child => child.state)
-                .SingleOrDefault(state => state.name == "Airborne Aim Pose");
-            AnimationClip airborneAimClip = airborneAimState?.motion as AnimationClip;
+                .SingleOrDefault(state => state.name == "Forward Weapon Pose");
+            AnimationClip forwardPoseClip = forwardPoseState?.motion as AnimationClip;
             if (
-                airborneAimState == null ||
-                airborneAimClip == null ||
-                airborneAimState.writeDefaultValues ||
-                AnimationUtility.GetCurveBindings(airborneAimClip)
+                forwardPoseState == null ||
+                forwardPoseClip == null ||
+                forwardPoseState.writeDefaultValues ||
+                AnimationUtility.GetCurveBindings(forwardPoseClip)
                     .Any(binding => !IsLayerSafeActionBindingPath(binding.path)) ||
-                AnimationUtility.GetObjectReferenceCurveBindings(airborneAimClip)
+                AnimationUtility.GetObjectReferenceCurveBindings(forwardPoseClip)
                     .Any(binding => !IsLayerSafeActionBindingPath(binding.path))
             )
             {
                 throw new InvalidOperationException(
-                    "Airborne aim must use a layer-safe upper-body clip without " +
-                    "Animator-root or lower-body bindings."
+                    "Forward weapon pose must use a layer-safe upper-body clip " +
+                    "without Animator-root or lower-body bindings."
                 );
             }
 
@@ -1534,8 +1600,7 @@ namespace Powersuit.Editor
             {
                 "Draw Weapon",
                 "Sheathe Weapon",
-                "Reload",
-                "Bolt Cycle"
+                "Reload"
             };
             foreach (string stateName in requiredLayerSafeStates)
             {
@@ -1562,6 +1627,48 @@ namespace Powersuit.Editor
                         "without Animator-root bindings or Write Defaults."
                     );
                 }
+            }
+
+            if (
+                weaponLayer.stateMachine.states.Any(
+                    child => child.state.name == "Bolt Cycle"
+                ) ||
+                weaponLayer.stateMachine.anyStateTransitions.Any(
+                    transition => transition.conditions.Any(
+                        condition => condition.parameter == "CycleWeapon"
+                    )
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    "CycleWeapon must not enter the diagonal override action layer."
+                );
+            }
+
+            AnimatorState boltCycleState = boltCycleLayer.stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Bolt Cycle");
+            AnimationClip boltCycleClip = boltCycleState?.motion as AnimationClip;
+            AnimationClipSettings boltClipSettings = boltCycleClip != null
+                ? AnimationUtility.GetAnimationClipSettings(boltCycleClip)
+                : null;
+            if (
+                boltCycleState == null ||
+                boltCycleClip == null ||
+                boltCycleState.writeDefaultValues ||
+                boltClipSettings == null ||
+                !boltClipSettings.hasAdditiveReferencePose ||
+                boltClipSettings.additiveReferencePoseClip == null ||
+                boltClipSettings.additiveReferencePoseClip.name != "PS_BoltCycle" ||
+                Mathf.Abs(boltClipSettings.additiveReferencePoseTime) > 0.0001f ||
+                AnimationUtility.GetCurveBindings(boltCycleClip)
+                    .Any(binding => !IsLayerSafeActionBindingPath(binding.path))
+            )
+            {
+                throw new InvalidOperationException(
+                    "Bolt Cycle must be a layer-safe additive action referenced " +
+                    "against its authored frame-zero pose."
+                );
             }
 
             AvatarMask weaponMask = weaponLayer.avatarMask;
@@ -1660,19 +1767,19 @@ namespace Powersuit.Editor
                 aimDistance == null ||
                 aimShoulder == null ||
                 aimFov == null ||
-                normalDistance.floatValue < 7.4f ||
-                normalHeight.floatValue < 1.6f ||
-                normalFov.floatValue < 67f ||
-                flightDistance.floatValue < 8.9f ||
+                normalDistance.floatValue < 9.4f ||
+                normalHeight.floatValue < 1.45f ||
+                normalFov.floatValue < 71f ||
+                flightDistance.floatValue < 10.9f ||
                 flightDistance.floatValue <= normalDistance.floatValue ||
                 flightHeight.floatValue < normalHeight.floatValue ||
-                flightFov.floatValue < 71f ||
+                flightFov.floatValue < 73f ||
                 flightFov.floatValue < normalFov.floatValue ||
-                aimDistance.floatValue < 3.3f ||
+                aimDistance.floatValue < 4.2f ||
                 aimDistance.floatValue >= normalDistance.floatValue ||
-                aimShoulder.vector3Value.x > -1.4f ||
-                aimShoulder.vector3Value.y < 0.2f ||
-                aimFov.floatValue < 55f ||
+                aimShoulder.vector3Value.x > -1.1f ||
+                Mathf.Abs(aimShoulder.vector3Value.y) > 0.1f ||
+                aimFov.floatValue < 61f ||
                 aimFov.floatValue >= normalFov.floatValue
             )
             {

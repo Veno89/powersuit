@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Powersuit.Tests.EditMode
 {
@@ -83,6 +84,39 @@ namespace Powersuit.Tests.EditMode
 
             Assert.That(distance, Is.EqualTo(5.77f).Within(0.0001f));
             Assert.That(occluded, Is.False);
+        }
+
+        [Test]
+        public void FloorSafePitch_KeepsGroundCameraAboveItsCollisionRadius()
+        {
+            float pitch = (float)Invoke(
+                CameraMathType,
+                "CalculateFloorSafeMinimumPitch",
+                9.5f,
+                1.5f,
+                0.25f,
+                -55f
+            );
+
+            float cameraHeight = 1.5f + Mathf.Sin(pitch * Mathf.Deg2Rad) * 9.5f;
+            Assert.That(pitch, Is.GreaterThan(-8f).And.LessThan(-7f));
+            Assert.That(cameraHeight, Is.GreaterThanOrEqualTo(0.249f));
+        }
+
+        [Test]
+        public void FloorSafePitch_InvalidProfileFallsBackToConfiguredLimit()
+        {
+            Assert.That(
+                Invoke(
+                    CameraMathType,
+                    "CalculateFloorSafeMinimumPitch",
+                    float.NaN,
+                    1.5f,
+                    0.25f,
+                    -55f
+                ),
+                Is.EqualTo(-55f)
+            );
         }
 
         [Test]

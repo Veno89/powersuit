@@ -60,8 +60,8 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float turningSpeed = 12f;
 
     [Header("Camera")]
-    [SerializeField] private float cameraDistance = 7.5f;
-    [SerializeField] private float cameraHeight = 1.65f;
+    [SerializeField] private float cameraDistance = 9.5f;
+    [SerializeField] private float cameraHeight = 1.5f;
     [SerializeField] private float mouseSensitivity = 0.15f;
     [SerializeField] private float controllerLookSpeed = 120f;
     [SerializeField] private float minimumPitch = -55f;
@@ -72,22 +72,23 @@ public sealed class PowerSuitController : MonoBehaviour
     [SerializeField] private float cameraLookSharpness = 28f;
 
     [Header("Flight Camera")]
-    [SerializeField] private float flightCameraDistance = 9f;
-    [SerializeField] private float flightCameraHeight = 1.9f;
-    [SerializeField] private float flightFieldOfView = 72f;
+    [SerializeField] private float flightCameraDistance = 11f;
+    [SerializeField] private float flightCameraHeight = 1.75f;
+    [SerializeField] private float flightFieldOfView = 74f;
 
     [Header("Third-Person Aim Mode")]
-    [SerializeField] private float aimCameraDistance = 3.4f;
-    [SerializeField] private float aimCameraHeight = 1.5f;
-    [SerializeField] private Vector3 aimShoulderOffset = new Vector3(-1.6f, 0.3f, 0f);
-    [SerializeField] private float defaultFieldOfView = 68f;
-    [SerializeField] private float aimFieldOfView = 58f;
+    [SerializeField] private float aimCameraDistance = 4.3f;
+    [SerializeField] private float aimCameraHeight = 1.45f;
+    [SerializeField] private Vector3 aimShoulderOffset = new Vector3(-1.2f, 0.05f, 0f);
+    [SerializeField] private float defaultFieldOfView = 72f;
+    [SerializeField] private float aimFieldOfView = 62f;
     [SerializeField] private float aimTransitionSpeed = 12f;
     [SerializeField] private float maxReticleOffset = 140f;
     [SerializeField] private float aimMaxDistance = 200f;
 
     private CharacterController controller;
     private Camera playerCamera;
+    private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
 
     private Vector3 horizontalVelocity;
     private float verticalVelocity;
@@ -126,10 +127,38 @@ public sealed class PowerSuitController : MonoBehaviour
         currentRecoilOffset = Vector2.ClampMagnitude(currentRecoilOffset, maxAccumulatedRecoil);
     }
 
+    /// <summary>
+    /// Accepted non-aim shots still need the character and shouldered rifle to
+    /// face the camera's combat ray. This changes only body heading: it does
+    /// not enable aim zoom, aim spread, or the aim locomotion state.
+    /// </summary>
+    public void FaceCameraForWeaponFire()
+    {
+        if (playerCamera == null)
+        {
+            return;
+        }
+
+        Vector3 cameraForward = Vector3.ProjectOnPlane(
+            playerCamera.transform.forward,
+            Vector3.up
+        );
+        if (cameraForward.sqrMagnitude <= 0.0001f)
+        {
+            return;
+        }
+
+        transform.rotation = Quaternion.LookRotation(
+            cameraForward.normalized,
+            Vector3.up
+        );
+    }
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         playerCamera = Camera.main;
+        weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
 
         if (playerCamera == null)
         {
@@ -263,7 +292,7 @@ public sealed class PowerSuitController : MonoBehaviour
             desiredDirection,
             transform.forward,
             cameraForward,
-            isAiming
+            ShouldFaceCameraForCombat()
         );
 
         RotateTowardsMovement(facingDirection);
@@ -309,7 +338,7 @@ public sealed class PowerSuitController : MonoBehaviour
             Vector3.up
         );
 
-        if (isAiming)
+        if (ShouldFaceCameraForCombat())
         {
             Vector3 cameraPlanar = Vector3.ProjectOnPlane(playerCamera.transform.forward, Vector3.up);
             RotateTowardsDirection(cameraPlanar);
@@ -340,6 +369,13 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         RotateTowardsDirection(direction);
+    }
+
+    private bool ShouldFaceCameraForCombat()
+    {
+        return isAiming ||
+            (weaponAnimationDriver != null &&
+             weaponAnimationDriver.RequiresForwardWeaponPose);
     }
 
     private void RotateTowardsDirection(Vector3 direction)
@@ -486,15 +522,33 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         Vector3 pivot = transform.position + Vector3.up * currentCameraHeight;
+        float orbitPitch = smoothedCameraPitch;
+        if (!isFlying)
+        {
+            float floorSafeOrbitPitch =
+                PowerSuitCameraMath.CalculateFloorSafeMinimumPitch(
+                    currentCameraDistance,
+                    currentCameraHeight + currentShoulderOffset.y,
+                    cameraCollisionRadius + cameraCollisionPadding,
+                    minimumPitch
+                );
+            orbitPitch = Mathf.Max(orbitPitch, floorSafeOrbitPitch);
+        }
+
         Quaternion cameraRotation = Quaternion.Euler(
             smoothedCameraPitch - currentRecoilOffset.y,
             smoothedCameraYaw + currentRecoilOffset.x,
             0f
         );
+        Quaternion orbitRotation = Quaternion.Euler(
+            orbitPitch,
+            smoothedCameraYaw + currentRecoilOffset.x,
+            0f
+        );
 
-        Vector3 cameraRight = cameraRotation * Vector3.right;
+        Vector3 cameraRight = orbitRotation * Vector3.right;
         Vector3 cameraUp = Vector3.up;
-        Vector3 cameraForward = cameraRotation * Vector3.forward;
+        Vector3 cameraForward = orbitRotation * Vector3.forward;
 
         Vector3 desiredPosition = pivot
             + (cameraRight * currentShoulderOffset.x)
@@ -968,6 +1022,36 @@ public sealed class PowerSuitController : MonoBehaviour
 /// </summary>
 public static class PowerSuitCameraMath
 {
+    public static float CalculateFloorSafeMinimumPitch(
+        float cameraDistance,
+        float pivotHeight,
+        float minimumClearance,
+        float configuredMinimumPitch
+    )
+    {
+        if (
+            cameraDistance <= 0f ||
+            float.IsNaN(cameraDistance) ||
+            float.IsInfinity(cameraDistance) ||
+            float.IsNaN(pivotHeight) ||
+            float.IsInfinity(pivotHeight) ||
+            float.IsNaN(minimumClearance) ||
+            float.IsInfinity(minimumClearance)
+        )
+        {
+            return configuredMinimumPitch;
+        }
+
+        float requiredSine = Mathf.Clamp(
+            (Mathf.Max(0f, minimumClearance) - pivotHeight) /
+                cameraDistance,
+            -1f,
+            1f
+        );
+        float floorSafePitch = Mathf.Asin(requiredSine) * Mathf.Rad2Deg;
+        return Mathf.Max(configuredMinimumPitch, floorSafePitch);
+    }
+
     public static float ExponentialDampingFactor(
         float sharpness,
         float deltaTime

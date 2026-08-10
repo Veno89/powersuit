@@ -10,9 +10,12 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     public const string CycleTriggerName = "CycleWeapon";
     public const string WeaponActionLayerName = "Weapon Actions";
     public const string NoWeaponActionStateName = "No Weapon Action";
+    public const string BoltCycleLayerName = "Bolt Cycle Action";
+    public const string NoBoltCycleStateName = "No Bolt Cycle";
 
     [SerializeField] private PowerSuitWeapon weapon;
     [SerializeField] private Animator animator;
+    [SerializeField, Min(0f)] private float postShotPoseHoldDuration = 0.25f;
 
     private static readonly int ReloadTrigger =
         Animator.StringToHash(ReloadTriggerName);
@@ -23,11 +26,24 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     private static readonly int NoWeaponActionState =
         Animator.StringToHash(NoWeaponActionStateName);
 
+    private static readonly int NoBoltCycleState =
+        Animator.StringToHash(NoBoltCycleStateName);
+
     private bool hasReloadTrigger;
     private bool hasCycleTrigger;
     private bool subscribed;
     private bool actionRequestedThisFrame;
+    private bool cycleRequestedThisFrame;
+    private bool cycleInProgress;
+    private float forwardPoseHoldRemaining;
+    private int forwardWeaponPoseLayerIndex = -1;
     private int weaponActionLayerIndex = -1;
+    private int boltCycleLayerIndex = -1;
+
+    public bool RequiresForwardWeaponPose =>
+        (weapon != null && weapon.IsCycling) ||
+        cycleInProgress ||
+        forwardPoseHoldRemaining > 0f;
 
     private void Awake()
     {
@@ -63,12 +79,22 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
     {
         hasReloadTrigger = HasTrigger(ReloadTrigger);
         hasCycleTrigger = HasTrigger(CycleTrigger);
+        forwardWeaponPoseLayerIndex = animator.GetLayerIndex(
+            PowerSuitAnimationDriver.ForwardWeaponPoseLayerName
+        );
         weaponActionLayerIndex = animator.GetLayerIndex(WeaponActionLayerName);
+        boltCycleLayerIndex = animator.GetLayerIndex(BoltCycleLayerName);
 
         // A full-weight Generic override layer can retain the last upper-body
         // pose after returning to a motionless state. Start neutral and only
         // give the layer weight while an action is actually playing.
         ReleaseWeaponActionLayer();
+        ReleaseBoltCycleLayer();
+        cycleInProgress = weapon != null && weapon.IsCycling;
+        if (cycleInProgress)
+        {
+            RefreshForwardWeaponPose();
+        }
     }
 
     private void OnEnable()
@@ -91,19 +117,34 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
     private void Update()
     {
+        if (forwardPoseHoldRemaining > 0f)
+        {
+            forwardPoseHoldRemaining = Mathf.Max(
+                0f,
+                forwardPoseHoldRemaining - Time.deltaTime
+            );
+        }
+
         SynchronizeWeaponActionLayer();
+        SynchronizeBoltCycleLayer();
     }
 
     private void OnDisable()
     {
         Unsubscribe();
         ReleaseWeaponActionLayer();
+        ReleaseBoltCycleLayer();
+        cycleInProgress = false;
+        forwardPoseHoldRemaining = 0f;
     }
 
     private void OnReloadStarted()
     {
         if (hasReloadTrigger)
         {
+            cycleInProgress = false;
+            forwardPoseHoldRemaining = 0f;
+            ReleaseBoltCycleLayer();
             BeginWeaponAction();
             animator.SetTrigger(ReloadTrigger);
         }
@@ -111,11 +152,50 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
     private void OnCycleStarted()
     {
+        cycleInProgress = true;
+        RefreshForwardWeaponPose();
         if (hasCycleTrigger)
         {
-            BeginWeaponAction();
+            BeginBoltCycle();
             animator.SetTrigger(CycleTrigger);
         }
+    }
+
+    private void OnShotAccepted(Powersuit.Combat.WeaponFireResult result)
+    {
+        RefreshForwardWeaponPose();
+    }
+
+    private void OnCycleCompleted()
+    {
+        cycleInProgress = false;
+        RefreshForwardWeaponPose();
+    }
+
+    private void RefreshForwardWeaponPose()
+    {
+        forwardPoseHoldRemaining = Mathf.Max(
+            forwardPoseHoldRemaining,
+            postShotPoseHoldDuration
+        );
+    }
+
+    /// <summary>
+    /// Gives a non-aim input shot one Animator evaluation with the rifle in its
+    /// forward pose before gameplay samples the animated muzzle. Returns false
+    /// when the generated forward-pose layer is not available, allowing the
+    /// weapon adapter to fall back to immediate fire.
+    /// </summary>
+    public bool PrepareForwardWeaponPose()
+    {
+        if (animator == null || forwardWeaponPoseLayerIndex < 0)
+        {
+            return false;
+        }
+
+        RefreshForwardWeaponPose();
+        animator.SetLayerWeight(forwardWeaponPoseLayerIndex, 1f);
+        return true;
     }
 
     /// <summary>
@@ -132,6 +212,17 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
         actionRequestedThisFrame = true;
         animator.SetLayerWeight(weaponActionLayerIndex, 1f);
+    }
+
+    private void BeginBoltCycle()
+    {
+        if (animator == null || boltCycleLayerIndex < 0)
+        {
+            return;
+        }
+
+        cycleRequestedThisFrame = true;
+        animator.SetLayerWeight(boltCycleLayerIndex, 1f);
     }
 
     private void SynchronizeWeaponActionLayer()
@@ -178,6 +269,46 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
         }
     }
 
+    private void SynchronizeBoltCycleLayer()
+    {
+        if (animator == null || boltCycleLayerIndex < 0)
+        {
+            return;
+        }
+
+        if (cycleRequestedThisFrame)
+        {
+            cycleRequestedThisFrame = false;
+            animator.SetLayerWeight(boltCycleLayerIndex, 1f);
+            return;
+        }
+
+        if (!animator.isInitialized)
+        {
+            return;
+        }
+
+        AnimatorStateInfo current = animator.GetCurrentAnimatorStateInfo(
+            boltCycleLayerIndex
+        );
+        bool isStableEmpty =
+            !animator.IsInTransition(boltCycleLayerIndex) &&
+            current.shortNameHash == NoBoltCycleState;
+        animator.SetLayerWeight(
+            boltCycleLayerIndex,
+            isStableEmpty ? 0f : 1f
+        );
+    }
+
+    private void ReleaseBoltCycleLayer()
+    {
+        cycleRequestedThisFrame = false;
+        if (animator != null && boltCycleLayerIndex >= 0)
+        {
+            animator.SetLayerWeight(boltCycleLayerIndex, 0f);
+        }
+    }
+
     private void Subscribe()
     {
         if (subscribed || weapon == null)
@@ -187,6 +318,8 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
         weapon.ReloadStarted += OnReloadStarted;
         weapon.CycleStarted += OnCycleStarted;
+        weapon.CycleCompleted += OnCycleCompleted;
+        weapon.ShotAccepted += OnShotAccepted;
         subscribed = true;
     }
 
@@ -199,6 +332,8 @@ public sealed class PowerSuitWeaponAnimationDriver : MonoBehaviour
 
         weapon.ReloadStarted -= OnReloadStarted;
         weapon.CycleStarted -= OnCycleStarted;
+        weapon.CycleCompleted -= OnCycleCompleted;
+        weapon.ShotAccepted -= OnShotAccepted;
         subscribed = false;
     }
 

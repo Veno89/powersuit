@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
+[DefaultExecutionOrder(100)]
 public sealed class PowerSuitAnimationDriver : MonoBehaviour
 {
-    public const string AirborneAimLayerName = "Airborne Aim";
+    public const string ForwardWeaponPoseLayerName = "Forward Weapon Pose";
     public const string MovementXParameterName = "MovementX";
     public const string MovementYParameterName = "MovementY";
     public const string MovementSpeedParameterName = "MovementSpeed";
@@ -14,9 +16,11 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
     [SerializeField] private PowerSuitController controller;
     [SerializeField] private Animator animator;
     [SerializeField] private PowerSuitWeaponPresentation weaponPresentation;
+    [SerializeField] private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
     [SerializeField, Min(0f)] private float movementDamping = 0.1f;
     [SerializeField, Min(1f)] private float fullSpeedLocomotionPlayback = 2f;
-    [SerializeField, Min(0f)] private float airborneAimBlendSharpness = 12f;
+    [FormerlySerializedAs("airborneAimBlendSharpness")]
+    [SerializeField, Min(0f)] private float forwardPoseBlendSharpness = 12f;
 
     private static readonly int IsMovingParameter =
         Animator.StringToHash("IsMoving");
@@ -51,8 +55,8 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
     private bool hasLocomotionPlaybackSpeed;
     private bool hasIsBackpedaling;
     private bool hasIsAimWalking;
-    private int airborneAimLayerIndex = -1;
-    private float airborneAimLayerWeight;
+    private int forwardWeaponPoseLayerIndex = -1;
+    private float forwardWeaponPoseLayerWeight;
 
     private void Awake()
     {
@@ -100,6 +104,11 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         {
             weaponPresentation = GetComponent<PowerSuitWeaponPresentation>();
         }
+
+        if (weaponAnimationDriver == null)
+        {
+            weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
+        }
     }
 
     private void CacheAnimatorBindings()
@@ -113,10 +122,20 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         );
         hasIsBackpedaling = HasParameter(IsBackpedalingParameter, AnimatorControllerParameterType.Bool);
         hasIsAimWalking = HasParameter(IsAimWalkingParameter, AnimatorControllerParameterType.Bool);
-        airborneAimLayerIndex = animator.GetLayerIndex(AirborneAimLayerName);
-        if (airborneAimLayerIndex >= 0)
+        forwardWeaponPoseLayerIndex = animator.GetLayerIndex(
+            ForwardWeaponPoseLayerName
+        );
+        forwardWeaponPoseLayerWeight =
+            weaponAnimationDriver != null &&
+            weaponAnimationDriver.RequiresForwardWeaponPose
+                ? 1f
+                : 0f;
+        if (forwardWeaponPoseLayerIndex >= 0)
         {
-            animator.SetLayerWeight(airborneAimLayerIndex, 0f);
+            animator.SetLayerWeight(
+                forwardWeaponPoseLayerIndex,
+                forwardWeaponPoseLayerWeight
+            );
         }
     }
 
@@ -141,7 +160,7 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
             controller.IsAiming && canAnimateAim
         );
 
-        UpdateAirborneAimLayer(canAnimateAim);
+        UpdateForwardWeaponPoseLayer(canAnimateAim);
 
         SetOptionalFloat(
             MovementXParameter,
@@ -187,46 +206,58 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
         }
     }
 
-    private void UpdateAirborneAimLayer(bool canAnimateAim)
+    private void UpdateForwardWeaponPoseLayer(bool canAnimateAim)
     {
-        if (airborneAimLayerIndex < 0)
+        if (forwardWeaponPoseLayerIndex < 0)
         {
             return;
         }
 
-        float targetWeight =
-            controller.IsFlying &&
-            controller.IsAiming &&
-            canAnimateAim
+        bool requestedByAim =
+            controller.IsFlying && controller.IsAiming && canAnimateAim;
+        bool requestedByFiring =
+            weaponAnimationDriver != null &&
+            weaponAnimationDriver.RequiresForwardWeaponPose;
+        float targetWeight = requestedByAim || requestedByFiring
                 ? 1f
                 : 0f;
+        if (requestedByFiring)
+        {
+            // CycleStarted is raised before projectile feedback. Snap the
+            // shouldered pose in for the same rendered frame so a hip shot can
+            // never be presented from the diagonal carry stance.
+            forwardWeaponPoseLayerWeight = 1f;
+            animator.SetLayerWeight(forwardWeaponPoseLayerIndex, 1f);
+            return;
+        }
+
         float blendFactor = PowerSuitCameraMath.ExponentialDampingFactor(
-            airborneAimBlendSharpness,
+            forwardPoseBlendSharpness,
             Time.deltaTime
         );
-        airborneAimLayerWeight = Mathf.Lerp(
-            airborneAimLayerWeight,
+        forwardWeaponPoseLayerWeight = Mathf.Lerp(
+            forwardWeaponPoseLayerWeight,
             targetWeight,
             blendFactor
         );
 
-        if (Mathf.Abs(airborneAimLayerWeight - targetWeight) < 0.001f)
+        if (Mathf.Abs(forwardWeaponPoseLayerWeight - targetWeight) < 0.001f)
         {
-            airborneAimLayerWeight = targetWeight;
+            forwardWeaponPoseLayerWeight = targetWeight;
         }
 
         animator.SetLayerWeight(
-            airborneAimLayerIndex,
-            airborneAimLayerWeight
+            forwardWeaponPoseLayerIndex,
+            forwardWeaponPoseLayerWeight
         );
     }
 
     private void OnDisable()
     {
-        airborneAimLayerWeight = 0f;
-        if (animator != null && airborneAimLayerIndex >= 0)
+        forwardWeaponPoseLayerWeight = 0f;
+        if (animator != null && forwardWeaponPoseLayerIndex >= 0)
         {
-            animator.SetLayerWeight(airborneAimLayerIndex, 0f);
+            animator.SetLayerWeight(forwardWeaponPoseLayerIndex, 0f);
         }
     }
 
@@ -275,6 +306,6 @@ public sealed class PowerSuitAnimationDriver : MonoBehaviour
             1f,
             fullSpeedLocomotionPlayback
         );
-        airborneAimBlendSharpness = Mathf.Max(0f, airborneAimBlendSharpness);
+        forwardPoseBlendSharpness = Mathf.Max(0f, forwardPoseBlendSharpness);
     }
 }

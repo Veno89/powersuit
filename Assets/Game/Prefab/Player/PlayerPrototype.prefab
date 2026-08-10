@@ -117,8 +117,8 @@ MonoBehaviour:
   boostSpeed: 20
   flightAcceleration: 12
   turningSpeed: 12
-  cameraDistance: 7.5
-  cameraHeight: 1.65
+  cameraDistance: 9.5
+  cameraHeight: 1.5
   mouseSensitivity: 0.15
   controllerLookSpeed: 120
   minimumPitch: -55
@@ -127,14 +127,14 @@ MonoBehaviour:
   cameraCollisionPadding: 0.05
   cameraCollisionReleaseSharpness: 14
   cameraLookSharpness: 28
-  flightCameraDistance: 9
-  flightCameraHeight: 1.9
-  flightFieldOfView: 72
-  aimCameraDistance: 3.4
-  aimCameraHeight: 1.5
-  aimShoulderOffset: {x: -1.6, y: 0.3, z: 0}
-  defaultFieldOfView: 68
-  aimFieldOfView: 58
+  flightCameraDistance: 11
+  flightCameraHeight: 1.75
+  flightFieldOfView: 74
+  aimCameraDistance: 4.3
+  aimCameraHeight: 1.45
+  aimShoulderOffset: {x: -1.2, y: 0.05, z: 0}
+  defaultFieldOfView: 72
+  aimFieldOfView: 62
   aimTransitionSpeed: 12
   maxReticleOffset: 140
   aimMaxDistance: 200
@@ -205,9 +205,10 @@ MonoBehaviour:
   controller: {fileID: 0}
   animator: {fileID: 0}
   weaponPresentation: {fileID: 0}
+  weaponAnimationDriver: {fileID: 0}
   movementDamping: 0.1
   fullSpeedLocomotionPlayback: 2
-  airborneAimBlendSharpness: 12
+  forwardPoseBlendSharpness: 12
 --- !u!114 &6954614664465323843
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -52,6 +52,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     [SerializeField] private Color aimingReticleColor = new Color(0.2f, 0.9f, 1f, 1f);
 
     private PowerSuitController controller;
+    private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
     private Camera playerCamera;
     private Light muzzleFlashLight;
     private float muzzleLightTimer;
@@ -60,6 +61,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private GUIStyle ammoHudStyle;
     private GUIStyle ammoCountStyle;
     private GUIStyle ammoStatusStyle;
+    private bool hipFireQueuedForForwardPose;
 
     public Transform MuzzleTransform
     {
@@ -139,6 +141,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         RebuildRuntimeState();
 
         controller = GetComponent<PowerSuitController>();
+        weaponAnimationDriver = GetComponent<PowerSuitWeaponAnimationDriver>();
         playerCamera = Camera.main;
 
         if (playerCamera == null)
@@ -169,9 +172,15 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             TryStartReload();
         }
 
-        if (IsFireRequested())
+        bool fireRequested = IsFireRequested();
+        if (hipFireQueuedForForwardPose)
         {
+            hipFireQueuedForForwardPose = false;
             TryFireWeapon();
+        }
+        else if (fireRequested)
+        {
+            RequestFire();
         }
 
         if (muzzleFlashLight != null && muzzleLightTimer > 0f)
@@ -184,6 +193,45 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        hipFireQueuedForForwardPose = false;
+    }
+
+    /// <summary>
+    /// Requests a gameplay shot. Non-aim fire is staged for one Animator
+    /// evaluation when necessary so projectile and muzzle feedback sample the
+    /// forward firing pose rather than the diagonal carry pose. Returns true
+    /// when the request fired immediately or was accepted for staging.
+    /// </summary>
+    public bool RequestFire()
+    {
+        if (hipFireQueuedForForwardPose)
+        {
+            return false;
+        }
+
+        bool queuedForForwardPose =
+            controller != null &&
+            !controller.IsAiming &&
+            CanFire &&
+            weaponAnimationDriver != null &&
+            !weaponAnimationDriver.RequiresForwardWeaponPose &&
+            weaponAnimationDriver.PrepareForwardWeaponPose();
+        if (!queuedForForwardPose)
+        {
+            return TryFireWeapon().Fired;
+        }
+
+        controller.FaceCameraForWeaponFire();
+        hipFireQueuedForForwardPose = true;
+        return true;
+    }
+
+    /// <summary>
+    /// Immediately attempts the gameplay transaction. Callers that have not
+    /// already prepared a firing pose should use <see cref="RequestFire"/>.
+    /// </summary>
     public WeaponFireResult TryFireWeapon()
     {
         EnsureRuntimeState();
@@ -202,6 +250,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             return result;
         }
 
+        controller?.FaceCameraForWeaponFire();
         FireProjectileAndFeedback(result.Damage);
         ShotAccepted?.Invoke(result);
         return result;

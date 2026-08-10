@@ -11,7 +11,8 @@ namespace Powersuit.Tests.EditMode
     public sealed class Generator109IntegrationTests
     {
         private const string BaseLayerName = "Base Layer";
-        private const string AirborneAimLayerName = "Airborne Aim";
+        private const string ForwardWeaponPoseLayerName = "Forward Weapon Pose";
+        private const string BoltCycleActionLayerName = "Bolt Cycle Action";
         private const string WeaponActionsLayerName = "Weapon Actions";
 
         private const string ModelPath =
@@ -88,67 +89,87 @@ namespace Powersuit.Tests.EditMode
             Assert.That(states, Does.Contain("Stowed Locomotion"));
             Assert.That(states, Does.Contain("Aim Locomotion"));
             Assert.That(states, Does.Contain("Stowed Hover"));
-            Assert.That(states, Does.Contain("Airborne Aim Pose"));
+            Assert.That(states, Does.Contain("Forward Weapon Pose"));
             Assert.That(states, Does.Contain("Reload"));
             Assert.That(states, Does.Contain("Bolt Cycle"));
 
-            Assert.That(controller.layers, Has.Length.EqualTo(3));
+            Assert.That(controller.layers, Has.Length.EqualTo(4));
             Assert.That(
                 controller.layers.Select(layer => layer.name),
                 Is.EqualTo(
                     new[]
                     {
                         BaseLayerName,
-                        AirborneAimLayerName,
+                        ForwardWeaponPoseLayerName,
+                        BoltCycleActionLayerName,
                         WeaponActionsLayerName
                     }
                 )
             );
 
             AnimatorControllerLayer baseLayer = FindLayer(controller, BaseLayerName);
-            AnimatorControllerLayer airborneAimLayer = FindLayer(
+            AnimatorControllerLayer forwardWeaponPoseLayer = FindLayer(
                 controller,
-                AirborneAimLayerName
+                ForwardWeaponPoseLayerName
+            );
+            AnimatorControllerLayer boltCycleActionLayer = FindLayer(
+                controller,
+                BoltCycleActionLayerName
             );
             AnimatorControllerLayer weaponActionsLayer = FindLayer(
                 controller,
                 WeaponActionsLayerName
             );
             Assert.That(baseLayer, Is.Not.Null);
-            Assert.That(airborneAimLayer, Is.Not.Null);
+            Assert.That(forwardWeaponPoseLayer, Is.Not.Null);
+            Assert.That(boltCycleActionLayer, Is.Not.Null);
             Assert.That(weaponActionsLayer, Is.Not.Null);
 
-            Assert.That(airborneAimLayer.defaultWeight, Is.Zero);
+            Assert.That(forwardWeaponPoseLayer.defaultWeight, Is.Zero);
             Assert.That(
-                airborneAimLayer.blendingMode,
+                forwardWeaponPoseLayer.blendingMode,
                 Is.EqualTo(AnimatorLayerBlendingMode.Override)
             );
-            Assert.That(airborneAimLayer.avatarMask, Is.Not.Null);
+            Assert.That(forwardWeaponPoseLayer.avatarMask, Is.Not.Null);
+            Assert.That(boltCycleActionLayer.defaultWeight, Is.Zero);
+            Assert.That(
+                boltCycleActionLayer.blendingMode,
+                Is.EqualTo(AnimatorLayerBlendingMode.Additive)
+            );
+            Assert.That(boltCycleActionLayer.avatarMask, Is.Not.Null);
             Assert.That(weaponActionsLayer.defaultWeight, Is.Zero);
             Assert.That(weaponActionsLayer.avatarMask, Is.Not.Null);
             Assert.That(
-                airborneAimLayer.avatarMask,
+                forwardWeaponPoseLayer.avatarMask,
                 Is.SameAs(weaponActionsLayer.avatarMask),
-                "Airborne aim and weapon actions must share the validated upper-body mask."
+                "Forward pose and weapon actions must share the validated upper-body mask."
+            );
+            Assert.That(
+                boltCycleActionLayer.avatarMask,
+                Is.SameAs(weaponActionsLayer.avatarMask),
+                "Additive bolt cycle must share the validated upper-body mask."
             );
 
-            AnimatorState airborneAimState = airborneAimLayer.stateMachine.states
+            AnimatorState forwardWeaponPoseState = forwardWeaponPoseLayer.stateMachine.states
                 .Select(child => child.state)
-                .SingleOrDefault(state => state.name == "Airborne Aim Pose");
-            Assert.That(airborneAimState, Is.Not.Null);
-            Assert.That(airborneAimState.writeDefaultValues, Is.False);
-            AnimationClip airborneAimClip = airborneAimState.motion as AnimationClip;
-            Assert.That(airborneAimClip, Is.Not.Null);
-            AssertLayerSafeClip(airborneAimClip, "Airborne Aim Pose");
-            AssertUpperBodyMask(airborneAimLayer.avatarMask, "Airborne Aim");
+                .SingleOrDefault(state => state.name == "Forward Weapon Pose");
+            Assert.That(forwardWeaponPoseState, Is.Not.Null);
+            Assert.That(forwardWeaponPoseState.writeDefaultValues, Is.False);
+            AnimationClip forwardWeaponPoseClip =
+                forwardWeaponPoseState.motion as AnimationClip;
+            Assert.That(forwardWeaponPoseClip, Is.Not.Null);
+            AssertLayerSafeClip(forwardWeaponPoseClip, "Forward Weapon Pose");
+            AssertUpperBodyMask(
+                forwardWeaponPoseLayer.avatarMask,
+                "Forward Weapon Pose"
+            );
 
             foreach (
                 string actionStateName in new[]
                 {
                     "Draw Weapon",
                     "Sheathe Weapon",
-                    "Reload",
-                    "Bolt Cycle"
+                    "Reload"
                 }
             )
             {
@@ -167,6 +188,44 @@ namespace Powersuit.Tests.EditMode
                 AssertLayerSafeClip(actionClip, actionStateName);
             }
             AssertUpperBodyMask(weaponActionsLayer.avatarMask, "Weapon Actions");
+
+            Assert.That(
+                weaponActionsLayer.stateMachine.states
+                    .Select(child => child.state.name),
+                Does.Not.Contain("Bolt Cycle"),
+                "The diagonal bolt clip must not remain on the override action layer."
+            );
+            Assert.That(
+                weaponActionsLayer.stateMachine.anyStateTransitions
+                    .SelectMany(transition => transition.conditions)
+                    .Select(condition => condition.parameter),
+                Does.Not.Contain("CycleWeapon")
+            );
+
+            AnimatorState boltCycleState = boltCycleActionLayer.stateMachine.states
+                .Select(child => child.state)
+                .SingleOrDefault(state => state.name == "Bolt Cycle");
+            Assert.That(boltCycleState, Is.Not.Null);
+            Assert.That(boltCycleState.writeDefaultValues, Is.False);
+            AnimationClip boltCycleClip = boltCycleState.motion as AnimationClip;
+            Assert.That(boltCycleClip, Is.Not.Null);
+            AssertLayerSafeClip(boltCycleClip, "Bolt Cycle");
+            AnimationClipSettings boltSettings =
+                AnimationUtility.GetAnimationClipSettings(boltCycleClip);
+            Assert.That(boltSettings.hasAdditiveReferencePose, Is.True);
+            Assert.That(boltSettings.additiveReferencePoseClip, Is.Not.Null);
+            Assert.That(
+                boltSettings.additiveReferencePoseClip.name,
+                Is.EqualTo("PS_BoltCycle")
+            );
+            Assert.That(
+                boltSettings.additiveReferencePoseTime,
+                Is.EqualTo(0f).Within(0.0001f)
+            );
+            AssertUpperBodyMask(
+                boltCycleActionLayer.avatarMask,
+                "Bolt Cycle Action"
+            );
             Assert.That(
                 controller.parameters.Select(parameter => parameter.name),
                 Is.SupersetOf(
@@ -192,27 +251,27 @@ namespace Powersuit.Tests.EditMode
             SerializedObject controllerSettings = new SerializedObject(suitController);
             Assert.That(
                 controllerSettings.FindProperty("cameraDistance").floatValue,
-                Is.EqualTo(7.5f).Within(0.001f)
+                Is.EqualTo(9.5f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("cameraHeight").floatValue,
-                Is.EqualTo(1.65f).Within(0.001f)
+                Is.EqualTo(1.5f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("defaultFieldOfView").floatValue,
-                Is.EqualTo(68f).Within(0.001f)
+                Is.EqualTo(72f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("flightCameraDistance").floatValue,
-                Is.EqualTo(9f).Within(0.001f)
+                Is.EqualTo(11f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("flightCameraHeight").floatValue,
-                Is.EqualTo(1.9f).Within(0.001f)
+                Is.EqualTo(1.75f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("flightFieldOfView").floatValue,
-                Is.EqualTo(72f).Within(0.001f)
+                Is.EqualTo(74f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("cameraCollisionPadding").floatValue,
@@ -228,19 +287,19 @@ namespace Powersuit.Tests.EditMode
             );
             Assert.That(
                 controllerSettings.FindProperty("aimCameraDistance").floatValue,
-                Is.EqualTo(3.4f).Within(0.001f)
+                Is.EqualTo(4.3f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("aimCameraHeight").floatValue,
-                Is.EqualTo(1.5f).Within(0.001f)
+                Is.EqualTo(1.45f).Within(0.001f)
             );
             Assert.That(
                 controllerSettings.FindProperty("aimShoulderOffset").vector3Value,
-                Is.EqualTo(new Vector3(-1.6f, 0.3f, 0f))
+                Is.EqualTo(new Vector3(-1.2f, 0.05f, 0f))
             );
             Assert.That(
                 controllerSettings.FindProperty("aimFieldOfView").floatValue,
-                Is.EqualTo(58f).Within(0.001f)
+                Is.EqualTo(62f).Within(0.001f)
             );
 
             GameObject basePlayer =
