@@ -19,7 +19,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | K — HUD | Implemented | Formatter/presenter tests pass | Resolution/readability/accessibility review |
 | L — Developer console | Implemented | Parser, registry and gameplay-command tests pass | Hands-on malformed-command pass |
 | M — Pooling/performance | Pooling, diagnostics, and opt-in Development Build soak implemented | 30/60/120 matrix and two-minute 48-enemy soak pass | Connected GPU/render capture, uncapped and remaining lifecycle cases |
-| N — Hero Suit V2 art | Original Aegis Vanguard concept plus isolated rig-compatible blockout | Generator114/Unity hashes preserved; 23-bone rig and 24 actions retained | Art-direction approval, production modeling, deformation, PBR, LODs, Unity A/B |
+| N — Hero Suit V2 art | Black/carbon/chrome Aegis Candidate003 plus isolated rig-compatible studies | Generator114/Unity hashes preserved; 23 bones, 24 actions, four exhaust anchors and 13 review renders validated | Collision-safe production modeling, deformation, PBR, LODs, Unity A/B |
 
 ## Completed implementation
 
@@ -98,8 +98,9 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Preserve Generator114, its frozen validation archive, the active Unity FBX/GUID, controller, and player prefab as the untouched rollback path.
 - [x] Create the original **Aegis Vanguard** four-view concept and hero material target in a separate `ArtSource/PoweredSuitNextGen/` lane.
 - [x] Build a deterministic review-only v002 mechanical blockout on the existing 23-bone armature while retaining all 24 `PS_*` actions; verify the approved source hashes remain unchanged.
+- [x] Build Candidate003 with the requested satin-black armor, carbon-fibre panels/cabling, chrome details, three-tier pauldrons, revised boots/forearms, outboard turbines, exact exhaust anchors, and 13 real-pose/detail review renders.
 - [x] Document measurable production targets for silhouette, articulation, rifle docking/camera clearance, hybrid rigid/skinned construction, UV/PBR work, renderer consolidation, and four LODs.
-- [ ] Owner-approve or revise the Aegis Vanguard silhouette, palette, back-thruster arrangement, and helmet language before expensive production modeling.
+- [ ] Owner-approve or revise Candidate003's silhouette, revised palette, back-thruster arrangement, and helmet language before expensive production modeling.
 - [ ] Replace the procedural shell with authored high-poly armor and a continuous undersuit; retopologize, weight, unwrap, bake, texture, and create LODs in the isolated candidate lane.
 - [ ] Validate all 24 actions, back-stowed rifle clearance, aim/scope framing, hardpoints, flight effects, deformation, draw calls, and representative GPU cost in a separate Unity review prefab/scene.
 - [ ] Promote only after an owner-approved old/new in-game A/B comparison; keep Generator114 available for one-click rollback.

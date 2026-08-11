@@ -7,10 +7,10 @@ Anthem's level of silhouette, layered construction, believable articulation, and
 material richness without reproducing a specific Javelin design. Preserve the
 current validated suit as a fully functional rollback throughout production.
 
-The working design is **Aegis Vanguard**: an athletic assault/recon exosuit with a
-warm ceramic shell, deep-teal secondary armor, a black mechanical undersuit,
-restrained copper service hardware, a three-facet cyan optical band, and two
-annular dorsal turbines.
+The working design is **Aegis Vanguard**: an athletic assault/recon exosuit with
+satin-black layered armor, blue-black carbon composite and braided carbon cable
+jackets, polished and black-chrome mechanical details, a three-facet cyan optical
+band, three-tier articulated pauldrons, and two annular dorsal turbines.
 
 ## Reference lessons, not copied shapes
 
@@ -42,9 +42,10 @@ Generator114 is a reliable gameplay prototype, not a hero art asset:
 - 12 simple constant-value materials;
 - 23 bones and 24 exact animation actions.
 
-The Aegis v002 automated blockout is approximately 32.4k triangles across 113
-review pieces. That is acceptable for rapid silhouette iteration, but not the
-runtime architecture we will ship.
+The current Candidate003 automated maquette is approximately 63.0k mesh triangles
+across 227 review objects (including four renderable curve objects). It preserves
+the same 23-bone rig and all 24 actions. That is acceptable for silhouette,
+material, and pose iteration, but not the runtime architecture we will ship.
 
 ## Non-negotiable gameplay contracts
 
@@ -114,15 +115,17 @@ small status lights, and active thruster cores.
 - Candidate lane is isolated under `ArtSource/PoweredSuitNextGen`.
 - Source hash is checked before and after every automated candidate build.
 
-### G1 — art direction (complete for first review)
+### G1 — art direction (complete for current review)
 
 - Four-view concept and hero material target exist.
-- Original silhouette and palette are defined.
-- Owner approves or requests a single focused revision.
+- Original silhouette and black/carbon/chrome palette targets are defined.
+- Owner requested the black, chrome, carbon-fibre, and layered-pauldron revision;
+  the image target and Candidate003 reflect it.
 
 ### G2 — gameplay blockout (current)
 
-- Refine v002 to match the approved concept's athletic proportions.
+- Candidate003 materially improves the helmet, torso hierarchy, layered shoulders,
+  limbs, boots, turbines, material separation, and review lighting over v002.
 - Test exploration, shoulder aim, scope, stowed rifle, sprint, hover, and flight views.
 - Sweep every animation for armor collisions before adding expensive detail.
 - Prove the back-rifle docking channel and shoulder-camera clearance.

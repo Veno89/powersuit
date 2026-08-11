@@ -8,9 +8,15 @@ controller, or the active player prefab.
 
 - `Concepts/aegis_vanguard_concept_v001.png` — original four-view design target.
 - `Concepts/aegis_vanguard_hero_v001.png` — original material/fidelity target.
+- `Concepts/aegis_vanguard_black_chrome_v002.png` — current black, carbon-fibre,
+  chrome, cyan, and layered-pauldron material target.
 - `renders/aegis_vanguard_blockout_v001/` — preserved first automated blockout.
 - `renders/aegis_vanguard_blockout_v002/` — refined rig-compatible blockout.
+- `renders/aegis_vanguard_candidate_v003/` — 13 neutral, detail, clay, and real
+  animation-pose review renders for the black/chrome candidate.
 - `candidates/aegis_vanguard_blockout_v002.json` — hashes, rig identity, and mesh metrics.
+- `candidates/aegis_vanguard_candidate_v003.json` — current integrity, action,
+  object, triangle, and render manifest.
 - `scripts/build_aegis_vanguard_candidate.py` — deterministic review-candidate generator.
 - `MASTERPIECE_PLAN.md` — production path and acceptance gates.
 - `PROMPTS.md` — image-generation provenance and final prompt specifications.
@@ -31,10 +37,20 @@ The candidate builder:
 6. verifies that the approved source hash is unchanged afterward; and
 7. does not export or modify any Unity asset.
 
-The v002 report verified the Generator114 working blend remained exactly
+The current v003 report verifies the Generator114 working blend remained exactly
 `6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a`.
 
-## Rebuild the blockout
+## Current visual direction
+
+Candidate003 replaces the earlier warm ceramic study with satin-black armor,
+blue-black carbon composite and braided carbon cabling, polished and black-chrome
+mechanical load paths, sparse cyan optics, three overlapping shoulder plates per
+side, and outboard annular turbines. Its forearm envelope and turbine spacing were
+also revised after weapon-pose inspection. It is the strongest automated review
+maquette so far, but it remains a procedural concept model rather than a finished
+hero character.
+
+## Rebuild Candidate003
 
 From the repository root on Windows:
 
@@ -44,7 +60,7 @@ From the repository root on Windows:
   --python "ArtSource\PoweredSuitNextGen\scripts\build_aegis_vanguard_candidate.py"
 ```
 
-This blockout is a silhouette and engineering prototype, not a production-ready
+This candidate is a silhouette, material, and engineering prototype, not a production-ready
 replacement. It deliberately retains separate pieces for rapid iteration. The
 final game mesh must use a continuous skinned undersuit, rigid weighted armor,
 authored UVs/PBR textures, repaired topology, LODs, and consolidated renderers.

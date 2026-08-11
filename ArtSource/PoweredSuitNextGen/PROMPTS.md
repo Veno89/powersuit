@@ -30,3 +30,22 @@ heat staining near turbines. Do not redesign the suit, add logos, or copy a
 franchise weapon or armor part. No text or watermark.
 
 Output: `Concepts/aegis_vanguard_hero_v001.png`.
+
+## Black/carbon/chrome revision
+
+Use case: stylized-concept. Asset type: high-fidelity game character material
+target. Image 1 is the edit target and authoritative Aegis Vanguard identity.
+Change the suit palette and surface language only: make the primary layered armor
+satin black and deep graphite, with visible but restrained carbon-fibre weave on
+flexible panels, cable jackets, abdominal sections, inner thighs, underarms, and
+selected armor insets. Add polished chrome mechanical load paths, piston collars,
+fasteners, trim edges, joint pivots, and turbine rings. Build visibly layered
+multi-tier shoulder pauldrons with three overlapping articulated plates per
+shoulder while preserving practical rifle and camera clearance. Keep the exact
+character proportions, helmet identity, cyan optical band, twin dorsal turbines,
+rifle, pose, camera, hangar, and lighting. Keep cyan emission sparse. Preserve
+believable wear through subtle edge polish, fine scratches, and fingerprints on
+chrome. Premium physically based real-time character rendering. No ivory or white
+armor, no gold, no logos, no text, no watermark, no franchise-specific shapes.
+
+Output: `Concepts/aegis_vanguard_black_chrome_v002.png`.

@@ -156,9 +156,9 @@ Before accepting the milestone, still perform:
 
 ### Hero Suit V2 candidate
 
-`ArtSource/PoweredSuitNextGen/` contains the original **Aegis Vanguard** concept, hero material target, a deterministic v002 mechanical blockout, integrity evidence, and the production/approval plan for a future high-fidelity player suit. It is an isolated art-review lane, not a runtime replacement. Generator114 and every active Unity model/prefab contract remain unchanged.
+`ArtSource/PoweredSuitNextGen/` contains the original **Aegis Vanguard** concept/hero target, the revised black-carbon-chrome material target, preserved early blockouts, and deterministic Candidate003: layered pauldrons, braided carbon cabling, outboard turbines, 13 neutral/detail/real-action renders, integrity evidence, and the production/approval plan for a future high-fidelity player suit. It is an isolated art-review lane, not a runtime replacement. Generator114 and every active Unity model/prefab contract remain unchanged.
 
-The current candidate proves the existing 23-bone/24-action contract can be retained, but it has not passed production sculpting, continuous-undersuit deformation, UV/PBR, LOD, renderer consolidation, gameplay-camera clearance, performance, or owner A/B approval. Promotion is explicitly blocked until those gates pass.
+Candidate003 proves the existing 23-bone/24-action contract and exact turbine/boot exhaust anchors can be retained, but it has not passed formal rifle/armor intersection gates, production sculpting, continuous-undersuit deformation, UV/PBR, LOD, renderer consolidation, gameplay-camera clearance, performance, or owner A/B approval. Promotion is explicitly blocked until those gates pass.
 
 Automated checks establish technical correctness and sustained capped performance on the certification machine; they do not prove subjective feel, performance on all representative hardware, detailed GPU cost, or production-quality content.
 

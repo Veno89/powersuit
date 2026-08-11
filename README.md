@@ -100,9 +100,9 @@ These checks and the broad owner pass establish the current playable baseline. T
 
 ## Hero Suit V2 visual development
 
-An original high-fidelity successor concept, **Aegis Vanguard**, now has a separate visual-development lane at `ArtSource/PoweredSuitNextGen/`. It includes a four-view design target, a hero material target, a deterministic rig-compatible v002 blockout, validation evidence, and a gated production plan. The blockout is review-only and is intentionally not integrated into Unity.
+An original high-fidelity successor concept, **Aegis Vanguard**, now has a separate visual-development lane at `ArtSource/PoweredSuitNextGen/`. It includes the original four-view/hero targets, a revised black-carbon-chrome material target, preserved v001/v002 studies, and a deterministic Candidate003 maquette with layered pauldrons, braided carbon cabling, outboard turbines, 13 neutral/detail/real-pose renders, validation evidence, and a gated production plan. Candidate003 is review-only and is intentionally not integrated into Unity.
 
-Generator114 remains the active, fully validated suit. Its Blender source, frozen FBX, active Unity FBX/GUID, controller, and player prefab were not overwritten. A future Hero V2 candidate must pass silhouette approval, all 24 animation/weapon/camera checks, deformation, authored UV/PBR, LOD, renderer/performance, and owner in-game A/B gates before promotion. See `ArtSource/PoweredSuitNextGen/MASTERPIECE_PLAN.md` and `VALIDATION.md`.
+Generator114 remains the active, fully validated suit. Its Blender source, frozen FBX, active Unity FBX/GUID, controller, and player prefab were not overwritten. Candidate003 retains the 23-bone rig and all 24 actions and now validates its four runtime exhaust anchors, but formal weapon-intersection sweeps, deformation, authored UV/PBR, LOD, renderer/performance, and owner in-game A/B gates remain required before promotion. See `ArtSource/PoweredSuitNextGen/MASTERPIECE_PLAN.md` and `VALIDATION.md`.
 
 ## Scope exclusions
 
