@@ -5,8 +5,9 @@ using Powersuit.Enemies.UnityAdapters;
 using UnityEngine;
 
 /// <summary>
-/// Owns one generated demo-world instance for one player. This component never
-/// searches the scene globally and never mutates scene objects it did not create.
+/// Owns one generated demo-world instance for one player. The only scene-owned
+/// objects it suspends are the explicitly named rollback environment and legacy
+/// enemies; cleanup restores exactly those recorded objects.
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(150)]
@@ -28,6 +29,8 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
     private bool worldCreationAttempted;
     private readonly List<SimpleEnemy> suppressedLegacyEnemies =
         new List<SimpleEnemy>(8);
+    private readonly List<GameObject> suppressedLegacyEnvironmentRoots =
+        new List<GameObject>(2);
 
     public GameObject DemoWorldPrefab => demoWorldPrefab;
     public Transform OwningPlayer => owningPlayer;
@@ -42,6 +45,8 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
         spawnDirector.IsInitialized;
     public string LastInitializationError { get; private set; } = string.Empty;
     public int SuppressedLegacyEnemyCount => suppressedLegacyEnemies.Count;
+    public int SuppressedLegacyEnvironmentCount =>
+        suppressedLegacyEnvironmentRoots.Count;
 
     private void Awake()
     {
@@ -253,7 +258,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
             );
         }
         BindHudIfPresent();
-        SuppressLegacyEnemiesInOwningScene();
+        SuppressLegacyContentInOwningScene();
         return true;
     }
 
@@ -310,7 +315,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
         spawnDirector = null;
         encounterDirector = null;
         worldCreationAttempted = false;
-        RestoreSuppressedLegacyEnemies();
+        RestoreSuppressedLegacyContent();
         LastInitializationError = string.Empty;
         return hadOwnedWorld;
     }
@@ -370,10 +375,9 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
     /// the generated six-archetype director owns encounters. Cleanup restores
     /// exactly the objects this bootstrap suspended.
     /// </summary>
-    private void SuppressLegacyEnemiesInOwningScene()
+    private void SuppressLegacyContentInOwningScene()
     {
         if (
-            !suppressLegacySceneEnemies ||
             owningPlayer == null ||
             !owningPlayer.gameObject.scene.IsValid()
         )
@@ -384,27 +388,61 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
         GameObject[] roots = owningPlayer.gameObject.scene.GetRootGameObjects();
         for (int rootIndex = 0; rootIndex < roots.Length; rootIndex++)
         {
-            SimpleEnemy[] enemies = roots[rootIndex]
-                .GetComponentsInChildren<SimpleEnemy>(includeInactive: false);
-            for (int enemyIndex = 0; enemyIndex < enemies.Length; enemyIndex++)
+            GameObject root = roots[rootIndex];
+            if (
+                root != null &&
+                root != worldInstance &&
+                root.activeSelf &&
+                string.Equals(
+                    root.name,
+                    "Demo Environment",
+                    StringComparison.Ordinal
+                )
+            )
             {
-                SimpleEnemy enemy = enemies[enemyIndex];
-                if (enemy == null || !enemy.gameObject.activeSelf)
+                if (!suppressedLegacyEnvironmentRoots.Contains(root))
                 {
-                    continue;
+                    suppressedLegacyEnvironmentRoots.Add(root);
                 }
+                root.SetActive(false);
+                continue;
+            }
 
-                if (!suppressedLegacyEnemies.Contains(enemy))
+            if (suppressLegacySceneEnemies)
+            {
+                SimpleEnemy[] enemies = root.GetComponentsInChildren<SimpleEnemy>(
+                    includeInactive: false
+                );
+                for (int enemyIndex = 0; enemyIndex < enemies.Length; enemyIndex++)
                 {
-                    suppressedLegacyEnemies.Add(enemy);
+                    SimpleEnemy enemy = enemies[enemyIndex];
+                    if (enemy == null || !enemy.gameObject.activeSelf)
+                    {
+                        continue;
+                    }
+
+                    if (!suppressedLegacyEnemies.Contains(enemy))
+                    {
+                        suppressedLegacyEnemies.Add(enemy);
+                    }
+                    enemy.gameObject.SetActive(false);
                 }
-                enemy.gameObject.SetActive(false);
             }
         }
     }
 
-    private void RestoreSuppressedLegacyEnemies()
+    private void RestoreSuppressedLegacyContent()
     {
+        for (int index = 0; index < suppressedLegacyEnvironmentRoots.Count; index++)
+        {
+            GameObject root = suppressedLegacyEnvironmentRoots[index];
+            if (root != null)
+            {
+                root.SetActive(true);
+            }
+        }
+        suppressedLegacyEnvironmentRoots.Clear();
+
         for (int index = 0; index < suppressedLegacyEnemies.Count; index++)
         {
             SimpleEnemy enemy = suppressedLegacyEnemies[index];

@@ -74,11 +74,11 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Add camera-facing, distance-culled mesh health bars suitable for pooled enemies.
 - [x] Add pooled enemy damage/stagger flashes and full-duration origin-to-target telegraphs with target rings.
 - [x] Add deterministic weighted/threat selection, caps, interval/group control, safe radius, ground/flying zones, pool warmup/reuse, death replacement, seed control, and diagnostics.
-- [x] Generate `PowerSuitCombatSandbox.prefab` with central combat, open flight/long-range, and vertical/aerial zones, plus 19 ground/flight spawn points; project ground candidates onto the surface and require full capsule clearance from sandbox geometry.
+- [x] Generate `PowerSuitCombatSandbox.prefab` with central combat, open flight/long-range, and vertical/aerial zones, plus 28 spawn points (21 ground and 7 flight); require at least seven points per ground zone, project them onto the surface, and require full capsule clearance from sandbox geometry.
 - [x] Add foundry catwalk/AoE pad, causeway bridge/AoE courtyard, and airfield hover-platform/flight-gate landmarks; tune the live cap to 10 with 4.4-second, 1–3 enemy groups.
 - [x] Add a deterministic three-phase demo encounter: 7 causeway enemies, 7 foundry enemies, and 9 airfield enemies; activate phases by proximity, expose remaining counts to the HUD, and restart the active phase after player defeat.
-- [x] Instantiate and bind the generated world at runtime without mutating the canonical scene; suppress and restore the three legacy rollback enemies through the bootstrap lifecycle.
-- [x] Remove animated real-time point lights from suit thrusters while retaining emissive exhaust jets and transient weapon/ability lighting, preventing floor-light flicker.
+- [x] Instantiate and bind the generated world at runtime without mutating the canonical scene; suppress and restore the legacy `Demo Environment` and three rollback enemies through the bootstrap lifecycle.
+- [x] Remove the actual floor-flicker cause by preventing the old gray floor and colored sandbox floors from rendering/colliding coplanarly. Keep suit thrusters emissive without unnecessary moving real-time lights, while retaining transient weapon/ability lighting.
 
 ### K–M — HUD, tools, pooling, and performance foundations
 
@@ -96,12 +96,12 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
 - [x] Full Unity EditMode suite: 261/261 passed, including generated-world ground projection and obstacle-clearance regressions.
-- [x] Full Unity PlayMode suite: 14/14 passed, including three-slot sheathe/swap/draw, independent magazines, Heavy Plasma charge gating, scope restoration, multi-target radial impact, and the 1,000-projectile pool exercise.
+- [x] Full Unity PlayMode suite: 15/15 passed, including canonical-world suppression/restoration, a complete seven-enemy opening wave, stable flight separation, three-slot sheathe/swap/draw, independent magazines, Heavy Plasma charge gating, scope restoration, multi-target radial impact, and the 1,000-projectile pool exercise.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
 - [x] Generator114 source validation: 24 animation clips, contract version 5, and 35 mandatory renders; exact FBX hash matches Unity and all six lateral clips import into cardinal 2D blends.
 - [x] Generated controller/run state, additive bolt clip, scope presenter, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.
 - [x] Clean runtime observation after final pooling/enemy fixes: no Unity gameplay errors or recurring warnings.
-- [x] Windows x64 Development Build completed after the spawn-clearance and floor-lighting hotfix.
+- [x] Windows x64 Development Build completed after the world-ownership and encounter-spawn hotfix.
 - [x] Fresh fifteen-second headless build smoke after that hotfix started successfully and remained alive until the intentional stop, with no gameplay exception, assertion, or missing-reference pattern. Only expected offline Unity cloud `curl` failures appeared; package-level Sentis shader warnings in the build were non-blocking.
 - [x] Final Unity Console inspection: 0 errors.
 - [x] Broad owner hands-on pass on 2026-08-11: the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent.

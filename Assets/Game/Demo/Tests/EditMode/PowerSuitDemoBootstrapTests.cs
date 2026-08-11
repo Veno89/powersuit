@@ -181,24 +181,40 @@ namespace Powersuit.Demo.Tests
         }
 
         [Test]
-        public void Initialize_SuspendsAndCleanupRestoresLegacySceneEnemies()
+        public void Initialize_SuspendsAndRestoresLegacySceneContent()
         {
             Component bootstrap = CreateBootstrap(out GameObject player);
             GameObject world = CreateValidWorldTemplate();
             Camera camera = CreateCamera();
             GameObject legacyEnemy = Track(new GameObject("Legacy Enemy"));
             legacyEnemy.AddComponent(FindType("SimpleEnemy"));
+            GameObject legacyEnvironment = Track(
+                new GameObject("Demo Environment")
+            );
+            GameObject unrelatedEnvironment = Track(
+                new GameObject("User Authored Environment")
+            );
             Configure(bootstrap, world, player.transform, camera);
 
             Assert.That(Invoke<bool>(bootstrap, "TryInitializeDemo"), Is.True);
             Assert.That(legacyEnemy.activeSelf, Is.False);
+            Assert.That(legacyEnvironment.activeSelf, Is.False);
+            Assert.That(unrelatedEnvironment.activeSelf, Is.True);
             Assert.That(
                 (int)GetProperty(bootstrap, "SuppressedLegacyEnemyCount"),
+                Is.EqualTo(1)
+            );
+            Assert.That(
+                (int)GetProperty(
+                    bootstrap,
+                    "SuppressedLegacyEnvironmentCount"
+                ),
                 Is.EqualTo(1)
             );
 
             Assert.That(Invoke<bool>(bootstrap, "TryInitializeDemo"), Is.True);
             Assert.That(legacyEnemy.activeSelf, Is.False);
+            Assert.That(legacyEnvironment.activeSelf, Is.False);
             Assert.That(
                 (int)GetProperty(bootstrap, "SuppressedLegacyEnemyCount"),
                 Is.EqualTo(1),
@@ -207,8 +223,17 @@ namespace Powersuit.Demo.Tests
 
             Assert.That(Invoke<bool>(bootstrap, "CleanupOwnedWorld"), Is.True);
             Assert.That(legacyEnemy.activeSelf, Is.True);
+            Assert.That(legacyEnvironment.activeSelf, Is.True);
+            Assert.That(unrelatedEnvironment.activeSelf, Is.True);
             Assert.That(
                 (int)GetProperty(bootstrap, "SuppressedLegacyEnemyCount"),
+                Is.Zero
+            );
+            Assert.That(
+                (int)GetProperty(
+                    bootstrap,
+                    "SuppressedLegacyEnvironmentCount"
+                ),
                 Is.Zero
             );
         }

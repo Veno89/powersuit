@@ -11,12 +11,12 @@ At runtime, `PowerSuitDemoBootstrap`:
 1. resolves the player camera after the prefab is instantiated;
 2. instantiates one `PowerSuitCombatSandbox.prefab`;
 3. binds the owned `EnemySpawnDirector` and structured `PowerSuitEncounterDirector` to the player and HUD;
-4. suppresses the three legacy scene `SimpleEnemy` rollback actors so only the generated encounter architecture runs; and
-5. restores those legacy actors when its ownership ends.
+4. suppresses the legacy scene `Demo Environment` and three `SimpleEnemy` rollback actors so only one world, floor/collision surface, and encounter architecture runs; and
+5. restores exactly those recorded legacy objects when its ownership ends.
 
 Ground spawn candidates are projected to the detected surface and accepted only when a full enemy-sized capsule is clear of sandbox geometry. The generated point set is validated against the authored blocks so pooled enemies cannot start inside them.
 
-The generated world prefab contains three connected greybox areas—central landing/combat, open flight/long range, and vertical/aerial combat—plus five spawn zones and 19 ground/flight points. A fixed three-phase encounter activates 7 causeway, 7 foundry, and 9 airfield enemies as the player reaches each zone. It is tech-demo geometry, not final environment art.
+The generated world prefab contains three connected greybox areas—central landing/combat, open flight/long range, and vertical/aerial combat—plus five spawn zones and 28 points (21 ground and 7 flight). Each ground zone has at least seven validated candidates, so every authored wave can materialize without reusing an occupied slot. A fixed three-phase encounter activates 7 causeway, 7 foundry, and 9 airfield enemies as the player reaches each zone. It is tech-demo geometry, not final environment art.
 
 ## Ownership boundaries
 
@@ -61,7 +61,7 @@ The scope uses the Precision Rifle's configured `ScopePoint` and aim profile. `V
 
 `PowerSuitController` adapts a CharacterController to plain-C# movement helpers: acceleration/deceleration, signed camera-relative movement, grounding hysteresis, coyote time, buffered jump, air control, landing, hold-to-flight, hover/braking, vertical flight, boost, banking, and safe ground/flight transitions. The focused player prefab persists the responsive profile (6.5 m/s ground, 14 m/s flight, 28 m/s boost), with piecewise zero-crossing reversal, stronger braking, 20/32 free/combat turning sharpness, 1.65x stable-ground sprint, a 0.9-second accepted-jump flight threshold, and 0.55 held-jump gravity scale. The rollback base prefab retains its legacy 5 m/s tune.
 
-Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps ground/flight attitude and landing squash presentation-only. `PowerSuitThrusterPresentation` builds cached emissive backpack/boot jets driven by sprint/flight/boost state and colored blue-white through orange/red by the separate propulsion-heat adapter. It deliberately avoids moving real-time point lights, which previously produced distracting floor-light flicker; transient weapon and ability lighting remains intact.
+Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps ground/flight attitude and landing squash presentation-only. `PowerSuitThrusterPresentation` builds cached emissive backpack/boot jets driven by sprint/flight/boost state and colored blue-white through orange/red by the separate propulsion-heat adapter. It avoids unnecessary moving real-time point lights; transient weapon and ability lighting remains intact. The reported gray/color floor flicker was instead coplanar z-fighting: the canonical scene's legacy gray floor occupied the same plane as the generated colored floors. Runtime ownership now disables/restores that legacy environment together with its duplicate colliders.
 
 The generated Animator uses four layers in this order:
 
@@ -134,10 +134,10 @@ Accepted gameplay-batch results from 2026-08-10, followed by the 2026-08-11 Deve
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
 - EditMode: 261/261 passed, including generated-world ground projection and full capsule-clearance checks.
-- PlayMode: 14/14 passed, including three-slot sheathe/swap/draw, independent magazine persistence, Heavy Plasma charge gating, generated receiver visibility, scope eligibility/optic restoration, multi-target radial falloff, and the 1,000-projectile pool exercise.
+- PlayMode: 15/15 passed, including canonical-world suppression/restoration, the complete seven-enemy opening wave, stable flight separation from the generated floor, three-slot sheathe/swap/draw, independent magazine persistence, Heavy Plasma charge gating, generated receiver visibility, scope eligibility/optic restoration, multi-target radial falloff, and the 1,000-projectile pool exercise.
 - Generator114 source validation passed for all 24 animation clips and 35 mandatory renders, including six lateral loops and 0.7130 m lateral foot separation; generated 2D blends, foot planting, propulsion heat/HUD, heat-reactive thrusters, complete-rifle scope suppression, and prefab data passed integration validation.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
-- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the spawn-clearance and floor-lighting hotfix. Its package-level Sentis shader warnings were non-blocking.
+- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the world-ownership and encounter-spawn hotfix. Its package-level Sentis shader warnings were non-blocking.
 - A fresh 15-second headless build smoke after that hotfix started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
 - Final Unity Console inspection reported 0 errors.
 - Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.

@@ -707,8 +707,11 @@ namespace Powersuit.Editor
                     new[]
                     {
                         new Vector3(-7f, 0.15f, -8f),
+                        new Vector3(0f, 0.15f, -8f),
                         new Vector3(7f, 0.15f, -8f),
+                        new Vector3(-8f, 0.15f, 3f),
                         new Vector3(-7f, 0.15f, 8f),
+                        new Vector3(0f, 0.15f, 8f),
                         new Vector3(7f, 0.15f, 8f)
                     }
                 ),
@@ -722,9 +725,12 @@ namespace Powersuit.Editor
                     new[]
                     {
                         new Vector3(-7f, 0.15f, -8f),
+                        new Vector3(-3f, 0.15f, -8f),
+                        new Vector3(1f, 0.15f, -8f),
                         new Vector3(7f, 0.15f, -8f),
+                        new Vector3(-7f, 0.15f, 0f),
+                        new Vector3(7f, 0.15f, 0f),
                         new Vector3(-7f, 0.15f, 8f),
-                        new Vector3(0f, 0.15f, -8f)
                     }
                 ),
                 CreateSpawnZone(
@@ -737,9 +743,12 @@ namespace Powersuit.Editor
                     new[]
                     {
                         new Vector3(-7f, 0.15f, -9f),
-                        new Vector3(7f, 0.15f, -8f),
+                        new Vector3(0f, 0.15f, -9f),
+                        new Vector3(7f, 0.15f, -9f),
+                        new Vector3(-8f, 0.15f, 3.5f),
+                        new Vector3(8f, 0.15f, 3.5f),
                         new Vector3(-7f, 0.15f, 8f),
-                        new Vector3(7f, 0.15f, -4f)
+                        new Vector3(2f, 0.15f, 8f)
                     }
                 ),
                 CreateSpawnZone(
@@ -1274,14 +1283,24 @@ namespace Powersuit.Editor
                 if ((zones[index].Compatibility & SpawnZoneCompatibility.Ground) != 0)
                 {
                     groundZones++;
+                    if (zones[index].CandidateCapacity < 7)
+                    {
+                        errors.Add(
+                            zones[index].name +
+                            " needs at least seven ground encounter points."
+                        );
+                    }
                 }
                 if ((zones[index].Compatibility & SpawnZoneCompatibility.Flight) != 0)
                 {
                     flightZones++;
-                }
-                if (zones[index].CandidateCapacity < 3)
-                {
-                    errors.Add(zones[index].name + " has too few explicit spawn points.");
+                    if (zones[index].CandidateCapacity < 3)
+                    {
+                        errors.Add(
+                            zones[index].name +
+                            " has too few explicit flight spawn points."
+                        );
+                    }
                 }
             }
             if (groundZones < 3 || flightZones < 2)

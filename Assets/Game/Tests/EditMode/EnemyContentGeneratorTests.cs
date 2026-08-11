@@ -170,14 +170,23 @@ namespace Powersuit.Tests.EditMode
                 Assert.That(capacity, Is.Not.Null);
                 Assert.That(tryBuild, Is.Not.Null);
 
+                int totalCandidateCount = 0;
+                int groundCandidateCount = 0;
                 foreach (Component zone in zones)
                 {
+                    int count = (int)capacity.GetValue(zone);
+                    totalCandidateCount += count;
                     if (!compatibility.GetValue(zone).ToString().Contains("Ground"))
                     {
                         continue;
                     }
 
-                    int count = (int)capacity.GetValue(zone);
+                    groundCandidateCount += count;
+                    Assert.That(
+                        count,
+                        Is.GreaterThanOrEqualTo(7),
+                        zone.name + " cannot host its full authored ground wave."
+                    );
                     for (int index = 0; index < count; index++)
                     {
                         object[] arguments = { index, null, null };
@@ -203,6 +212,9 @@ namespace Powersuit.Tests.EditMode
                         );
                     }
                 }
+
+                Assert.That(groundCandidateCount, Is.EqualTo(21));
+                Assert.That(totalCandidateCount, Is.EqualTo(28));
             }
             finally
             {

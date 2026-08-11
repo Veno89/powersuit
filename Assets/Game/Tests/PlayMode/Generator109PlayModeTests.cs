@@ -334,6 +334,140 @@ namespace Powersuit.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PoweredSuitAimDemo_OwnsWorldWaveAndStableFlightSurface()
+        {
+            AsyncOperation loadOperation;
+#if UNITY_EDITOR
+            loadOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(
+                "Assets/Scenes/PoweredSuitAimDemo.unity",
+                new LoadSceneParameters(LoadSceneMode.Single)
+            );
+#else
+            loadOperation = SceneManager.LoadSceneAsync(
+                "PoweredSuitAimDemo",
+                LoadSceneMode.Single
+            );
+#endif
+            Assert.That(loadOperation, Is.Not.Null);
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+
+            GameObject player = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Generator 109 Player"
+            );
+            GameObject legacyEnvironment = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Demo Environment"
+            );
+            Assert.That(player, Is.Not.Null);
+            Assert.That(legacyEnvironment, Is.Not.Null);
+
+            Component bootstrap = player.GetComponent("PowerSuitDemoBootstrap");
+            Assert.That(bootstrap, Is.Not.Null);
+            PropertyInfo worldProperty = bootstrap.GetType().GetProperty(
+                "WorldInstance",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(worldProperty, Is.Not.Null);
+
+            float initializationDeadline = Time.realtimeSinceStartup + 2f;
+            GameObject world = null;
+            while (
+                Time.realtimeSinceStartup < initializationDeadline &&
+                world == null
+            )
+            {
+                world = worldProperty.GetValue(bootstrap) as GameObject;
+                yield return null;
+            }
+
+            Assert.That(world, Is.Not.Null);
+            Assert.That(
+                legacyEnvironment.activeSelf,
+                Is.False,
+                "The old grey floor must be inactive while colored zone floors own the sandbox."
+            );
+
+            Component spawnDirector = bootstrap.GetType()
+                .GetProperty("SpawnDirector")
+                ?.GetValue(bootstrap) as Component;
+            Assert.That(spawnDirector, Is.Not.Null);
+
+            float waveDeadline = Time.realtimeSinceStartup + 4f;
+            while (
+                Time.realtimeSinceStartup < waveDeadline &&
+                (
+                    GetIntProperty(spawnDirector, "ActiveInstanceCount") < 7 ||
+                    GetIntProperty(spawnDirector, "PendingSpawnCount") > 0
+                )
+            )
+            {
+                yield return null;
+            }
+
+            Assert.That(
+                GetIntProperty(spawnDirector, "ActiveInstanceCount"),
+                Is.EqualTo(7),
+                "The complete seven-enemy causeway wave must materialize."
+            );
+            Assert.That(
+                GetIntProperty(spawnDirector, "PendingSpawnCount"),
+                Is.Zero
+            );
+
+            Component encounter = bootstrap.GetType()
+                .GetProperty("EncounterDirector")
+                ?.GetValue(bootstrap) as Component;
+            if (encounter is Behaviour encounterBehaviour)
+            {
+                encounterBehaviour.enabled = false;
+            }
+            spawnDirector.GetType().GetMethod("ClearActiveEnemies")?.Invoke(
+                spawnDirector,
+                null
+            );
+
+            Component controller = player.GetComponent("PowerSuitController");
+            Component heat = player.GetComponent("PowerSuitPropulsionHeat");
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(heat, Is.Not.Null);
+            heat.GetType().GetMethod("ResetHeat")?.Invoke(
+                heat,
+                new object[] { 0f }
+            );
+            controller.GetType().GetMethod(
+                "SetCursorLocked",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            )?.Invoke(controller, new object[] { true });
+
+            float startHeight = player.transform.position.y;
+            controller.GetType().GetMethod("SetFlightEnabled")?.Invoke(
+                controller,
+                new object[] { true }
+            );
+            float flightDeadline = Time.realtimeSinceStartup + 0.4f;
+            while (Time.realtimeSinceStartup < flightDeadline)
+            {
+                yield return null;
+            }
+
+            Assert.That(GetBoolProperty(controller, "CanUsePropulsion"), Is.True);
+            Assert.That(
+                GetBoolProperty(controller, "IsFlying"),
+                Is.True,
+                "A single generated floor must not force the suit back to grounded."
+            );
+            Assert.That(
+                player.transform.position.y,
+                Is.GreaterThan(startHeight + 0.1f),
+                "Flight takeoff must separate the CharacterController from the floor."
+            );
+        }
+
+        [UnityTest]
         public IEnumerator PoweredSuitAimDemo_AimCameraKeepsSuitInFrameAtCommonAspects()
         {
             AsyncOperation loadOperation;
