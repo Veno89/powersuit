@@ -3,6 +3,18 @@ using UnityEngine;
 
 public sealed class CombatFeedbackPool : MonoBehaviour
 {
+    public readonly struct RuntimeInstantiationEntry
+    {
+        public RuntimeInstantiationEntry(GameObject prefab, long count)
+        {
+            Prefab = prefab;
+            Count = count;
+        }
+
+        public GameObject Prefab { get; }
+        public long Count { get; }
+    }
+
     public readonly struct Statistics
     {
         public Statistics(
@@ -65,6 +77,8 @@ public sealed class CombatFeedbackPool : MonoBehaviour
     private readonly Dictionary<GameObject, Queue<GameObject>> pools = new Dictionary<GameObject, Queue<GameObject>>();
     private readonly Dictionary<GameObject, PooledInstanceData> instanceLookup = new Dictionary<GameObject, PooledInstanceData>();
     private readonly HashSet<GameObject> activeObjects = new HashSet<GameObject>();
+    private readonly Dictionary<GameObject, long> runtimeInstantiationsByPrefab =
+        new Dictionary<GameObject, long>();
     private Transform poolRoot;
     private int peakActiveCount;
     private int activeProjectileCount;
@@ -121,6 +135,41 @@ public sealed class CombatFeedbackPool : MonoBehaviour
 
         statistics = instance.CurrentStatistics;
         return true;
+    }
+
+    /// <summary>
+    /// Copies per-prefab runtime-instantiation totals into caller-owned
+    /// storage. This is intended for low-frequency diagnostics after a soak;
+    /// it performs no managed allocation and never exposes mutable pool state.
+    /// </summary>
+    public static int CopyRuntimeInstantiationEntries(
+        RuntimeInstantiationEntry[] destination
+    )
+    {
+        if (destination == null)
+        {
+            throw new System.ArgumentNullException(nameof(destination));
+        }
+
+        if (instance == null || destination.Length == 0)
+        {
+            return 0;
+        }
+
+        int written = 0;
+        foreach (KeyValuePair<GameObject, long> entry in
+                 instance.runtimeInstantiationsByPrefab)
+        {
+            if (written >= destination.Length)
+            {
+                break;
+            }
+            destination[written++] = new RuntimeInstantiationEntry(
+                entry.Key,
+                entry.Value
+            );
+        }
+        return written;
     }
 
     private void Awake()
@@ -212,6 +261,8 @@ public sealed class CombatFeedbackPool : MonoBehaviour
         {
             obj = Instantiate(prefab, position, rotation, poolRoot);
             runtimeInstantiationCount++;
+            runtimeInstantiationsByPrefab.TryGetValue(prefab, out long count);
+            runtimeInstantiationsByPrefab[prefab] = count + 1L;
             instanceLookup[obj] = CreateInstanceData(obj, prefab);
         }
         else

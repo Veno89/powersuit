@@ -68,11 +68,11 @@ The console is gated to the Editor and Development Builds and routes changes thr
 - The Generator114 animation contract contains 24 clips and 35 mandatory validation renders. It preserves Generator113's powered gait and adds six lateral loops for ready, aimed, and stowed movement; lateral flight-phase foot separation is 0.7130 m.
 - `PowerSuitValidationRunner` runs the full Unity suites and writes ignored summaries under `Temp/`.
 
-See [ROADMAP.md](ROADMAP.md) for acceptance status and [PROJECT.md](Assets/Game/Documentation/PROJECT.md) for subsystem ownership and validation workflow.
+See [ROADMAP.md](ROADMAP.md) for acceptance status, [PROJECT.md](Assets/Game/Documentation/PROJECT.md) for subsystem ownership and validation workflow, and [PERFORMANCE.md](PERFORMANCE.md) for the repeatable Development Build stress harness and measured results.
 
 ## Verification record
 
-Current workspace evidence from 2026-08-10:
+Accepted gameplay-batch evidence from 2026-08-10, followed by the 2026-08-11 performance certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
 - Unity EditMode: 234/234 passed.
@@ -81,16 +81,18 @@ Current workspace evidence from 2026-08-10:
 - Windows x64 Development Build completed successfully at 2026-08-10 22:46. Only non-blocking package-level Sentis shader warnings were reported.
 - A 15-second headless player smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. Expected offline Unity cloud `curl` failures were unrelated to gameplay, and final Unity Console inspection reported 0 errors.
 - Owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounters work and feel decent. The targeted edge-case and measurement gates below remain separate.
+- Development Player certification passed at capped 30/60/120 FPS with 32 concurrent enemies, zero measured main-thread managed allocation, zero post-warmup pool misses, and zero logged errors.
+- A two-minute 60 FPS lifecycle run with 48 concurrent enemies passed across 7,200 measured frames, 175 enemy spawns, and 2,455 pooled spawns; frame p95 was 16.669 ms and there were no runtime pool instantiations.
 
-These checks and the broad owner pass establish the current playable baseline. They do **not** replace targeted edge-case testing, actual Unity Profiler captures under representative stress, or a long lifecycle soak.
+These checks and the broad owner pass establish the current playable baseline. The remaining performance gap is detailed connected GPU/render profiling and the additional lifecycle cases listed below, not basic CPU/frame/pool certification.
 
 ## Remaining milestone gates
 
 - Owner/manual feel acceptance at Game view Fit/1x, including combined ground/flight/aim/scope/fire/reload/ability inputs, slopes, steps, close cover, and camera framing.
 - Owner/manual acceptance of sprint cadence, tap-jump versus hold-to-flight timing, touchdown transitions, and the unobstructed Precision Rifle scope presentation.
 - Owner tuning of the implemented shared sprint/flight heat rates, lock threshold, cooldown delay, and HUD readability.
-- Real profiler captures at representative and stress loads, including 30/60/120+ FPS checks, CPU/render/GC observations, and pool-capacity tuning.
-- Long lifecycle validation across death/respawn, scene reload, repeated pool reuse, malformed console input, and extended play.
+- Connected render/GPU profiling with usable draw-call and GPU-time counters, plus uncapped headroom and representative target-hardware measurements.
+- Remaining lifecycle validation across player respawn, scene reload, seed reset, spawner toggles, and malformed console input. Repeated enemy/projectile/ability reuse and enemy replacement are covered by the automated two-minute soak.
 - Replacement-character/retargeting validation and true art/content polish. The current generated powered suit, enemies, VFX/audio hooks, and three-zone environment remain tech-demo content rather than final production art. Audio hooks stay silent until owned or explicitly approved licensed SFX are available; no external audio was added in this pass.
 
 ## Scope exclusions

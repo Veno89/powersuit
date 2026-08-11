@@ -125,7 +125,7 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 - `Temp/PowerSuitValidationEditMode.txt`
 - `Temp/PowerSuitValidationPlayMode.txt`
 
-Current 2026-08-10 results:
+Accepted gameplay-batch results from 2026-08-10, followed by the 2026-08-11 Development Player certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
 - EditMode: 234/234 passed.
@@ -136,21 +136,23 @@ Current 2026-08-10 results:
 - A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
 - Final Unity Console inspection reported 0 errors.
 - Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.
-- Broad owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent; targeted edge cases and objective measurements remain open.
+- Broad owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent; targeted edge cases and the remaining GPU/render/target-hardware measurements stay open.
+- The opt-in Development Player performance matrix passed at 30/60/120 FPS with 32 concurrent enemies, zero main-thread managed allocation in measured frames, zero post-warmup pool misses, and zero logged errors.
+- A two-minute 60 FPS/48-enemy lifecycle run passed across 7,200 measured frames, 175 enemy spawns, and 2,455 pooled spawns; frame p95 was 16.669 ms with no runtime pool instantiation.
 
 Before accepting the milestone, still perform:
 
 1. Set the Game view to **Fit** or `1x`; local `2x`/`4x` or pan state can mimic camera zoom.
 2. Run the complete ground/flight/aim/scope/fire/reload/ability and conflicting-input matrix, including slopes, steps, close cover, death/respawn, and owner feel review.
-3. Capture real Unity Profiler evidence at representative and stress loads, including CPU/render/GC, pool misses, and 30/60/120+ frame-rate behavior.
-4. Run an extended lifecycle soak with repeated pooled reuse, reloads, seed/spawner changes, scene reload, malformed console commands, and player/enemy death cycles.
+3. Capture connected render-thread, draw-call, and GPU evidence, plus uncapped headroom and representative target-hardware results. CPU/frame/allocation/pool behavior at capped 30/60/120 is recorded in the root `PERFORMANCE.md`.
+4. Extend lifecycle coverage to player respawn, reload, seed/spawner changes, scene reload, and malformed console commands. Enemy death/replacement plus repeated enemy/projectile/ability pool reuse are covered by the automated two-minute soak.
 5. Validate a replacement humanoid/retargeting path and complete final animation, character, enemy, world, UI, VFX, and audio content polish.
 6. Tune and accept the implemented propulsion heat drain/cooldown/recovery behavior and its HUD/heat-reactive exhaust feedback.
 
-Automated checks establish technical correctness of the current batch; they do not prove subjective feel, a sustained 60 FPS target on representative hardware, or production-quality content.
+Automated checks establish technical correctness and sustained capped performance on the certification machine; they do not prove subjective feel, performance on all representative hardware, detailed GPU cost, or production-quality content.
 
 ## Known limitations and exclusions
 
-Open gaps are targeted edge-case acceptance, profiler captures and performance tuning under representative stress, long lifecycle evidence, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, silent audio hooks, and UI are suitable for a tech demo, not final production art. No external audio assets were added.
+Open gaps are targeted edge-case acceptance, connected GPU/render and target-hardware profiling, the remaining lifecycle cases, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, silent audio hooks, and UI are suitable for a tech demo, not final production art. No external audio assets were added.
 
 Excluded are multiplayer/networking, loot/inventory/rarity, progression/skill trees, crafting, missions/quests/dialogue/story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, and final Asset Store publication.

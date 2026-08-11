@@ -602,6 +602,83 @@ namespace Powersuit.Enemies.UnityAdapters
             return enemySpeedMultiplier;
         }
 
+        /// <summary>
+        /// Prewarms each configured enemy pool for a deliberate stress load.
+        /// The overlap multiplier accounts for dead instances that remain
+        /// visible briefly while replacements are already being activated.
+        /// Normal encounter startup continues to use each entry's authored,
+        /// lower-memory prewarm count.
+        /// </summary>
+        public int PrewarmForConcurrentPopulation(
+            int desiredPopulation,
+            int lifecycleOverlapMultiplier = 2
+        )
+        {
+            if (!initialized || runtimeSources.Length == 0)
+            {
+                return 0;
+            }
+
+            int perPrefab = CalculateStressPrewarmPerPrefab(
+                desiredPopulation,
+                runtimeSources.Length,
+                lifecycleOverlapMultiplier
+            );
+            int projectileTarget = CalculateStressProjectilePrewarmCount(
+                desiredPopulation,
+                lifecycleOverlapMultiplier
+            );
+            for (int index = 0; index < runtimeSources.Length; index++)
+            {
+                RuntimeSpawnSource source = runtimeSources[index];
+                CombatFeedbackPool.Prewarm(
+                    source.Prefab,
+                    Mathf.Max(source.PrewarmCount, perPrefab)
+                );
+
+                EnemyAttackEmitter emitter =
+                    source.Prefab.GetComponent<EnemyAttackEmitter>();
+                if (emitter != null && emitter.ProjectilePrefab != null)
+                {
+                    CombatFeedbackPool.Prewarm(
+                        emitter.ProjectilePrefab.gameObject,
+                        projectileTarget
+                    );
+                }
+            }
+            return perPrefab * runtimeSources.Length;
+        }
+
+        public static int CalculateStressPrewarmPerPrefab(
+            int desiredPopulation,
+            int sourceCount,
+            int lifecycleOverlapMultiplier = 2
+        )
+        {
+            int population = Mathf.Clamp(
+                desiredPopulation,
+                MinimumActiveEnemyCap,
+                MaximumActiveEnemyCap
+            );
+            int sources = Mathf.Max(1, sourceCount);
+            int overlap = Mathf.Clamp(lifecycleOverlapMultiplier, 1, 4);
+            return Mathf.CeilToInt(population / (float)sources) * overlap;
+        }
+
+        public static int CalculateStressProjectilePrewarmCount(
+            int desiredPopulation,
+            int lifecycleOverlapMultiplier = 2
+        )
+        {
+            int population = Mathf.Clamp(
+                desiredPopulation,
+                MinimumActiveEnemyCap,
+                MaximumActiveEnemyCap
+            );
+            int overlap = Mathf.Clamp(lifecycleOverlapMultiplier, 1, 4);
+            return population * overlap;
+        }
+
         public int KillAllActiveEnemies()
         {
             int killed = 0;

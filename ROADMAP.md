@@ -1,6 +1,6 @@
 # PowerSuit Feel-First Combat and Flight Tech Demo Roadmap
 
-This is the canonical status ledger for the compact 10–15 minute combat-and-flight sandbox. `[x]` means implementation plus the stated automated verification exists in the current workspace. Manual owner acceptance and real profiler evidence are tracked separately and are never implied by an automated pass.
+This is the canonical status ledger for the compact 10–15 minute combat-and-flight sandbox. `[x]` means implementation plus the stated automated verification exists in the current workspace. Manual owner acceptance and detailed connected GPU/render evidence are tracked separately and are never implied by an automated pass.
 
 ## Milestone snapshot
 
@@ -18,7 +18,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | J — Three-zone world | Implemented as generated prefab | Generator/integration validation passes | Traversal, sightline and layout polish |
 | K — HUD | Implemented | Formatter/presenter tests pass | Resolution/readability/accessibility review |
 | L — Developer console | Implemented | Parser, registry and gameplay-command tests pass | Hands-on malformed-command pass |
-| M — Pooling/performance | Functional pooling and diagnostics implemented | 1,000-projectile pool test, build and smoke pass | Profiler captures, stress and long soak |
+| M — Pooling/performance | Pooling, diagnostics, and opt-in Development Build soak implemented | 30/60/120 matrix and two-minute 48-enemy soak pass | Connected GPU/render capture, uncapped and remaining lifecycle cases |
 
 ## Completed implementation
 
@@ -82,6 +82,8 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Add commands for player/weapon/ability/enemy/director tuning, spawn/clear/seed control, reload, FPS, pools, and projectiles.
 - [x] Pool combat feedback, player/enemy/ability projectiles and actors, and enemies with explicit reset hooks and active/inactive/peak diagnostics.
 - [x] Move one-time projectile component setup out of the hot spawn path and enable generated material instancing.
+- [x] Add an opt-in Development Build stress runner with strict command-line parsing, bounded nonalloc sample collection, JSON reporting, error gates, and per-prefab pool-miss diagnostics.
+- [x] Add stress-only enemy and shared-projectile prewarming sized for concurrent population and replacement overlap without inflating ordinary encounter warmup.
 
 ## Verification completed
 
@@ -96,6 +98,8 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Fifteen-second headless build smoke started successfully and remained alive until the intentional stop, with no gameplay exception, assertion, or missing-reference pattern. Only expected offline Unity cloud `curl` failures appeared; package-level Sentis shader warnings in the build were non-blocking.
 - [x] Final Unity Console inspection: 0 errors.
 - [x] Broad owner hands-on pass on 2026-08-11: the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent.
+- [x] Development Player matrix at 30/60/120 FPS with 32 active enemies: stable target pacing, 0 B main-thread managed allocation p95/max, 0 post-warmup pool misses, and 0 logged errors.
+- [x] Two-minute 60 FPS lifecycle soak with 48 active enemies: 7,200 measured frames, frame p95 16.669 ms, 175 enemies spawned, 2,455 pool spawns, 0 runtime pool instantiations, and 0 logged errors.
 
 ## Targeted manual and measurement gates still open
 
@@ -105,8 +109,8 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [ ] Combat matrix on ground and in flight: shoulder aim, Precision-Rifle-only RMB + `V` scope, scope readability/reticle alignment, hip fire, reload, bolt cycle, draw/stow, rocket, lightning target/cancel/cast, void cast, and conflicting-input priority.
 - [ ] Camera matrix: exploration/shoulder/flight/boost/target/scope transitions, close cover, vertical aim, recoil, and keeping player/weapon readable.
 - [ ] Encounter feel: six archetypes are distinguishable and fair; spawn pacing, telegraphs, threat mix, damage, cooldowns, meter gain, and readability suit the intended loop.
-- [ ] Unity Profiler captures under representative and stress loads. Record CPU, rendering, GC/allocation, pool misses/capacity, projectile counts, and frame pacing at 30/60/120+ FPS and uncapped.
-- [ ] Long lifecycle soak covering repeated enemy/projectile/ability pool reuse, death/respawn, scene reload, seed resets, spawner toggles, malformed console commands, and extended play.
+- [ ] Connected Unity Profiler/Frame Debugger or graphics capture for render thread, draw calls, and GPU time; the Development Player backend did not expose usable automated draw/GPU counters. Also record uncapped headroom and representative target hardware.
+- [ ] Extend lifecycle coverage to player respawn, scene reload, seed resets, spawner toggles, and malformed console commands. Repeated enemy/projectile/ability reuse and enemy death/replacement are certified by the two-minute soak.
 - [ ] Replacement-humanoid/retargeting validation, hardpoint and IK robustness, and true art, VFX, audio, animation, UI, and world-content polish.
 - [ ] Owner-tune the implemented propulsion heat drain/cooldown/recovery thresholds and verify the HUD/heat-reactive exhaust during sustained sprint, flight, and boost.
 - [ ] Owner-accept the new cardinal/diagonal blends, foot plants, starts/stops, braking, and sharp-turn presentation at the unchanged gameplay speeds.

@@ -2,7 +2,8 @@
     "name": "Powersuit.EditModeTests",
     "rootNamespace": "Powersuit.Tests.EditMode",
     "references": [
-        "Powersuit.Combat.Runtime"
+        "Powersuit.Combat.Runtime",
+        "Powersuit.Core.Runtime"
     ],
     "includePlatforms": [
         "Editor"

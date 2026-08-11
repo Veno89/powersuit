@@ -31,6 +31,45 @@ namespace Powersuit.Enemies.UnityAdapters.Tests
             }
         }
 
+        [TestCase(16, 6, 2, 6)]
+        [TestCase(10, 6, 2, 4)]
+        [TestCase(1, 1, 1, 1)]
+        [TestCase(999, 0, 99, 2048)]
+        public void StressPrewarm_DistributesBoundedLifecycleOverlap(
+            int population,
+            int sourceCount,
+            int overlap,
+            int expectedPerPrefab
+        )
+        {
+            Assert.That(
+                EnemySpawnDirector.CalculateStressPrewarmPerPrefab(
+                    population,
+                    sourceCount,
+                    overlap
+                ),
+                Is.EqualTo(expectedPerPrefab)
+            );
+        }
+
+        [TestCase(32, 2, 64)]
+        [TestCase(1, 1, 1)]
+        [TestCase(999, 99, 2048)]
+        public void StressPrewarm_CoversConcurrentEnemyProjectiles(
+            int population,
+            int overlap,
+            int expected
+        )
+        {
+            Assert.That(
+                EnemySpawnDirector.CalculateStressProjectilePrewarmCount(
+                    population,
+                    overlap
+                ),
+                Is.EqualTo(expected)
+            );
+        }
+
         [Test]
         public void Definition_ConvertsAllSixRolePresetsToValidatedRuntimeData()
         {
