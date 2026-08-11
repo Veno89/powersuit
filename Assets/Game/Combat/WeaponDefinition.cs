@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace Powersuit.Combat
 {
+    public enum WeaponReticleStyle
+    {
+        PrecisionCross = 0,
+        AssaultDynamic = 1
+    }
+
     [CreateAssetMenu(
         fileName = "WeaponDefinition",
         menuName = "Powersuit/Combat/Weapon Definition",
@@ -68,6 +74,22 @@ namespace Powersuit.Combat
         private float scopedLookSensitivityMultiplier = 0.45f;
         [SerializeField, Min(0.01f)] private float aimTransitionSharpness = 22f;
 
+        [Header("Presentation Identity")]
+        [SerializeField] private WeaponReticleStyle reticleStyle =
+            WeaponReticleStyle.PrecisionCross;
+        [SerializeField] private Color reticleColor =
+            new Color(0.2f, 0.9f, 1f, 1f);
+        [SerializeField, Min(0f)] private float reticleBaseGapPixels = 4f;
+        [SerializeField, Min(1f)] private float reticleArmLengthPixels = 12f;
+        [SerializeField, Min(0f)] private float reticleShotExpansionPixels = 7f;
+        [SerializeField, Min(0.01f)] private float reticleRecoverySharpness = 18f;
+        [SerializeField] private Color authoredMuzzleFlashColor =
+            new Color(0.3f, 0.85f, 1f, 1f);
+        [SerializeField, Min(0f)] private float authoredMuzzleFlashIntensity = 7f;
+        [SerializeField, Min(0.01f)] private float authoredMuzzleFlashDuration = 0.065f;
+        [SerializeField, Min(0f)] private float visualRecoilDistance = 0.018f;
+        [SerializeField, Min(0f)] private float visualRecoilDegrees = 1.5f;
+
         public string WeaponId => weaponId;
         public string DisplayName => displayName;
         public WeaponClass WeaponClass => weaponClass;
@@ -103,6 +125,21 @@ namespace Powersuit.Combat
         public float ScopedLookSensitivityMultiplier =>
             scopedLookSensitivityMultiplier;
         public float AimTransitionSharpness => aimTransitionSharpness;
+        public WeaponReticleStyle ReticleStyle => reticleStyle;
+        public Color ReticleColor => reticleColor;
+        public float ReticleBaseGapPixels => Mathf.Max(0f, reticleBaseGapPixels);
+        public float ReticleArmLengthPixels => Mathf.Max(1f, reticleArmLengthPixels);
+        public float ReticleShotExpansionPixels =>
+            Mathf.Max(0f, reticleShotExpansionPixels);
+        public float ReticleRecoverySharpness =>
+            Mathf.Max(0.01f, reticleRecoverySharpness);
+        public Color MuzzleFlashColor => authoredMuzzleFlashColor;
+        public float MuzzleFlashIntensity =>
+            Mathf.Max(0f, authoredMuzzleFlashIntensity);
+        public float MuzzleFlashDuration =>
+            Mathf.Max(0.01f, authoredMuzzleFlashDuration);
+        public float VisualRecoilDistance => Mathf.Max(0f, visualRecoilDistance);
+        public float VisualRecoilDegrees => Mathf.Max(0f, visualRecoilDegrees);
 
         public WeaponRuntimeConfig CreateRuntimeConfig()
         {

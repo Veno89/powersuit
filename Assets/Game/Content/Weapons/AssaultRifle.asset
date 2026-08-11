@@ -44,3 +44,14 @@ MonoBehaviour:
   shoulderLookSensitivityMultiplier: 0.95
   scopedLookSensitivityMultiplier: 0.45
   aimTransitionSharpness: 22
+  reticleStyle: 1
+  reticleColor: {r: 1, g: 0.58, b: 0.14, a: 1}
+  reticleBaseGapPixels: 7
+  reticleArmLengthPixels: 9
+  reticleShotExpansionPixels: 10
+  reticleRecoverySharpness: 16
+  authoredMuzzleFlashColor: {r: 1, g: 0.42, b: 0.08, a: 1}
+  authoredMuzzleFlashIntensity: 10
+  authoredMuzzleFlashDuration: 0.045
+  visualRecoilDistance: 0.035
+  visualRecoilDegrees: 2.8

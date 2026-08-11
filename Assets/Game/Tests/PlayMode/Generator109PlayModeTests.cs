@@ -132,6 +132,7 @@ namespace Powersuit.Tests.PlayMode
 
             Animator animator = player.GetComponentInChildren<Animator>(true);
             Assert.That(animator, Is.Not.Null);
+
             int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
             animator.Play("Aim Locomotion", baseLayerIndex, 0f);
             animator.Update(0.1f);
@@ -959,6 +960,13 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(weapon, Is.Not.Null);
             Assert.That(animator, Is.Not.Null);
 
+            MethodInfo setCursorLocked = controller.GetType().GetMethod(
+                "SetCursorLocked",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            Assert.That(setCursorLocked, Is.Not.Null);
+            setCursorLocked.Invoke(controller, new object[] { true });
+
             int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
             int forwardPoseLayerIndex = RequireLayerIndex(
                 animator,
@@ -1078,6 +1086,7 @@ namespace Powersuit.Tests.PlayMode
                 Quaternion.Euler(0f, -55f, 0f) * cameraHeading,
                 Vector3.up
             );
+            setCursorLocked.Invoke(controller, new object[] { true });
 
             float midpointDeadline = Time.realtimeSinceStartup + 0.75f;
             while (Time.realtimeSinceStartup < midpointDeadline)
@@ -1372,10 +1381,18 @@ namespace Powersuit.Tests.PlayMode
             Component loadout = player.GetComponent("PowerSuitWeaponLoadout");
             Component controller = player.GetComponent("PowerSuitController");
             Component scopeSight = player.GetComponent("PowerSuitScopeSight");
+            Component presentation = player.GetComponent(
+                "PowerSuitWeaponPresentation"
+            );
+            Component weaponVisuals = player.GetComponent(
+                "PowerSuitWeaponVisualController"
+            );
             Assert.That(weapon, Is.Not.Null);
             Assert.That(loadout, Is.Not.Null);
             Assert.That(controller, Is.Not.Null);
             Assert.That(scopeSight, Is.Not.Null);
+            Assert.That(presentation, Is.Not.Null);
+            Assert.That(weaponVisuals, Is.Not.Null);
             Assert.That(GetIntProperty(loadout, "SlotCount"), Is.EqualTo(2));
             Assert.That(GetIntProperty(loadout, "EquippedIndex"), Is.EqualTo(0));
             Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Precision Rifle"));
@@ -1389,9 +1406,35 @@ namespace Powersuit.Tests.PlayMode
             object switchResult = loadout.GetType().GetMethod("RequestSlot")
                 ?.Invoke(loadout, new object[] { 1 });
             Assert.That(switchResult?.ToString(), Is.EqualTo("Queued"));
-            yield return null;
+            Assert.That(
+                loadout.GetType().GetProperty("IsSwitching")?.GetValue(loadout),
+                Is.EqualTo(true)
+            );
+
+            bool observedSheathing = false;
+            bool observedDrawing = false;
+            float switchDeadline = Time.realtimeSinceStartup + 4f;
+            while (
+                GetIntProperty(loadout, "EquippedIndex") != 1 ||
+                (bool)loadout.GetType().GetProperty("IsSwitching")
+                    .GetValue(loadout)
+            )
+            {
+                string carryState = presentation.GetType()
+                    .GetProperty("State")?.GetValue(presentation)?.ToString();
+                observedSheathing |= carryState == "Sheathing";
+                observedDrawing |= carryState == "Drawing";
+                Assert.That(
+                    Time.realtimeSinceStartup,
+                    Is.LessThan(switchDeadline),
+                    "The visible sheathe/swap/draw sequence did not finish."
+                );
+                yield return null;
+            }
 
             Assert.That(GetIntProperty(loadout, "EquippedIndex"), Is.EqualTo(1));
+            Assert.That(observedSheathing, Is.True);
+            Assert.That(observedDrawing, Is.True);
             Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Assault Rifle"));
             Assert.That(
                 scopeSight.GetType().GetProperty("IsScopeEligible")
@@ -1411,6 +1454,22 @@ namespace Powersuit.Tests.PlayMode
                 Is.True,
                 "The shared prototype receiver must hide its precision optic when the Assault Rifle is equipped."
             );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("IsAssaultVisualActive")
+                    ?.GetValue(weaponVisuals),
+                Is.EqualTo(true)
+            );
+            Transform assaultFeedbackRoot = weaponVisuals.GetType()
+                .GetProperty("AssaultFeedbackRoot")
+                ?.GetValue(weaponVisuals) as Transform;
+            Assert.That(assaultFeedbackRoot, Is.Not.Null);
+            Renderer[] assaultRenderers = assaultFeedbackRoot.parent
+                .GetComponentsInChildren<Renderer>(true);
+            Assert.That(assaultRenderers.Length, Is.GreaterThanOrEqualTo(12));
+            Assert.That(
+                assaultRenderers.All(renderer => renderer.enabled),
+                Is.True
+            );
 
             object fireResult = weapon.GetType().GetMethod("TryFireWeapon")
                 ?.Invoke(weapon, null);
@@ -1422,10 +1481,33 @@ namespace Powersuit.Tests.PlayMode
                 GetIntProperty(weapon, "CurrentMagazineAmmo"),
                 Is.EqualTo(29)
             );
+            Assert.That(
+                weapon.GetType().GetProperty("CurrentReticleStyle")
+                    ?.GetValue(weapon)?.ToString(),
+                Is.EqualTo("AssaultDynamic")
+            );
+            Assert.That(
+                (float)weaponVisuals.GetType().GetProperty("RecoilAmount")
+                    .GetValue(weaponVisuals),
+                Is.GreaterThan(0f),
+                "An accepted automatic-rifle shot must kick its visible receiver."
+            );
 
             loadout.GetType().GetMethod("RequestSlot")
                 ?.Invoke(loadout, new object[] { 0 });
-            yield return null;
+            switchDeadline = Time.realtimeSinceStartup + 4f;
+            while (
+                GetIntProperty(loadout, "EquippedIndex") != 0 ||
+                (bool)loadout.GetType().GetProperty("IsSwitching")
+                    .GetValue(loadout)
+            )
+            {
+                Assert.That(
+                    Time.realtimeSinceStartup,
+                    Is.LessThan(switchDeadline)
+                );
+                yield return null;
+            }
             Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Precision Rifle"));
             Assert.That(
                 GetIntProperty(weapon, "CurrentMagazineAmmo"),
@@ -1442,10 +1524,31 @@ namespace Powersuit.Tests.PlayMode
                 Is.True,
                 "Returning to the Precision Rifle must restore the authored optic renderers."
             );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("IsAssaultVisualActive")
+                    ?.GetValue(weaponVisuals),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                assaultRenderers.All(renderer => !renderer.enabled),
+                Is.True
+            );
 
             loadout.GetType().GetMethod("RequestSlot")
                 ?.Invoke(loadout, new object[] { 1 });
-            yield return null;
+            switchDeadline = Time.realtimeSinceStartup + 4f;
+            while (
+                GetIntProperty(loadout, "EquippedIndex") != 1 ||
+                (bool)loadout.GetType().GetProperty("IsSwitching")
+                    .GetValue(loadout)
+            )
+            {
+                Assert.That(
+                    Time.realtimeSinceStartup,
+                    Is.LessThan(switchDeadline)
+                );
+                yield return null;
+            }
             Assert.That(
                 GetIntProperty(weapon, "CurrentMagazineAmmo"),
                 Is.EqualTo(29),

@@ -11,7 +11,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | C — Flight feel | Implemented with hold-to-flight/touchdown | State/adapter tests and smoke pass | Jump/flight timing, hover, boost, landing and frame-rate feel review |
 | D — Camera and aiming | Implemented profiles and true scope | Camera/source validation passes | Fit/1x framing, close cover and scope feel review |
 | E — Animation integration | Generator114 24-clip directional powered-gait set implemented | 2D controller/prefab and 35-render source validation pass | Owner feel, retargeting and replacement character |
-| F — Weapon loadout | Precision + Assault implemented | Runtime/switching/presentation/pooling tests pass | Weapon distinction and combat tuning review |
+| F — Weapon loadout | Precision + visually distinct Assault implemented | Runtime/switching/presentation/pooling tests pass | Weapon distinction and combat tuning review |
 | G — Three abilities | Implemented | State, targeting and adapter tests pass | Combat tuning and presentation review |
 | H — Enemy architecture | Implemented with six archetypes | Runtime/adapter/content tests pass | Archetype readability and fair-combat review |
 | I — SpawnDirector | Implemented | Deterministic planner/director tests pass | Encounter pacing review and stress tuning |
@@ -52,8 +52,10 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Integrate ready/stowed carry, draw/sheathe, directional locomotion, aim-walk, flight, reload, and additive bolt action through the generated four-layer controller.
 - [x] Keep rifle authority in C#: finite ammo, cadence, criticals, timed manual/empty-magazine automatic reload, physical projectile, bolt gate, death/reset, and action priorities.
 - [x] Keep the rifle forward for accepted hip-fire and flight-fire staging instead of leaving it diagonally across the chest.
-- [x] Add a fixed, data-driven two-slot loadout with independent ammunition/cadence state, safe reload/cycle cancellation, respawn reset, transition-aware switching, and centralized `1`/`2`/wheel/gamepad input.
-- [x] Add a 720 RPM, 30-round Assault Rifle definition with automatic fire, distinct damage/spread/recoil/aim tuning, 48-projectile prewarm, auto-reload, and Precision-Rifle-only scope enforcement. The current receiver mesh is shared and hides its optic outside the precision slot.
+- [x] Add a fixed, data-driven two-slot loadout with independent ammunition/cadence state, safe reload/cycle cancellation, respawn reset, and centralized `1`/`2`/wheel/gamepad input. Visible switching sheathes the current weapon, commits the receiver swap while hidden, and draws the selected weapon; the newest request remains queued through carry transitions.
+- [x] Add a 720 RPM, 30-round Assault Rifle definition with automatic fire, distinct damage/spread/recoil/aim tuning, 48-projectile prewarm, auto-reload, and Precision-Rifle-only scope enforcement.
+- [x] Generate a distinct scope-free 16-piece Assault Rifle receiver using three shared materials and no colliders; toggle it against the precision receiver without moving the rig-owned gameplay hardpoints.
+- [x] Add data-driven presentation identity: a dynamic orange automatic-fire reticle, warm muzzle flash, stronger presentation-only receiver kick, and weapon-specific reticle recovery while retaining pooled projectile/tracer authority.
 
 ### G — Combat abilities
 
@@ -91,7 +93,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
 - [x] Full Unity EditMode suite: 254/254 passed.
-- [x] Full Unity PlayMode suite: 13/13 passed.
+- [x] Full Unity PlayMode suite: 13/13 passed, including the real sheathe/swap/draw sequence, independent magazines, generated receiver visibility, assault reticle/recoil identity, and scope restoration.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
 - [x] Generator114 source validation: 24 animation clips, contract version 5, and 35 mandatory renders; exact FBX hash matches Unity and all six lateral clips import into cardinal 2D blends.
 - [x] Generated controller/run state, additive bolt clip, scope presenter, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.
@@ -108,7 +110,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [ ] Owner acceptance at **Game view Fit/1x** for camera framing and perceived zoom. A saved local `2x`/`4x` or panned Game view is not a gameplay camera setting.
 - [ ] Ground matrix: walk/sprint responsiveness and cadence, reverse/backpedal, diagonal movement, jump buffer/coyote behavior, slopes, steps, walls, landing recovery, and rapid direction changes.
 - [ ] Flight matrix: quick-tap jump versus roughly 0.9-second hold-to-flight, automatic touchdown, hover, ascend/descend, braking, boost, banking, terrain proximity, and rapid ground/flight transitions.
-- [ ] Combat matrix on ground and in flight: shoulder aim, Precision-Rifle-only RMB + `V` scope, scope readability/reticle alignment, hip fire, reload, bolt cycle, draw/stow, rocket, lightning target/cancel/cast, void cast, and conflicting-input priority.
+- [ ] Combat matrix on ground and in flight: visible Precision/Assault switching, distinct receiver/reticle/automatic-fire readability, shoulder aim, Precision-Rifle-only RMB + `V` scope, scope readability/reticle alignment, hip fire, reload, bolt cycle, draw/stow, rocket, lightning target/cancel/cast, void cast, and conflicting-input priority.
 - [ ] Camera matrix: exploration/shoulder/flight/boost/target/scope transitions, close cover, vertical aim, recoil, and keeping player/weapon readable.
 - [ ] Encounter feel: six archetypes are distinguishable and fair; spawn pacing, telegraphs, threat mix, damage, cooldowns, meter gain, and readability suit the intended loop.
 - [ ] Connected Unity Profiler/Frame Debugger or graphics capture for render thread, draw calls, and GPU time; the Development Player backend did not expose usable automated draw/GPU counters. Also record uncapped headroom and representative target hardware.
@@ -121,7 +123,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 
 1. Set Game view to Fit/1x and start `PoweredSuitAimDemo`.
 2. Move through the central zone, hold `Shift` to sprint, tap `Space` for a normal jump, then hold an accepted jump for about 0.9 seconds to enter flight; boost into the open zone and touch down again.
-3. Switch with `1`/`2` or the wheel; verify each magazine persists, hold fire with the Assault Rifle, then test shoulder aim and RMB + `V` with the Precision Rifle on ground and in flight. Confirm the Assault Rifle cannot scope, then fire, cycle, reload, stow/draw, and check sight and close-cover framing.
+3. Switch with `1`/`2` or the wheel; verify the old weapon sheathes, its receiver swaps while hidden, and the new weapon draws. Confirm each magazine persists and the Assault Rifle shows its compact scope-free receiver, orange dynamic reticle, automatic muzzle cadence, and visual kick. Then test shoulder aim and RMB + `V` with the Precision Rifle on ground and in flight, confirm the Assault Rifle cannot scope, and check firing, cycling, reloading, stow/draw, sight, and close-cover framing.
 4. Use rocket, hold/release lightning, and charge/cast void against mixed enemy groups.
 5. Open the console and use `showstats on`, `pools`, `projectiles`, `enemies`, `spawn.list`, and controlled `spawn`/`despawnall`/`seed` commands.
 6. Record specific feel issues separately from automated correctness failures; use the tuning commands to establish candidate values before changing authored defaults.

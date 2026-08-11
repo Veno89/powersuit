@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Powersuit.Combat;
 using UnityEngine;
 
@@ -80,6 +81,10 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private int fallbackInputFrame = -1;
     private PowerSuitInputSnapshot fallbackInputSnapshot;
     private GameObject fallbackProjectileTemplate;
+    private float reticleShotExpansion;
+    private readonly List<ParticleSystem> muzzleParticleBuffer =
+        new List<ParticleSystem>(8);
+    private readonly List<Light> muzzleLightBuffer = new List<Light>(4);
 
     public Transform MuzzleTransform
     {
@@ -147,6 +152,12 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         get => showLegacyAmmoHud;
         set => showLegacyAmmoHud = value;
     }
+    public WeaponReticleStyle CurrentReticleStyle =>
+        weaponDefinition != null
+            ? weaponDefinition.ReticleStyle
+            : WeaponReticleStyle.PrecisionCross;
+    public float CurrentReticleGapPixels =>
+        ResolveReticleBaseGap() + reticleShotExpansion;
 
     /// <summary>
     /// Sets the player weapon's outgoing damage multiplier. NaN preserves the
@@ -302,6 +313,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         activeConfiguration = runtimeState.Configuration;
         AttachRuntimeEvents();
         RaiseAmmunitionChanged();
+        reticleShotExpansion = 0f;
+        ApplyMuzzleFlashProfile();
 
         if (scopeSight == null)
         {
@@ -351,6 +364,18 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private void Update()
     {
         runtimeState?.Advance(Time.deltaTime);
+
+        if (reticleShotExpansion > 0f)
+        {
+            float sharpness = weaponDefinition != null
+                ? weaponDefinition.ReticleRecoverySharpness
+                : 18f;
+            reticleShotExpansion *= Mathf.Exp(-sharpness * Time.deltaTime);
+            if (reticleShotExpansion < 0.01f)
+            {
+                reticleShotExpansion = 0f;
+            }
+        }
 
         if (IsReloadPressed())
         {
@@ -449,6 +474,13 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
         controller?.FaceCameraForWeaponFire();
         FireProjectileAndFeedback(result);
+        if (weaponDefinition != null)
+        {
+            reticleShotExpansion = Mathf.Max(
+                reticleShotExpansion,
+                weaponDefinition.ReticleShotExpansionPixels
+            );
+        }
         ShotAccepted?.Invoke(result);
         return result;
     }
@@ -801,13 +833,15 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             {
                 flashObj.transform.SetParent(muzzleTransform, true);
             }
+            ApplyMuzzleFlashColor(flashObj);
         }
 
         if (muzzleFlashLight != null)
         {
             muzzleFlashLight.transform.position = position;
+            ApplyMuzzleFlashProfile();
             muzzleFlashLight.enabled = true;
-            muzzleLightTimer = flashDuration;
+            muzzleLightTimer = ResolveMuzzleFlashDuration();
         }
     }
 
@@ -833,6 +867,56 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             muzzleFlashLight.intensity = flashLightIntensity;
             muzzleFlashLight.enabled = false;
         }
+
+        ApplyMuzzleFlashProfile();
+    }
+
+    private void ApplyMuzzleFlashProfile()
+    {
+        if (muzzleFlashLight == null)
+        {
+            return;
+        }
+
+        muzzleFlashLight.color = weaponDefinition != null
+            ? weaponDefinition.MuzzleFlashColor
+            : muzzleFlashColor;
+        muzzleFlashLight.intensity = weaponDefinition != null
+            ? weaponDefinition.MuzzleFlashIntensity
+            : flashLightIntensity;
+    }
+
+    private void ApplyMuzzleFlashColor(GameObject flashObject)
+    {
+        if (flashObject == null)
+        {
+            return;
+        }
+
+        Color color = weaponDefinition != null
+            ? weaponDefinition.MuzzleFlashColor
+            : muzzleFlashColor;
+        muzzleParticleBuffer.Clear();
+        flashObject.GetComponentsInChildren(true, muzzleParticleBuffer);
+        for (int index = 0; index < muzzleParticleBuffer.Count; index++)
+        {
+            ParticleSystem.MainModule main = muzzleParticleBuffer[index].main;
+            main.startColor = color;
+        }
+
+        muzzleLightBuffer.Clear();
+        flashObject.GetComponentsInChildren(true, muzzleLightBuffer);
+        for (int index = 0; index < muzzleLightBuffer.Count; index++)
+        {
+            muzzleLightBuffer[index].color = color;
+        }
+    }
+
+    private float ResolveMuzzleFlashDuration()
+    {
+        return weaponDefinition != null
+            ? weaponDefinition.MuzzleFlashDuration
+            : Mathf.Max(0.01f, flashDuration);
     }
 
     private void PlayFireAudio()
@@ -1014,55 +1098,85 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         float guiY = Screen.height - reticlePos.y;
 
         Color savedColor = GUI.color;
-        GUI.color = isAiming ? aimingReticleColor : normalCrosshairColor;
-
-        if (isAiming)
-        {
-            const float size = 12f;
-            const float thickness = 2f;
-            const float gap = 4f;
-
-            GUI.DrawTexture(
-                new Rect(guiX - thickness * 0.5f, guiY - gap - size, thickness, size),
-                Texture2D.whiteTexture
-            );
-            GUI.DrawTexture(
-                new Rect(guiX - thickness * 0.5f, guiY + gap, thickness, size),
-                Texture2D.whiteTexture
-            );
-            GUI.DrawTexture(
-                new Rect(guiX - gap - size, guiY - thickness * 0.5f, size, thickness),
-                Texture2D.whiteTexture
-            );
-            GUI.DrawTexture(
-                new Rect(guiX + gap, guiY - thickness * 0.5f, size, thickness),
-                Texture2D.whiteTexture
-            );
-            GUI.DrawTexture(
-                new Rect(guiX - 1.5f, guiY - 1.5f, 3f, 3f),
-                Texture2D.whiteTexture
-            );
-        }
-        else
-        {
-            const float size = 8f;
-            const float thickness = 2f;
-
-            GUI.DrawTexture(
-                new Rect(guiX - size, guiY - thickness * 0.5f, size * 2f, thickness),
-                Texture2D.whiteTexture
-            );
-            GUI.DrawTexture(
-                new Rect(guiX - thickness * 0.5f, guiY - size, thickness, size * 2f),
-                Texture2D.whiteTexture
-            );
-        }
+        GUI.color = ResolveReticleColor(isAiming);
+        DrawWeaponReticle(guiX, guiY, isAiming);
 
         GUI.color = savedColor;
         if (showLegacyAmmoHud)
         {
             DrawAmmoHud();
         }
+    }
+
+    private void DrawWeaponReticle(float guiX, float guiY, bool isAiming)
+    {
+        float thickness = CurrentReticleStyle == WeaponReticleStyle.AssaultDynamic
+            ? 2.5f
+            : 2f;
+        float armLength = weaponDefinition != null
+            ? weaponDefinition.ReticleArmLengthPixels
+            : (isAiming ? 12f : 8f);
+        float gap = CurrentReticleGapPixels;
+
+        GUI.DrawTexture(
+            new Rect(
+                guiX - thickness * 0.5f,
+                guiY - gap - armLength,
+                thickness,
+                armLength
+            ),
+            Texture2D.whiteTexture
+        );
+        GUI.DrawTexture(
+            new Rect(guiX - thickness * 0.5f, guiY + gap, thickness, armLength),
+            Texture2D.whiteTexture
+        );
+        GUI.DrawTexture(
+            new Rect(
+                guiX - gap - armLength,
+                guiY - thickness * 0.5f,
+                armLength,
+                thickness
+            ),
+            Texture2D.whiteTexture
+        );
+        GUI.DrawTexture(
+            new Rect(guiX + gap, guiY - thickness * 0.5f, armLength, thickness),
+            Texture2D.whiteTexture
+        );
+
+        float centerSize = CurrentReticleStyle == WeaponReticleStyle.AssaultDynamic
+            ? 2f
+            : 3f;
+        GUI.DrawTexture(
+            new Rect(
+                guiX - centerSize * 0.5f,
+                guiY - centerSize * 0.5f,
+                centerSize,
+                centerSize
+            ),
+            Texture2D.whiteTexture
+        );
+    }
+
+    private float ResolveReticleBaseGap()
+    {
+        if (weaponDefinition != null)
+        {
+            return weaponDefinition.ReticleBaseGapPixels;
+        }
+
+        return controller != null && controller.IsAiming ? 4f : 0f;
+    }
+
+    private Color ResolveReticleColor(bool isAiming)
+    {
+        if (weaponDefinition != null)
+        {
+            return weaponDefinition.ReticleColor;
+        }
+
+        return isAiming ? aimingReticleColor : normalCrosshairColor;
     }
 
     private void DrawAmmoHud()

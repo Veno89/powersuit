@@ -77,6 +77,26 @@ namespace Powersuit.Tests.EditMode
                 asset.GetType().GetProperty("ProjectilePrewarmCount")?.GetValue(asset),
                 Is.EqualTo(48)
             );
+            Assert.That(
+                asset.GetType().GetProperty("ReticleStyle")?.GetValue(asset)
+                    ?.ToString(),
+                Is.EqualTo("AssaultDynamic")
+            );
+            Assert.That(
+                asset.GetType().GetProperty("ReticleBaseGapPixels")
+                    ?.GetValue(asset),
+                Is.EqualTo(7f).Within(0.001f)
+            );
+            Assert.That(
+                asset.GetType().GetProperty("MuzzleFlashIntensity")
+                    ?.GetValue(asset),
+                Is.EqualTo(10f).Within(0.001f)
+            );
+            Assert.That(
+                asset.GetType().GetProperty("VisualRecoilDistance")
+                    ?.GetValue(asset),
+                Is.EqualTo(0.035f).Within(0.001f)
+            );
         }
 
         [Test]

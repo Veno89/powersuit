@@ -666,6 +666,60 @@ namespace Powersuit.Tests.EditMode
                     ?.GetValue(assaultDefinition),
                 Is.EqualTo(false)
             );
+            Component weaponVisuals = player.GetComponent(
+                "PowerSuitWeaponVisualController"
+            );
+            Assert.That(weaponVisuals, Is.Not.Null);
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("PrecisionRendererCount")
+                    ?.GetValue(weaponVisuals),
+                Is.GreaterThan(0)
+            );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("AssaultRendererCount")
+                    ?.GetValue(weaponVisuals),
+                Is.GreaterThanOrEqualTo(12)
+            );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("AssaultFeedbackRoot")
+                    ?.GetValue(weaponVisuals),
+                Is.Not.Null
+            );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("IsAssaultVisualActive")
+                    ?.GetValue(weaponVisuals),
+                Is.EqualTo(false)
+            );
+            GameObject assaultVisual = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Game/Prefab/Weapons/AssaultRifleVisual.prefab"
+            );
+            Assert.That(assaultVisual, Is.Not.Null);
+            Renderer[] assaultVisualRenderers =
+                assaultVisual.GetComponentsInChildren<Renderer>(true);
+            Assert.That(assaultVisualRenderers.Length, Is.GreaterThanOrEqualTo(12));
+            Assert.That(
+                assaultVisualRenderers.Select(renderer => renderer.sharedMaterial)
+                    .Where(material => material != null)
+                    .Distinct()
+                    .Count(),
+                Is.GreaterThanOrEqualTo(3),
+                "The Assault Rifle must retain body, armor, and emissive identity materials."
+            );
+            Assert.That(
+                assaultVisualRenderers.Any(renderer =>
+                    renderer.name.IndexOf(
+                        "Scope",
+                        StringComparison.OrdinalIgnoreCase
+                    ) >= 0
+                ),
+                Is.False,
+                "The automatic rifle receiver must be authored without a scope."
+            );
+            Assert.That(
+                assaultVisual.GetComponentsInChildren<Collider>(true),
+                Is.Empty,
+                "The presentation-only receiver must not alter weapon/player collision."
+            );
             object definition = weapon.GetType()
                 .GetProperty("Definition")
                 ?.GetValue(weapon);

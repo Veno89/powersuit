@@ -57,6 +57,17 @@ namespace Powersuit.Editor
         public const string AssaultRifleDefinitionPath =
             "Assets/Game/Content/Weapons/AssaultRifle.asset";
 
+        public const string AssaultRifleVisualPrefabPath =
+            "Assets/Game/Prefab/Weapons/AssaultRifleVisual.prefab";
+        private const string WeaponMaterialFolder =
+            "Assets/Game/Content/Weapons/Materials";
+        private const string AssaultRifleBodyMaterialPath =
+            WeaponMaterialFolder + "/AssaultRifleBody.mat";
+        private const string AssaultRifleArmorMaterialPath =
+            WeaponMaterialFolder + "/AssaultRifleArmor.mat";
+        private const string AssaultRifleAccentMaterialPath =
+            WeaponMaterialFolder + "/AssaultRifleAccent.mat";
+
         private const string AbilityPrefabFolder =
             "Assets/Game/Prefab/Abilities";
         private const string RocketPrefabPath =
@@ -220,6 +231,7 @@ namespace Powersuit.Editor
 
             ConfigurePrecisionRifleDefinition(overwriteExisting: false);
             ConfigureAssaultRifleDefinition(overwriteExisting: false);
+            ConfigureWeaponPresentationIdentity();
             ConfigureModelImporter();
             Dictionary<string, AnimationClip> clips = LoadRequiredClips();
             AnimatorController controller = UpdateAnimatorController(clips);
@@ -241,10 +253,13 @@ namespace Powersuit.Editor
                 PowerSuitDemoEnemyContentGenerator.GeneratedContent
                     enemyContent =
                         PowerSuitDemoEnemyContentGenerator.Generate();
+                GameObject assaultRifleVisual =
+                    CreateOrUpdateAssaultRifleVisualPrefab();
                 GameObject variant = CreatePlayerVariant(
                     controller,
                     abilityPrefabs,
-                    enemyContent.CombatSandboxPrefab
+                    enemyContent.CombatSandboxPrefab,
+                    assaultRifleVisual
                 );
                 if (sceneHandling == DemoSceneHandling.CreateAndPopulate)
                 {
@@ -481,6 +496,25 @@ namespace Powersuit.Editor
                 0.45f
             );
             SetFloat(serialized, "aimTransitionSharpness", 22f);
+            SetEnum(serialized, "reticleStyle", 0); // PrecisionCross
+            SetColor(
+                serialized,
+                "reticleColor",
+                new Color(0.2f, 0.9f, 1f, 1f)
+            );
+            SetFloat(serialized, "reticleBaseGapPixels", 4f);
+            SetFloat(serialized, "reticleArmLengthPixels", 12f);
+            SetFloat(serialized, "reticleShotExpansionPixels", 7f);
+            SetFloat(serialized, "reticleRecoverySharpness", 18f);
+            SetColor(
+                serialized,
+                "authoredMuzzleFlashColor",
+                new Color(0.3f, 0.85f, 1f, 1f)
+            );
+            SetFloat(serialized, "authoredMuzzleFlashIntensity", 7f);
+            SetFloat(serialized, "authoredMuzzleFlashDuration", 0.065f);
+            SetFloat(serialized, "visualRecoilDistance", 0.018f);
+            SetFloat(serialized, "visualRecoilDegrees", 1.5f);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
             AssetDatabase.SaveAssetIfDirty(definition);
@@ -545,6 +579,116 @@ namespace Powersuit.Editor
                 0.45f
             );
             SetFloat(serialized, "aimTransitionSharpness", 22f);
+            SetEnum(serialized, "reticleStyle", 1); // AssaultDynamic
+            SetColor(
+                serialized,
+                "reticleColor",
+                new Color(1f, 0.58f, 0.14f, 1f)
+            );
+            SetFloat(serialized, "reticleBaseGapPixels", 7f);
+            SetFloat(serialized, "reticleArmLengthPixels", 9f);
+            SetFloat(serialized, "reticleShotExpansionPixels", 10f);
+            SetFloat(serialized, "reticleRecoverySharpness", 16f);
+            SetColor(
+                serialized,
+                "authoredMuzzleFlashColor",
+                new Color(1f, 0.42f, 0.08f, 1f)
+            );
+            SetFloat(serialized, "authoredMuzzleFlashIntensity", 10f);
+            SetFloat(serialized, "authoredMuzzleFlashDuration", 0.045f);
+            SetFloat(serialized, "visualRecoilDistance", 0.035f);
+            SetFloat(serialized, "visualRecoilDegrees", 2.8f);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(definition);
+            AssetDatabase.SaveAssetIfDirty(definition);
+        }
+
+        private static void ConfigureWeaponPresentationIdentity()
+        {
+            WeaponDefinition precision =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    PrecisionRifleDefinitionPath
+                );
+            WeaponDefinition assault =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    AssaultRifleDefinitionPath
+                );
+            if (precision == null || assault == null)
+            {
+                throw new InvalidOperationException(
+                    "Weapon presentation migration requires both loadout definitions."
+                );
+            }
+
+            ConfigureWeaponPresentationIdentity(
+                precision,
+                WeaponReticleStyle.PrecisionCross,
+                new Color(0.2f, 0.9f, 1f, 1f),
+                reticleGap: 4f,
+                reticleArm: 12f,
+                shotExpansion: 7f,
+                recoverySharpness: 18f,
+                muzzleColor: new Color(0.3f, 0.85f, 1f, 1f),
+                muzzleIntensity: 7f,
+                muzzleDuration: 0.065f,
+                recoilDistance: 0.018f,
+                recoilDegrees: 1.5f
+            );
+            ConfigureWeaponPresentationIdentity(
+                assault,
+                WeaponReticleStyle.AssaultDynamic,
+                new Color(1f, 0.58f, 0.14f, 1f),
+                reticleGap: 7f,
+                reticleArm: 9f,
+                shotExpansion: 10f,
+                recoverySharpness: 16f,
+                muzzleColor: new Color(1f, 0.42f, 0.08f, 1f),
+                muzzleIntensity: 10f,
+                muzzleDuration: 0.045f,
+                recoilDistance: 0.035f,
+                recoilDegrees: 2.8f
+            );
+        }
+
+        private static void ConfigureWeaponPresentationIdentity(
+            WeaponDefinition definition,
+            WeaponReticleStyle reticleStyle,
+            Color reticleColor,
+            float reticleGap,
+            float reticleArm,
+            float shotExpansion,
+            float recoverySharpness,
+            Color muzzleColor,
+            float muzzleIntensity,
+            float muzzleDuration,
+            float recoilDistance,
+            float recoilDegrees
+        )
+        {
+            SerializedObject serialized = new SerializedObject(definition);
+            SetEnum(serialized, "reticleStyle", (int)reticleStyle);
+            SetColor(serialized, "reticleColor", reticleColor);
+            SetFloat(serialized, "reticleBaseGapPixels", reticleGap);
+            SetFloat(serialized, "reticleArmLengthPixels", reticleArm);
+            SetFloat(serialized, "reticleShotExpansionPixels", shotExpansion);
+            SetFloat(
+                serialized,
+                "reticleRecoverySharpness",
+                recoverySharpness
+            );
+            SetColor(serialized, "authoredMuzzleFlashColor", muzzleColor);
+            SetFloat(
+                serialized,
+                "authoredMuzzleFlashIntensity",
+                muzzleIntensity
+            );
+            SetFloat(
+                serialized,
+                "authoredMuzzleFlashDuration",
+                muzzleDuration
+            );
+            SetFloat(serialized, "visualRecoilDistance", recoilDistance);
+            SetFloat(serialized, "visualRecoilDegrees", recoilDegrees);
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
             AssetDatabase.SaveAssetIfDirty(definition);
@@ -1470,10 +1614,266 @@ namespace Powersuit.Editor
             }
         }
 
+        private static GameObject CreateOrUpdateAssaultRifleVisualPrefab()
+        {
+            EnsureAssetFolder(WeaponMaterialFolder);
+            EnsureAssetFolder("Assets/Game/Prefab/Weapons");
+
+            Material body = CreateOrUpdateWeaponMaterial(
+                AssaultRifleBodyMaterialPath,
+                new Color(0.035f, 0.055f, 0.075f, 1f),
+                metallic: 0.72f,
+                emission: false
+            );
+            Material armor = CreateOrUpdateWeaponMaterial(
+                AssaultRifleArmorMaterialPath,
+                new Color(0.17f, 0.21f, 0.24f, 1f),
+                metallic: 0.58f,
+                emission: false
+            );
+            Material accent = CreateOrUpdateWeaponMaterial(
+                AssaultRifleAccentMaterialPath,
+                new Color(1f, 0.28f, 0.035f, 1f),
+                metallic: 0.2f,
+                emission: true
+            );
+
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
+            try
+            {
+                GameObject root = new GameObject("AssaultRifleVisual");
+                SceneManager.MoveGameObjectToScene(root, previewScene);
+                GameObject feedbackRoot = new GameObject(
+                    "AssaultRifleFeedbackRoot"
+                );
+                feedbackRoot.transform.SetParent(root.transform, false);
+
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "Stock",
+                    new Vector3(0f, 0.005f, 0.105f),
+                    new Vector3(0.18f, 0.19f, 0.25f),
+                    Quaternion.identity, body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "StockShoulderPad",
+                    new Vector3(0f, 0.005f, 0.005f),
+                    new Vector3(0.205f, 0.23f, 0.045f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "Receiver",
+                    new Vector3(0f, 0.025f, 0.36f),
+                    new Vector3(0.205f, 0.205f, 0.34f),
+                    Quaternion.identity, body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "ReceiverArmor",
+                    new Vector3(0f, 0.12f, 0.37f),
+                    new Vector3(0.17f, 0.065f, 0.31f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "Handguard",
+                    new Vector3(0f, 0.025f, 0.64f),
+                    new Vector3(0.165f, 0.16f, 0.25f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cylinder, "Barrel",
+                    new Vector3(0f, 0.045f, 0.855f),
+                    new Vector3(0.032f, 0.115f, 0.032f),
+                    Quaternion.Euler(90f, 0f, 0f), body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cylinder,
+                    "MuzzleBrake",
+                    new Vector3(0f, 0.045f, 0.98f),
+                    new Vector3(0.06f, 0.045f, 0.06f),
+                    Quaternion.Euler(90f, 0f, 0f), armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "PistolGrip",
+                    new Vector3(0f, -0.145f, 0.34f),
+                    new Vector3(0.085f, 0.235f, 0.09f),
+                    Quaternion.Euler(-12f, 0f, 0f), body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "Magazine",
+                    new Vector3(0f, -0.16f, 0.485f),
+                    new Vector3(0.11f, 0.255f, 0.12f),
+                    Quaternion.Euler(14f, 0f, 0f), armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "ForwardGrip",
+                    new Vector3(0f, -0.125f, 0.625f),
+                    new Vector3(0.07f, 0.19f, 0.075f),
+                    Quaternion.Euler(-6f, 0f, 0f), body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "TopRail",
+                    new Vector3(0f, 0.17f, 0.49f),
+                    new Vector3(0.105f, 0.035f, 0.48f),
+                    Quaternion.identity, body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "RearIronSight",
+                    new Vector3(0f, 0.215f, 0.285f),
+                    new Vector3(0.085f, 0.075f, 0.035f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "FrontIronSight",
+                    new Vector3(0f, 0.205f, 0.72f),
+                    new Vector3(0.06f, 0.085f, 0.03f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "EnergyCellLeft",
+                    new Vector3(-0.108f, 0.025f, 0.43f),
+                    new Vector3(0.025f, 0.055f, 0.18f),
+                    Quaternion.identity, accent
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "EnergyCellRight",
+                    new Vector3(0.108f, 0.025f, 0.43f),
+                    new Vector3(0.025f, 0.055f, 0.18f),
+                    Quaternion.identity, accent
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube,
+                    "MuzzleAccent",
+                    new Vector3(0f, 0.045f, 0.965f),
+                    new Vector3(0.075f, 0.025f, 0.025f),
+                    Quaternion.identity, accent
+                );
+
+                GameObject saved = PrefabUtility.SaveAsPrefabAsset(
+                    root,
+                    AssaultRifleVisualPrefabPath
+                );
+                if (saved == null)
+                {
+                    throw new InvalidOperationException(
+                        "Could not save the generated Assault Rifle visual prefab."
+                    );
+                }
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(previewScene);
+            }
+
+            return AssetDatabase.LoadAssetAtPath<GameObject>(
+                AssaultRifleVisualPrefabPath
+            );
+        }
+
+        private static Material CreateOrUpdateWeaponMaterial(
+            string path,
+            Color color,
+            float metallic,
+            bool emission
+        )
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit") ??
+                Shader.Find("Standard");
+            if (shader == null)
+            {
+                throw new InvalidOperationException(
+                    "No supported lit shader is available for weapon visuals."
+                );
+            }
+
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null)
+            {
+                material = new Material(shader)
+                {
+                    name = Path.GetFileNameWithoutExtension(path)
+                };
+                AssetDatabase.CreateAsset(material, path);
+            }
+            else
+            {
+                material.shader = shader;
+            }
+
+            material.enableInstancing = true;
+            material.color = color;
+            if (material.HasProperty("_BaseColor"))
+            {
+                material.SetColor("_BaseColor", color);
+            }
+            if (material.HasProperty("_Metallic"))
+            {
+                material.SetFloat("_Metallic", Mathf.Clamp01(metallic));
+            }
+            if (material.HasProperty("_Smoothness"))
+            {
+                material.SetFloat("_Smoothness", emission ? 0.68f : 0.4f);
+            }
+            if (material.HasProperty("_EmissionColor"))
+            {
+                material.SetColor(
+                    "_EmissionColor",
+                    emission ? color * 2.6f : Color.black
+                );
+                material.EnableKeyword("_EMISSION");
+            }
+            EditorUtility.SetDirty(material);
+            AssetDatabase.SaveAssetIfDirty(material);
+            return material;
+        }
+
+        private static GameObject CreateWeaponPrimitive(
+            Transform parent,
+            PrimitiveType primitiveType,
+            string name,
+            Vector3 localPosition,
+            Vector3 localScale,
+            Quaternion localRotation,
+            Material material
+        )
+        {
+            GameObject created = GameObject.CreatePrimitive(primitiveType);
+            created.name = name;
+            SceneManager.MoveGameObjectToScene(
+                created,
+                parent.gameObject.scene
+            );
+            created.transform.SetParent(parent, false);
+            created.transform.localPosition = localPosition;
+            created.transform.localRotation = localRotation;
+            created.transform.localScale = localScale;
+            Renderer renderer = created.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = material;
+                renderer.shadowCastingMode =
+                    UnityEngine.Rendering.ShadowCastingMode.On;
+                renderer.receiveShadows = true;
+            }
+            Collider collider = created.GetComponent<Collider>();
+            if (collider != null)
+            {
+                UnityEngine.Object.DestroyImmediate(collider);
+            }
+            return created;
+        }
+
         private static GameObject CreatePlayerVariant(
             AnimatorController controller,
             AbilityPrefabSet abilityPrefabs,
-            GameObject demoWorldPrefab
+            GameObject demoWorldPrefab,
+            GameObject assaultRifleVisualPrefab
         )
         {
             GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BasePlayerPrefabPath);
@@ -1545,6 +1945,14 @@ namespace Powersuit.Editor
                     modelInstance.transform,
                     "Rifle_SightOcular"
                 );
+                Transform stockContact = FindChildRecursive(
+                    modelInstance.transform,
+                    "Rifle_StockContact"
+                );
+                Transform primaryGrip = FindChildRecursive(
+                    modelInstance.transform,
+                    "Rifle_PrimaryGrip"
+                );
                 Transform shoulder = FindChildRecursive(
                     modelInstance.transform,
                     "Shoulder.R"
@@ -1553,12 +1961,40 @@ namespace Powersuit.Editor
                     muzzle == null ||
                     rifleRoot == null ||
                     sightOcular == null ||
+                    stockContact == null ||
+                    primaryGrip == null ||
                     shoulder == null
                 )
                 {
                     throw new InvalidOperationException(
                         "The imported Generator 111 hierarchy does not expose " +
-                        "RifleRoot/Rifle_Muzzle/Rifle_SightOcular/Shoulder.R."
+                        "the rifle root, muzzle, grip, stock, sight, or shoulder anchors."
+                    );
+                }
+
+                Renderer[] precisionRenderers =
+                    rifleRoot.GetComponentsInChildren<Renderer>(true);
+                GameObject assaultVisualInstance = AttachAssaultRifleVisual(
+                    assaultRifleVisualPrefab,
+                    rifleRoot,
+                    stockContact,
+                    muzzle,
+                    primaryGrip
+                );
+                Transform assaultFeedbackRoot = FindChildRecursive(
+                    assaultVisualInstance.transform,
+                    "AssaultRifleFeedbackRoot"
+                );
+                Renderer[] assaultRenderers =
+                    assaultVisualInstance.GetComponentsInChildren<Renderer>(true);
+                if (
+                    assaultFeedbackRoot == null ||
+                    precisionRenderers.Length == 0 ||
+                    assaultRenderers.Length < 12
+                )
+                {
+                    throw new InvalidOperationException(
+                        "The generated Assault Rifle visual hierarchy is incomplete."
                     );
                 }
 
@@ -1620,6 +2056,20 @@ namespace Powersuit.Editor
                 weaponLoadout.Configure(
                     new[] { weaponDefinition, assaultRifleDefinition },
                     initialSlot: 0
+                );
+                PowerSuitWeaponVisualController weaponVisuals =
+                    instance.GetComponent<PowerSuitWeaponVisualController>();
+                if (weaponVisuals == null)
+                {
+                    weaponVisuals =
+                        instance.AddComponent<PowerSuitWeaponVisualController>();
+                }
+                weaponVisuals.Configure(
+                    weapon,
+                    suitController,
+                    precisionRenderers,
+                    assaultRenderers,
+                    assaultFeedbackRoot
                 );
                 weapon.ShowLegacyAmmoHud = false;
                 SerializedObject weaponFeedback = new SerializedObject(weapon);
@@ -1923,6 +2373,80 @@ namespace Powersuit.Editor
             adapter.transform.localRotation = MuzzleAdapterRotation;
             adapter.transform.localScale = Vector3.one;
             return adapter.transform;
+        }
+
+        private static GameObject AttachAssaultRifleVisual(
+            GameObject visualPrefab,
+            Transform rifleRoot,
+            Transform stockContact,
+            Transform muzzle,
+            Transform primaryGrip
+        )
+        {
+            if (
+                visualPrefab == null ||
+                rifleRoot == null ||
+                stockContact == null ||
+                muzzle == null ||
+                primaryGrip == null
+            )
+            {
+                throw new ArgumentNullException(
+                    nameof(visualPrefab),
+                    "Assault Rifle visual alignment requires every authored hardpoint."
+                );
+            }
+
+            GameObject instance = PrefabUtility.InstantiatePrefab(
+                visualPrefab,
+                rifleRoot
+            ) as GameObject;
+            if (instance == null)
+            {
+                throw new InvalidOperationException(
+                    "Could not instantiate the Assault Rifle visual prefab."
+                );
+            }
+            instance.name = "AssaultRifleVisual";
+
+            Vector3 stockLocal = rifleRoot.InverseTransformPoint(
+                stockContact.position
+            );
+            Vector3 muzzleLocal = rifleRoot.InverseTransformPoint(
+                muzzle.position
+            );
+            Vector3 gripLocal = rifleRoot.InverseTransformPoint(
+                primaryGrip.position
+            );
+            Vector3 forward = muzzleLocal - stockLocal;
+            float length = forward.magnitude;
+            if (length < 0.25f)
+            {
+                throw new InvalidOperationException(
+                    "The imported rifle hardpoints do not define a usable length."
+                );
+            }
+            forward /= length;
+
+            Vector3 gripOffset = Vector3.ProjectOnPlane(
+                gripLocal - stockLocal,
+                forward
+            );
+            Vector3 up = gripOffset.sqrMagnitude > 0.000001f
+                ? -gripOffset.normalized
+                : Vector3.up;
+            if (Mathf.Abs(Vector3.Dot(up, forward)) > 0.98f)
+            {
+                up = Vector3.up;
+            }
+
+            instance.transform.localPosition = stockLocal;
+            instance.transform.localRotation = Quaternion.LookRotation(
+                forward,
+                up
+            );
+            instance.transform.localScale = Vector3.one * length;
+            return instance;
         }
 
         private static Transform CreateScopeAdapter(Transform importedOcular)
@@ -2439,6 +2963,22 @@ namespace Powersuit.Editor
                 throw new InvalidOperationException($"Missing serialized property: {propertyName}");
             }
             property.vector3Value = value;
+        }
+
+        private static void SetColor(
+            SerializedObject serialized,
+            string propertyName,
+            Color value
+        )
+        {
+            SerializedProperty property = serialized.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException(
+                    $"Missing serialized property: {propertyName}"
+                );
+            }
+            property.colorValue = value;
         }
 
         private static void SetObjectReference(
@@ -3207,11 +3747,41 @@ namespace Powersuit.Editor
                 );
             PowerSuitWeaponLoadout loadout =
                 variant.GetComponent<PowerSuitWeaponLoadout>();
+            PowerSuitWeaponVisualController weaponVisuals =
+                variant.GetComponent<PowerSuitWeaponVisualController>();
+            GameObject assaultVisualPrefab =
+                AssetDatabase.LoadAssetAtPath<GameObject>(
+                    AssaultRifleVisualPrefabPath
+                );
+            Renderer[] assaultPrefabRenderers = assaultVisualPrefab != null
+                ? assaultVisualPrefab.GetComponentsInChildren<Renderer>(true)
+                : Array.Empty<Renderer>();
+            int assaultMaterialCount = assaultPrefabRenderers
+                .Select(renderer => renderer.sharedMaterial)
+                .Where(material => material != null)
+                .Distinct()
+                .Count();
             if (
                 weapon == null ||
                 precisionRifle == null ||
                 assaultRifle == null ||
                 loadout == null ||
+                weaponVisuals == null ||
+                assaultVisualPrefab == null ||
+                assaultPrefabRenderers.Length < 12 ||
+                assaultMaterialCount < 3 ||
+                assaultPrefabRenderers.Any(renderer =>
+                    renderer.name.IndexOf(
+                        "Scope",
+                        StringComparison.OrdinalIgnoreCase
+                    ) >= 0
+                ) ||
+                assaultVisualPrefab.GetComponentInChildren<Collider>(true) !=
+                    null ||
+                weaponVisuals.PrecisionRendererCount == 0 ||
+                weaponVisuals.AssaultRendererCount < 12 ||
+                weaponVisuals.AssaultFeedbackRoot == null ||
+                weaponVisuals.IsAssaultVisualActive ||
                 loadout.SlotCount != 2 ||
                 loadout.GetDefinition(0) != precisionRifle ||
                 loadout.GetDefinition(1) != assaultRifle ||
@@ -3219,6 +3789,12 @@ namespace Powersuit.Editor
                 assaultRifle.TriggerMode != WeaponTriggerMode.Automatic ||
                 assaultRifle.SupportsScope ||
                 assaultRifle.ProjectilePrewarmCount < 48 ||
+                assaultRifle.ReticleStyle !=
+                    WeaponReticleStyle.AssaultDynamic ||
+                assaultRifle.VisualRecoilDistance < 0.03f ||
+                assaultRifle.MuzzleFlashIntensity < 9f ||
+                precisionRifle.ReticleStyle !=
+                    WeaponReticleStyle.PrecisionCross ||
                 weapon.Definition != precisionRifle ||
                 !precisionRifle.AutoReloadWhenEmpty ||
                 weapon.MuzzleTransform == null ||

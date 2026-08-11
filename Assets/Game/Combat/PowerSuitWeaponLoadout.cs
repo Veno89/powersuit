@@ -18,12 +18,16 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
     [SerializeField] private PowerSuitWeaponPresentation presentation;
     [SerializeField] private PowerSuitController controller;
     [SerializeField] private PowerSuitInputRouter inputRouter;
+    [SerializeField] private PowerSuitWeaponVisualController visualController;
 
     private WeaponLoadoutState state;
     private Renderer[] scopeRenderers = Array.Empty<Renderer>();
     private bool[] scopeRendererDefaults = Array.Empty<bool>();
     private int fallbackInputFrame = -1;
     private PowerSuitInputSnapshot fallbackInputSnapshot;
+    private bool switchThroughStowed;
+    private bool drawAfterSwitch;
+    private bool awaitingDrawCompletion;
 
     public int SlotCount => weaponDefinitions?.Length ?? 0;
     public int EquippedIndex => state?.EquippedIndex ?? -1;
@@ -33,6 +37,10 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
             ? weaponDefinitions[state.EquippedIndex]
             : null;
     public int ScopeRendererCount => scopeRenderers.Length;
+    public bool IsSwitching =>
+        switchThroughStowed ||
+        awaitingDrawCompletion ||
+        (state != null && state.HasPendingSelection);
 
     public event Action<int, WeaponDefinition> WeaponChanged;
 
@@ -69,12 +77,15 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
             state.RequestNext();
         }
 
-        TryCommitPendingSelection();
+        ProgressPendingSelection();
     }
 
     private void OnDisable()
     {
         state?.CancelPendingSelection();
+        switchThroughStowed = false;
+        drawAfterSwitch = false;
+        awaitingDrawCompletion = false;
     }
 
     public WeaponDefinition GetDefinition(int index)
@@ -112,7 +123,7 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
         }
 
         WeaponSelectionRequestResult result = state.RequestSelection(index);
-        TryCommitPendingSelection();
+        ProgressPendingSelection();
         return result;
     }
 
@@ -125,13 +136,16 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
         }
 
         WeaponSelectionRequestResult result = state.RequestNext();
-        TryCommitPendingSelection();
+        ProgressPendingSelection();
         return result;
     }
 
     public void ResetForRespawn()
     {
         state?.ResetTransientStates();
+        switchThroughStowed = false;
+        drawAfterSwitch = false;
+        awaitingDrawCompletion = false;
     }
 
     private void EnsureInitialized()
@@ -203,31 +217,110 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
         presentation ??= GetComponent<PowerSuitWeaponPresentation>();
         controller ??= GetComponent<PowerSuitController>();
         inputRouter ??= GetComponent<PowerSuitInputRouter>();
+        visualController ??= GetComponent<PowerSuitWeaponVisualController>();
     }
 
-    private void TryCommitPendingSelection()
+    private void ProgressPendingSelection()
     {
-        if (
-            state == null ||
-            !state.HasPendingSelection ||
-            (presentation != null && presentation.IsTransitioning)
-        )
+        if (state == null)
         {
             return;
         }
 
-        if (!state.TryCommitPendingSelection(canSwitch: true))
+        if (awaitingDrawCompletion)
+        {
+            if (
+                presentation == null ||
+                (
+                    !presentation.IsTransitioning &&
+                    presentation.State == PowerSuitWeaponPresentationState.Ready
+                )
+            )
+            {
+                awaitingDrawCompletion = false;
+            }
+
+            if (!state.HasPendingSelection)
+            {
+                return;
+            }
+        }
+
+        if (!state.HasPendingSelection)
+        {
+            if (
+                switchThroughStowed &&
+                drawAfterSwitch &&
+                presentation != null &&
+                !presentation.IsTransitioning &&
+                presentation.State == PowerSuitWeaponPresentationState.Stowed
+            )
+            {
+                awaitingDrawCompletion = presentation.RequestDraw();
+            }
+            switchThroughStowed = false;
+            drawAfterSwitch = false;
+            return;
+        }
+
+        if (presentation == null)
+        {
+            CommitPendingSelection();
+            return;
+        }
+
+        if (presentation.IsTransitioning)
         {
             return;
         }
 
-        EquipCurrentState();
+        if (!switchThroughStowed)
+        {
+            if (presentation.State == PowerSuitWeaponPresentationState.Ready)
+            {
+                if (presentation.RequestSheathe())
+                {
+                    switchThroughStowed = true;
+                    drawAfterSwitch = true;
+                }
+                return;
+            }
+
+            if (presentation.State == PowerSuitWeaponPresentationState.Stowed)
+            {
+                CommitPendingSelection();
+            }
+            return;
+        }
+
+        if (presentation.State != PowerSuitWeaponPresentationState.Stowed)
+        {
+            return;
+        }
+
+        CommitPendingSelection();
+        bool shouldDraw = drawAfterSwitch;
+        switchThroughStowed = false;
+        drawAfterSwitch = false;
+        if (shouldDraw)
+        {
+            awaitingDrawCompletion = presentation.RequestDraw();
+        }
+    }
+
+    private void CommitPendingSelection()
+    {
+        if (state.TryCommitPendingSelection(canSwitch: true))
+        {
+            EquipCurrentState();
+        }
     }
 
     private void EquipCurrentState()
     {
         WeaponDefinition definition = weaponDefinitions[state.EquippedIndex];
         weapon.EquipLoadoutWeapon(definition, state.EquippedWeapon);
+        visualController?.ApplyWeaponVisual(definition);
         ApplyScopeRendererState(definition.SupportsScope);
         WeaponChanged?.Invoke(state.EquippedIndex, definition);
     }
