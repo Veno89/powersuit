@@ -35,7 +35,9 @@ namespace Powersuit.Enemies.UnityAdapters
         [SerializeField] private LayerMask groundMask = ~0;
 
         [Header("Visibility and clearance")]
-        [Min(0f)] [SerializeField] private float clearanceRadius = 0.75f;
+        [Min(0f)] [SerializeField] private float clearanceRadius = 1.4f;
+        [Min(0.01f)] [SerializeField] private float clearanceHeight = 3.6f;
+        [Min(0f)] [SerializeField] private float groundSurfaceOffset = 0.05f;
         [SerializeField] private LayerMask obstacleMask = ~0;
         [SerializeField] private LayerMask visibilityOcclusionMask = ~0;
         [SerializeField] private Vector3 visibilityProbeOffset = Vector3.up;
@@ -151,25 +153,32 @@ namespace Powersuit.Enemies.UnityAdapters
             Vector3 position = point != null
                 ? point.position
                 : transform.TransformPoint(localBoundsCenter);
+            Vector3 resolvedPosition = position;
             bool pointEnabled = !hasExplicitPoints ||
                 (point != null && point.gameObject.activeInHierarchy);
             bool insideBounds = ContainsWorldPoint(position);
             bool groundValid =
                 (compatibility & SpawnZoneCompatibility.Ground) == 0 ||
-                (insideBounds && IsGroundPositionValid(position));
+                (insideBounds && TryResolveGroundPosition(
+                    position,
+                    out resolvedPosition
+                ));
             bool flightValid =
                 (compatibility & SpawnZoneCompatibility.Flight) == 0 ||
                 insideBounds;
 
             candidate = new SpawnPointCandidate(
                 candidateIds[pointIndex],
-                ToCombatVector(position),
+                ToCombatVector(resolvedPosition),
                 compatibility,
                 isEnabled: CandidatesEnabled && pointEnabled,
-                isInsideCameraView: IsInsideCameraView(viewCamera, position),
+                isInsideCameraView: IsInsideCameraView(
+                    viewCamera,
+                    resolvedPosition
+                ),
                 isGroundPositionValid: groundValid,
                 isWithinFlightBounds: flightValid,
-                isObstacleFree: IsObstacleFree(position)
+                isObstacleFree: IsObstacleFree(resolvedPosition)
             );
             return true;
         }
@@ -186,6 +195,15 @@ namespace Powersuit.Enemies.UnityAdapters
 
         public bool IsGroundPositionValid(Vector3 worldPosition)
         {
+            return TryResolveGroundPosition(worldPosition, out _);
+        }
+
+        public bool TryResolveGroundPosition(
+            Vector3 worldPosition,
+            out Vector3 resolvedPosition
+        )
+        {
+            resolvedPosition = worldPosition;
             if (!requireGroundSurface)
             {
                 return true;
@@ -202,7 +220,7 @@ namespace Powersuit.Enemies.UnityAdapters
             );
             float minimumGroundDot = Mathf.Cos(maximumGroundSlope * Mathf.Deg2Rad);
             float nearestDistance = float.PositiveInfinity;
-            bool validSurface = false;
+            RaycastHit nearest = default;
 
             for (int index = 0; index < hitCount; index++)
             {
@@ -216,12 +234,20 @@ namespace Powersuit.Enemies.UnityAdapters
                 if (hitDistance < nearestDistance)
                 {
                     nearestDistance = hitDistance;
-                    validSurface = Vector3.Dot(raycastHits[index].normal, Vector3.up)
-                        >= minimumGroundDot;
+                    nearest = raycastHits[index];
                 }
             }
 
-            return validSurface;
+            if (
+                nearest.collider == null ||
+                Vector3.Dot(nearest.normal, Vector3.up) < minimumGroundDot
+            )
+            {
+                return false;
+            }
+
+            resolvedPosition.y = nearest.point.y + groundSurfaceOffset;
+            return true;
         }
 
         public bool IsObstacleFree(Vector3 worldPosition)
@@ -231,13 +257,35 @@ namespace Powersuit.Enemies.UnityAdapters
                 return true;
             }
 
-            int count = Physics.OverlapSphereNonAlloc(
-                worldPosition,
+            float radius = Mathf.Min(
                 clearanceRadius,
-                overlapHits,
-                obstacleMask,
-                QueryTriggerInteraction.Ignore
+                clearanceHeight * 0.5f
             );
+            int count;
+            if ((compatibility & SpawnZoneCompatibility.Ground) != 0)
+            {
+                Vector3 bottom = worldPosition + Vector3.up * radius;
+                Vector3 top = worldPosition + Vector3.up *
+                    Mathf.Max(radius, clearanceHeight - radius);
+                count = Physics.OverlapCapsuleNonAlloc(
+                    bottom,
+                    top,
+                    radius,
+                    overlapHits,
+                    obstacleMask,
+                    QueryTriggerInteraction.Ignore
+                );
+            }
+            else
+            {
+                count = Physics.OverlapSphereNonAlloc(
+                    worldPosition,
+                    radius,
+                    overlapHits,
+                    obstacleMask,
+                    QueryTriggerInteraction.Ignore
+                );
+            }
             for (int index = 0; index < count; index++)
             {
                 Collider collider = overlapHits[index];
@@ -356,6 +404,8 @@ namespace Powersuit.Enemies.UnityAdapters
             groundProbeDistance = Mathf.Max(0.01f, groundProbeDistance);
             maximumGroundSlope = Mathf.Clamp(maximumGroundSlope, 0f, 89f);
             clearanceRadius = Mathf.Max(0f, clearanceRadius);
+            clearanceHeight = Mathf.Max(0.01f, clearanceHeight);
+            groundSurfaceOffset = Mathf.Max(0f, groundSurfaceOffset);
             RebuildCandidateIds();
         }
 

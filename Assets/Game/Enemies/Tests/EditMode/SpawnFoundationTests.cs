@@ -98,6 +98,21 @@ namespace Powersuit.Enemies.Tests
             );
             Assert.That(
                 Evaluate(
+                    ground,
+                    Point(
+                        "blocked-ground",
+                        20f,
+                        SpawnZoneCompatibility.Ground,
+                        isObstacleFree: false
+                    ),
+                    player,
+                    safeRadius: 5f,
+                    avoidView: false
+                ),
+                Is.EqualTo(SpawnEligibilityFailure.GroundPositionObstructed)
+            );
+            Assert.That(
+                Evaluate(
                     flying,
                     Point("ground", 20f, SpawnZoneCompatibility.Ground),
                     player,

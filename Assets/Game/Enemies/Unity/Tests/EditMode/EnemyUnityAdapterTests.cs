@@ -345,6 +345,66 @@ namespace Powersuit.Enemies.UnityAdapters.Tests
         }
 
         [Test]
+        public void SpawnZone_GroundClearanceRejectsGeometryButNotItsFloor()
+        {
+            GameObject floor = Track(
+                GameObject.CreatePrimitive(PrimitiveType.Cube)
+            );
+            floor.name = "Spawn Test Floor";
+            floor.transform.position = new Vector3(0f, -0.5f, 0f);
+            floor.transform.localScale = new Vector3(20f, 1f, 20f);
+
+            GameObject obstruction = Track(
+                GameObject.CreatePrimitive(PrimitiveType.Cube)
+            );
+            obstruction.name = "Tall Spawn Obstruction";
+            obstruction.transform.position = new Vector3(0f, 2.5f, 0f);
+            obstruction.transform.localScale = new Vector3(2f, 5f, 2f);
+
+            GameObject zoneObject = CreateObject("Clearance Zone");
+            SpawnZone zone = zoneObject.AddComponent<SpawnZone>();
+            Transform blocked = CreateObject("Blocked Point").transform;
+            blocked.SetParent(zoneObject.transform, false);
+            blocked.position = new Vector3(0f, 0.15f, 0f);
+            Transform clear = CreateObject("Clear Point").transform;
+            clear.SetParent(zoneObject.transform, false);
+            clear.position = new Vector3(5f, 0.15f, 0f);
+            zone.Configure(
+                "clearance-zone",
+                SpawnZoneCompatibility.Ground,
+                new[] { blocked, clear },
+                new Bounds(Vector3.up * 2f, new Vector3(20f, 8f, 20f)),
+                requireGroundProbe: true
+            );
+            Physics.SyncTransforms();
+
+            Assert.That(
+                zone.TryBuildCandidate(0, null, out SpawnPointCandidate occupied),
+                Is.True
+            );
+            Assert.That(occupied.IsGroundPositionValid, Is.True);
+            Assert.That(occupied.IsObstacleFree, Is.False);
+            Assert.That(
+                SpawnEligibility.Evaluate(
+                    EnemyArchetypeCatalog.PatrolRifleman,
+                    occupied,
+                    new CombatVector3(100f, 0f, 0f),
+                    playerSafeRadius: 1f,
+                    avoidCameraView: false
+                ),
+                Is.EqualTo(SpawnEligibilityFailure.GroundPositionObstructed)
+            );
+
+            Assert.That(
+                zone.TryBuildCandidate(1, null, out SpawnPointCandidate available),
+                Is.True
+            );
+            Assert.That(available.IsGroundPositionValid, Is.True);
+            Assert.That(available.IsObstacleFree, Is.True);
+            Assert.That(available.Position.Y, Is.EqualTo(0.05f).Within(0.01f));
+        }
+
+        [Test]
         public void SpawnDirector_SpawnsProtectedEnemyAndReusesItAfterDeath()
         {
             Transform player = CreateObject("Player").transform;

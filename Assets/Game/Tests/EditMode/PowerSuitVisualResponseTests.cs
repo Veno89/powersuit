@@ -197,7 +197,7 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
-        public void ThrusterPresentation_BuildsFourCachedBlueWhiteJets()
+        public void ThrusterPresentation_BuildsJetsWithoutDynamicFloorLights()
         {
             GameObject host = new GameObject("Thruster Presentation Test");
             host.SetActive(false);
@@ -242,8 +242,9 @@ namespace Powersuit.Tests.EditMode
                 );
                 Assert.That(
                     host.GetComponentsInChildren<Light>(true),
-                    Has.Length.EqualTo(2),
-                    "Only backpack nozzles carry cached point-light glows."
+                    Is.Empty,
+                    "Animated exhaust remains emissive but must not flash local " +
+                    "lighting across the floor."
                 );
                 Assert.That(
                     host.GetComponentsInChildren<LineRenderer>(true),

@@ -685,6 +685,22 @@ namespace Powersuit.Tests.PlayMode
                 "Generator 109 Player"
             );
             Assert.That(player, Is.Not.Null);
+
+            // This is an animation/carry-state regression, not an encounter
+            // endurance test. Remove the runtime-owned sandbox before waiting
+            // through a real bolt cycle and reload so enemy damage cannot kill
+            // and respawn the player, which intentionally clears AimRequested.
+            Component demoBootstrap = player.GetComponent(
+                "PowerSuitDemoBootstrap"
+            );
+            Assert.That(demoBootstrap, Is.Not.Null);
+            MethodInfo cleanupOwnedWorld = demoBootstrap.GetType().GetMethod(
+                "CleanupOwnedWorld",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(cleanupOwnedWorld, Is.Not.Null);
+            cleanupOwnedWorld.Invoke(demoBootstrap, null);
+
             GameObject enemies = FindRoot(
                 SceneManager.GetActiveScene(),
                 "Test Enemies"
@@ -699,11 +715,15 @@ namespace Powersuit.Tests.PlayMode
             Behaviour animationDriver =
                 player.GetComponent("PowerSuitAnimationDriver") as Behaviour;
             Component weapon = player.GetComponent("PowerSuitWeapon");
+            Component weaponPresentation = player.GetComponent(
+                "PowerSuitWeaponPresentation"
+            );
             Animator animator = player.GetComponentInChildren<Animator>(true);
             Assert.That(controller, Is.Not.Null);
             Assert.That(animationDriver, Is.Not.Null);
             Assert.That(animationDriver.enabled, Is.True);
             Assert.That(weapon, Is.Not.Null);
+            Assert.That(weaponPresentation, Is.Not.Null);
             Assert.That(animator, Is.Not.Null);
 
             int baseLayerIndex = RequireLayerIndex(animator, BaseLayerName);
@@ -906,7 +926,11 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(
                 animator.GetLayerWeight(forwardWeaponPoseLayerIndex),
                 Is.GreaterThan(0.99f),
-                "Held aim must recover immediately after airborne reload."
+                "Held aim must recover immediately after airborne reload. " +
+                $"AimRequested={GetBoolProperty(controller, "AimRequested")}, " +
+                $"IsAiming={GetBoolProperty(controller, "IsAiming")}, " +
+                $"PresentationState={weaponPresentation.GetType().GetProperty("State")?.GetValue(weaponPresentation)}, " +
+                $"CanUseWeapon={GetBoolProperty(weaponPresentation, "CanUseWeapon")}"
             );
             AssertWeaponBoreFacesForward(
                 player,

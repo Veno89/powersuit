@@ -135,6 +135,81 @@ namespace Powersuit.Tests.EditMode
             }
         }
 
+        [Test]
+        public void GeneratedGroundSpawnPoints_HaveSurfaceAndGeometryClearance()
+        {
+            InvokeStatic("Generate");
+            Type generatorType = GetGeneratorType();
+            string sandboxPath = (string)generatorType
+                .GetField(
+                    "CombatSandboxPrefabPath",
+                    BindingFlags.Public | BindingFlags.Static
+                )
+                .GetRawConstantValue();
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                sandboxPath
+            );
+            Assert.That(prefab, Is.Not.Null);
+
+            Type zoneType = Type.GetType(
+                "Powersuit.Enemies.UnityAdapters.SpawnZone, Powersuit.Enemies.Unity",
+                throwOnError: true
+            );
+            GameObject instance = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                Physics.SyncTransforms();
+                Component[] zones = instance.GetComponentsInChildren(
+                    zoneType,
+                    includeInactive: true
+                );
+                PropertyInfo compatibility = zoneType.GetProperty("Compatibility");
+                PropertyInfo capacity = zoneType.GetProperty("CandidateCapacity");
+                MethodInfo tryBuild = zoneType.GetMethod("TryBuildCandidate");
+                Assert.That(compatibility, Is.Not.Null);
+                Assert.That(capacity, Is.Not.Null);
+                Assert.That(tryBuild, Is.Not.Null);
+
+                foreach (Component zone in zones)
+                {
+                    if (!compatibility.GetValue(zone).ToString().Contains("Ground"))
+                    {
+                        continue;
+                    }
+
+                    int count = (int)capacity.GetValue(zone);
+                    for (int index = 0; index < count; index++)
+                    {
+                        object[] arguments = { index, null, null };
+                        Assert.That(
+                            (bool)tryBuild.Invoke(zone, arguments),
+                            Is.True,
+                            zone.name + " point " + index
+                        );
+                        object candidate = arguments[2];
+                        Type candidateType = candidate.GetType();
+                        Assert.That(
+                            candidateType.GetProperty("IsGroundPositionValid")
+                                .GetValue(candidate),
+                            Is.True,
+                            zone.name + " point " + index + " has no ground."
+                        );
+                        Assert.That(
+                            candidateType.GetProperty("IsObstacleFree")
+                                .GetValue(candidate),
+                            Is.True,
+                            zone.name + " point " + index +
+                                " intersects generated geometry."
+                        );
+                    }
+                }
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(instance);
+            }
+        }
+
         private static object InvokeStatic(string methodName)
         {
             MethodInfo method = GetGeneratorType().GetMethod(

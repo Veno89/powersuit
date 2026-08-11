@@ -172,7 +172,8 @@ namespace Powersuit.Enemies
         IncompatibleZone = 4,
         InvalidGroundPosition = 5,
         OutsideFlightBounds = 6,
-        FlightPathObstructed = 7
+        FlightPathObstructed = 7,
+        GroundPositionObstructed = 8
     }
 
     public static class SpawnEligibility
@@ -238,9 +239,14 @@ namespace Powersuit.Enemies
                 return SpawnEligibilityFailure.IncompatibleZone;
             }
 
-            return candidate.IsGroundPositionValid
+            if (!candidate.IsGroundPositionValid)
+            {
+                return SpawnEligibilityFailure.InvalidGroundPosition;
+            }
+
+            return candidate.IsObstacleFree
                 ? SpawnEligibilityFailure.None
-                : SpawnEligibilityFailure.InvalidGroundPosition;
+                : SpawnEligibilityFailure.GroundPositionObstructed;
         }
     }
 }

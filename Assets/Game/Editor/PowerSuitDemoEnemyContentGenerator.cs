@@ -706,10 +706,10 @@ namespace Powersuit.Editor
                     new Bounds(new Vector3(0f, 2f, 0f), new Vector3(17f, 6f, 20f)),
                     new[]
                     {
-                        new Vector3(-6f, 0.15f, -7f),
-                        new Vector3(6f, 0.15f, -6f),
-                        new Vector3(-5f, 0.15f, 7f),
-                        new Vector3(5f, 0.15f, 6f)
+                        new Vector3(-7f, 0.15f, -8f),
+                        new Vector3(7f, 0.15f, -8f),
+                        new Vector3(-7f, 0.15f, 8f),
+                        new Vector3(7f, 0.15f, 8f)
                     }
                 ),
                 CreateSpawnZone(
@@ -721,10 +721,10 @@ namespace Powersuit.Editor
                     new Bounds(new Vector3(0f, 2f, 0f), new Vector3(17f, 6f, 20f)),
                     new[]
                     {
-                        new Vector3(-6f, 0.15f, -8f),
-                        new Vector3(5f, 0.15f, -7f),
-                        new Vector3(-4f, 0.15f, 8f),
-                        new Vector3(6f, 0.15f, 7f)
+                        new Vector3(-7f, 0.15f, -8f),
+                        new Vector3(7f, 0.15f, -8f),
+                        new Vector3(-7f, 0.15f, 8f),
+                        new Vector3(0f, 0.15f, -8f)
                     }
                 ),
                 CreateSpawnZone(
@@ -736,10 +736,10 @@ namespace Powersuit.Editor
                     new Bounds(new Vector3(0f, 2f, 0f), new Vector3(17f, 6f, 20f)),
                     new[]
                     {
-                        new Vector3(-6f, 0.15f, -7f),
-                        new Vector3(6f, 0.15f, -6f),
-                        new Vector3(-5f, 0.15f, 7f),
-                        new Vector3(5f, 0.15f, 7f)
+                        new Vector3(-7f, 0.15f, -9f),
+                        new Vector3(7f, 0.15f, -8f),
+                        new Vector3(-7f, 0.15f, 8f),
+                        new Vector3(7f, 0.15f, -4f)
                     }
                 ),
                 CreateSpawnZone(

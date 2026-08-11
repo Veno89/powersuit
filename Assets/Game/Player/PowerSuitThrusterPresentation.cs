@@ -176,27 +176,12 @@ public sealed class PowerSuitThrusterPresentation : MonoBehaviour
         LineRenderer outer = CreateLine(host.transform, "Outer Plume", outerWidth);
         LineRenderer core = CreateLine(host.transform, "White-Hot Core", coreWidth);
 
-        Light glow = null;
-        if (!isBoot)
-        {
-            GameObject lightObject = new GameObject("Nozzle Glow");
-            lightObject.transform.SetParent(host.transform, false);
-            glow = lightObject.AddComponent<Light>();
-            glow.type = LightType.Point;
-            glow.color = new Color(0.3f, 0.78f, 1f);
-            glow.range = 2.2f;
-            glow.intensity = 0f;
-            glow.shadows = LightShadows.None;
-            glow.renderMode = LightRenderMode.ForceVertex;
-            glow.enabled = false;
-        }
-
         jets[index] = new ThrusterJet(
             host,
             anchor,
             outer,
             core,
-            glow,
+            null,
             isBoot,
             isBoot ? bootMaximumLength : backpackMaximumLength
         );

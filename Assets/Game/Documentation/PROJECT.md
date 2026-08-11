@@ -14,6 +14,8 @@ At runtime, `PowerSuitDemoBootstrap`:
 4. suppresses the three legacy scene `SimpleEnemy` rollback actors so only the generated encounter architecture runs; and
 5. restores those legacy actors when its ownership ends.
 
+Ground spawn candidates are projected to the detected surface and accepted only when a full enemy-sized capsule is clear of sandbox geometry. The generated point set is validated against the authored blocks so pooled enemies cannot start inside them.
+
 The generated world prefab contains three connected greybox areas—central landing/combat, open flight/long range, and vertical/aerial combat—plus five spawn zones and 19 ground/flight points. A fixed three-phase encounter activates 7 causeway, 7 foundry, and 9 airfield enemies as the player reaches each zone. It is tech-demo geometry, not final environment art.
 
 ## Ownership boundaries
@@ -59,7 +61,7 @@ The scope uses the Precision Rifle's configured `ScopePoint` and aim profile. `V
 
 `PowerSuitController` adapts a CharacterController to plain-C# movement helpers: acceleration/deceleration, signed camera-relative movement, grounding hysteresis, coyote time, buffered jump, air control, landing, hold-to-flight, hover/braking, vertical flight, boost, banking, and safe ground/flight transitions. The focused player prefab persists the responsive profile (6.5 m/s ground, 14 m/s flight, 28 m/s boost), with piecewise zero-crossing reversal, stronger braking, 20/32 free/combat turning sharpness, 1.65x stable-ground sprint, a 0.9-second accepted-jump flight threshold, and 0.55 held-jump gravity scale. The rollback base prefab retains its legacy 5 m/s tune.
 
-Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps ground/flight attitude and landing squash presentation-only. `PowerSuitThrusterPresentation` builds cached backpack/boot jets and glows, driven by sprint/flight/boost state and colored blue-white through orange/red by the separate propulsion-heat adapter.
+Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps ground/flight attitude and landing squash presentation-only. `PowerSuitThrusterPresentation` builds cached emissive backpack/boot jets driven by sprint/flight/boost state and colored blue-white through orange/red by the separate propulsion-heat adapter. It deliberately avoids moving real-time point lights, which previously produced distracting floor-light flicker; transient weapon and ability lighting remains intact.
 
 The generated Animator uses four layers in this order:
 
@@ -99,7 +101,7 @@ The generated content set contains six `EnemyArchetypeDefinition` assets and mat
 
 `EnemyArchetypeController` combines definition-driven runtime state, movement/flight decisions, target ownership, force response, health, telegraph/attack signals, and complete pool reset. `EnemyAttackEmitter` and the pooled enemy projectile keep attack presentation and projectile lifecycle separate. `EnemyHealthBarPresenter` uses camera-facing mesh renderers with distance culling rather than a Canvas per enemy.
 
-`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, encounter-specific spawning, and live diagnostics. `PowerSuitEncounterDirector` uses the plain-C# `DemoEncounterState` to activate exact zone rosters by player proximity, count authoritative enemy defeats, restart the active phase after player defeat, and publish objective state. The generated sequence is causeway (3 Patrol Riflemen, 2 Sentries, 2 Pursuers), foundry (3 Pursuers, 3 Skirmishers, 1 Heavy Artillery), then airfield (4 Flying Harriers, 3 Skirmishers, 2 Heavy Artillery). The reusable weighted director remains available for console and stress scenarios.
+`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, surface projection, capsule obstacle clearance, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, encounter-specific spawning, and live diagnostics. `PowerSuitEncounterDirector` uses the plain-C# `DemoEncounterState` to activate exact zone rosters by player proximity, count authoritative enemy defeats, restart the active phase after player defeat, and publish objective state. The generated sequence is causeway (3 Patrol Riflemen, 2 Sentries, 2 Pursuers), foundry (3 Pursuers, 3 Skirmishers, 1 Heavy Artillery), then airfield (4 Flying Harriers, 3 Skirmishers, 2 Heavy Artillery). The reusable weighted director remains available for console and stress scenarios.
 
 ## HUD and developer console
 
@@ -131,12 +133,12 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 Accepted gameplay-batch results from 2026-08-10, followed by the 2026-08-11 Development Player certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- EditMode: 259/259 passed.
+- EditMode: 261/261 passed, including generated-world ground projection and full capsule-clearance checks.
 - PlayMode: 14/14 passed, including three-slot sheathe/swap/draw, independent magazine persistence, Heavy Plasma charge gating, generated receiver visibility, scope eligibility/optic restoration, multi-target radial falloff, and the 1,000-projectile pool exercise.
 - Generator114 source validation passed for all 24 animation clips and 35 mandatory renders, including six lateral loops and 0.7130 m lateral foot separation; generated 2D blends, foot planting, propulsion heat/HUD, heat-reactive thrusters, complete-rifle scope suppression, and prefab data passed integration validation.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
-- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the three-weapon player and structured encounter world. Its package-level Sentis shader warnings were non-blocking.
-- A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
+- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the spawn-clearance and floor-lighting hotfix. Its package-level Sentis shader warnings were non-blocking.
+- A fresh 15-second headless build smoke after that hotfix started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
 - Final Unity Console inspection reported 0 errors.
 - Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.
 - Broad owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent; targeted edge cases and the remaining GPU/render/target-hardware measurements stay open.
