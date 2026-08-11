@@ -33,13 +33,14 @@ namespace Powersuit.Abilities.UnityAdapters
 
         [SerializeField, Min(0.01f)] private float lineWidth = 0.105f;
         [SerializeField, Min(0f)] private float surfaceOffset = 0.055f;
-        [SerializeField, Min(0.01f)] private float defaultImpactSeconds = 0.55f;
+        [SerializeField, Min(0.01f)] private float defaultImpactSeconds = 0.8f;
         [SerializeField] private bool createImpactLight = true;
 
         private LineRenderer boundaryRing;
         private LineRenderer energyRing;
         private LineRenderer radialBurst;
         private LineRenderer lightningBolt;
+        private LineRenderer aftermathRing;
         private Light impactLight;
         private Material presentationMaterial;
         private AbilityAreaPresentationPhase phase;
@@ -56,7 +57,7 @@ namespace Powersuit.Abilities.UnityAdapters
             ? Mathf.Clamp01(elapsed / duration)
             : 1f;
         public bool IsVisible => phase != AbilityAreaPresentationPhase.Hidden;
-        public int CachedLineRendererCount => isBuilt ? 4 : 0;
+        public int CachedLineRendererCount => isBuilt ? 5 : 0;
 
         private void Awake()
         {
@@ -135,6 +136,7 @@ namespace Powersuit.Abilities.UnityAdapters
             SetLineVisible(energyRing, false);
             SetLineVisible(radialBurst, false);
             SetLineVisible(lightningBolt, false);
+            SetLineVisible(aftermathRing, false);
             if (impactLight != null)
             {
                 impactLight.enabled = false;
@@ -204,6 +206,11 @@ namespace Powersuit.Abilities.UnityAdapters
                 "Lightning Column",
                 false,
                 BoltSegments
+            );
+            aftermathRing = CreateLine(
+                "Area Aftermath",
+                true,
+                CircleSegments + 1
             );
 
             GameObject lightObject = new GameObject("Impact Flash Light");
@@ -275,6 +282,7 @@ namespace Powersuit.Abilities.UnityAdapters
                 SetLine(energyRing, secondary, lineWidth * 0.8f, 0.85f);
                 SetLineVisible(radialBurst, false);
                 SetLineVisible(lightningBolt, false);
+                SetLineVisible(aftermathRing, false);
                 impactLight.enabled = false;
                 return;
             }
@@ -297,6 +305,19 @@ namespace Powersuit.Abilities.UnityAdapters
             SetLine(boundaryRing, primary, lineWidth * 1.65f, fade * 0.85f);
             SetLine(energyRing, secondary, lineWidth * 2.4f, fade);
             SetLine(radialBurst, secondary, lineWidth * 1.1f, fade * 0.9f);
+            DrawCircle(
+                aftermathRing,
+                center + normal * 0.009f,
+                normal,
+                radius
+            );
+            float aftermathFade = 1f - Mathf.SmoothStep(0.72f, 1f, normalized);
+            SetLine(
+                aftermathRing,
+                Color.Lerp(primary, Color.black, 0.42f),
+                lineWidth * 1.9f,
+                aftermathFade * 0.9f
+            );
 
             if (isLightning)
             {

@@ -253,7 +253,7 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
 
         if (damageResult.WasApplied)
         {
-            ReticleHitMarker.ShowHitMarker(damageResult.WasKilled);
+            ReticleHitMarker.ShowHitMarker(damageResult.WasKilled, isCritical);
 
             if (enemyImpactPrefab != null)
             {

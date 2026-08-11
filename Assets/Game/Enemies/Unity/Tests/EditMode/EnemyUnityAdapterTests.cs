@@ -64,6 +64,44 @@ namespace Powersuit.Enemies.UnityAdapters.Tests
         }
 
         [Test]
+        public void ReadabilityPresenter_PulsesOnAppliedDamageAndBindsVisualRoot()
+        {
+            GameObject enemy = CreateObject("Readable Enemy");
+            Transform visual = CreateObject("Visual").transform;
+            visual.SetParent(enemy.transform, false);
+            GameObject target = CreateObject("Target");
+            target.transform.position = Vector3.forward * 10f;
+
+            EnemyArchetypeController controller =
+                enemy.AddComponent<EnemyArchetypeController>();
+            EnemyCombatReadabilityPresenter presenter =
+                enemy.AddComponent<EnemyCombatReadabilityPresenter>();
+            presenter.Configure(controller, visual);
+            controller.Initialize(
+                EnemyArchetypeCatalog.PatrolRifleman,
+                target.transform,
+                initialAttackDelaySeconds: 10f
+            );
+
+            DamageResult result = controller.ApplyDamage(
+                new DamageInfo(
+                    target,
+                    CombatFaction.Player,
+                    DamageType.Kinetic,
+                    12f,
+                    CombatVector3.Zero,
+                    new CombatVector3(0f, 0f, 1f),
+                    false
+                )
+            );
+
+            Assert.That(result.WasApplied, Is.True);
+            Assert.That(presenter.Controller, Is.SameAs(controller));
+            Assert.That(presenter.VisualRoot, Is.SameAs(visual));
+            Assert.That(presenter.DamagePulse, Is.EqualTo(1f));
+        }
+
+        [Test]
         public void Controller_PursuesWhileStationaryRoleDoesNotTranslate()
         {
             Transform target = CreateObject("Target").transform;

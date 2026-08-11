@@ -22,7 +22,7 @@ namespace Powersuit.Abilities.UnityAdapters
         [SerializeField] private GameObject impactEffectPrefab;
 
         [Header("Area Readability")]
-        [SerializeField, Min(0.05f)] private float impactVisibleSeconds = 0.55f;
+        [SerializeField, Min(0.05f)] private float impactVisibleSeconds = 0.8f;
         [SerializeField] private AbilityAreaEffectPresentation areaPresentation;
 
         private RaycastHit[] hitBuffer = new RaycastHit[InitialHitCapacity];

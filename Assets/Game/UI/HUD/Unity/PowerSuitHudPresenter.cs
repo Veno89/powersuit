@@ -9,6 +9,7 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
     [Header("Gameplay Sources")]
     [SerializeField] private PlayerHealth healthSource;
     [SerializeField] private PowerSuitWeapon weaponSource;
+    [SerializeField] private PowerSuitPropulsionHeat propulsionHeatSource;
     [SerializeField] private ShoulderRocketAbility shoulderRocketSource;
     [SerializeField] private LightningStrikeAbility lightningSource;
     [SerializeField] private VoidUltimateAbility ultimateSource;
@@ -24,6 +25,11 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
     [SerializeField] private GameObject reloadRoot;
     [SerializeField] private Image reloadFill;
     [SerializeField] private Text reloadLabel;
+
+    [Header("Propulsion Heat")]
+    [SerializeField] private GameObject propulsionHeatRoot;
+    [SerializeField] private Image propulsionHeatFill;
+    [SerializeField] private Text propulsionHeatLabel;
 
     [Header("Shoulder Rocket")]
     [SerializeField] private GameObject shoulderRocketRoot;
@@ -47,6 +53,7 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
 
     public PlayerHealth HealthSource => healthSource;
     public PowerSuitWeapon WeaponSource => weaponSource;
+    public PowerSuitPropulsionHeat PropulsionHeatSource => propulsionHeatSource;
     public ShoulderRocketAbility ShoulderRocketSource => shoulderRocketSource;
     public LightningStrikeAbility LightningSource => lightningSource;
     public VoidUltimateAbility UltimateSource => ultimateSource;
@@ -82,8 +89,28 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
         VoidUltimateAbility ultimate
     )
     {
+        BindSources(
+            health,
+            weapon,
+            health != null ? health.GetComponent<PowerSuitPropulsionHeat>() : null,
+            shoulderRocket,
+            lightning,
+            ultimate
+        );
+    }
+
+    public void BindSources(
+        PlayerHealth health,
+        PowerSuitWeapon weapon,
+        PowerSuitPropulsionHeat propulsionHeat,
+        ShoulderRocketAbility shoulderRocket,
+        LightningStrikeAbility lightning,
+        VoidUltimateAbility ultimate
+    )
+    {
         healthSource = health;
         weaponSource = weapon;
+        propulsionHeatSource = propulsionHeat;
         shoulderRocketSource = shoulderRocket;
         lightningSource = lightning;
         ultimateSource = ultimate;
@@ -118,6 +145,17 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
             : HudHealthState.Missing;
 
         HudWeaponState weapon = CaptureWeapon();
+        HudPropulsionHeatState propulsionHeat =
+            propulsionHeatSource != null
+                ? new HudPropulsionHeatState(
+                    true,
+                    propulsionHeatSource.Heat,
+                    propulsionHeatSource.MaximumHeat,
+                    propulsionHeatSource.IsOverheated,
+                    propulsionHeatSource.ResolveCurrentLoad() !=
+                        PowerSuitPropulsionLoad.None
+                )
+                : HudPropulsionHeatState.Missing;
         HudAbilityState shoulderRocket = shoulderRocketSource != null
             ? new HudAbilityState(
                 true,
@@ -148,6 +186,7 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
         return new PowerSuitHudSnapshot(
             health,
             weapon,
+            propulsionHeat,
             shoulderRocket,
             lightning,
             ultimate
@@ -219,6 +258,35 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
                     reloadLabel,
                     PowerSuitHudFormatter.FormatReload(snapshot.Weapon)
                 );
+            }
+        }
+
+        if ((dirty & PowerSuitHudDirtyFlags.PropulsionHeat) != 0)
+        {
+            SetVisible(
+                propulsionHeatRoot,
+                snapshot.PropulsionHeat.IsAvailable
+            );
+            SetFill(propulsionHeatFill, snapshot.PropulsionHeat.Normalized);
+            if ((textDirty & PowerSuitHudDirtyFlags.PropulsionHeat) != 0)
+            {
+                SetText(
+                    propulsionHeatLabel,
+                    PowerSuitHudFormatter.FormatPropulsionHeat(
+                        snapshot.PropulsionHeat
+                    )
+                );
+            }
+
+            if (propulsionHeatFill != null)
+            {
+                propulsionHeatFill.color = snapshot.PropulsionHeat.IsOverheated
+                    ? new Color(1f, 0.16f, 0.08f, 0.98f)
+                    : Color.Lerp(
+                        new Color(0.12f, 0.82f, 1f, 0.95f),
+                        new Color(1f, 0.48f, 0.06f, 0.98f),
+                        snapshot.PropulsionHeat.Normalized
+                    );
             }
         }
 

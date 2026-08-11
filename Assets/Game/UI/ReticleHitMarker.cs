@@ -7,6 +7,7 @@ public sealed class ReticleHitMarker : MonoBehaviour
 
     [SerializeField] private Color markerColor = new Color(1f, 0.25f, 0.25f, 1f);
     [SerializeField] private Color killMarkerColor = new Color(1f, 0.82f, 0.2f, 1f);
+    [SerializeField] private Color criticalMarkerColor = new Color(0.25f, 0.95f, 1f, 1f);
     [SerializeField] private float displayDuration = 0.15f;
     [SerializeField] private float killDisplayDuration = 0.28f;
     [SerializeField] private float startSize = 10f;
@@ -16,6 +17,7 @@ public sealed class ReticleHitMarker : MonoBehaviour
     private float timer;
     private float activeDuration;
     private bool showingKill;
+    private bool showingCritical;
     private PowerSuitController controller;
 
     private void Awake()
@@ -38,7 +40,7 @@ public sealed class ReticleHitMarker : MonoBehaviour
         }
     }
 
-    public static void ShowHitMarker(bool wasKilled = false)
+    public static void ShowHitMarker(bool wasKilled = false, bool wasCritical = false)
     {
         if (instance == null)
         {
@@ -51,7 +53,7 @@ public sealed class ReticleHitMarker : MonoBehaviour
 
         if (instance != null)
         {
-            instance.TriggerHitMarker(wasKilled);
+            instance.TriggerHitMarker(wasKilled, wasCritical);
         }
     }
 
@@ -60,9 +62,10 @@ public sealed class ReticleHitMarker : MonoBehaviour
         ShowHitMarker(true);
     }
 
-    public void TriggerHitMarker(bool wasKilled = false)
+    public void TriggerHitMarker(bool wasKilled = false, bool wasCritical = false)
     {
         showingKill = wasKilled;
+        showingCritical = wasCritical;
         activeDuration = wasKilled
             ? Mathf.Max(displayDuration, killDisplayDuration)
             : displayDuration;
@@ -97,11 +100,15 @@ public sealed class ReticleHitMarker : MonoBehaviour
         float guiY = Screen.height - reticlePos.y;
 
         float progress = 1f - (timer / Mathf.Max(0.001f, activeDuration));
-        float sizeMultiplier = showingKill ? 1.35f : 1f;
+        float sizeMultiplier = showingKill ? 1.45f : showingCritical ? 1.22f : 1f;
         float currentSize = Mathf.Lerp(startSize, endSize, progress) * sizeMultiplier;
         float alpha = Mathf.Clamp01(1f - progress);
 
-        Color c = showingKill ? killMarkerColor : markerColor;
+        Color c = showingKill
+            ? killMarkerColor
+            : showingCritical
+                ? criticalMarkerColor
+                : markerColor;
         c.a = alpha;
 
         Color savedColor = GUI.color;
@@ -115,6 +122,16 @@ public sealed class ReticleHitMarker : MonoBehaviour
         DrawLine(new Vector2(guiX + gap + halfSize, guiY - gap - halfSize), new Vector2(guiX + gap, guiY - gap), lineThickness);
         DrawLine(new Vector2(guiX - gap - halfSize, guiY + gap + halfSize), new Vector2(guiX - gap, guiY + gap), lineThickness);
         DrawLine(new Vector2(guiX + gap + halfSize, guiY + gap + halfSize), new Vector2(guiX + gap, guiY + gap), lineThickness);
+
+        if (showingKill || showingCritical)
+        {
+            float cardinal = currentSize * 0.72f;
+            float inner = gap + 1f;
+            DrawLine(new Vector2(guiX, guiY - cardinal), new Vector2(guiX, guiY - inner), lineThickness);
+            DrawLine(new Vector2(guiX, guiY + cardinal), new Vector2(guiX, guiY + inner), lineThickness);
+            DrawLine(new Vector2(guiX - cardinal, guiY), new Vector2(guiX - inner, guiY), lineThickness);
+            DrawLine(new Vector2(guiX + cardinal, guiY), new Vector2(guiX + inner, guiY), lineThickness);
+        }
 
         GUI.color = savedColor;
     }

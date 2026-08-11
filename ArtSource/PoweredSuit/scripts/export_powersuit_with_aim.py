@@ -3,7 +3,7 @@
 
 Export is intentionally blocked unless:
 - automated validation passed
-- all 33 mandatory renders still exist and match their approved hashes
+- all 35 mandatory renders still exist and match their approved hashes
 - the user explicitly approved the visual result
 - the Action/Slot and rifle hierarchy remain valid
 """
@@ -78,6 +78,8 @@ EXPECTED_RENDER_FILES = {
     "renders/weapon_animation_validation/stowed_walk_frame_009_rear_3q.png",
     "renders/weapon_animation_validation/stowed_hover_frame_031_rear_3q.png",
     "renders/weapon_animation_validation/run_forward_frame_006_side.png",
+    "renders/weapon_animation_validation/walk_right_frame_009_front_3q.png",
+    "renders/weapon_animation_validation/aim_strafe_left_frame_009_front_3q.png",
 }
 
 
@@ -112,7 +114,9 @@ def _load_and_verify_approval(root_dir: Path) -> tuple[dict, dict]:
         for relative, expected_hash in approval.get("render_sha256", {}).items()
     }
     if set(approved_hashes) != EXPECTED_RENDER_FILES:
-        raise RuntimeError("Visual approval does not cover the canonical 33-render set.")
+        raise RuntimeError(
+            f"Visual approval does not cover the canonical {len(EXPECTED_RENDER_FILES)}-render set."
+        )
     report_files = {
         str(relative).replace("\\", "/")
         for relative in (
@@ -126,7 +130,9 @@ def _load_and_verify_approval(root_dir: Path) -> tuple[dict, dict]:
         or report.get("rifle_render_set_complete") is not True
         or report.get("weapon_animation_render_set_complete") is not True
     ):
-        raise RuntimeError("Validation report does not describe the canonical 33-render set.")
+        raise RuntimeError(
+            f"Validation report does not describe the canonical {len(EXPECTED_RENDER_FILES)}-render set."
+        )
     for relative, expected_hash in approved_hashes.items():
         path = root_dir / relative
         if not path.exists() or _sha256(path) != expected_hash:

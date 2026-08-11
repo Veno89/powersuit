@@ -57,7 +57,7 @@ from weapon_handling_contract import (  # noqa: E402
 from render_animation_validation import _validate_render_content  # noqa: E402
 
 CONTROL_BONES = ("WeaponRoot", "WeaponMagazine", "WeaponBolt")
-EXPECTED_ANIMATION_CONTRACT_VERSION = 4
+EXPECTED_ANIMATION_CONTRACT_VERSION = 5
 EXPECTED_RANGES = {
     "PS_WeaponReady_Idle": (1, 61),
     "PS_WeaponStowed_Idle": (1, 61),
@@ -65,12 +65,18 @@ EXPECTED_RANGES = {
     "PS_Weapon_Sheathe": (1, 30),
     "PS_Walk_Forward": (1, 31),
     "PS_Walk_Backward": (1, 31),
+    "PS_Walk_Left": (1, 31),
+    "PS_Walk_Right": (1, 31),
     "PS_Aim_Walk_Forward": (1, 31),
     "PS_Aim_Walk_Backward": (1, 31),
+    "PS_Aim_Walk_Left": (1, 31),
+    "PS_Aim_Walk_Right": (1, 31),
     "PS_Reload": (1, 84),
     "PS_BoltCycle": (1, 20),
     "PS_WeaponStowed_Walk_Forward": (1, 31),
     "PS_WeaponStowed_Walk_Backward": (1, 31),
+    "PS_WeaponStowed_Walk_Left": (1, 31),
+    "PS_WeaponStowed_Walk_Right": (1, 31),
     "PS_WeaponStowed_Hover": (1, 61),
     "PS_Run_Forward": (1, 21),
 }
@@ -90,6 +96,8 @@ REQUIRED_RENDERS = (
     "stowed_walk_frame_009_rear_3q.png",
     "stowed_hover_frame_031_rear_3q.png",
     "run_forward_frame_006_side.png",
+    "walk_right_frame_009_front_3q.png",
+    "aim_strafe_left_frame_009_front_3q.png",
 )
 
 
@@ -251,6 +259,18 @@ def _validate(
             f"forward/backpedal foot phases too similar={directional_foot_delta:.3f} m"
         )
 
+    _evaluate(armature, "PS_Walk_Left", 9)
+    left_strafe_foot = bone_head_world(armature, "Foot.L")
+    _evaluate(armature, "PS_Walk_Right", 9)
+    right_strafe_foot = bone_head_world(armature, "Foot.L")
+    lateral_foot_delta = abs(
+        (left_strafe_foot - right_strafe_foot).dot(_ready_right)
+    )
+    if lateral_foot_delta < 0.22:
+        blockers.append(
+            f"left/right strafe foot separation too small={lateral_foot_delta:.3f} m"
+        )
+
     forward = ready_forward
     up = ready_up
     run_stride = 0.0
@@ -324,6 +344,7 @@ def _validate(
         "reload_magazine_travel_m": magazine_travel,
         "bolt_travel_m": bolt_travel,
         "forward_backward_foot_phase_delta_m": directional_foot_delta,
+        "left_right_foot_separation_m": lateral_foot_delta,
         "run_cycle_frames": 20,
         "run_cycle_seconds": 20.0 / 30.0,
         "run_step_cadence_per_minute": 180,
@@ -484,6 +505,8 @@ def _render_all(armature: bpy.types.Object, root: bpy.types.Object) -> list[Path
             ("PS_WeaponStowed_Walk_Forward", 9, "rear_3q", REQUIRED_RENDERS[12]),
             ("PS_WeaponStowed_Hover", 31, "rear_3q", REQUIRED_RENDERS[13]),
             ("PS_Run_Forward", 6, "side", REQUIRED_RENDERS[14]),
+            ("PS_Walk_Right", 9, "front_3q", REQUIRED_RENDERS[15]),
+            ("PS_Aim_Walk_Left", 9, "front_3q", REQUIRED_RENDERS[16]),
         )
         paths: list[Path] = []
         for action, frame, view, filename in jobs:
@@ -535,6 +558,8 @@ def _append_report(paths: list[Path], metrics: dict[str, object]) -> Path:
         "bolt hand and bolt mechanism move together",
         "stowed walk and hover keep the rifle on the back",
         "forward run has a committed lean, longer stride, and airborne phase",
+        "left/right cross-steps carry weight laterally without idle sliding",
+        "aim strafing keeps the rifle shouldered while the legs cross-step",
     ]:
         if requirement not in visual_review_required:
             visual_review_required.append(requirement)

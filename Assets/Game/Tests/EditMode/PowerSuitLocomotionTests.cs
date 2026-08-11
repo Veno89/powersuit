@@ -23,6 +23,85 @@ namespace Powersuit.Tests.EditMode
         private static Type MovementSettingsType =>
             FindRuntimeType("PowerSuitMovementSettings");
 
+        private static Type PropulsionHeatStateType =>
+            FindRuntimeType("PowerSuitPropulsionHeatState");
+
+        private static Type PropulsionLoadType =>
+            FindRuntimeType("PowerSuitPropulsionLoad");
+
+        private static Type FootPlantingMathType =>
+            FindRuntimeType("PowerSuitFootPlantingMath");
+
+        [Test]
+        public void PropulsionHeat_SharedLoadsUseDistinctRatesAndClamp()
+        {
+            object state = CreatePropulsionHeatState();
+
+            AdvancePropulsionHeat(state, 1, 2f);
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(16f).Within(0.001f));
+
+            AdvancePropulsionHeat(state, 2, 2f);
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(26f).Within(0.001f));
+
+            AdvancePropulsionHeat(state, 3, 10f);
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(100f));
+            Assert.That(GetProperty<bool>(state, "IsOverheated"), Is.True);
+            Assert.That(GetProperty<bool>(state, "CanUsePropulsion"), Is.False);
+        }
+
+        [Test]
+        public void PropulsionHeat_OverheatLocksUntilRecoveryThreshold()
+        {
+            object state = CreatePropulsionHeatState();
+            AdvancePropulsionHeat(state, 3, 10f);
+
+            AdvancePropulsionHeat(state, 0, 1f);
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(100f));
+            Assert.That(GetProperty<bool>(state, "IsOverheated"), Is.True);
+
+            AdvancePropulsionHeat(state, 0, 1f);
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(74f).Within(0.001f));
+            Assert.That(GetProperty<bool>(state, "IsOverheated"), Is.True);
+
+            AdvancePropulsionHeat(state, 0, 2f);
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(22f).Within(0.001f));
+            Assert.That(GetProperty<bool>(state, "IsOverheated"), Is.False);
+        }
+
+        [Test]
+        public void PropulsionHeat_ResetClearsLockAndProgress()
+        {
+            object state = CreatePropulsionHeatState();
+            AdvancePropulsionHeat(state, 3, 10f);
+
+            state.GetType().GetMethod("Reset")?.Invoke(
+                state,
+                new object[] { 0.25f }
+            );
+
+            Assert.That(GetProperty<float>(state, "Heat"), Is.EqualTo(25f));
+            Assert.That(GetProperty<float>(state, "NormalizedHeat"), Is.EqualTo(0.25f));
+            Assert.That(GetProperty<bool>(state, "IsOverheated"), Is.False);
+        }
+
+        [Test]
+        public void FootPlanting_OnlyCorrectsFeetAlreadyNearTheSurface()
+        {
+            Assert.That(
+                CalculateFootCorrection(0.08f, 0.03f, 0.11f),
+                Is.EqualTo(-0.05f).Within(0.0001f)
+            );
+            Assert.That(
+                CalculateFootCorrection(0.3f, 0.03f, 0.11f),
+                Is.Zero,
+                "A lifted swing foot must remain authored rather than being dragged to ground."
+            );
+            Assert.That(
+                CalculateFootCorrection(float.NaN, 0f, 0.11f),
+                Is.Zero
+            );
+        }
+
         [Test]
         public void ResolveFacingDirection_BackwardInputFacesOppositeTravel()
         {
@@ -1308,6 +1387,50 @@ namespace Powersuit.Tests.EditMode
             return AppDomain.CurrentDomain.GetAssemblies()
                 .Select(assembly => assembly.GetType(typeName))
                 .First(type => type != null);
+        }
+
+        private static object CreatePropulsionHeatState()
+        {
+            return Activator.CreateInstance(
+                PropulsionHeatStateType,
+                100f,
+                8f,
+                5f,
+                14f,
+                26f,
+                1f,
+                0.35f
+            );
+        }
+
+        private static float CalculateFootCorrection(
+            float footHeight,
+            float surfaceHeight,
+            float maximumCorrection
+        )
+        {
+            MethodInfo method = FootPlantingMathType.GetMethod(
+                "CalculateVerticalCorrection",
+                BindingFlags.Public | BindingFlags.Static
+            );
+            Assert.That(method, Is.Not.Null);
+            return (float)method.Invoke(
+                null,
+                new object[] { footHeight, surfaceHeight, maximumCorrection }
+            );
+        }
+
+        private static void AdvancePropulsionHeat(
+            object state,
+            int load,
+            float deltaTime
+        )
+        {
+            object loadValue = Enum.ToObject(PropulsionLoadType, load);
+            state.GetType().GetMethod("Advance")?.Invoke(
+                state,
+                new[] { loadValue, (object)deltaTime }
+            );
         }
 
         private static void Invoke(object target, string methodName, object argument)

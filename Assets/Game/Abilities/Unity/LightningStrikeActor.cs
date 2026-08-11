@@ -12,7 +12,7 @@ namespace Powersuit.Abilities.UnityAdapters
     public sealed class LightningStrikeActor : MonoBehaviour, ICombatPoolable
     {
         [SerializeField, Min(0f)] private float telegraphSeconds = 0.2f;
-        [SerializeField, Min(0.01f)] private float visibleSeconds = 0.45f;
+        [SerializeField, Min(0.01f)] private float visibleSeconds = 0.9f;
         [SerializeField] private LayerMask recipientMask = ~0;
         [SerializeField, Min(1)] private int queryCapacity = 64;
         [SerializeField] private Transform visualRoot;

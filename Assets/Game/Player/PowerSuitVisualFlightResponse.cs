@@ -20,6 +20,13 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float aimedAttitudeMultiplier = 0.25f;
     [SerializeField, Min(0f)] private float attitudeSharpness = 12f;
 
+    [Header("Ground Locomotion Response")]
+    [SerializeField, Range(0f, 12f)] private float startStopLeanDegrees = 5f;
+    [SerializeField, Range(0f, 12f)] private float strafeLeanDegrees = 4f;
+    [SerializeField, Range(0f, 16f)] private float sharpTurnLeanDegrees = 7f;
+    [SerializeField, Range(0f, 12f)] private float runForwardLeanDegrees = 4f;
+    [SerializeField, Min(0.01f)] private float fullResponsePerSecond = 5f;
+
     [Header("Landing Response")]
     [Tooltip("Maximum proportional world-height squash. The wrapper origin/feet stay fixed.")]
     [SerializeField, Range(0f, 0.15f)] private float maximumCompression = 0.06f;
@@ -36,6 +43,7 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
     private bool hasAuthoredPose;
     private bool subscribed;
     private int compressionScaleAxis = 1;
+    private Vector2 previousGroundMovement;
 
     public Transform VisualRoot
     {
@@ -93,6 +101,7 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
         float targetRoll = 0f;
         if (controller.IsFlying)
         {
+            previousGroundMovement = Vector2.zero;
             Vector2 movement = Vector2.ClampMagnitude(
                 controller.LocalMovement,
                 1f
@@ -108,6 +117,28 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
             {
                 targetPitch -= boostPitchDegrees * attitudeMultiplier;
             }
+        }
+        else
+        {
+            Vector2 movement = Vector2.ClampMagnitude(
+                controller.LocalMovement,
+                1f
+            );
+            Vector2 attitude =
+                PowerSuitVisualResponseMath.CalculateGroundAttitude(
+                    movement,
+                    previousGroundMovement,
+                    controller.IsRunning,
+                    startStopLeanDegrees,
+                    strafeLeanDegrees,
+                    sharpTurnLeanDegrees,
+                    runForwardLeanDegrees,
+                    fullResponsePerSecond,
+                    deltaTime
+                );
+            targetPitch = attitude.x;
+            targetRoll = attitude.y;
+            previousGroundMovement = movement;
         }
 
         currentPitch = PowerSuitVisualResponseMath.ExponentialStep(
@@ -148,6 +179,7 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
         currentPitch = 0f;
         currentRoll = 0f;
         compression = 0f;
+        previousGroundMovement = Vector2.zero;
     }
 
     public void ResetPresentation()
@@ -155,6 +187,7 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
         currentPitch = 0f;
         currentRoll = 0f;
         compression = 0f;
+        previousGroundMovement = Vector2.zero;
         RestoreAuthoredPose();
     }
 
@@ -235,6 +268,14 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
                 : aimedAttitudeMultiplier
         );
         attitudeSharpness = SanitizeNonNegative(attitudeSharpness, 12f);
+        startStopLeanDegrees = SanitizeNonNegative(startStopLeanDegrees, 5f);
+        strafeLeanDegrees = SanitizeNonNegative(strafeLeanDegrees, 4f);
+        sharpTurnLeanDegrees = SanitizeNonNegative(sharpTurnLeanDegrees, 7f);
+        runForwardLeanDegrees = SanitizeNonNegative(runForwardLeanDegrees, 4f);
+        fullResponsePerSecond = Mathf.Max(
+            0.01f,
+            SanitizeNonNegative(fullResponsePerSecond, 5f)
+        );
         maximumCompression = Mathf.Clamp(
             SanitizeNonNegative(maximumCompression, 0.06f),
             0f,
@@ -262,6 +303,64 @@ public sealed class PowerSuitVisualFlightResponse : MonoBehaviour
 
 public static class PowerSuitVisualResponseMath
 {
+    public static Vector2 CalculateGroundAttitude(
+        Vector2 currentMovement,
+        Vector2 previousMovement,
+        bool isRunning,
+        float startStopLeanDegrees,
+        float strafeLeanDegrees,
+        float sharpTurnLeanDegrees,
+        float runForwardLeanDegrees,
+        float fullResponsePerSecond,
+        float deltaTime
+    )
+    {
+        RequireFinite(currentMovement.x, nameof(currentMovement));
+        RequireFinite(currentMovement.y, nameof(currentMovement));
+        RequireFinite(previousMovement.x, nameof(previousMovement));
+        RequireFinite(previousMovement.y, nameof(previousMovement));
+        RequireFiniteNonNegative(startStopLeanDegrees, nameof(startStopLeanDegrees));
+        RequireFiniteNonNegative(strafeLeanDegrees, nameof(strafeLeanDegrees));
+        RequireFiniteNonNegative(sharpTurnLeanDegrees, nameof(sharpTurnLeanDegrees));
+        RequireFiniteNonNegative(runForwardLeanDegrees, nameof(runForwardLeanDegrees));
+        if (
+            float.IsNaN(fullResponsePerSecond) ||
+            float.IsInfinity(fullResponsePerSecond) ||
+            fullResponsePerSecond <= 0f
+        )
+        {
+            throw new ArgumentOutOfRangeException(nameof(fullResponsePerSecond));
+        }
+
+        if (!IsUsableDeltaTime(deltaTime))
+        {
+            return Vector2.zero;
+        }
+
+        currentMovement = Vector2.ClampMagnitude(currentMovement, 1f);
+        previousMovement = Vector2.ClampMagnitude(previousMovement, 1f);
+        float responseScale = fullResponsePerSecond * deltaTime;
+        float speedResponse = Mathf.Clamp(
+            (currentMovement.magnitude - previousMovement.magnitude) /
+                responseScale,
+            -1f,
+            1f
+        );
+        float lateralResponse = Mathf.Clamp(
+            (currentMovement.x - previousMovement.x) / responseScale,
+            -1f,
+            1f
+        );
+
+        float pitch =
+            -speedResponse * startStopLeanDegrees -
+            (isRunning ? runForwardLeanDegrees : 0f);
+        float roll =
+            -currentMovement.x * strafeLeanDegrees -
+            lateralResponse * sharpTurnLeanDegrees;
+        return new Vector2(pitch, roll);
+    }
+
     public static int FindDominantScaleAxis(Vector3 localDirection)
     {
         if (

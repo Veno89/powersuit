@@ -79,6 +79,64 @@ namespace Powersuit.Tests.EditMode
             );
         }
 
+        [Test]
+        public void GroundAttitude_DistinguishesStartStopStrafeAndRun()
+        {
+            Vector2 start = (Vector2)Invoke(
+                "CalculateGroundAttitude",
+                new Vector2(0f, 1f),
+                Vector2.zero,
+                false,
+                5f,
+                4f,
+                7f,
+                4f,
+                5f,
+                0.1f
+            );
+            Vector2 stop = (Vector2)Invoke(
+                "CalculateGroundAttitude",
+                Vector2.zero,
+                new Vector2(0f, 1f),
+                false,
+                5f,
+                4f,
+                7f,
+                4f,
+                5f,
+                0.1f
+            );
+            Vector2 strafeTurn = (Vector2)Invoke(
+                "CalculateGroundAttitude",
+                new Vector2(1f, 0f),
+                Vector2.zero,
+                false,
+                5f,
+                4f,
+                7f,
+                4f,
+                5f,
+                0.1f
+            );
+            Vector2 run = (Vector2)Invoke(
+                "CalculateGroundAttitude",
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                true,
+                5f,
+                4f,
+                7f,
+                4f,
+                5f,
+                0.1f
+            );
+
+            Assert.That(start.x, Is.LessThan(-4.9f));
+            Assert.That(stop.x, Is.GreaterThan(4.9f));
+            Assert.That(strafeTurn.y, Is.LessThan(-10.9f));
+            Assert.That(run.x, Is.EqualTo(-4f).Within(0.001f));
+        }
+
         [TestCase(false, false, false, 0f)]
         [TestCase(true, false, false, 0.82f)]
         [TestCase(false, true, false, 0.48f)]

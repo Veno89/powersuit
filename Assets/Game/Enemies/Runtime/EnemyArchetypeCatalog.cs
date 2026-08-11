@@ -20,7 +20,7 @@ namespace Powersuit.Enemies
                 burstCount: 1,
                 burstInterval: 0f,
                 projectileSpeed: 34f,
-                telegraph: 0.08f,
+                telegraph: 0.18f,
                 spread: 2.6f,
                 minimumRange: 3f,
                 maximumRange: 36f
@@ -36,7 +36,7 @@ namespace Powersuit.Enemies
                 burstCount: 3,
                 burstInterval: 0.12f,
                 projectileSpeed: 31f,
-                telegraph: 0.18f,
+                telegraph: 0.35f,
                 spread: 1.8f,
                 minimumRange: 4f,
                 maximumRange: 42f
@@ -52,7 +52,7 @@ namespace Powersuit.Enemies
                 burstCount: 2,
                 burstInterval: 0.1f,
                 projectileSpeed: 30f,
-                telegraph: 0.12f,
+                telegraph: 0.25f,
                 spread: 3.2f,
                 minimumRange: 2.5f,
                 maximumRange: 27f
@@ -70,7 +70,7 @@ namespace Powersuit.Enemies
                 burstCount: 1,
                 burstShotIntervalSeconds: 0f,
                 projectileSpeed: 12f,
-                telegraphSeconds: 1.25f,
+                telegraphSeconds: 1.4f,
                 spreadDegrees: 0.6f,
                 minimumRange: 8f,
                 maximumRange: 56f,
@@ -87,7 +87,7 @@ namespace Powersuit.Enemies
                 burstCount: 2,
                 burstInterval: 0.14f,
                 projectileSpeed: 29f,
-                telegraph: 0.18f,
+                telegraph: 0.32f,
                 spread: 2.2f,
                 minimumRange: 5f,
                 maximumRange: 44f
@@ -103,7 +103,7 @@ namespace Powersuit.Enemies
                 burstCount: 3,
                 burstInterval: 0.1f,
                 projectileSpeed: 33f,
-                telegraph: 0.16f,
+                telegraph: 0.3f,
                 spread: 1.5f,
                 minimumRange: 7f,
                 maximumRange: 48f

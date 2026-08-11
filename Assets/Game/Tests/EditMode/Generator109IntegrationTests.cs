@@ -88,6 +88,8 @@ namespace Powersuit.Tests.EditMode
                         "PS_Aim",
                         "PS_Aim_Walk_Backward",
                         "PS_Aim_Walk_Forward",
+                        "PS_Aim_Walk_Left",
+                        "PS_Aim_Walk_Right",
                         "PS_BoltCycle",
                         "PS_Hover",
                         "PS_Idle",
@@ -96,10 +98,14 @@ namespace Powersuit.Tests.EditMode
                         "PS_Walk",
                         "PS_Walk_Backward",
                         "PS_Walk_Forward",
+                        "PS_Walk_Left",
+                        "PS_Walk_Right",
                         "PS_WeaponStowed_Idle",
                         "PS_WeaponStowed_Hover",
                         "PS_WeaponStowed_Walk_Backward",
                         "PS_WeaponStowed_Walk_Forward",
+                        "PS_WeaponStowed_Walk_Left",
+                        "PS_WeaponStowed_Walk_Right",
                         "PS_WeaponReady_Idle",
                         "PS_Weapon_Draw",
                         "PS_Weapon_Sheathe"
@@ -161,6 +167,31 @@ namespace Powersuit.Tests.EditMode
             AssertBoolTransition(runState, aimState, "IsAiming", true);
             AssertBoolTransition(runState, stowedState, "WeaponStowed", true);
             AssertBoolTransition(runState, hoverState, "IsFlying", true);
+
+            AssertDirectionalBlend(
+                readyState,
+                "PS_WeaponReady_Idle",
+                "PS_Walk_Forward",
+                "PS_Walk_Backward",
+                "PS_Walk_Left",
+                "PS_Walk_Right"
+            );
+            AssertDirectionalBlend(
+                aimState,
+                "PS_Aim",
+                "PS_Aim_Walk_Forward",
+                "PS_Aim_Walk_Backward",
+                "PS_Aim_Walk_Left",
+                "PS_Aim_Walk_Right"
+            );
+            AssertDirectionalBlend(
+                stowedState,
+                "PS_WeaponStowed_Idle",
+                "PS_WeaponStowed_Walk_Forward",
+                "PS_WeaponStowed_Walk_Backward",
+                "PS_WeaponStowed_Walk_Left",
+                "PS_WeaponStowed_Walk_Right"
+            );
 
             Assert.That(controller.layers, Has.Length.EqualTo(4));
             Assert.That(
@@ -536,9 +567,12 @@ namespace Powersuit.Tests.EditMode
             Assert.That(visual, Is.Not.Null);
             Component visualResponse =
                 player.GetComponent("PowerSuitVisualFlightResponse");
+            Component footPlanting =
+                player.GetComponent("PowerSuitFootPlanting");
             Component thrusterPresentation =
                 player.GetComponent("PowerSuitThrusterPresentation");
             Assert.That(visualResponse, Is.Not.Null);
+            Assert.That(footPlanting, Is.Not.Null);
             Assert.That(thrusterPresentation, Is.Not.Null);
             Assert.That(
                 visualResponse.GetType().GetProperty("VisualRoot")
@@ -551,6 +585,18 @@ namespace Powersuit.Tests.EditMode
                     ?.GetValue(thrusterPresentation),
                 Is.EqualTo(visual),
                 "Powered exhaust must follow the animated visual hierarchy."
+            );
+            Assert.That(
+                footPlanting.GetType().GetProperty("Animator")?.GetValue(footPlanting),
+                Is.EqualTo(animators[0])
+            );
+            Assert.That(
+                footPlanting.GetType().GetProperty("LeftFoot")?.GetValue(footPlanting),
+                Is.Not.Null
+            );
+            Assert.That(
+                footPlanting.GetType().GetProperty("RightFoot")?.GetValue(footPlanting),
+                Is.Not.Null
             );
             Assert.That(
                 Quaternion.Angle(
@@ -653,6 +699,43 @@ namespace Powersuit.Tests.EditMode
                 Is.LessThan(0.1f),
                 "The scope adapter must map the imported +Y optic axis to Unity forward."
             );
+        }
+
+        private static void AssertDirectionalBlend(
+            AnimatorState state,
+            string idle,
+            string forward,
+            string backward,
+            string left,
+            string right
+        )
+        {
+            BlendTree tree = state.motion as BlendTree;
+            Assert.That(tree, Is.Not.Null, state.name);
+            Assert.That(tree.blendType, Is.EqualTo(BlendTreeType.FreeformDirectional2D));
+            Assert.That(tree.blendParameter, Is.EqualTo("MovementX"));
+            Assert.That(tree.blendParameterY, Is.EqualTo("MovementY"));
+
+            var expected = new[]
+            {
+                (idle, Vector2.zero),
+                (forward, Vector2.up),
+                (backward, Vector2.down),
+                (left, Vector2.left),
+                (right, Vector2.right)
+            };
+            Assert.That(tree.children, Has.Length.EqualTo(expected.Length));
+            foreach ((string motionName, Vector2 position) in expected)
+            {
+                ChildMotion child = tree.children.Single(
+                    candidate => candidate.motion != null && candidate.motion.name == motionName
+                );
+                Assert.That(
+                    Vector2.Distance(child.position, position),
+                    Is.LessThan(0.001f),
+                    motionName
+                );
+            }
         }
 
         [Test]

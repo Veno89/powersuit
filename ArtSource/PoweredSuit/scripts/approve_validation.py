@@ -56,6 +56,8 @@ WEAPON_ANIMATION_FILES = (
     "renders/weapon_animation_validation/stowed_walk_frame_009_rear_3q.png",
     "renders/weapon_animation_validation/stowed_hover_frame_031_rear_3q.png",
     "renders/weapon_animation_validation/run_forward_frame_006_side.png",
+    "renders/weapon_animation_validation/walk_right_frame_009_front_3q.png",
+    "renders/weapon_animation_validation/aim_strafe_left_frame_009_front_3q.png",
 )
 EXPECTED_RENDER_FILES = (*AIM_FILES, *RIFLE_FILES, *WEAPON_ANIMATION_FILES)
 CHECKLIST = (
@@ -76,6 +78,8 @@ CHECKLIST = (
     "bolt cycle visibly moves the hand and mechanism",
     "stowed walk and hover retain the back-mounted rifle",
     "forward run visibly differs from walk with longer stride, lean, and flight",
+    "left and right strafes use deliberate lateral footwork rather than rotated forward walk",
+    "aim-strafe preserves the shouldered rifle while lateral footwork remains readable",
 )
 
 
@@ -149,7 +153,7 @@ def main() -> None:
         or normalized_weapon_animation != set(WEAPON_ANIMATION_FILES)
     ):
         raise RuntimeError(
-            "Validation report paths are not the canonical 33-render set."
+            f"Validation report paths are not the canonical {len(EXPECTED_RENDER_FILES)}-render set."
         )
     if report.get("blend_sha256_at_validation") != _sha256(blend_path):
         raise RuntimeError("The .blend changed after validation. Rebuild and review again.")

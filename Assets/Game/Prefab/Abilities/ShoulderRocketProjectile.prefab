@@ -107,7 +107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Abilities.Unity::Powersuit.Abilities.UnityAdapters.AbilityAreaEffectPresentation
   lineWidth: 0.105
   surfaceOffset: 0.055
-  defaultImpactSeconds: 0.55
+  defaultImpactSeconds: 0.8
   createImpactLight: 1
 --- !u!114 &360622041996078486
 MonoBehaviour:
@@ -127,7 +127,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   areaQueryCapacity: 64
   impactEffectPrefab: {fileID: 0}
-  impactVisibleSeconds: 0.55
+  impactVisibleSeconds: 0.8
   areaPresentation: {fileID: 0}
 --- !u!96 &5210009190987406861
 TrailRenderer:

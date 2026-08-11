@@ -71,6 +71,8 @@ REQUIRED_WEAPON_ANIMATION_RENDERS = {
     "stowed_walk_frame_009_rear_3q.png",
     "stowed_hover_frame_031_rear_3q.png",
     "run_forward_frame_006_side.png",
+    "walk_right_frame_009_front_3q.png",
+    "aim_strafe_left_frame_009_front_3q.png",
 }
 
 

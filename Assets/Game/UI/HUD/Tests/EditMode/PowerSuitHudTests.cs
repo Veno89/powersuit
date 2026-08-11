@@ -39,6 +39,13 @@ namespace Powersuit.UI.HUD.Tests
                 false,
                 false
             );
+            HudPropulsionHeatState heat = new HudPropulsionHeatState(
+                true,
+                float.PositiveInfinity,
+                float.NaN,
+                false,
+                true
+            );
 
             Assert.That(health.Current, Is.Zero);
             Assert.That(health.Maximum, Is.EqualTo(1f));
@@ -50,6 +57,8 @@ namespace Powersuit.UI.HUD.Tests
             Assert.That(ability.CooldownNormalized, Is.EqualTo(1f));
             Assert.That(ability.ReadyNormalized, Is.Zero);
             Assert.That(ultimate.MeterNormalized, Is.Zero);
+            Assert.That(heat.Heat, Is.Zero);
+            Assert.That(heat.MaximumHeat, Is.EqualTo(1f));
         }
 
         [Test]
@@ -130,6 +139,18 @@ namespace Powersuit.UI.HUD.Tests
                 Is.EqualTo("RELOADING 43%")
             );
             Assert.That(
+                PowerSuitHudFormatter.FormatPropulsionHeat(
+                    new HudPropulsionHeatState(
+                        true,
+                        42.5f,
+                        100f,
+                        false,
+                        true
+                    )
+                ),
+                Is.EqualTo("HEAT 43%")
+            );
+            Assert.That(
                 PowerSuitHudFormatter.FormatAbility(
                     "ROCKET",
                     new HudAbilityState(true, 3.25f, 0.5f, false, false)
@@ -202,6 +223,7 @@ namespace Powersuit.UI.HUD.Tests
             PowerSuitHudSnapshot initial = new PowerSuitHudSnapshot(
                 new HudHealthState(true, 72.1f, 100f, false),
                 new HudWeaponState(true, 3, 5, 20, false, true, 0.421f),
+                new HudPropulsionHeatState(true, 42.1f, 100f, false, true),
                 new HudAbilityState(true, 3.21f, 0.5f, false, false),
                 new HudAbilityState(true, 4.71f, 0.5f, false, false),
                 new HudUltimateState(true, 0.421f, false, false)
@@ -211,6 +233,7 @@ namespace Powersuit.UI.HUD.Tests
             PowerSuitHudSnapshot visuallyChanged = new PowerSuitHudSnapshot(
                 new HudHealthState(true, 72.2f, 100f, false),
                 new HudWeaponState(true, 3, 5, 20, false, true, 0.424f),
+                new HudPropulsionHeatState(true, 42.4f, 100f, false, true),
                 new HudAbilityState(true, 3.24f, 0.49f, false, false),
                 new HudAbilityState(true, 4.74f, 0.49f, false, false),
                 new HudUltimateState(true, 0.424f, false, false)
@@ -231,6 +254,7 @@ namespace Powersuit.UI.HUD.Tests
             detector.Capture(new PowerSuitHudSnapshot(
                 new HudHealthState(true, 72.1f, 100f, false),
                 new HudWeaponState(true, 3, 5, 20, false, true, 0.424f),
+                new HudPropulsionHeatState(true, 42.4f, 100f, false, true),
                 new HudAbilityState(true, 3.24f, 0.5f, false, false),
                 new HudAbilityState(true, 4.74f, 0.5f, false, false),
                 new HudUltimateState(true, 0.424f, false, false)
@@ -240,6 +264,7 @@ namespace Powersuit.UI.HUD.Tests
                 new PowerSuitHudSnapshot(
                     new HudHealthState(true, 73.01f, 100f, false),
                     new HudWeaponState(true, 3, 5, 20, false, true, 0.425f),
+                    new HudPropulsionHeatState(true, 42.5f, 100f, false, true),
                     new HudAbilityState(true, 3.25f, 0.49f, false, false),
                     new HudAbilityState(true, 4.75f, 0.49f, false, false),
                     new HudUltimateState(true, 0.425f, false, false)
@@ -251,6 +276,7 @@ namespace Powersuit.UI.HUD.Tests
                 Is.EqualTo(
                     PowerSuitHudDirtyFlags.Health |
                     PowerSuitHudDirtyFlags.Reload |
+                    PowerSuitHudDirtyFlags.PropulsionHeat |
                     PowerSuitHudDirtyFlags.ShoulderRocket |
                     PowerSuitHudDirtyFlags.Lightning |
                     PowerSuitHudDirtyFlags.Ultimate
@@ -351,6 +377,7 @@ namespace Powersuit.UI.HUD.Tests
             return new PowerSuitHudSnapshot(
                 new HudHealthState(true, 75f, 100f, false),
                 weapon ?? new HudWeaponState(true, 3, 5, 20, false, false, 0f),
+                new HudPropulsionHeatState(true, 25f, 100f, false, false),
                 new HudAbilityState(true, 0f, 0f, true, false),
                 lightning ?? new HudAbilityState(true, 0f, 0f, true, false),
                 new HudUltimateState(true, 0.5f, false, false)

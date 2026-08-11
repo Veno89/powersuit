@@ -317,6 +317,7 @@ GameObject:
   - component: {fileID: 1192554725052913187}
   - component: {fileID: 2477880733686922859}
   - component: {fileID: 7582635530366268125}
+  - component: {fileID: 681430367640454470}
   - component: {fileID: 7054026691194563136}
   m_Layer: 0
   m_Name: Skirmisher
@@ -414,6 +415,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyAttackEmitter
   projectilePrefab: {fileID: 4451341877632146015, guid: 3c105a8f767d6cb48b36aa303c9c625f, type: 3}
   prewarmCount: 6
+--- !u!114 &681430367640454470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4354460178843937047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 289f540f11497eb46a0110416b62c9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyCombatReadabilityPresenter
+  controller: {fileID: 2477880733686922859}
+  visualRoot: {fileID: 3556614354796595013}
+  damageScalePunch: 0.075
+  damagePulseSharpness: 13
+  telegraphLineWidth: 0.075
+  telegraphTargetRadius: 0.75
 --- !u!114 &7054026691194563136
 MonoBehaviour:
   m_ObjectHideFlags: 0

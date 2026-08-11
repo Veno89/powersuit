@@ -260,6 +260,21 @@ namespace Powersuit.Editor
                     airfieldMaterial
                 );
 
+                // Saving prefabs can cause Unity to normalize local material
+                // keywords on referenced assets. Reassert the two authored
+                // emissive materials after every prefab save so regeneration
+                // cannot silently make the Harrier/projectile unlit.
+                CreateOrUpdateMaterial(
+                    EnemyMaterialFolder + "/" + EnemyRole.FlyingHarrier + ".mat",
+                    EnemyColors[(int)EnemyRole.FlyingHarrier],
+                    emission: true
+                );
+                CreateOrUpdateMaterial(
+                    ProjectileMaterialPath,
+                    new Color(1f, 0.24f, 0.035f),
+                    emission: true
+                );
+
                 ValidationReport report = Validate();
                 if (!report.IsValid)
                 {
@@ -295,6 +310,12 @@ namespace Powersuit.Editor
             {
                 errors.Add("EnemyAttackProjectile prefab has no TrailRenderer.");
             }
+
+            ValidateEmissionMaterial(
+                EnemyMaterialFolder + "/" + EnemyRole.FlyingHarrier + ".mat",
+                errors
+            );
+            ValidateEmissionMaterial(ProjectileMaterialPath, errors);
 
             for (int index = 0; index < Roles.Length; index++)
             {
@@ -340,6 +361,26 @@ namespace Powersuit.Editor
 
             ValidateSandboxPrefab(errors);
             return new ValidationReport(errors);
+        }
+
+        private static void ValidateEmissionMaterial(
+            string assetPath,
+            List<string> errors
+        )
+        {
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+            if (material == null || material.shader == null)
+            {
+                errors.Add("Missing emissive material: " + assetPath);
+                return;
+            }
+
+            UnityEngine.Rendering.LocalKeyword keyword =
+                new UnityEngine.Rendering.LocalKeyword(material.shader, "_EMISSION");
+            if (!keyword.isValid || !material.IsKeywordEnabled(keyword))
+            {
+                errors.Add(assetPath + " does not retain its _EMISSION keyword.");
+            }
         }
 
         private static EnemyArchetypeDefinition CreateOrUpdateDefinition(
@@ -403,7 +444,7 @@ namespace Powersuit.Editor
                 };
                 AssetDatabase.CreateAsset(material, assetPath);
             }
-            else
+            else if (material.shader != shader)
             {
                 material.shader = shader;
             }
@@ -426,13 +467,18 @@ namespace Powersuit.Editor
             {
                 Color emissionColor = emission ? color * 2.4f : Color.black;
                 material.SetColor("_EmissionColor", emissionColor);
-                if (emission)
+                // URP declares _EMISSION as a local shader keyword. Using the
+                // render-pipeline helper keeps it in the material's serialized
+                // valid-keyword set on current Unity versions; the legacy
+                // string-only API can silently drop it during reimport.
+                UnityEngine.Rendering.LocalKeyword emissionKeyword =
+                    new UnityEngine.Rendering.LocalKeyword(
+                        material.shader,
+                        "_EMISSION"
+                    );
+                if (emissionKeyword.isValid)
                 {
-                    material.EnableKeyword("_EMISSION");
-                }
-                else
-                {
-                    material.DisableKeyword("_EMISSION");
+                    material.SetKeyword(emissionKeyword, emission);
                 }
             }
 
@@ -513,6 +559,9 @@ namespace Powersuit.Editor
                 root.transform
             ).transform;
             BuildEnemyVisual(previewScene, visualRoot, role, material);
+            EnemyCombatReadabilityPresenter readability =
+                root.AddComponent<EnemyCombatReadabilityPresenter>();
+            readability.Configure(controller, visualRoot);
             BuildEnemyHealthBar(
                 previewScene,
                 root,
@@ -766,16 +815,16 @@ namespace Powersuit.Editor
             // Keep the default encounter readable for a first-time player.
             // The developer console can deliberately raise this cap for stress
             // testing without making an idle launch immediately lethal.
-            SetInteger(serialized, "activeEnemyCap", 8);
-            SetFloat(serialized, "spawnIntervalSeconds", 5.5f);
+            SetInteger(serialized, "activeEnemyCap", 10);
+            SetFloat(serialized, "spawnIntervalSeconds", 4.4f);
             SetInteger(serialized, "minimumGroupSize", 1);
-            SetInteger(serialized, "maximumGroupSize", 2);
-            SetFloat(serialized, "groupThreatBudget", 4f);
-            SetFloat(serialized, "groupActivationSpacingSeconds", 0.18f);
-            SetFloat(serialized, "playerSafeRadius", 11f);
+            SetInteger(serialized, "maximumGroupSize", 3);
+            SetFloat(serialized, "groupThreatBudget", 5.5f);
+            SetFloat(serialized, "groupActivationSpacingSeconds", 0.24f);
+            SetFloat(serialized, "playerSafeRadius", 10f);
             SetBoolean(serialized, "avoidCameraView", true);
             SetFloat(serialized, "spawnProtectionSeconds", 1.25f);
-            SetFloat(serialized, "maximumInitialAttackStaggerSeconds", 2.4f);
+            SetFloat(serialized, "maximumInitialAttackStaggerSeconds", 2.8f);
             SetFloat(serialized, "deathRecycleDelaySeconds", 0.65f);
             SetBoolean(serialized, "useDeterministicSeed", true);
             SetInteger(serialized, "deterministicSeed", 109);
@@ -836,6 +885,10 @@ namespace Powersuit.Editor
             AddWorldBox(previewScene, parent, "CargoStack", new Vector3(4.5f, 1f, 4.5f), new Vector3(4f, 2f, 3f), material);
             AddWorldBox(previewScene, parent, "LowCoverA", new Vector3(3f, 0.65f, -5.5f), new Vector3(5f, 1.3f, 1f), material);
             AddWorldBox(previewScene, parent, "LowCoverB", new Vector3(-2f, 0.65f, 6f), new Vector3(4f, 1.3f, 1f), material);
+            AddWorldBox(previewScene, parent, "UpperCatwalk", new Vector3(-1.5f, 3.5f, 0f), new Vector3(8f, 0.45f, 2.2f), material);
+            AddWorldBox(previewScene, parent, "CatwalkSupportWest", new Vector3(-5f, 1.7f, 0f), new Vector3(0.7f, 3.4f, 0.7f), material);
+            AddWorldBox(previewScene, parent, "CatwalkSupportEast", new Vector3(2f, 1.7f, 0f), new Vector3(0.7f, 3.4f, 0.7f), material);
+            AddWorldBox(previewScene, parent, "AoEPracticePad", new Vector3(5.4f, 0.06f, 0f), new Vector3(5.5f, 0.12f, 5.5f), material);
         }
 
         private static void BuildCausewayArea(
@@ -855,6 +908,10 @@ namespace Powersuit.Editor
             AddWorldBox(previewScene, parent, "CoverNorth", new Vector3(-5f, 0.7f, 5f), new Vector3(3.5f, 1.4f, 1f), material);
             AddWorldBox(previewScene, parent, "CoverSouth", new Vector3(5f, 0.7f, -5f), new Vector3(3.5f, 1.4f, 1f), material);
             AddWorldBox(previewScene, parent, "Overlook", new Vector3(5.7f, 1.25f, 6.8f), new Vector3(5f, 2.5f, 4f), material);
+            AddWorldBox(previewScene, parent, "ElevatedBridge", new Vector3(0f, 3.2f, 6.2f), new Vector3(9f, 0.5f, 2.4f), material);
+            AddWorldBox(previewScene, parent, "BridgePillarWest", new Vector3(-3.6f, 1.5f, 6.2f), new Vector3(0.65f, 3f, 0.65f), material);
+            AddWorldBox(previewScene, parent, "BridgePillarEast", new Vector3(3.6f, 1.5f, 6.2f), new Vector3(0.65f, 3f, 0.65f), material);
+            AddWorldBox(previewScene, parent, "AoECourtyard", new Vector3(2.5f, 0.05f, -1f), new Vector3(6f, 0.1f, 6f), material);
         }
 
         private static void BuildAirfieldArea(
@@ -868,6 +925,11 @@ namespace Powersuit.Editor
             AddWorldBox(previewScene, parent, "TowerEast", new Vector3(5.6f, 4f, 5.5f), new Vector3(2.2f, 8f, 2.2f), material);
             AddWorldBox(previewScene, parent, "LandingPad", new Vector3(0f, 0.35f, 0f), new Vector3(7f, 0.7f, 7f), material);
             AddWorldBox(previewScene, parent, "BlastShield", new Vector3(-4f, 1f, 5f), new Vector3(5f, 2f, 0.8f), material);
+            AddWorldBox(previewScene, parent, "HoverPlatformNorth", new Vector3(0f, 4.2f, 7.2f), new Vector3(5.5f, 0.5f, 3.2f), material);
+            AddWorldBox(previewScene, parent, "HoverPlatformSouth", new Vector3(4.7f, 6.4f, -6.8f), new Vector3(4.2f, 0.5f, 3.2f), material);
+            AddWorldBox(previewScene, parent, "FlightGateWest", new Vector3(-6.8f, 5f, 0f), new Vector3(0.7f, 10f, 3.8f), material);
+            AddWorldBox(previewScene, parent, "FlightGateEast", new Vector3(6.8f, 5f, 0f), new Vector3(0.7f, 10f, 3.8f), material);
+            AddWorldBox(previewScene, parent, "FlightGateTop", new Vector3(0f, 9.6f, 0f), new Vector3(13.6f, 0.7f, 3.8f), material);
         }
 
         private static void AddWorldBox(
@@ -1047,6 +1109,8 @@ namespace Powersuit.Editor
             EnemyAttackEmitter emitter = prefab.GetComponent<EnemyAttackEmitter>();
             EnemyHealthBarPresenter healthBar =
                 prefab.GetComponent<EnemyHealthBarPresenter>();
+            EnemyCombatReadabilityPresenter readability =
+                prefab.GetComponent<EnemyCombatReadabilityPresenter>();
             if (controller == null)
             {
                 errors.Add(path + " has no root EnemyArchetypeController.");
@@ -1071,6 +1135,14 @@ namespace Powersuit.Editor
             )
             {
                 errors.Add(path + " has no configured pooled health bar.");
+            }
+            if (
+                readability == null ||
+                readability.Controller != controller ||
+                readability.VisualRoot == null
+            )
+            {
+                errors.Add(path + " has no configured hit/telegraph readability presenter.");
             }
             if (prefab.GetComponent<DamageableTarget>() != null)
             {
@@ -1102,6 +1174,20 @@ namespace Powersuit.Editor
             )
             {
                 errors.Add("Combat sandbox does not contain all three connected areas.");
+            }
+            else if (
+                environment.Find("Zone_FoundryYard/UpperCatwalk") == null ||
+                environment.Find("Zone_FoundryYard/AoEPracticePad") == null ||
+                environment.Find("Zone_CentralCauseway/ElevatedBridge") == null ||
+                environment.Find("Zone_CentralCauseway/AoECourtyard") == null ||
+                environment.Find("Zone_AerialBasin/HoverPlatformNorth") == null ||
+                environment.Find("Zone_AerialBasin/HoverPlatformSouth") == null ||
+                environment.Find("Zone_AerialBasin/FlightGateTop") == null
+            )
+            {
+                errors.Add(
+                    "Combat sandbox is missing cover, elevation, AoE, or flight-lane landmarks."
+                );
             }
 
             SpawnZone[] zones = sandbox.GetComponentsInChildren<SpawnZone>(true);
@@ -1149,6 +1235,16 @@ namespace Powersuit.Editor
             if (serialized.FindProperty("initializeOnStart").boolValue)
             {
                 errors.Add("Sandbox director must wait for external player/camera binding.");
+            }
+            if (
+                serialized.FindProperty("activeEnemyCap").intValue != 10 ||
+                Mathf.Abs(
+                    serialized.FindProperty("spawnIntervalSeconds").floatValue - 4.4f
+                ) > 0.001f ||
+                serialized.FindProperty("maximumGroupSize").intValue != 3
+            )
+            {
+                errors.Add("Sandbox encounter pacing does not match the polished demo profile.");
             }
         }
 

@@ -501,6 +501,7 @@ GameObject:
   - component: {fileID: 8906142185189284032}
   - component: {fileID: 5066314840962208521}
   - component: {fileID: 7150089082192506524}
+  - component: {fileID: 4450504929105388292}
   - component: {fileID: 5955249930202548225}
   m_Layer: 0
   m_Name: StationarySentry
@@ -598,6 +599,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyAttackEmitter
   projectilePrefab: {fileID: 4451341877632146015, guid: 3c105a8f767d6cb48b36aa303c9c625f, type: 3}
   prewarmCount: 6
+--- !u!114 &4450504929105388292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6162126286359751352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 289f540f11497eb46a0110416b62c9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyCombatReadabilityPresenter
+  controller: {fileID: 5066314840962208521}
+  visualRoot: {fileID: 6789953329995225217}
+  damageScalePunch: 0.075
+  damagePulseSharpness: 13
+  telegraphLineWidth: 0.075
+  telegraphTargetRadius: 0.75
 --- !u!114 &5955249930202548225
 MonoBehaviour:
   m_ObjectHideFlags: 0

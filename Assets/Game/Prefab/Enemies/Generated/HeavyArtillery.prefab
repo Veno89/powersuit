@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 4186072300193344807}
   - component: {fileID: 8628961861037859436}
   - component: {fileID: 3334966941873547128}
+  - component: {fileID: 8875403743589825263}
   - component: {fileID: 8546996529131516123}
   m_Layer: 0
   m_Name: HeavyArtillery
@@ -322,6 +323,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyAttackEmitter
   projectilePrefab: {fileID: 4451341877632146015, guid: 3c105a8f767d6cb48b36aa303c9c625f, type: 3}
   prewarmCount: 6
+--- !u!114 &8875403743589825263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1181218179551538293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 289f540f11497eb46a0110416b62c9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyCombatReadabilityPresenter
+  controller: {fileID: 8628961861037859436}
+  visualRoot: {fileID: 7490344456957118456}
+  damageScalePunch: 0.075
+  damagePulseSharpness: 13
+  telegraphLineWidth: 0.075
+  telegraphTargetRadius: 0.75
 --- !u!114 &8546996529131516123
 MonoBehaviour:
   m_ObjectHideFlags: 0

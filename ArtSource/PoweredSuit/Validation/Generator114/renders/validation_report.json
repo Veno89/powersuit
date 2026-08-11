@@ -1,0 +1,783 @@
+{
+  "actions_and_slots": {
+    "PS_Aim": {
+      "action": "PS_Aim",
+      "curve_count": 207,
+      "empty_curve_count": 0,
+      "keyframe_count": 621,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    },
+    "PS_Hover": {
+      "action": "PS_Hover",
+      "curve_count": 147,
+      "empty_curve_count": 0,
+      "keyframe_count": 441,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    },
+    "PS_Idle": {
+      "action": "PS_Idle",
+      "curve_count": 147,
+      "empty_curve_count": 0,
+      "keyframe_count": 441,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    },
+    "PS_Walk": {
+      "action": "PS_Walk",
+      "curve_count": 147,
+      "empty_curve_count": 0,
+      "keyframe_count": 735,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    }
+  },
+  "aim_pose_geometry_metrics": {
+    "aiming_eye_outward_m": 0.055,
+    "aiming_eye_reference_semantic": "firing_side_visor_receptor_proxy",
+    "aiming_eye_reference_world": [
+      -0.08667397499084473,
+      0.20097580552101135,
+      1.9263801574707031
+    ],
+    "automated_blockers": [],
+    "eye_to_ocular_ray_angle_deg": 9.945762249032576,
+    "eye_to_ocular_ray_blocker_deg": 25.0,
+    "eye_to_ocular_ray_preferred_deg": 15.0,
+    "head_scope_pitch_deg": 5.5,
+    "head_scope_roll_deg": -6.0,
+    "head_scope_yaw_deg": 0.5,
+    "head_search_quality": 0.780999912549,
+    "head_search_violation": 0.0,
+    "left_elbow_absolute_down_m": 0.1954803243279457,
+    "left_elbow_absolute_outward_m": -0.01686016656458378,
+    "left_elbow_bend_deg": 106.5697977827215,
+    "left_elbow_down_m": 0.21802434185519814,
+    "left_elbow_forward_m": 0.3823298141360283,
+    "left_elbow_outward_m": 0.12293370999395847,
+    "left_reach_ratio": 0.8016046074784073,
+    "non_stock_weapon_torso_mesh_overlap_pairs": 0,
+    "placement_mode": "stance_family_rigid",
+    "rifle_forward_dot_visual_forward": 0.9996504597365856,
+    "rifle_generator_version": 111,
+    "right_elbow_absolute_down_m": 0.2926398259587586,
+    "right_elbow_absolute_outward_m": 0.13051022496074438,
+    "right_elbow_bend_deg": 64.26316533958443,
+    "right_elbow_down_m": 0.2957934675505385,
+    "right_elbow_forward_m": 0.2863600291311741,
+    "right_elbow_outward_m": 0.20529563026502728,
+    "right_reach_ratio": 0.5319380178368717,
+    "scope_helmet_aabb_overlap_m3": 0.0,
+    "scope_helmet_mesh_overlap_pairs": 0,
+    "sight_axis_angle_deg": 1.7457225077286327,
+    "sight_front_clearance_m": 0.08884123060852289,
+    "sight_lateral_m": 0.011011386872269213,
+    "sight_vertical_m": 0.011281625949777663,
+    "stock_contact_to_expected_stance_offset_error_m": 7.539662075228826e-09,
+    "stock_contact_to_right_shoulder_m": 0.1261611326139092,
+    "stock_contact_to_stance_anchor_m": 0.08101852394177846,
+    "stock_shoulder_mesh_overlap_pairs": 22,
+    "stock_shoulder_min_vertex_surface_distance_m": 0.000196192879229784,
+    "support_hand_grip_mesh_overlap_pairs": 6,
+    "trigger_hand_grip_mesh_overlap_pairs": 18,
+    "weapon_contract_version": 3.0
+  },
+  "aim_render_files": [
+    "renders\\aim_validation\\idle_upperbody_front_3q.png",
+    "renders\\aim_validation\\idle_upperbody_side.png",
+    "renders\\aim_validation\\aim_frame_001_front_3q.png",
+    "renders\\aim_validation\\aim_frame_001_side.png",
+    "renders\\aim_validation\\aim_frame_015_front_3q.png",
+    "renders\\aim_validation\\aim_frame_015_side.png",
+    "renders\\aim_validation\\aim_frame_030_front_3q.png",
+    "renders\\aim_validation\\aim_frame_030_side.png",
+    "renders\\aim_validation\\aim_over_shoulder.png",
+    "renders\\aim_validation\\aim_close_trigger_grip.png",
+    "renders\\aim_validation\\aim_close_support_grip.png",
+    "renders\\aim_validation\\aim_close_stock_scope.png",
+    "renders\\aim_validation\\aim_close_elbows.png"
+  ],
+  "animation": {
+    "aim_action_data": {
+      "action": "PS_Aim",
+      "curve_count": 207,
+      "empty_curve_count": 0,
+      "keyframe_count": 621,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    },
+    "aim_slot": {
+      "action": "PS_Aim",
+      "curve_count": 207,
+      "empty_curve_count": 0,
+      "keyframe_count": 621,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    },
+    "frame_1_to_15_max_matrix_delta": 0.0054235393181443214,
+    "frame_1_to_30_max_matrix_delta": 0.0,
+    "idle_slot": {
+      "action": "PS_Idle",
+      "curve_count": 147,
+      "empty_curve_count": 0,
+      "keyframe_count": 441,
+      "rotation_modes": {
+        "Chest": "XYZ",
+        "Foot.L": "XYZ",
+        "Foot.R": "XYZ",
+        "Hand.L": "XYZ",
+        "Hand.R": "XYZ",
+        "Head": "XYZ",
+        "Hips": "XYZ",
+        "LowerArm.L": "XYZ",
+        "LowerArm.R": "XYZ",
+        "LowerLeg.L": "XYZ",
+        "LowerLeg.R": "XYZ",
+        "Neck": "XYZ",
+        "Root": "XYZ",
+        "Shoulder.L": "XYZ",
+        "Shoulder.R": "XYZ",
+        "Spine": "XYZ",
+        "UpperArm.L": "XYZ",
+        "UpperArm.R": "XYZ",
+        "UpperLeg.L": "XYZ",
+        "UpperLeg.R": "XYZ",
+        "WeaponBolt": "XYZ",
+        "WeaponMagazine": "XYZ",
+        "WeaponRoot": "XYZ"
+      },
+      "slot_count": 1,
+      "slot_identifier": "OBPowerSuit_Armature",
+      "slot_name": "",
+      "slot_target_id_type": "OBJECT"
+    },
+    "idle_vs_aim": {
+      "changed_required_bones": [
+        "Chest",
+        "Head",
+        "Shoulder.R",
+        "UpperArm.R",
+        "LowerArm.R",
+        "Hand.R",
+        "Shoulder.L",
+        "UpperArm.L",
+        "LowerArm.L",
+        "Hand.L"
+      ],
+      "max_rotation_delta_degrees": 138.28040529751073,
+      "max_translation_delta_m": 1.2664517892772098,
+      "per_bone": {
+        "Chest": {
+          "rotation_delta_degrees": 7.210000216514331,
+          "translation_delta_m": 0.009771939867313327
+        },
+        "Hand.L": {
+          "rotation_delta_degrees": 95.0278339581327,
+          "translation_delta_m": 1.2664517892772098
+        },
+        "Hand.R": {
+          "rotation_delta_degrees": 91.62582096601346,
+          "translation_delta_m": 1.0251062198589023
+        },
+        "Head": {
+          "rotation_delta_degrees": 7.867059360532793,
+          "translation_delta_m": 0.04415481166906434
+        },
+        "LowerArm.L": {
+          "rotation_delta_degrees": 124.89320437111645,
+          "translation_delta_m": 0.58547840888753
+        },
+        "LowerArm.R": {
+          "rotation_delta_degrees": 138.28040529751073,
+          "translation_delta_m": 0.3258336713693661
+        },
+        "Shoulder.L": {
+          "rotation_delta_degrees": 25.69875476889897,
+          "translation_delta_m": 0.03251871214231874
+        },
+        "Shoulder.R": {
+          "rotation_delta_degrees": 9.217064007322817,
+          "translation_delta_m": 0.03251871214231874
+        },
+        "UpperArm.L": {
+          "rotation_delta_degrees": 91.14963780614296,
+          "translation_delta_m": 0.13453929452980473
+        },
+        "UpperArm.R": {
+          "rotation_delta_degrees": 88.89481320931085,
+          "translation_delta_m": 0.05917133546611695
+        }
+      }
+    },
+    "lower_body_max_matrix_delta": 2.6645352591003757e-15,
+    "root_motion_m": 0.0
+  },
+  "automated_blockers": [],
+  "automated_validation": "PASS",
+  "blend_file": "powersuit_pipeline.blend",
+  "blend_sha256_at_validation": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+  "blender_version": "5.2.0 LTS",
+  "export_allowed": true,
+  "hand_helper_metrics": {
+    "left_hand_to_foregrip_target_m": 4.3599180699538497e-05,
+    "left_wrist_to_support_wrist_target_m": 4.3599180699538497e-05,
+    "right_hand_to_grip_target_m": 3.660721371597132e-05,
+    "right_wrist_to_primary_wrist_target_m": 3.660721371597132e-05
+  },
+  "hierarchy": {
+    "active_ik_constraints": [],
+    "direct_bone_parented_rifle_objects": [
+      "Rifle_BoltHandleKnob_R",
+      "Rifle_BoltHandleStem_R",
+      "Rifle_ChargingRail_R",
+      "Rifle_Magazine",
+      "Rifle_Magazine_Base",
+      "RifleRoot"
+    ],
+    "rifle_root_child_count": 57,
+    "rifle_root_children": [
+      "Rifle_Barrel",
+      "Rifle_Barrel_EnergySleeve",
+      "Rifle_Barrel_Shroud",
+      "Rifle_DataModule",
+      "Rifle_EjectionPort_R",
+      "Rifle_GripBackstrap",
+      "Rifle_Handguard_BottomRail",
+      "Rifle_Handguard_Core",
+      "Rifle_Handguard_SidePanel_L",
+      "Rifle_Handguard_SidePanel_R",
+      "Rifle_Handguard_TopRail",
+      "Rifle_Muzzle",
+      "Rifle_MuzzleBore",
+      "Rifle_MuzzleBrake_Baffle_1",
+      "Rifle_MuzzleBrake_Baffle_2",
+      "Rifle_MuzzleBrake_Core",
+      "Rifle_MuzzleBrake_TopFin",
+      "Rifle_PistolGrip",
+      "Rifle_PrimaryGrip",
+      "Rifle_Receiver_Core",
+      "Rifle_Receiver_LowerSpine",
+      "Rifle_Receiver_UpperShell",
+      "Rifle_ScopeElevation",
+      "Rifle_ScopeLensFront",
+      "Rifle_ScopeLensRear",
+      "Rifle_ScopeMount_Front",
+      "Rifle_ScopeMount_Front_Crossbar",
+      "Rifle_ScopeMount_Rear",
+      "Rifle_ScopeMount_Rear_Crossbar",
+      "Rifle_ScopeObjective",
+      "Rifle_ScopeOcular",
+      "Rifle_ScopeTube",
+      "Rifle_ScopeWindage",
+      "Rifle_SightOcular",
+      "Rifle_StockContact",
+      "Rifle_StockSpine",
+      "Rifle_StockStrut_L",
+      "Rifle_StockStrut_R",
+      "Rifle_Stock_BottomRail",
+      "Rifle_Stock_ButtPad",
+      "Rifle_Stock_RearBridge",
+      "Rifle_Stock_TopRail",
+      "Rifle_SupportGrip",
+      "Rifle_SupportGripMax",
+      "Rifle_SupportGripMin",
+      "Rifle_SupportGripTarget",
+      "Rifle_SupportGrip_Mount",
+      "Rifle_Trigger",
+      "Rifle_TriggerGuard",
+      "Rifle_Vent_L_1",
+      "Rifle_Vent_L_2",
+      "Rifle_Vent_L_3",
+      "Rifle_Vent_L_4",
+      "Rifle_Vent_R_1",
+      "Rifle_Vent_R_2",
+      "Rifle_Vent_R_3",
+      "Rifle_Vent_R_4"
+    ],
+    "rifle_root_parent": "PowerSuit_Armature",
+    "rifle_root_parent_bone": "WeaponRoot",
+    "rifle_root_parent_type": "BONE",
+    "rifle_world_determinant": 0.9999999403953552,
+    "temporary_objects": [],
+    "weapon_contract": {
+      "articulated_components": {
+        "bolt": [
+          "Rifle_BoltHandleKnob_R",
+          "Rifle_BoltHandleStem_R",
+          "Rifle_ChargingRail_R"
+        ],
+        "magazine": [
+          "Rifle_Magazine",
+          "Rifle_Magazine_Base"
+        ]
+      },
+      "contract_version": 3,
+      "muzzle_local": [
+        0.0,
+        1.1109999418258667,
+        0.14499999582767487
+      ],
+      "primary_grip_contact_offset_local": [
+        0.0,
+        -0.014000000432133675,
+        0.07999999821186066
+      ],
+      "primary_grip_local": [
+        0.0,
+        -0.03999999910593033,
+        0.01600000075995922
+      ],
+      "primary_grip_semantic": "wrist_head",
+      "sight_ocular_local": [
+        0.0,
+        -0.2529999911785126,
+        0.3149999976158142
+      ],
+      "stance_family": "shouldered_precision",
+      "stock_contact_local": [
+        -0.10999999940395355,
+        -0.36500000953674316,
+        0.03500000014901161
+      ],
+      "support_grip_contact_offset_local": [
+        0.013000000268220901,
+        -0.014000000432133675,
+        0.06700000166893005
+      ],
+      "support_grip_local": [
+        0.013000000268220901,
+        0.19099999964237213,
+        0.04500000178813934
+      ],
+      "support_grip_semantic": "wrist_head",
+      "weapon_family": "long_gun",
+      "weapon_id": "PS_HeroSniper"
+    }
+  },
+  "rifle_contact_geometry_metrics": {
+    "automated_blockers": [],
+    "buttpad_max_dimension_m": 0.12549634277820587,
+    "grip_helper_semantics": "wrist_transform",
+    "grip_wrist_offset_max_m": 0.11,
+    "grip_wrist_offset_min_m": 0.045,
+    "handguard_lower_rail_max_dimension_m": 0.07999998331069946,
+    "max_optic_lateral_offset_m": 0.0,
+    "primary_helper_to_grip_center_m": 0.08121576653664347,
+    "primary_wrist_declared_offset_vector_local": [
+      0.0,
+      -0.014000000432133675,
+      0.07999999821186066
+    ],
+    "primary_wrist_offset_vector_error_m": 7.679882693323606e-09,
+    "primary_wrist_offset_vector_local": [
+      0.0,
+      -0.013999998569488525,
+      0.08000000566244125
+    ],
+    "sight_hardpoint_lateral_offset_m": 0.0,
+    "stock_hardpoint_lateral_offset_m": 0.10999999940395355,
+    "stock_hardpoint_to_buttpad_center_m": 0.015000015393202056,
+    "support_grip_max_dimension_m": 0.11613932251930237,
+    "support_helper_to_grip_center_m": 0.06967065660511497,
+    "support_mount_max_dimension_m": 0.054999999701976776,
+    "support_wrist_declared_offset_vector_local": [
+      0.013000000268220901,
+      -0.014000000432133675,
+      0.06700000166893005
+    ],
+    "support_wrist_offset_vector_error_m": 1.862645149230957e-09,
+    "support_wrist_offset_vector_local": [
+      0.013000000268220901,
+      -0.013999998569488525,
+      0.06700000166893005
+    ],
+    "weapon_contract_version": 3.0
+  },
+  "rifle_render_files": [
+    "renders\\rifle_validation\\rifle_left_side_closeup.png",
+    "renders\\rifle_validation\\rifle_right_side_closeup.png",
+    "renders\\rifle_validation\\rifle_front_3q_closeup.png",
+    "renders\\rifle_validation\\rifle_rear_3q_closeup.png",
+    "renders\\rifle_validation\\rifle_with_suit_scale.png"
+  ],
+  "rifle_render_set_complete": true,
+  "validation_render_backend": "BLENDER_WORKBENCH",
+  "visual_rejection_reason": "",
+  "visual_review_required": [
+    "arms do not bend backward",
+    "trigger hand visibly holds the pistol grip",
+    "support palm and fingers visibly wrap the compact foregrip",
+    "weapon and arms do not pass through torso",
+    "small buttpad seats in the right shoulder pocket",
+    "helmet visor is attached to the helmet and ocular lens aligns with its sight line",
+    "no oversized platform remains beneath the handguard",
+    "rifle silhouette reads as one hero weapon",
+    "idle and aim visibly differ",
+    "ready idle holds the rifle diagonally with both hands",
+    "stowed rifle lies diagonally against the back without torso penetration",
+    "draw and sheath transitions do not pop or detach",
+    "forward walk plants feet without moonwalking",
+    "S/backward locomotion visibly backpedals while facing forward",
+    "aim-walk keeps the shouldered sight picture while legs move",
+    "reload hand follows the magazine through removal and insertion",
+    "bolt hand and bolt mechanism move together",
+    "stowed walk and hover keep the rifle on the back",
+    "forward run has a committed lean, longer stride, and airborne phase",
+    "left/right cross-steps carry weight laterally without idle sliding",
+    "aim strafing keeps the rifle shouldered while the legs cross-step"
+  ],
+  "visual_validation": "APPROVED",
+  "weapon_animation_render_files": [
+    "renders\\weapon_animation_validation\\ready_idle_front_3q.png",
+    "renders\\weapon_animation_validation\\stowed_idle_rear_3q.png",
+    "renders\\weapon_animation_validation\\draw_frame_010_rear_3q.png",
+    "renders\\weapon_animation_validation\\draw_frame_018_side.png",
+    "renders\\weapon_animation_validation\\sheathe_frame_021_rear_3q.png",
+    "renders\\weapon_animation_validation\\walk_forward_frame_009_side.png",
+    "renders\\weapon_animation_validation\\walk_backward_frame_009_side.png",
+    "renders\\weapon_animation_validation\\aim_walk_forward_frame_009_front_3q.png",
+    "renders\\weapon_animation_validation\\aim_walk_backward_frame_009_side.png",
+    "renders\\weapon_animation_validation\\reload_frame_050_magazine.png",
+    "renders\\weapon_animation_validation\\reload_frame_064_insert.png",
+    "renders\\weapon_animation_validation\\bolt_frame_012_close.png",
+    "renders\\weapon_animation_validation\\stowed_walk_frame_009_rear_3q.png",
+    "renders\\weapon_animation_validation\\stowed_hover_frame_031_rear_3q.png",
+    "renders\\weapon_animation_validation\\run_forward_frame_006_side.png",
+    "renders\\weapon_animation_validation\\walk_right_frame_009_front_3q.png",
+    "renders\\weapon_animation_validation\\aim_strafe_left_frame_009_front_3q.png"
+  ],
+  "weapon_animation_render_set_complete": true,
+  "weapon_animation_validation": {
+    "action_ranges": {
+      "PS_Aim_Walk_Backward": [
+        1,
+        31
+      ],
+      "PS_Aim_Walk_Forward": [
+        1,
+        31
+      ],
+      "PS_Aim_Walk_Left": [
+        1,
+        31
+      ],
+      "PS_Aim_Walk_Right": [
+        1,
+        31
+      ],
+      "PS_BoltCycle": [
+        1,
+        20
+      ],
+      "PS_Reload": [
+        1,
+        84
+      ],
+      "PS_Run_Forward": [
+        1,
+        21
+      ],
+      "PS_Walk_Backward": [
+        1,
+        31
+      ],
+      "PS_Walk_Forward": [
+        1,
+        31
+      ],
+      "PS_Walk_Left": [
+        1,
+        31
+      ],
+      "PS_Walk_Right": [
+        1,
+        31
+      ],
+      "PS_WeaponReady_Idle": [
+        1,
+        61
+      ],
+      "PS_WeaponStowed_Hover": [
+        1,
+        61
+      ],
+      "PS_WeaponStowed_Idle": [
+        1,
+        61
+      ],
+      "PS_WeaponStowed_Walk_Backward": [
+        1,
+        31
+      ],
+      "PS_WeaponStowed_Walk_Forward": [
+        1,
+        31
+      ],
+      "PS_WeaponStowed_Walk_Left": [
+        1,
+        31
+      ],
+      "PS_WeaponStowed_Walk_Right": [
+        1,
+        31
+      ],
+      "PS_Weapon_Draw": [
+        1,
+        30
+      ],
+      "PS_Weapon_Sheathe": [
+        1,
+        30
+      ]
+    },
+    "animation_contract_version": 5,
+    "automated_blockers": [],
+    "bolt_travel_m": 0.09500003450143121,
+    "control_bones": [
+      "WeaponRoot",
+      "WeaponMagazine",
+      "WeaponBolt"
+    ],
+    "draw_sheathe_endpoint_deltas": {
+      "draw_end_to_ready": 0.0,
+      "draw_start_to_stowed": 0.0,
+      "sheathe_end_to_stowed": 0.0,
+      "sheathe_start_to_ready": 0.0
+    },
+    "forward_backward_foot_phase_delta_m": 0.21299253753662606,
+    "fps": 30,
+    "left_right_foot_separation_m": 0.7130007100095099,
+    "ready_left_wrist_error_m": 5.304441052199294e-05,
+    "ready_right_wrist_error_m": 3.7247061271404926e-05,
+    "ready_torso_forward_projection_m": -0.011890442429155712,
+    "reload_magazine_travel_m": 0.32194009544795543,
+    "run_cycle_frames": 20,
+    "run_cycle_seconds": 0.6666666666666666,
+    "run_flight_clearance_m": 0.03650374384596944,
+    "run_left_wrist_error_m": 5.295189220083831e-05,
+    "run_right_wrist_error_m": 3.7378804720430246e-05,
+    "run_step_cadence_per_minute": 180,
+    "run_stride_m": 0.9341078011784703,
+    "run_torso_forward_projection_m": 0.10808517088674385,
+    "single_armature_slot_per_action": true,
+    "stowed_back_offset_m": -0.28499968396499753,
+    "walk_stride_m": 0.8379278450738639,
+    "weapon_contract": {
+      "articulated_components": {
+        "bolt": [
+          "Rifle_BoltHandleKnob_R",
+          "Rifle_BoltHandleStem_R",
+          "Rifle_ChargingRail_R"
+        ],
+        "magazine": [
+          "Rifle_Magazine",
+          "Rifle_Magazine_Base"
+        ]
+      },
+      "contract_version": 3,
+      "muzzle_local": [
+        0.0,
+        1.1109999418258667,
+        0.14499999582767487
+      ],
+      "primary_grip_contact_offset_local": [
+        0.0,
+        -0.014000000432133675,
+        0.07999999821186066
+      ],
+      "primary_grip_local": [
+        0.0,
+        -0.03999999910593033,
+        0.01600000075995922
+      ],
+      "primary_grip_semantic": "wrist_head",
+      "sight_ocular_local": [
+        0.0,
+        -0.2529999911785126,
+        0.3149999976158142
+      ],
+      "stance_family": "shouldered_precision",
+      "stock_contact_local": [
+        -0.10999999940395355,
+        -0.36500000953674316,
+        0.03500000014901161
+      ],
+      "support_grip_contact_offset_local": [
+        0.013000000268220901,
+        -0.014000000432133675,
+        0.06700000166893005
+      ],
+      "support_grip_local": [
+        0.013000000268220901,
+        0.19099999964237213,
+        0.04500000178813934
+      ],
+      "support_grip_semantic": "wrist_head",
+      "weapon_family": "long_gun",
+      "weapon_id": "PS_HeroSniper"
+    }
+  }
+}

@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Abilities.Unity::Powersuit.Abilities.UnityAdapters.AbilityAreaEffectPresentation
   lineWidth: 0.105
   surfaceOffset: 0.055
-  defaultImpactSeconds: 0.55
+  defaultImpactSeconds: 0.8
   createImpactLight: 1
 --- !u!114 &237362498207393761
 MonoBehaviour:

@@ -89,11 +89,17 @@ namespace Powersuit.Editor
             "PS_Weapon_Sheathe",
             "PS_Walk_Forward",
             "PS_Walk_Backward",
+            "PS_Walk_Left",
+            "PS_Walk_Right",
             "PS_Run_Forward",
             "PS_Aim_Walk_Forward",
             "PS_Aim_Walk_Backward",
+            "PS_Aim_Walk_Left",
+            "PS_Aim_Walk_Right",
             "PS_WeaponStowed_Walk_Forward",
             "PS_WeaponStowed_Walk_Backward",
+            "PS_WeaponStowed_Walk_Left",
+            "PS_WeaponStowed_Walk_Right",
             "PS_WeaponStowed_Hover",
             "PS_Reload",
             "PS_BoltCycle"
@@ -110,11 +116,17 @@ namespace Powersuit.Editor
                 "PS_WeaponStowed_Idle",
                 "PS_Walk_Forward",
                 "PS_Walk_Backward",
+                "PS_Walk_Left",
+                "PS_Walk_Right",
                 "PS_Run_Forward",
                 "PS_Aim_Walk_Forward",
                 "PS_Aim_Walk_Backward",
+                "PS_Aim_Walk_Left",
+                "PS_Aim_Walk_Right",
                 "PS_WeaponStowed_Walk_Forward",
                 "PS_WeaponStowed_Walk_Backward",
+                "PS_WeaponStowed_Walk_Left",
+                "PS_WeaponStowed_Walk_Right",
                 "PS_WeaponStowed_Hover"
             };
 
@@ -218,6 +230,7 @@ namespace Powersuit.Editor
                 // and unrelated prefabs. Missing feedback assets must be created
                 // explicitly before integration.
                 ValidateCombatFeedbackAssets();
+                ConfigureCombatFeedbackAssets();
 
                 AbilityPrefabSet abilityPrefabs =
                     CreateOrUpdateAbilityPrefabs();
@@ -625,21 +638,27 @@ namespace Powersuit.Editor
                 "Ready Locomotion Blend",
                 clips["PS_Walk_Backward"],
                 clips["PS_WeaponReady_Idle"],
-                clips["PS_Walk_Forward"]
+                clips["PS_Walk_Forward"],
+                clips["PS_Walk_Left"],
+                clips["PS_Walk_Right"]
             );
             BlendTree stowedLocomotion = CreateDirectionalBlendTree(
                 controller,
                 "Stowed Locomotion Blend",
                 clips["PS_WeaponStowed_Walk_Backward"],
                 clips["PS_WeaponStowed_Idle"],
-                clips["PS_WeaponStowed_Walk_Forward"]
+                clips["PS_WeaponStowed_Walk_Forward"],
+                clips["PS_WeaponStowed_Walk_Left"],
+                clips["PS_WeaponStowed_Walk_Right"]
             );
             BlendTree aimLocomotion = CreateDirectionalBlendTree(
                 controller,
                 "Aim Locomotion Blend",
                 clips["PS_Aim_Walk_Backward"],
                 clips["PS_Aim"],
-                clips["PS_Aim_Walk_Forward"]
+                clips["PS_Aim_Walk_Forward"],
+                clips["PS_Aim_Walk_Left"],
+                clips["PS_Aim_Walk_Right"]
             );
 
             AnimatorState ready = AddState(
@@ -1022,20 +1041,25 @@ namespace Powersuit.Editor
             string name,
             Motion backward,
             Motion idle,
-            Motion forward
+            Motion forward,
+            Motion left,
+            Motion right
         )
         {
             BlendTree tree = new BlendTree
             {
                 name = name,
-                blendType = BlendTreeType.Simple1D,
-                blendParameter = "MovementY",
+                blendType = BlendTreeType.FreeformDirectional2D,
+                blendParameter = "MovementX",
+                blendParameterY = "MovementY",
                 useAutomaticThresholds = false,
                 hideFlags = HideFlags.HideInHierarchy
             };
-            tree.AddChild(backward, -1f);
-            tree.AddChild(idle, 0f);
-            tree.AddChild(forward, 1f);
+            tree.AddChild(idle, Vector2.zero);
+            tree.AddChild(backward, Vector2.down);
+            tree.AddChild(forward, Vector2.up);
+            tree.AddChild(left, Vector2.left);
+            tree.AddChild(right, Vector2.right);
             AssetDatabase.AddObjectToAsset(tree, controller);
             return tree;
         }
@@ -1513,6 +1537,10 @@ namespace Powersuit.Editor
                 }
                 weapon.Definition = weaponDefinition;
                 weapon.ShowLegacyAmmoHud = false;
+                SerializedObject weaponFeedback = new SerializedObject(weapon);
+                SetFloat(weaponFeedback, "flashLightIntensity", 7f);
+                SetFloat(weaponFeedback, "flashDuration", 0.065f);
+                weaponFeedback.ApplyModifiedPropertiesWithoutUndo();
 
                 PowerSuitScopeSight scopeSight =
                     instance.GetComponent<PowerSuitScopeSight>();
@@ -1555,6 +1583,14 @@ namespace Powersuit.Editor
                 }
                 visualFlightResponse.VisualRoot = visualWrapper.transform;
 
+                PowerSuitFootPlanting footPlanting =
+                    instance.GetComponent<PowerSuitFootPlanting>();
+                if (footPlanting == null)
+                {
+                    footPlanting = instance.AddComponent<PowerSuitFootPlanting>();
+                }
+                footPlanting.Bind(suitController, animator);
+
                 PowerSuitThrusterPresentation thrusterPresentation =
                     instance.GetComponent<PowerSuitThrusterPresentation>();
                 if (thrusterPresentation == null)
@@ -1563,6 +1599,15 @@ namespace Powersuit.Editor
                         instance.AddComponent<PowerSuitThrusterPresentation>();
                 }
                 thrusterPresentation.VisualRoot = visualWrapper.transform;
+
+                PowerSuitPropulsionHeat propulsionHeat =
+                    instance.GetComponent<PowerSuitPropulsionHeat>();
+                if (propulsionHeat == null)
+                {
+                    propulsionHeat = instance.AddComponent<
+                        PowerSuitPropulsionHeat
+                    >();
+                }
 
                 ShoulderRocketAbility shoulderRocket =
                     instance.GetComponent<ShoulderRocketAbility>();
@@ -1628,6 +1673,7 @@ namespace Powersuit.Editor
                     instance,
                     playerHealth,
                     weapon,
+                    propulsionHeat,
                     shoulderRocket,
                     lightningStrike,
                     voidUltimate
@@ -1953,6 +1999,7 @@ namespace Powersuit.Editor
             GameObject player,
             PlayerHealth health,
             PowerSuitWeapon weapon,
+            PowerSuitPropulsionHeat propulsionHeat,
             ShoulderRocketAbility rocket,
             LightningStrikeAbility lightning,
             VoidUltimateAbility ultimate
@@ -2011,6 +2058,15 @@ namespace Powersuit.Editor
                 new Vector2(260f, 52f),
                 TextAnchor.MiddleCenter
             );
+            HudWidget propulsionHeatWidget = CreateHudWidget(
+                safeArea,
+                "PropulsionHeat",
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(30f, 86f),
+                new Vector2(280f, 38f),
+                TextAnchor.MiddleLeft
+            );
             HudWidget reloadWidget = CreateHudWidget(
                 safeArea,
                 "Reload",
@@ -2053,6 +2109,11 @@ namespace Powersuit.Editor
             SerializedObject serialized = new SerializedObject(presenter);
             SetObjectReference(serialized, "healthSource", health);
             SetObjectReference(serialized, "weaponSource", weapon);
+            SetObjectReference(
+                serialized,
+                "propulsionHeatSource",
+                propulsionHeat
+            );
             SetObjectReference(serialized, "shoulderRocketSource", rocket);
             SetObjectReference(serialized, "lightningSource", lightning);
             SetObjectReference(serialized, "ultimateSource", ultimate);
@@ -2071,6 +2132,11 @@ namespace Powersuit.Editor
                 serialized,
                 "reload",
                 reloadWidget
+            );
+            ConfigureHudWidget(
+                serialized,
+                "propulsionHeat",
+                propulsionHeatWidget
             );
             ConfigureHudWidget(
                 serialized,
@@ -2455,6 +2521,118 @@ namespace Powersuit.Editor
             }
         }
 
+        private static void ConfigureCombatFeedbackAssets()
+        {
+            ConfigureParticleFeedbackPrefab(
+                "Assets/Game/Prefab/Combat/EnemyImpactEffect.prefab",
+                burstCount: 38,
+                minimumLifetime: 0.1f,
+                maximumLifetime: 0.34f,
+                minimumSpeed: 1.5f,
+                maximumSpeed: 7.5f,
+                minimumSize: 0.065f,
+                maximumSize: 0.27f,
+                coneAngle: 48f
+            );
+            ConfigureParticleFeedbackPrefab(
+                "Assets/Game/Prefab/Combat/EnvironmentImpactEffect.prefab",
+                burstCount: 22,
+                minimumLifetime: 0.08f,
+                maximumLifetime: 0.28f,
+                minimumSpeed: 1f,
+                maximumSpeed: 5.5f,
+                minimumSize: 0.045f,
+                maximumSize: 0.2f,
+                coneAngle: 38f
+            );
+            ConfigureParticleFeedbackPrefab(
+                "Assets/Game/Prefab/Combat/MuzzleFlashEffect.prefab",
+                burstCount: 24,
+                minimumLifetime: 0.035f,
+                maximumLifetime: 0.13f,
+                minimumSpeed: 1f,
+                maximumSpeed: 3.2f,
+                minimumSize: 0.055f,
+                maximumSize: 0.25f,
+                coneAngle: 24f
+            );
+
+            const string projectilePath =
+                "Assets/Game/Prefab/Combat/PlayerProjectile.prefab";
+            GameObject projectileRoot = PrefabUtility.LoadPrefabContents(projectilePath);
+            try
+            {
+                PlayerProjectile projectile = projectileRoot.GetComponent<PlayerProjectile>();
+                if (projectile == null)
+                {
+                    throw new InvalidOperationException(
+                        "PlayerProjectile prefab is missing its runtime adapter."
+                    );
+                }
+                SerializedObject serialized = new SerializedObject(projectile);
+                SetFloat(serialized, "trailTime", 0.22f);
+                SetFloat(serialized, "startWidth", 0.2f);
+                SetFloat(serialized, "endWidth", 0.025f);
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                PrefabUtility.SaveAsPrefabAsset(projectileRoot, projectilePath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(projectileRoot);
+            }
+        }
+
+        private static void ConfigureParticleFeedbackPrefab(
+            string path,
+            short burstCount,
+            float minimumLifetime,
+            float maximumLifetime,
+            float minimumSpeed,
+            float maximumSpeed,
+            float minimumSize,
+            float maximumSize,
+            float coneAngle
+        )
+        {
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                ParticleSystem particles = root.GetComponent<ParticleSystem>();
+                if (particles == null)
+                {
+                    throw new InvalidOperationException(path + " has no ParticleSystem.");
+                }
+                ParticleSystem.MainModule main = particles.main;
+                main.startLifetime = new ParticleSystem.MinMaxCurve(
+                    minimumLifetime,
+                    maximumLifetime
+                );
+                main.startSpeed = new ParticleSystem.MinMaxCurve(
+                    minimumSpeed,
+                    maximumSpeed
+                );
+                main.startSize = new ParticleSystem.MinMaxCurve(
+                    minimumSize,
+                    maximumSize
+                );
+                ParticleSystem.EmissionModule emission = particles.emission;
+                emission.rateOverTime = 0f;
+                emission.SetBursts(
+                    new[] { new ParticleSystem.Burst(0f, burstCount) }
+                );
+                ParticleSystem.ShapeModule shape = particles.shape;
+                shape.shapeType = ParticleSystemShapeType.Cone;
+                shape.angle = coneAngle;
+                AutoRecycleEffect recycle = root.GetComponent<AutoRecycleEffect>();
+                recycle?.SetDuration(maximumLifetime + 0.12f);
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
         private static void ValidateIntegratedAssets()
         {
             Dictionary<string, AnimationClip> clips = LoadRequiredClips();
@@ -2571,6 +2749,31 @@ namespace Powersuit.Editor
                     "at its validated powered-sprint cadence and retain every locomotion exit."
                 );
             }
+
+            ValidateDirectionalLocomotionBlend(
+                readyState,
+                clips["PS_WeaponReady_Idle"],
+                clips["PS_Walk_Forward"],
+                clips["PS_Walk_Backward"],
+                clips["PS_Walk_Left"],
+                clips["PS_Walk_Right"]
+            );
+            ValidateDirectionalLocomotionBlend(
+                aimState,
+                clips["PS_Aim"],
+                clips["PS_Aim_Walk_Forward"],
+                clips["PS_Aim_Walk_Backward"],
+                clips["PS_Aim_Walk_Left"],
+                clips["PS_Aim_Walk_Right"]
+            );
+            ValidateDirectionalLocomotionBlend(
+                stowedState,
+                clips["PS_WeaponStowed_Idle"],
+                clips["PS_WeaponStowed_Walk_Forward"],
+                clips["PS_WeaponStowed_Walk_Backward"],
+                clips["PS_WeaponStowed_Walk_Left"],
+                clips["PS_WeaponStowed_Walk_Right"]
+            );
 
             AnimatorControllerLayer forwardPoseLayer = controller.layers
                 .SingleOrDefault(
@@ -3003,6 +3206,8 @@ namespace Powersuit.Editor
             PowerSuitHudSafeArea hudSafeArea =
                 variant.GetComponentInChildren<PowerSuitHudSafeArea>(true);
             PlayerHealth playerHealth = variant.GetComponent<PlayerHealth>();
+            PowerSuitPropulsionHeat propulsionHeat =
+                variant.GetComponent<PowerSuitPropulsionHeat>();
             PowerSuitDemoBootstrap demoBootstrap =
                 variant.GetComponent<PowerSuitDemoBootstrap>();
             GameObject expectedDemoWorld =
@@ -3021,6 +3226,8 @@ namespace Powersuit.Editor
                 playerHealth == null ||
                 hud.HealthSource != playerHealth ||
                 hud.WeaponSource != weapon ||
+                propulsionHeat == null ||
+                hud.PropulsionHeatSource != propulsionHeat ||
                 hud.ShoulderRocketSource != rocketAbility ||
                 hud.LightningSource != lightningAbility ||
                 hud.UltimateSource != ultimateAbility ||
@@ -3066,18 +3273,24 @@ namespace Powersuit.Editor
 
             PowerSuitVisualFlightResponse visualFlightResponse =
                 variant.GetComponent<PowerSuitVisualFlightResponse>();
+            PowerSuitFootPlanting footPlanting =
+                variant.GetComponent<PowerSuitFootPlanting>();
             PowerSuitThrusterPresentation thrusterPresentation =
                 variant.GetComponent<PowerSuitThrusterPresentation>();
             if (
                 visualFlightResponse == null ||
                 visualFlightResponse.VisualRoot != visual ||
+                footPlanting == null ||
+                footPlanting.Animator == null ||
+                footPlanting.LeftFoot == null ||
+                footPlanting.RightFoot == null ||
                 thrusterPresentation == null ||
                 thrusterPresentation.VisualRoot != visual
             )
             {
                 throw new InvalidOperationException(
-                    "Generator 109 player must bind flight attitude and powered " +
-                    "thruster feedback to its dedicated visual wrapper."
+                    "Generator 109 player must bind flight attitude, foot planting, " +
+                    "and powered thruster feedback to its dedicated visual hierarchy."
                 );
             }
 
@@ -3111,6 +3324,53 @@ namespace Powersuit.Editor
             }
 
             ValidateDemoSceneContents();
+        }
+
+        private static void ValidateDirectionalLocomotionBlend(
+            AnimatorState state,
+            Motion idle,
+            Motion forward,
+            Motion backward,
+            Motion left,
+            Motion right
+        )
+        {
+            BlendTree tree = state != null ? state.motion as BlendTree : null;
+            if (
+                tree == null ||
+                tree.blendType != BlendTreeType.FreeformDirectional2D ||
+                tree.blendParameter != "MovementX" ||
+                tree.blendParameterY != "MovementY"
+            )
+            {
+                throw new InvalidOperationException(
+                    state?.name + " must use the signed two-dimensional locomotion blend."
+                );
+            }
+
+            Dictionary<Motion, Vector2> expected = new Dictionary<Motion, Vector2>
+            {
+                [idle] = Vector2.zero,
+                [forward] = Vector2.up,
+                [backward] = Vector2.down,
+                [left] = Vector2.left,
+                [right] = Vector2.right
+            };
+            ChildMotion[] children = tree.children;
+            if (
+                children.Length != expected.Count ||
+                children.Any(
+                    child =>
+                        child.motion == null ||
+                        !expected.TryGetValue(child.motion, out Vector2 expectedPosition) ||
+                        Vector2.Distance(child.position, expectedPosition) > 0.001f
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    state.name + " is missing one or more cardinal locomotion motions."
+                );
+            }
         }
 
         private static void ValidateDemoSceneContents()

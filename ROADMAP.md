@@ -10,7 +10,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | B — Ground movement feel | Implemented with sprint/run | Plain-C# and adapter tests pass | Sprint cadence, slopes, steps, landing and feel review |
 | C — Flight feel | Implemented with hold-to-flight/touchdown | State/adapter tests and smoke pass | Jump/flight timing, hover, boost, landing and frame-rate feel review |
 | D — Camera and aiming | Implemented profiles and true scope | Camera/source validation passes | Fit/1x framing, close cover and scope feel review |
-| E — Animation integration | Generator113 18-clip powered-gait set implemented | Controller/prefab and 33-render source validation pass | Directional start/stop/strafe polish, retargeting and replacement character |
+| E — Animation integration | Generator114 24-clip directional powered-gait set implemented | 2D controller/prefab and 35-render source validation pass | Owner feel, retargeting and replacement character |
 | F — Precision Rifle | Implemented | Runtime/presentation/pooling tests pass | Shot, reload, bolt and scope feel review |
 | G — Three abilities | Implemented | State, targeting and adapter tests pass | Combat tuning and presentation review |
 | H — Enemy architecture | Implemented with six archetypes | Runtime/adapter/content tests pass | Archetype readability and fair-combat review |
@@ -38,8 +38,10 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Apply the focused fast-response tune: 6.5 m/s ground speed, strong acceleration/deceleration/reversal braking, responsive 14/28 m/s flight/boost, faster combat turning, and stride playback matched closer to the new speed.
 - [x] Add stable-ground `Shift` sprinting for forward/lateral movement with a 1.65x speed multiplier; keep aim and backpedal in their dedicated locomotion states.
 - [x] Add the looping `PS_Run_Forward` clip and generated `Run Locomotion` state, using 1.35x state playback rather than the ordinary locomotion speed parameter.
-- [x] Preserve the 6.5 m/s walk and 10.725 m/s sprint speeds while advancing Generator113 to a 0.8379 m powered walk stride, 0.9341 m run stride, 0.0365 m airborne clearance, and a calmer 2.75x full-speed ordinary gait cadence.
-- [x] Add cached blue-white backpack and boot exhaust for sprint, hover, and boost without giving presentation code movement or future heat-resource authority.
+- [x] Preserve the 6.5 m/s walk and 10.725 m/s sprint speeds while advancing Generator114 to 24 actions: powered forward/backward gaits plus authored ready/aimed/stowed left/right loops and 2D diagonal blends.
+- [x] Add contact-aware foot planting plus procedural start/stop, braking, strafe, turn, and run attitude without giving presentation code movement authority.
+- [x] Add cached backpack and boot exhaust for sprint, hover, and boost, with heat-reactive blue-white through orange/red presentation.
+- [x] Add a shared, testable sprint/flight/boost propulsion-heat resource, cooldown delay, overheat/recovery lock, respawn reset, and safe-area HUD bar.
 - [x] Replace the `F` flight toggle with tap-versus-hold jump ownership: tap `Space` jumps, while continuously holding an accepted ground/coyote jump for about 0.9 seconds enters flight.
 - [x] Prevent falling + `Space` from arming flight, cancel the hold sequence on early landing/release, and return to ground locomotion automatically when the player's feet touch down.
 - [x] Add hover, vertical control, braking, boost, banking, landing, and flight-compatible weapon/ability actions; `Shift` remains the flight boost while airborne.
@@ -56,6 +58,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Implement shoulder rocket with hardpoint launch, reticle targeting, cooldown, pooled projectile, radial falloff damage, and impulse.
 - [x] Implement hold/release lightning targeting with projected indicator, validation/cancel, cooldown, warning, and area strike.
 - [x] Visualize rocket and lightning strength with pulsing full-radius boundaries, expanding shockwaves/rays, impact light, and a vertical lightning column.
+- [x] Retain a full-radius aftermath ring after rocket/lightning impact; strengthen rifle muzzle/tracer/impact feedback and critical/kill hit markers.
 - [x] Implement meter-gated void orb with placement, periodic damage, pull, final outward burst, and pooled reset.
 - [x] Share cooldown/meter, target validation, faction-safe radial deduplication, external-force, pool, input, and lifecycle boundaries without a giant generic skill graph.
 
@@ -64,13 +67,15 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Add shared enemy configuration, runtime state, decision logic, signals, motor/controller, attack emitter/projectile, force response, health/death, and reset ownership.
 - [x] Generate and validate six definitions and prefabs: Stationary Sentry, Patrol Rifleman, Pursuer, Heavy Artillery, Flying Harrier, and Skirmisher.
 - [x] Add camera-facing, distance-culled mesh health bars suitable for pooled enemies.
+- [x] Add pooled enemy damage/stagger flashes and full-duration origin-to-target telegraphs with target rings.
 - [x] Add deterministic weighted/threat selection, caps, interval/group control, safe radius, ground/flying zones, pool warmup/reuse, death replacement, seed control, and diagnostics.
 - [x] Generate `PowerSuitCombatSandbox.prefab` with central combat, open flight/long-range, and vertical/aerial zones, plus 19 ground/flight spawn points.
+- [x] Add foundry catwalk/AoE pad, causeway bridge/AoE courtyard, and airfield hover-platform/flight-gate landmarks; tune the live cap to 10 with 4.4-second, 1–3 enemy groups.
 - [x] Instantiate and bind the generated world at runtime without mutating the canonical scene; suppress and restore the three legacy rollback enemies through the bootstrap lifecycle.
 
 ### K–M — HUD, tools, pooling, and performance foundations
 
-- [x] Add health, ammo/reload, reticle/hit, ability cooldown, and ultimate HUD state; expose encounter counts through console statistics.
+- [x] Add health, propulsion heat, ammo/reload, reticle/hit, ability cooldown, and ultimate HUD state; expose encounter counts through console statistics.
 - [x] Avoid redundant HUD string updates through display-quantized snapshot comparison.
 - [x] Remove duplicate legacy health/ammo/reload overlays from the integrated player and parent all Canvas widgets under a tested safe-area root; keep health, abilities, ammo, and reload in separate screen regions.
 - [x] Add an Editor/Development-Build console with parsing, history, help, errors, clamping, cursor/input ownership, runtime tuning APIs, and optional statistics.
@@ -81,17 +86,18 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 ## Verification completed
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
-- [x] Full Unity EditMode suite: 228/228 passed.
+- [x] Full Unity EditMode suite: 234/234 passed.
 - [x] Full Unity PlayMode suite: 12/12 passed.
 - [x] PlayMode pool exercise: 1,000 projectile spawn/recycle operations without steady-state instantiation.
-- [x] Generator113 source validation: 18 animation clips, contract version 4, and 33 mandatory renders; deterministic CPU fallback completed after the NVIDIA headless Workbench path crashed.
+- [x] Generator114 source validation: 24 animation clips, contract version 5, and 35 mandatory renders; exact FBX hash matches Unity and all six lateral clips import into cardinal 2D blends.
 - [x] Generated controller/run state, additive bolt clip, scope presenter, prefabs, definitions, player integration, world, bootstrap, HUD, and SpawnDirector validation.
 - [x] Clean runtime observation after final pooling/enemy fixes: no Unity gameplay errors or recurring warnings.
 - [x] Windows x64 Development Build completed.
 - [x] Fifteen-second headless build smoke started successfully and remained alive until the intentional stop, with no gameplay exception, assertion, or missing-reference pattern. Only expected offline Unity cloud `curl` failures appeared; package-level Sentis shader warnings in the build were non-blocking.
 - [x] Final Unity Console inspection: 0 errors.
+- [x] Broad owner hands-on pass on 2026-08-11: the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent.
 
-## Manual and measurement gates still open
+## Targeted manual and measurement gates still open
 
 - [ ] Owner acceptance at **Game view Fit/1x** for camera framing and perceived zoom. A saved local `2x`/`4x` or panned Game view is not a gameplay camera setting.
 - [ ] Ground matrix: walk/sprint responsiveness and cadence, reverse/backpedal, diagonal movement, jump buffer/coyote behavior, slopes, steps, walls, landing recovery, and rapid direction changes.
@@ -102,8 +108,8 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [ ] Unity Profiler captures under representative and stress loads. Record CPU, rendering, GC/allocation, pool misses/capacity, projectile counts, and frame pacing at 30/60/120+ FPS and uncapped.
 - [ ] Long lifecycle soak covering repeated enemy/projectile/ability pool reuse, death/respawn, scene reload, seed resets, spawner toggles, malformed console commands, and extended play.
 - [ ] Replacement-humanoid/retargeting validation, hardpoint and IK robustness, and true art, VFX, audio, animation, UI, and world-content polish.
-- [ ] Add a data-driven overheat/stamina resource shared by sprint and flight, with clear HUD/cooldown feedback, after propulsion feel is owner-approved.
-- [ ] Add directional run/strafe, acceleration, braking, and stop transitions plus contact-aware foot planting/IK where it materially reduces remaining slide.
+- [ ] Owner-tune the implemented propulsion heat drain/cooldown/recovery thresholds and verify the HUD/heat-reactive exhaust during sustained sprint, flight, and boost.
+- [ ] Owner-accept the new cardinal/diagonal blends, foot plants, starts/stops, braking, and sharp-turn presentation at the unchanged gameplay speeds.
 
 ## Recommended owner test loop
 

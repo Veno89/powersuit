@@ -5,8 +5,7 @@ using UnityEngine.Rendering;
 /// <summary>
 /// Cached, procedural blue-white propulsion feedback for powered sprint and
 /// flight. It is presentation-only and never changes movement or heat state.
-/// A future overheat system can scale the exposed intensity without replacing
-/// this renderer.
+/// Shared propulsion heat shifts the plume toward orange/red near lockout.
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(210)]
@@ -16,20 +15,21 @@ public sealed class PowerSuitThrusterPresentation : MonoBehaviour
     private const int ExpectedJetCount = 4;
 
     [SerializeField] private PowerSuitController controller;
+    [SerializeField] private PowerSuitPropulsionHeat propulsionHeat;
     [SerializeField] private Transform visualRoot;
 
     [Header("Response")]
-    [SerializeField, Range(0f, 1f)] private float sprintIntensity = 0.82f;
+    [SerializeField, Range(0f, 1f)] private float sprintIntensity = 1f;
     [SerializeField, Range(0f, 1f)] private float flightIntensity = 0.48f;
     [SerializeField, Range(0f, 1f)] private float boostIntensity = 1f;
     [SerializeField, Min(0f)] private float ignitionSharpness = 20f;
     [SerializeField, Min(0f)] private float releaseSharpness = 11f;
 
     [Header("Jet Shape")]
-    [SerializeField, Min(0.01f)] private float backpackMaximumLength = 1.45f;
-    [SerializeField, Min(0.01f)] private float bootMaximumLength = 0.9f;
-    [SerializeField, Min(0.001f)] private float outerWidth = 0.13f;
-    [SerializeField, Min(0.001f)] private float coreWidth = 0.048f;
+    [SerializeField, Min(0.01f)] private float backpackMaximumLength = 1.7f;
+    [SerializeField, Min(0.01f)] private float bootMaximumLength = 1.1f;
+    [SerializeField, Min(0.001f)] private float outerWidth = 0.16f;
+    [SerializeField, Min(0.001f)] private float coreWidth = 0.055f;
 
     private readonly ThrusterJet[] jets = new ThrusterJet[ExpectedJetCount];
     private Material jetMaterial;
@@ -103,6 +103,7 @@ public sealed class PowerSuitThrusterPresentation : MonoBehaviour
     private void ResolveDependencies()
     {
         controller ??= GetComponent<PowerSuitController>();
+        propulsionHeat ??= GetComponent<PowerSuitPropulsionHeat>();
         if (visualRoot == null)
         {
             Transform candidate = transform.Find("PowerSuitVisual_Generator109");
@@ -257,9 +258,16 @@ public sealed class PowerSuitThrusterPresentation : MonoBehaviour
                     : (-transform.forward - Vector3.up * 0.16f).normalized;
             }
 
-            float pulse = 0.92f + 0.08f * Mathf.Sin(
+            float heat = propulsionHeat != null
+                ? propulsionHeat.NormalizedHeat
+                : 0f;
+            float heatFlicker = heat > 0.8f
+                ? Mathf.Lerp(1f, 0.72f + 0.28f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 47f)),
+                    Mathf.InverseLerp(0.8f, 1f, heat))
+                : 1f;
+            float pulse = (0.92f + 0.08f * Mathf.Sin(
                 (Time.unscaledTime * 31f) + index * 1.7f
-            );
+            )) * heatFlicker;
             float length = jet.MaximumLength * clamped * pulse;
             Vector3 origin = jet.Anchor.position;
             jet.Outer.SetPosition(0, origin);
@@ -267,10 +275,18 @@ public sealed class PowerSuitThrusterPresentation : MonoBehaviour
             jet.Core.SetPosition(0, origin);
             jet.Core.SetPosition(1, origin + direction * length * 0.62f);
 
-            Color outerStart = new Color(0.08f, 0.62f, 1f, 0.9f * clamped);
-            Color outerEnd = new Color(0.02f, 0.18f, 1f, 0f);
-            Color coreStart = new Color(0.88f, 0.98f, 1f, clamped);
-            Color coreEnd = new Color(0.22f, 0.72f, 1f, 0f);
+            Color coldOuter = new Color(0.08f, 0.62f, 1f);
+            Color hotOuter = new Color(1f, 0.22f, 0.025f);
+            Color coldCore = new Color(0.88f, 0.98f, 1f);
+            Color hotCore = new Color(1f, 0.86f, 0.24f);
+            Color outerStart = Color.Lerp(coldOuter, hotOuter, heat);
+            outerStart.a = 0.9f * clamped;
+            Color outerEnd = Color.Lerp(new Color(0.02f, 0.18f, 1f), Color.red, heat);
+            outerEnd.a = 0f;
+            Color coreStart = Color.Lerp(coldCore, hotCore, heat);
+            coreStart.a = clamped;
+            Color coreEnd = Color.Lerp(new Color(0.22f, 0.72f, 1f), new Color(1f, 0.35f, 0.02f), heat);
+            coreEnd.a = 0f;
             jet.Outer.startColor = outerStart;
             jet.Outer.endColor = outerEnd;
             jet.Core.startColor = coreStart;
@@ -278,7 +294,8 @@ public sealed class PowerSuitThrusterPresentation : MonoBehaviour
             if (jet.Glow != null)
             {
                 jet.Glow.enabled = true;
-                jet.Glow.intensity = 2.6f * clamped;
+                jet.Glow.color = Color.Lerp(new Color(0.3f, 0.78f, 1f), new Color(1f, 0.18f, 0.02f), heat);
+                jet.Glow.intensity = 3.2f * clamped;
             }
         }
     }

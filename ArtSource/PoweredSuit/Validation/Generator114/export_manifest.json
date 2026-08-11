@@ -1,0 +1,285 @@
+{
+  "action_frame_ranges": {
+    "PS_Aim": [
+      1,
+      30
+    ],
+    "PS_Aim_Walk_Backward": [
+      1,
+      31
+    ],
+    "PS_Aim_Walk_Forward": [
+      1,
+      31
+    ],
+    "PS_Aim_Walk_Left": [
+      1,
+      31
+    ],
+    "PS_Aim_Walk_Right": [
+      1,
+      31
+    ],
+    "PS_BoltCycle": [
+      1,
+      20
+    ],
+    "PS_Hover": [
+      1,
+      61
+    ],
+    "PS_Idle": [
+      1,
+      61
+    ],
+    "PS_Reload": [
+      1,
+      84
+    ],
+    "PS_Run_Forward": [
+      1,
+      21
+    ],
+    "PS_Walk": [
+      1,
+      31
+    ],
+    "PS_Walk_Backward": [
+      1,
+      31
+    ],
+    "PS_Walk_Forward": [
+      1,
+      31
+    ],
+    "PS_Walk_Left": [
+      1,
+      31
+    ],
+    "PS_Walk_Right": [
+      1,
+      31
+    ],
+    "PS_WeaponReady_Idle": [
+      1,
+      61
+    ],
+    "PS_WeaponStowed_Hover": [
+      1,
+      61
+    ],
+    "PS_WeaponStowed_Idle": [
+      1,
+      61
+    ],
+    "PS_WeaponStowed_Walk_Backward": [
+      1,
+      31
+    ],
+    "PS_WeaponStowed_Walk_Forward": [
+      1,
+      31
+    ],
+    "PS_WeaponStowed_Walk_Left": [
+      1,
+      31
+    ],
+    "PS_WeaponStowed_Walk_Right": [
+      1,
+      31
+    ],
+    "PS_Weapon_Draw": [
+      1,
+      30
+    ],
+    "PS_Weapon_Sheathe": [
+      1,
+      30
+    ]
+  },
+  "animation_contract_version": 5,
+  "animation_fps": 30,
+  "exported_actions": [
+    "PS_Idle",
+    "PS_Walk",
+    "PS_Hover",
+    "PS_Aim",
+    "PS_WeaponReady_Idle",
+    "PS_WeaponStowed_Idle",
+    "PS_Weapon_Draw",
+    "PS_Weapon_Sheathe",
+    "PS_Walk_Forward",
+    "PS_Walk_Backward",
+    "PS_Walk_Left",
+    "PS_Walk_Right",
+    "PS_Aim_Walk_Forward",
+    "PS_Aim_Walk_Backward",
+    "PS_Aim_Walk_Left",
+    "PS_Aim_Walk_Right",
+    "PS_Reload",
+    "PS_BoltCycle",
+    "PS_WeaponStowed_Walk_Forward",
+    "PS_WeaponStowed_Walk_Backward",
+    "PS_WeaponStowed_Walk_Left",
+    "PS_WeaponStowed_Walk_Right",
+    "PS_WeaponStowed_Hover",
+    "PS_Run_Forward"
+  ],
+  "exported_objects": [
+    "Backpack_Core",
+    "Backpack_Thruster.L",
+    "Backpack_Thruster.R",
+    "Boot_Toe.L",
+    "Boot_Toe.R",
+    "Chest_Core",
+    "Chest_Plate",
+    "Chest_Plate.L",
+    "Chest_Plate.R",
+    "Elbow.L",
+    "Elbow.R",
+    "Forearm.L",
+    "Forearm.R",
+    "Forearm_Plate.L",
+    "Forearm_Plate.R",
+    "Hand.L",
+    "Hand.R",
+    "Heavy_Boot.L",
+    "Heavy_Boot.R",
+    "Helmet_Core",
+    "Helmet_Crown",
+    "Helmet_Jaw",
+    "Helmet_Plate.L",
+    "Helmet_Plate.R",
+    "Helmet_Visor",
+    "Hip_Guard.L",
+    "Hip_Guard.R",
+    "Knee.L",
+    "Knee.R",
+    "Knee_Guard.L",
+    "Knee_Guard.R",
+    "Lower_Leg.L",
+    "Lower_Leg.R",
+    "Neck",
+    "Pelvis",
+    "PowerSuit_Armature",
+    "RifleRoot",
+    "Rifle_Barrel",
+    "Rifle_Barrel_EnergySleeve",
+    "Rifle_Barrel_Shroud",
+    "Rifle_BoltHandleKnob_R",
+    "Rifle_BoltHandleStem_R",
+    "Rifle_ChargingRail_R",
+    "Rifle_DataModule",
+    "Rifle_EjectionPort_R",
+    "Rifle_GripBackstrap",
+    "Rifle_Handguard_BottomRail",
+    "Rifle_Handguard_Core",
+    "Rifle_Handguard_SidePanel_L",
+    "Rifle_Handguard_SidePanel_R",
+    "Rifle_Handguard_TopRail",
+    "Rifle_Magazine",
+    "Rifle_Magazine_Base",
+    "Rifle_Muzzle",
+    "Rifle_MuzzleBore",
+    "Rifle_MuzzleBrake_Baffle_1",
+    "Rifle_MuzzleBrake_Baffle_2",
+    "Rifle_MuzzleBrake_Core",
+    "Rifle_MuzzleBrake_TopFin",
+    "Rifle_PistolGrip",
+    "Rifle_PrimaryGrip",
+    "Rifle_Receiver_Core",
+    "Rifle_Receiver_LowerSpine",
+    "Rifle_Receiver_UpperShell",
+    "Rifle_ScopeElevation",
+    "Rifle_ScopeLensFront",
+    "Rifle_ScopeLensRear",
+    "Rifle_ScopeMount_Front",
+    "Rifle_ScopeMount_Front_Crossbar",
+    "Rifle_ScopeMount_Rear",
+    "Rifle_ScopeMount_Rear_Crossbar",
+    "Rifle_ScopeObjective",
+    "Rifle_ScopeOcular",
+    "Rifle_ScopeTube",
+    "Rifle_ScopeWindage",
+    "Rifle_SightOcular",
+    "Rifle_StockContact",
+    "Rifle_StockSpine",
+    "Rifle_StockStrut_L",
+    "Rifle_StockStrut_R",
+    "Rifle_Stock_BottomRail",
+    "Rifle_Stock_ButtPad",
+    "Rifle_Stock_RearBridge",
+    "Rifle_Stock_TopRail",
+    "Rifle_SupportGrip",
+    "Rifle_SupportGripMax",
+    "Rifle_SupportGripMin",
+    "Rifle_SupportGripTarget",
+    "Rifle_SupportGrip_Mount",
+    "Rifle_Trigger",
+    "Rifle_TriggerGuard",
+    "Rifle_Vent_L_1",
+    "Rifle_Vent_L_2",
+    "Rifle_Vent_L_3",
+    "Rifle_Vent_L_4",
+    "Rifle_Vent_R_1",
+    "Rifle_Vent_R_2",
+    "Rifle_Vent_R_3",
+    "Rifle_Vent_R_4",
+    "Shin_Plate.L",
+    "Shin_Plate.R",
+    "Shoulder_Armour.L",
+    "Shoulder_Armour.R",
+    "Shoulder_Wing.L",
+    "Shoulder_Wing.R",
+    "Thigh_Plate.L",
+    "Thigh_Plate.R",
+    "Thruster_Nozzle.L",
+    "Thruster_Nozzle.R",
+    "Upper_Arm.L",
+    "Upper_Arm.R",
+    "Upper_Chest",
+    "Upper_Leg.L",
+    "Upper_Leg.R",
+    "Waist"
+  ],
+  "fbx_path": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuit\\exports\\powersuit_animated_with_aim.fbx",
+  "fbx_sha256": "4b5282d52470bbd624c8e18331bdd15b6f99b20174cfeea770f08134200d3b79",
+  "fbx_size_bytes": 5017020,
+  "gameplay_timing_markers": {
+    "bolt_cycle_end_frame": 20,
+    "reload_commit_frame": 75,
+    "reload_end_frame": 84
+  },
+  "source_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuit\\powersuit_pipeline.blend",
+  "unity_import_notes": {
+    "expected_clips": [
+      "PS_Idle",
+      "PS_Walk",
+      "PS_Hover",
+      "PS_Aim",
+      "PS_WeaponReady_Idle",
+      "PS_WeaponStowed_Idle",
+      "PS_Weapon_Draw",
+      "PS_Weapon_Sheathe",
+      "PS_Walk_Forward",
+      "PS_Walk_Backward",
+      "PS_Walk_Left",
+      "PS_Walk_Right",
+      "PS_Aim_Walk_Forward",
+      "PS_Aim_Walk_Backward",
+      "PS_Aim_Walk_Left",
+      "PS_Aim_Walk_Right",
+      "PS_Reload",
+      "PS_BoltCycle",
+      "PS_WeaponStowed_Walk_Forward",
+      "PS_WeaponStowed_Walk_Backward",
+      "PS_WeaponStowed_Walk_Left",
+      "PS_WeaponStowed_Walk_Right",
+      "PS_WeaponStowed_Hover",
+      "PS_Run_Forward"
+    ],
+    "rig_type": "Generic",
+    "scale_factor": 1.0
+  },
+  "validation_report_blend_sha256": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a"
+}

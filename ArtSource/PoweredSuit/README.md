@@ -4,29 +4,29 @@ This directory is the authoritative Blender authoring source and deterministic t
 
 ## Current status
 
-Approved Generator 113 candidate:
+Approved Generator 114 candidate:
 
 - Blender: 5.2 LTS
 - rifle generator: 111
 - weapon contract: v3; rigid signature: v6
-- animation contract: v4
+- animation contract: v5
 - automated validation: `PASS`
 - technical visual validation: `APPROVED`
 - export allowed: `true`
-- required renders: 13 aim + 5 rifle + 15 weapon-animation = 33
-- exported clips: 18 exact armature actions
-- generated blend SHA-256: `a5054d65af2cb6a04836216456a1a3162f8d860c6c421533a7ac08a9f70d2d4b`
-- exported FBX SHA-256: `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`
+- required renders: 13 aim + 5 rifle + 17 weapon-animation = 35
+- exported clips: 24 exact armature actions
+- generated blend SHA-256: `6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a`
+- exported FBX SHA-256: `4b5282d52470bbd624c8e18331bdd15b6f99b20174cfeea770f08134200d3b79`
 
-The clean Generator113 build passed with no automated blockers. All 33 mandatory renders were technically reviewed and hash-locked before the gated export on 2026-08-10. The exact report, approval, images, export manifest, and FBX are archived under `Validation/Generator113`.
+The clean Generator114 build passed with no automated blockers. All 35 mandatory renders were technically reviewed and hash-locked before the gated export on 2026-08-10. The exact report, approval, images, export manifest, and FBX are archived under `Validation/Generator114`.
 
-Generator 110 remains the winding/closed-geometry repair baseline, Generator 111 remains the 17-action rollback candidate, and Generator 112 remains the first sprint candidate. Generator 113 preserves their geometry, rig, weapon controls, 18 action names, and action ranges while lengthening the stance-aware powered gait. The run still uses frames 1-21 at 30 FPS, a 20-frame cycle with a native cadence of 180 steps per minute.
+Generator 110 remains the winding/closed-geometry repair baseline, Generator 111 remains the 17-action rollback candidate, Generator 112 remains the first sprint candidate, and Generator 113 remains the powered-stride baseline. Generator 114 preserves their geometry, rig, weapon controls, and action ranges while adding six stance-aware lateral loops. The run still uses frames 1-21 at 30 FPS, a 20-frame cycle with a native cadence of 180 steps per minute.
 
 ## What is authoritative
 
 - `source/powersuit_source.blend` — immutable audited recovered input
 - `scripts/` — active build, animation, validation, approval, and export tools
-- `Validation/Generator109/` through `Validation/Generator113/` — immutable candidate evidence and rollback artifacts
+- `Validation/Generator109/` through `Validation/Generator114/` — immutable candidate evidence and rollback artifacts
 - `WEAPON_FRAMEWORK.md` — weapon/stance architecture reference
 - `PROVENANCE.md` — exact lineage and historical Reset06 diagnosis
 - `UNITY_INTEGRATION.md` — safe Unity integration procedure
@@ -50,15 +50,15 @@ If headless Workbench rendering crashes inside a Windows display driver while Un
 
 ## Animation set
 
-Generator 113 exports exactly:
+Generator 114 exports exactly:
 
 - `PS_Idle`, `PS_Walk`, `PS_Hover`, `PS_Aim`
 - `PS_WeaponReady_Idle`, `PS_WeaponStowed_Idle`, `PS_WeaponStowed_Hover`
 - `PS_Weapon_Draw`, `PS_Weapon_Sheathe`
-- `PS_Walk_Forward`, `PS_Walk_Backward`
+- `PS_Walk_Forward`, `PS_Walk_Backward`, `PS_Walk_Left`, `PS_Walk_Right`
 - `PS_Run_Forward`
-- `PS_Aim_Walk_Forward`, `PS_Aim_Walk_Backward`
-- `PS_WeaponStowed_Walk_Forward`, `PS_WeaponStowed_Walk_Backward`
+- `PS_Aim_Walk_Forward`, `PS_Aim_Walk_Backward`, `PS_Aim_Walk_Left`, `PS_Aim_Walk_Right`
+- `PS_WeaponStowed_Walk_Forward`, `PS_WeaponStowed_Walk_Backward`, `PS_WeaponStowed_Walk_Left`, `PS_WeaponStowed_Walk_Right`
 - `PS_Reload`, `PS_BoltCycle`
 
 All use one armature Action Slot. Rifle and articulated-component animation is carried by non-deforming armature controls, avoiding unsynchronized object-action FBX takes.

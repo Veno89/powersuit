@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 1819108784581979073}
   - component: {fileID: 51791716677826024}
   - component: {fileID: 6168840587338757509}
+  - component: {fileID: 1418030772990590262}
   - component: {fileID: 7990309600032407504}
   m_Layer: 0
   m_Name: PatrolRifleman
@@ -199,6 +200,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyAttackEmitter
   projectilePrefab: {fileID: 4451341877632146015, guid: 3c105a8f767d6cb48b36aa303c9c625f, type: 3}
   prewarmCount: 6
+--- !u!114 &1418030772990590262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4568279007139121036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 289f540f11497eb46a0110416b62c9d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Powersuit.Enemies.Unity::Powersuit.Enemies.UnityAdapters.EnemyCombatReadabilityPresenter
+  controller: {fileID: 51791716677826024}
+  visualRoot: {fileID: 6814015088418308692}
+  damageScalePunch: 0.075
+  damagePulseSharpness: 13
+  telegraphLineWidth: 0.075
+  telegraphTargetRadius: 0.75
 --- !u!114 &7990309600032407504
 MonoBehaviour:
   m_ObjectHideFlags: 0

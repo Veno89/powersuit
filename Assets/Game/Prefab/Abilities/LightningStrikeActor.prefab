@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Powersuit.Abilities.Unity::Powersuit.Abilities.UnityAdapters.AbilityAreaEffectPresentation
   lineWidth: 0.105
   surfaceOffset: 0.055
-  defaultImpactSeconds: 0.55
+  defaultImpactSeconds: 0.8
   createImpactLight: 1
 --- !u!114 &3302559521960493892
 MonoBehaviour:
@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Powersuit.Abilities.Unity::Powersuit.Abilities.UnityAdapters.LightningStrikeActor
   telegraphSeconds: 0.2
-  visibleSeconds: 0.45
+  visibleSeconds: 0.9
   recipientMask:
     serializedVersion: 2
     m_Bits: 4294967295

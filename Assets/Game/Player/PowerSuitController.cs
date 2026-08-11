@@ -25,6 +25,9 @@ public sealed class PowerSuitController : MonoBehaviour
 
     public bool IsRunning => isRunning;
 
+    public bool CanUsePropulsion =>
+        propulsionHeat == null || propulsionHeat.CanUsePropulsion;
+
     public bool IsGrounded =>
         groundContactState != null
             ? groundContactState.IsGrounded
@@ -167,6 +170,7 @@ public sealed class PowerSuitController : MonoBehaviour
     private PowerSuitWeaponPresentation weaponPresentation;
     private PowerSuitWeapon weapon;
     private PlayerHealth playerHealth;
+    private PowerSuitPropulsionHeat propulsionHeat;
     private WeaponAimState weaponAimState;
     private WeaponDefinition weaponAimDefinition;
     private bool weaponAimStateUsesFallback;
@@ -289,6 +293,7 @@ public sealed class PowerSuitController : MonoBehaviour
         weaponPresentation = GetComponent<PowerSuitWeaponPresentation>();
         weapon = GetComponent<PowerSuitWeapon>();
         playerHealth = GetComponent<PlayerHealth>();
+        propulsionHeat = GetComponent<PowerSuitPropulsionHeat>();
         inputRouter = GetComponent<PowerSuitInputRouter>();
         EnsureWeaponAimState();
         GetMovementSettings().Sanitize();
@@ -330,6 +335,16 @@ public sealed class PowerSuitController : MonoBehaviour
         }
 
         HandleCursor();
+
+        if (!CanUsePropulsion)
+        {
+            isRunning = false;
+            isBoosting = false;
+            if (isFlying)
+            {
+                SetFlightEnabled(false);
+            }
+        }
 
         if (!cursorLocked)
         {
@@ -410,13 +425,14 @@ public sealed class PowerSuitController : MonoBehaviour
         );
 
         bool hasStableSupport = groundContactState.IsGrounded;
-        isRunning = PowerSuitLocomotionMath.ShouldRun(
-            hasStableSupport,
-            IsBoostHeld(),
-            aimRequested,
-            isAiming,
-            input
-        );
+        isRunning = CanUsePropulsion &&
+            PowerSuitLocomotionMath.ShouldRun(
+                hasStableSupport,
+                IsBoostHeld(),
+                aimRequested,
+                isAiming,
+                input
+            );
         float effectiveWalkSpeed =
             PowerSuitLocomotionMath.CalculateGroundTargetSpeed(
                 walkSpeed,
@@ -549,7 +565,8 @@ public sealed class PowerSuitController : MonoBehaviour
         bool hasFlightIntent =
             desiredPlanarDirection.sqrMagnitude > 0.0001f ||
             Mathf.Abs(desiredVerticalInput) > 0.0001f;
-        isBoosting = IsBoostHeld() && hasFlightIntent;
+        isBoosting =
+            CanUsePropulsion && IsBoostHeld() && hasFlightIntent;
 
         float selectedPlanarSpeed =
             (isBoosting ? boostSpeed : flightSpeed) * flightSpeedMultiplier;
@@ -1132,6 +1149,11 @@ public sealed class PowerSuitController : MonoBehaviour
     /// </summary>
     public void SetFlightEnabled(bool enabled)
     {
+        if (enabled && !CanUsePropulsion)
+        {
+            return;
+        }
+
         if (enabled == isFlying)
         {
             return;
@@ -1406,6 +1428,7 @@ public sealed class PowerSuitController : MonoBehaviour
         localMovement = Vector2.zero;
         currentRecoilOffset = Vector2.zero;
         currentReticleOffset = Vector2.zero;
+        propulsionHeat?.ResetHeat();
 
         cameraYaw = transform.eulerAngles.y;
         cameraPitch = 15f;

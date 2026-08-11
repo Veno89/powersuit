@@ -69,7 +69,7 @@ from weapon_handling_contract import (  # noqa: E402
 )
 
 FPS = 30
-ANIMATION_CONTRACT_VERSION = 4
+ANIMATION_CONTRACT_VERSION = 5
 REQUIRED_GENERATOR_VERSION = 111
 WEAPON_ROOT_BONE = "WeaponRoot"
 MAGAZINE_BONE = "WeaponMagazine"
@@ -98,10 +98,16 @@ LOOP_ACTIONS = {
     "PS_WeaponStowed_Idle",
     "PS_Walk_Forward",
     "PS_Walk_Backward",
+    "PS_Walk_Left",
+    "PS_Walk_Right",
     "PS_Aim_Walk_Forward",
     "PS_Aim_Walk_Backward",
+    "PS_Aim_Walk_Left",
+    "PS_Aim_Walk_Right",
     "PS_WeaponStowed_Walk_Forward",
     "PS_WeaponStowed_Walk_Backward",
+    "PS_WeaponStowed_Walk_Left",
+    "PS_WeaponStowed_Walk_Right",
     "PS_WeaponStowed_Hover",
     "PS_Run_Forward",
 }
@@ -195,6 +201,75 @@ def _lift_hips_world(
     hips = armature.pose.bones["Hips"]
     hips.matrix = Matrix.Translation(offset) @ hips.matrix
     bpy.context.view_layer.update()
+    return _basis_snapshot(armature)
+
+
+def _lateral_lower_body(
+    armature: bpy.types.Object,
+    reference: dict[str, Matrix],
+    frame: int,
+    direction_sign: float,
+) -> dict[str, Matrix]:
+    """Author an in-place powered cross-step for left/right locomotion.
+
+    The existing rig has no lateral source take. This keeps the audited idle
+    basis and drives hip abduction, alternating knee lift, and a small pelvis
+    bank in visual body space. Left/right clips are exact mirrors in timing,
+    so Unity's 2D blend tree can form stable diagonal poses without sliding an
+    idle lower body sideways.
+    """
+    if frame < WALK_SAMPLE_FRAMES[0] or frame > WALK_SAMPLE_FRAMES[-1]:
+        raise RuntimeError(f"Lateral gait frame {frame} is out of range.")
+    direction_sign = -1.0 if direction_sign < 0.0 else 1.0
+    cycle = (frame - 1) / float(WALK_SAMPLE_FRAMES[-1] - 1)
+    swing = math.sin(cycle * math.tau)
+    left_lift = max(0.0, swing)
+    right_lift = max(0.0, -swing)
+
+    _apply_basis_snapshot(armature, reference)
+    right, forward, _up = body_basis(armature)
+    rotate_pose_bone_world(
+        armature,
+        "Hips",
+        forward,
+        math.radians(-direction_sign * 3.5),
+    )
+    rotate_pose_bone_world(
+        armature,
+        "UpperLeg.L",
+        forward,
+        math.radians(direction_sign * (7.0 + 21.0 * swing)),
+    )
+    rotate_pose_bone_world(
+        armature,
+        "UpperLeg.R",
+        forward,
+        math.radians(direction_sign * (7.0 - 21.0 * swing)),
+    )
+    rotate_pose_bone_world(
+        armature,
+        "LowerLeg.L",
+        right,
+        math.radians(24.0 * left_lift),
+    )
+    rotate_pose_bone_world(
+        armature,
+        "Foot.L",
+        right,
+        math.radians(-12.0 * left_lift),
+    )
+    rotate_pose_bone_world(
+        armature,
+        "LowerLeg.R",
+        right,
+        math.radians(24.0 * right_lift),
+    )
+    rotate_pose_bone_world(
+        armature,
+        "Foot.R",
+        right,
+        math.radians(-12.0 * right_lift),
+    )
     return _basis_snapshot(armature)
 
 
@@ -852,6 +927,41 @@ def main() -> None:
             poses[output_frame] = pose
         locomotion[name] = poses
 
+    for name, upper, direction_sign, stowed in (
+        ("PS_Walk_Left", ready, -1.0, False),
+        ("PS_Walk_Right", ready, 1.0, False),
+        ("PS_Aim_Walk_Left", aim, -1.0, False),
+        ("PS_Aim_Walk_Right", aim, 1.0, False),
+        ("PS_WeaponStowed_Walk_Left", idle, -1.0, True),
+        ("PS_WeaponStowed_Walk_Right", idle, 1.0, True),
+    ):
+        poses: dict[int, dict[str, Matrix]] = {}
+        for output_frame in WALK_SAMPLE_FRAMES:
+            lower = _lateral_lower_body(
+                armature,
+                idle,
+                output_frame,
+                direction_sign,
+            )
+            pose = _combine_upper_and_lower(upper, lower)
+            if stowed:
+                _apply_basis_snapshot(armature, pose)
+                pose = _pose_weapon_at_world(
+                    armature,
+                    pose,
+                    _stowed_world(armature),
+                    carrier_to_root,
+                )
+            else:
+                pose = _pose_weapon_follow_hand(
+                    armature,
+                    pose,
+                    hand_to_root,
+                    carrier_to_root,
+                )
+            poses[output_frame] = pose
+        locomotion[name] = poses
+
     run_forward: dict[int, dict[str, Matrix]] = {}
     for output_frame, source_frame in zip(RUN_SAMPLE_FRAMES, WALK_SAMPLE_FRAMES):
         lower = _amplify_lower_body(
@@ -1026,6 +1136,8 @@ def main() -> None:
     root["ps_stowed_locomotion_actions"] = [
         "PS_WeaponStowed_Walk_Forward",
         "PS_WeaponStowed_Walk_Backward",
+        "PS_WeaponStowed_Walk_Left",
+        "PS_WeaponStowed_Walk_Right",
         "PS_WeaponStowed_Hover",
     ]
     _validate_actions(armature, root, magazines, bolts)

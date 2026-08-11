@@ -62,6 +62,25 @@ namespace Powersuit.UI.HUD
             );
         }
 
+        public static string FormatPropulsionHeat(HudPropulsionHeatState heat)
+        {
+            if (!heat.IsAvailable)
+            {
+                return "HEAT " + Unavailable;
+            }
+
+            if (heat.IsOverheated)
+            {
+                return "PROPULSION OVERHEATED";
+            }
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                heat.IsActive ? "HEAT {0:0}%" : "COOLING {0:0}%",
+                heat.Normalized * 100f
+            );
+        }
+
         public static string FormatAbility(string displayName, HudAbilityState ability)
         {
             string safeName = string.IsNullOrWhiteSpace(displayName)

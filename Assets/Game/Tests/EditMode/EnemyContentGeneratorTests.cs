@@ -77,6 +77,44 @@ namespace Powersuit.Tests.EditMode
                 Is.GreaterThanOrEqualTo(5)
             );
             Assert.That(projectile.GetComponent(projectileType), Is.Not.Null);
+
+            Transform environment = sandbox.transform.Find("Environment");
+            Assert.That(environment, Is.Not.Null);
+            Assert.That(environment.Find("Zone_FoundryYard/UpperCatwalk"), Is.Not.Null);
+            Assert.That(environment.Find("Zone_FoundryYard/AoEPracticePad"), Is.Not.Null);
+            Assert.That(environment.Find("Zone_CentralCauseway/ElevatedBridge"), Is.Not.Null);
+            Assert.That(environment.Find("Zone_CentralCauseway/AoECourtyard"), Is.Not.Null);
+            Assert.That(environment.Find("Zone_AerialBasin/HoverPlatformNorth"), Is.Not.Null);
+            Assert.That(environment.Find("Zone_AerialBasin/FlightGateTop"), Is.Not.Null);
+
+            Type directorType = Type.GetType(
+                "Powersuit.Enemies.UnityAdapters.EnemySpawnDirector, Powersuit.Enemies.Unity",
+                throwOnError: true
+            );
+            Component director = sandbox.GetComponentInChildren(directorType, true);
+            Assert.That(director, Is.Not.Null);
+            SerializedObject directorSettings = new SerializedObject(director);
+            Assert.That(directorSettings.FindProperty("activeEnemyCap").intValue, Is.EqualTo(10));
+            Assert.That(
+                directorSettings.FindProperty("spawnIntervalSeconds").floatValue,
+                Is.EqualTo(4.4f).Within(0.001f)
+            );
+            Assert.That(directorSettings.FindProperty("maximumGroupSize").intValue, Is.EqualTo(3));
+
+            Type readabilityType = Type.GetType(
+                "Powersuit.Enemies.UnityAdapters.EnemyCombatReadabilityPresenter, "
+                    + "Powersuit.Enemies.Unity",
+                throwOnError: true
+            );
+            foreach (object enemyPrefab in (IEnumerable)generated.GetType()
+                .GetProperty("EnemyPrefabs").GetValue(generated))
+            {
+                Assert.That(
+                    ((GameObject)enemyPrefab).GetComponent(readabilityType),
+                    Is.Not.Null,
+                    ((GameObject)enemyPrefab).name
+                );
+            }
         }
 
         private static object InvokeStatic(string methodName)

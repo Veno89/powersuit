@@ -4,7 +4,7 @@ This document describes the current **Feel-First Combat and Flight Tech Demo** i
 
 ## Runtime composition
 
-`PlayerPrototype_Generator109.prefab` is the canonical player variant. The retained `Generator109` filename preserves GUID continuity while the nested suit and animation content comes from the later Generator113 asset pass. Generator113 preserves the 18 animation names/ranges and 33 mandatory validation renders while advancing the powered-gait contract to version 4.
+`PlayerPrototype_Generator109.prefab` is the canonical player variant. The retained `Generator109` filename preserves GUID continuity while the nested suit and animation content comes from the later Generator114 asset pass. Generator114 contains 24 exact animation actions and 35 mandatory validation renders, preserving Generator113's powered gait while adding six stance-aware lateral loops under animation contract version 5.
 
 At runtime, `PowerSuitDemoBootstrap`:
 
@@ -58,7 +58,7 @@ The scope uses the Precision Rifle's configured `ScopePoint` and aim profile. `V
 
 `PowerSuitController` adapts a CharacterController to plain-C# movement helpers: acceleration/deceleration, signed camera-relative movement, grounding hysteresis, coyote time, buffered jump, air control, landing, hold-to-flight, hover/braking, vertical flight, boost, banking, and safe ground/flight transitions. The focused player prefab persists the responsive profile (6.5 m/s ground, 14 m/s flight, 28 m/s boost), with piecewise zero-crossing reversal, stronger braking, 20/32 free/combat turning sharpness, 1.65x stable-ground sprint, a 0.9-second accepted-jump flight threshold, and 0.55 held-jump gravity scale. The rollback base prefab retains its legacy 5 m/s tune.
 
-Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps banking/squash presentation-only. `PowerSuitThrusterPresentation` builds four cached blue-white jets (outer plume plus core per nozzle) and two unshadowed backpack glows, driven only by sprint/flight/boost state. Neither component owns movement or the planned heat resource.
+Camera state blends exploration, shoulder, flight, boost, ability-targeting, and weapon-specific scope profiles. Collision uses reusable hit storage, immediate pull-in, and damped release. The focused response profile uses 0.18 mouse sensitivity, 180 degrees/second pad look, camera sharpness 45, aim transition sharpness 22, and rifle shoulder/scope multipliers 0.9/0.45. `PowerSuitVisualFlightResponse` keeps ground/flight attitude and landing squash presentation-only. `PowerSuitThrusterPresentation` builds cached backpack/boot jets and glows, driven by sprint/flight/boost state and colored blue-white through orange/red by the separate propulsion-heat adapter.
 
 The generated Animator uses four layers in this order:
 
@@ -67,7 +67,9 @@ The generated Animator uses four layers in this order:
 3. masked additive `Bolt Cycle Action`
 4. masked override `Weapon Actions`
 
-The base layer owns locomotion/flight, including a dedicated `Run Locomotion` state driven by `IsRunning`. Generator113 lengthens every stance-aware locomotion stride and lowers ordinary full-speed playback from 4.5x to 2.75x while leaving controller speeds unchanged. Its looping `PS_Run_Forward` clip stays at 1.35x state playback (approximately 243 steps/minute); propulsion feedback intentionally communicates powered assistance instead of demanding impossible human-scale no-slip steps at 10.725 m/s. Sprint is limited to stable-ground forward/lateral ready-carry movement; aim, backpedal, stowed locomotion, and flight keep their dedicated states. Forward pose keeps accepted hip/flight fire pointed forward without forcing aim FOV. The additive layer cycles the articulated bolt, while the highest override owns draw, sheathe, and reload. Code controls commit/cancel/reset behavior.
+The base layer owns locomotion/flight, including a dedicated `Run Locomotion` state driven by `IsRunning`. Generator114 keeps the 0.8379 m powered walk and 0.9341 m run strides, adds ready/aimed/stowed lateral actions, and feeds signed `MovementX`/`MovementY` into three cardinal 2D blend trees. Its looping `PS_Run_Forward` clip stays at 1.35x state playback; propulsion feedback intentionally communicates powered assistance at 10.725 m/s. `PowerSuitFootPlanting` applies bounded post-Animator contact correction only to feet near a surface, while the visual response supplies start/stop, braking, strafe, turn, and run attitude without changing motor velocity. Forward pose keeps accepted hip/flight fire pointed forward without forcing aim FOV. The additive layer cycles the articulated bolt, while the highest override owns draw, sheathe, and reload.
+
+`PowerSuitPropulsionHeatState` is the plain-C# shared stamina/heat authority for sprint, flight, and boost. Defaults are 100 capacity, 8/5/14 heat per second for sprint/flight/boost, a one-second cooldown delay, 26 heat per second cooling, and an overheat lock that recovers at 35%. `PowerSuitPropulsionHeat` adapts it to controller state, disables propulsion while locked, resets on respawn, drives HUD state, and informs thruster color without moving the character.
 
 `WeaponDefinition` owns authored rifle tuning, empty-magazine auto-reload policy, and ground/shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
 
@@ -94,11 +96,11 @@ The generated content set contains six `EnemyArchetypeDefinition` assets and mat
 
 `EnemyArchetypeController` combines definition-driven runtime state, movement/flight decisions, target ownership, force response, health, telegraph/attack signals, and complete pool reset. `EnemyAttackEmitter` and the pooled enemy projectile keep attack presentation and projectile lifecycle separate. `EnemyHealthBarPresenter` uses camera-facing mesh renderers with distance culling rather than a Canvas per enemy.
 
-`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, and live diagnostics. The generated default is tuned to an eight-enemy cap, 5.5-second interval, groups up to two, and threat budget four.
+`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, and live diagnostics. The generated default is tuned to a ten-enemy cap, 4.4-second interval, groups up to three, and threat budget 5.5. The world adds a foundry catwalk/AoE pad, causeway bridge/AoE courtyard, and airfield hover platforms/flight gates while keeping the original five zones and 19 spawn points.
 
 ## HUD and developer console
 
-The HUD consumes a quantized `PowerSuitHudSnapshot` and only rebuilds display strings when visible values change. It covers health, ammo/reload, reticle/hit state, rocket/lightning cooldowns, and ultimate meter. The generated Canvas owns a `PowerSuitHudSafeArea`; health sits bottom-left, abilities bottom-center, and ammo/reload bottom-right. The integrated player disables the older IMGUI health and ammunition panels so they cannot overlap the instructions or reload widget. Encounter counts are reported by the developer-console statistics provider rather than the HUD snapshot.
+The HUD consumes a quantized `PowerSuitHudSnapshot` and only rebuilds display strings when visible values change. It covers health, propulsion heat/overheat, ammo/reload, reticle/hit state, rocket/lightning cooldowns, and ultimate meter. The generated Canvas owns a `PowerSuitHudSafeArea`; health and heat sit bottom-left, abilities bottom-center, and ammo/reload bottom-right. The integrated player disables the older IMGUI health and ammunition panels so they cannot overlap the instructions or reload widget. Encounter counts are reported by the developer-console statistics provider rather than the HUD snapshot.
 
 The developer console is enabled in the Editor and Development Builds. Its pure registry/parser provides help, errors, history, quoted arguments, typed parsing, and clamping. The Unity overlay owns cursor/input focus. The gameplay pack exposes intentional APIs for player, rifle, ability, enemy, director, seed/spawn, scene, FPS, pool, and projectile commands. Run `help` in game for the complete current list.
 
@@ -126,14 +128,15 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 Current 2026-08-10 results:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- EditMode: 228/228 passed.
+- EditMode: 234/234 passed.
 - PlayMode: 12/12 passed.
-- Generator113 source validation passed for all 18 animation clips and 33 mandatory renders, with powered strides of 0.8379 m walk / 0.9341 m run and 0.0365 m run clearance; generated gait playback, thruster presenter, complete-rifle scope suppression, and importer/prefab data passed integration validation.
+- Generator114 source validation passed for all 24 animation clips and 35 mandatory renders, including six lateral loops and 0.7130 m lateral foot separation; generated 2D blends, foot planting, propulsion heat/HUD, heat-reactive thrusters, complete-rifle scope suppression, and prefab data passed integration validation.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
-- Windows x64 Development Build succeeded at 2026-08-10 17:50. Its package-level Sentis shader warnings were non-blocking.
+- Windows x64 Development Build succeeded at 2026-08-10 22:46. Its package-level Sentis shader warnings were non-blocking.
 - A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
 - Final Unity Console inspection reported 0 errors.
 - Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.
+- Broad owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounter loop work and feel decent; targeted edge cases and objective measurements remain open.
 
 Before accepting the milestone, still perform:
 
@@ -142,12 +145,12 @@ Before accepting the milestone, still perform:
 3. Capture real Unity Profiler evidence at representative and stress loads, including CPU/render/GC, pool misses, and 30/60/120+ frame-rate behavior.
 4. Run an extended lifecycle soak with repeated pooled reuse, reloads, seed/spawner changes, scene reload, malformed console commands, and player/enemy death cycles.
 5. Validate a replacement humanoid/retargeting path and complete final animation, character, enemy, world, UI, VFX, and audio content polish.
-6. After sprint/flight propulsion feel is accepted, add a testable overheat/stamina state, cooldown behavior, and HUD bar without coupling it to the visual exhaust adapter.
+6. Tune and accept the implemented propulsion heat drain/cooldown/recovery behavior and its HUD/heat-reactive exhaust feedback.
 
 Automated checks establish technical correctness of the current batch; they do not prove subjective feel, a sustained 60 FPS target on representative hardware, or production-quality content.
 
 ## Known limitations and exclusions
 
-Open gaps are owner/manual feel acceptance, directional start/stop/strafe and contact-aware footwork polish, the later sprint/flight overheat resource, profiler captures and performance tuning under representative stress, long lifecycle evidence, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, silent audio hooks, and UI are suitable for a tech demo, not final production art. No external audio assets were added.
+Open gaps are targeted edge-case acceptance, profiler captures and performance tuning under representative stress, long lifecycle evidence, replacement-character validation, and true content polish. The generated models, enemies, greybox world, effects, silent audio hooks, and UI are suitable for a tech demo, not final production art. No external audio assets were added.
 
 Excluded are multiplayer/networking, loot/inventory/rarity, progression/skill trees, crafting, missions/quests/dialogue/story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, and final Asset Store publication.

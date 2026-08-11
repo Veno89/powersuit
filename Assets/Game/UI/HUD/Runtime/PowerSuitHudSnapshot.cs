@@ -12,7 +12,9 @@ namespace Powersuit.UI.HUD
         ShoulderRocket = 1 << 3,
         Lightning = 1 << 4,
         Ultimate = 1 << 5,
-        All = Health | Ammunition | Reload | ShoulderRocket | Lightning | Ultimate
+        PropulsionHeat = 1 << 6,
+        All = Health | Ammunition | Reload | ShoulderRocket | Lightning |
+            Ultimate | PropulsionHeat
     }
 
     public readonly struct HudHealthState : IEquatable<HudHealthState>
@@ -277,11 +279,83 @@ namespace Powersuit.UI.HUD
         }
     }
 
+    public readonly struct HudPropulsionHeatState :
+        IEquatable<HudPropulsionHeatState>
+    {
+        public HudPropulsionHeatState(
+            bool isAvailable,
+            float heat,
+            float maximumHeat,
+            bool isOverheated,
+            bool isActive
+        )
+        {
+            IsAvailable = isAvailable;
+            if (!isAvailable)
+            {
+                Heat = 0f;
+                MaximumHeat = 0f;
+                Normalized = 0f;
+                IsOverheated = false;
+                IsActive = false;
+                return;
+            }
+
+            MaximumHeat = HudValueMath.PositiveOrFallback(maximumHeat, 1f);
+            Heat = HudValueMath.Clamp(
+                HudValueMath.NonNegativeOrZero(heat),
+                0f,
+                MaximumHeat
+            );
+            Normalized = Heat / MaximumHeat;
+            IsOverheated = isOverheated;
+            IsActive = isActive && !isOverheated;
+        }
+
+        public static HudPropulsionHeatState Missing => default;
+
+        public bool IsAvailable { get; }
+        public float Heat { get; }
+        public float MaximumHeat { get; }
+        public float Normalized { get; }
+        public bool IsOverheated { get; }
+        public bool IsActive { get; }
+
+        public bool Equals(HudPropulsionHeatState other)
+        {
+            return IsAvailable == other.IsAvailable &&
+                Heat.Equals(other.Heat) &&
+                MaximumHeat.Equals(other.MaximumHeat) &&
+                Normalized.Equals(other.Normalized) &&
+                IsOverheated == other.IsOverheated &&
+                IsActive == other.IsActive;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is HudPropulsionHeatState other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = IsAvailable ? 1 : 0;
+                hash = (hash * 397) ^ Heat.GetHashCode();
+                hash = (hash * 397) ^ MaximumHeat.GetHashCode();
+                hash = (hash * 397) ^ Normalized.GetHashCode();
+                hash = (hash * 397) ^ (IsOverheated ? 1 : 0);
+                return (hash * 397) ^ (IsActive ? 1 : 0);
+            }
+        }
+    }
+
     public readonly struct PowerSuitHudSnapshot : IEquatable<PowerSuitHudSnapshot>
     {
         public PowerSuitHudSnapshot(
             HudHealthState health,
             HudWeaponState weapon,
+            HudPropulsionHeatState propulsionHeat,
             HudAbilityState shoulderRocket,
             HudAbilityState lightning,
             HudUltimateState ultimate
@@ -289,6 +363,7 @@ namespace Powersuit.UI.HUD
         {
             Health = health;
             Weapon = weapon;
+            PropulsionHeat = propulsionHeat;
             ShoulderRocket = shoulderRocket;
             Lightning = lightning;
             Ultimate = ultimate;
@@ -298,6 +373,7 @@ namespace Powersuit.UI.HUD
 
         public HudHealthState Health { get; }
         public HudWeaponState Weapon { get; }
+        public HudPropulsionHeatState PropulsionHeat { get; }
         public HudAbilityState ShoulderRocket { get; }
         public HudAbilityState Lightning { get; }
         public HudUltimateState Ultimate { get; }
@@ -306,6 +382,7 @@ namespace Powersuit.UI.HUD
         {
             return Health.Equals(other.Health) &&
                 Weapon.Equals(other.Weapon) &&
+                PropulsionHeat.Equals(other.PropulsionHeat) &&
                 ShoulderRocket.Equals(other.ShoulderRocket) &&
                 Lightning.Equals(other.Lightning) &&
                 Ultimate.Equals(other.Ultimate);
@@ -322,6 +399,7 @@ namespace Powersuit.UI.HUD
             {
                 int hash = Health.GetHashCode();
                 hash = (hash * 397) ^ Weapon.GetHashCode();
+                hash = (hash * 397) ^ PropulsionHeat.GetHashCode();
                 hash = (hash * 397) ^ ShoulderRocket.GetHashCode();
                 hash = (hash * 397) ^ Lightning.GetHashCode();
                 return (hash * 397) ^ Ultimate.GetHashCode();
@@ -360,6 +438,11 @@ namespace Powersuit.UI.HUD
             if (!previous.Weapon.ReloadEquals(next.Weapon))
             {
                 dirty |= PowerSuitHudDirtyFlags.Reload;
+            }
+
+            if (!previous.PropulsionHeat.Equals(next.PropulsionHeat))
+            {
+                dirty |= PowerSuitHudDirtyFlags.PropulsionHeat;
             }
 
             if (!previous.ShoulderRocket.Equals(next.ShoulderRocket))
@@ -424,6 +507,11 @@ namespace Powersuit.UI.HUD
             if (!ReloadTextEquals(previous.Weapon, next.Weapon))
             {
                 dirty |= PowerSuitHudDirtyFlags.Reload;
+            }
+
+            if (!HeatTextEquals(previous.PropulsionHeat, next.PropulsionHeat))
+            {
+                dirty |= PowerSuitHudDirtyFlags.PropulsionHeat;
             }
 
             if (!AbilityTextEquals(previous.ShoulderRocket, next.ShoulderRocket))
@@ -534,6 +622,25 @@ namespace Powersuit.UI.HUD
             return leftState != AbilityLabelState.Cooldown ||
                 ToDisplayedInteger(left.CooldownRemaining * 10f) ==
                 ToDisplayedInteger(right.CooldownRemaining * 10f);
+        }
+
+        private static bool HeatTextEquals(
+            HudPropulsionHeatState left,
+            HudPropulsionHeatState right
+        )
+        {
+            if (
+                left.IsAvailable != right.IsAvailable ||
+                left.IsOverheated != right.IsOverheated ||
+                left.IsActive != right.IsActive
+            )
+            {
+                return false;
+            }
+
+            return !left.IsAvailable ||
+                ToDisplayedInteger(left.Normalized * 100f) ==
+                ToDisplayedInteger(right.Normalized * 100f);
         }
 
         private static bool UltimateTextEquals(

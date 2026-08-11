@@ -21,7 +21,7 @@ namespace Powersuit.Abilities.UnityAdapters.Tests
 
                 presentation.ShowTarget(6f, isValid: true);
                 presentation.AdvancePresentation(0.25f);
-                Assert.That(presentation.CachedLineRendererCount, Is.EqualTo(4));
+                Assert.That(presentation.CachedLineRendererCount, Is.EqualTo(5));
                 Assert.That(presentation.IsVisible, Is.True);
                 Assert.That(presentation.Radius, Is.EqualTo(6f));
                 Assert.That(presentation.Style, Is.EqualTo(

@@ -1,17 +1,17 @@
 # Unity Integration Record
 
-Generator 113 is the active Unity evaluation candidate. Legacy files at `Assets/Game/Models/powersuit_animated.fbx`, `powersuit_rigged.fbx`, and `powersuit_rifle.fbx` remain unchanged for rollback and GUID stability. Generator 110 through Generator 112 evidence/FBXs are preserved under their named validation archives.
+Generator 114 is the active Unity evaluation candidate. Legacy files at `Assets/Game/Models/powersuit_animated.fbx`, `powersuit_rigged.fbx`, and `powersuit_rifle.fbx` remain unchanged for rollback and GUID stability. Generator 110 through Generator 113 evidence/FBXs are preserved under their named validation archives.
 
-## Generator 113 integration
+## Generator 114 integration
 
-1. The Blender report says `PASS`, `APPROVED`, and `export_allowed: true`; approval covers exactly 33 renders and the export manifest records the validated blend and FBX hashes.
-2. The gated FBX is imported at `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx` using its existing `.meta` GUID `f48464ae4ba58b54f976e658ece758b3`. It uses a Generic rig, disables camera/light import, retains hierarchy, disables optimization, and defines exactly the 18 manifest clips.
-3. The active Unity FBX SHA-256 is `fe18bc8f3e93b2d5ba9e8c9edbd4e8910ad1e27197f806e0b24b95b36136f3dd`, byte-identical to the approved Generator 113 export and archive.
+1. The Blender report says `PASS`, `APPROVED`, and `export_allowed: true`; approval covers exactly 35 renders and the export manifest records the validated blend and FBX hashes.
+2. The gated FBX is imported at `Assets/Game/Models/PoweredSuit/powersuit_animated_with_aim.fbx` using its existing `.meta` GUID `f48464ae4ba58b54f976e658ece758b3`. It uses a Generic rig, disables camera/light import, retains hierarchy, disables optimization, and defines exactly the 24 manifest clips.
+3. The active Unity FBX SHA-256 is `4b5282d52470bbd624c8e18331bdd15b6f99b20174cfeea770f08134200d3b79`, byte-identical to the approved Generator 114 export and archive.
 4. `PlayerPrototype_Generator109.prefab` remains the additive variant. Its historical name is retained for GUID/reference continuity; only its nested presentation model, animation wiring, and weapon definition are updated.
 5. The imported armature contains `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt`, so suit, rifle, magazine, and bolt motion remain synchronized in one FBX take per clip.
 6. A non-animated wrapper uses the measured facing correction `AngleAxis(+90 degrees, X) * Euler(0 degrees, 180 degrees, 0 degrees)`. The Animator writes the imported root, so the correction must remain on the wrapper.
 7. `PowerSuitWeapon.MuzzleTransform` is bound to an axis-correct child of imported `Rifle_Muzzle`. The measured adapter aligns with the physical bore; do not replace it with a fixed floating muzzle.
-8. `PowerSuitAnimator.controller` is updated in place. Its base layer handles ready/stowed/aim locomotion, run, and hover; `Forward Weapon Pose` supplies the shouldered upper-body pose, `Bolt Cycle Action` applies the additive mechanism/hand motion, and the highest masked `Weapon Actions` layer owns draw, sheathe, and reload.
+8. `PowerSuitAnimator.controller` is updated in place. Its base layer handles ready/stowed/aim locomotion with signed 2D cardinal blend trees, run, and hover; `Forward Weapon Pose` supplies the shouldered upper-body pose, `Bolt Cycle Action` applies the additive mechanism/hand motion, and the highest masked `Weapon Actions` layer owns draw, sheathe, and reload.
 9. The `Run Locomotion` state uses the authored `PS_Run_Forward` clip at fixed `1.35x` playback and is driven by the `IsRunning` bool. Do not inherit the walk state's movement-speed playback parameter; reverse movement continues to use the authored backpedal.
 10. Do not bind raw FBX action takes directly to the override layer. Integration creates `_UpperBody.anim` copies containing only `Root/Hips/Spine...`, `WeaponRoot`, `WeaponMagazine`, and `WeaponBolt` curves, and keeps Write Defaults off.
 11. `PowerSuitUpperBody.mask` must keep both arm chains and all three weapon controls active while excluding Animator root, `Root`, `Hips`, pelvis, and upper legs.
@@ -21,11 +21,12 @@ Generator 113 is the active Unity evaluation candidate. Legacy files at `Assets/
 
 ## Verified import and integration contract
 
-- exact 18-clip ModelImporter configuration and unique matching takes
-- exactly 18 imported `AnimationClip` subassets
+- exact 24-clip ModelImporter configuration and unique matching takes
+- exactly 24 imported `AnimationClip` subassets
 - `PS_Run_Forward`: Unity frames 0-20, 30 FPS, `0.667 s`, loop time/pose enabled
-- existing FBX GUID and all 17 Generator 111 clip entries preserved; only the run entry was added
+- existing FBX GUID and all 18 Generator 113 clip entries preserved; only the six lateral entries were added
 - one active Animator and stable model-wrapper correction
+- ready, aimed, and stowed locomotion use forward/back/left/right clips through signed `MovementX`/`MovementY` 2D blends
 - run state uses `PS_Run_Forward`, `IsRunning`, and fixed `1.35x` playback
 - physical visor/bore/muzzle direction and no firing through the player
 - base locomotion continues under reload and bolt-cycle actions
@@ -33,14 +34,14 @@ Generator 113 is the active Unity evaluation candidate. Legacy files at `Assets/
 - stable-ready reload works on both ground and in flight
 - prefab/scene wiring, safe spawns, camera composition, controller, HUD, weapon definition, and imported helpers
 - full C# solution: 18 assemblies, 0 warnings, 0 errors
-- EditMode: 228/228 passed
+- EditMode: 234/234 passed
 - PlayMode: 12/12 passed
 - Unity Console: 0 errors
-- Windows x64 Development build: succeeded on 2026-08-10 at 17:50
+- Windows x64 Development build: succeeded on 2026-08-10 at 22:46
 - 15-second headless smoke: no gameplay exception, assertion, or missing-reference patterns
 
 Unity's AI Inference/Sentis package emitted non-blocking third-party shader performance warnings during the Development build. No compiler, test, scene-load, smoke, or build failure resulted.
 
 ## Manual promotion check
 
-Open `Assets/Scenes/PoweredSuitAimDemo.unity`, press Play, and run the matrix in the root `ROADMAP.md`: powered walk/run cadence, blue-white sprint/hover/boost exhaust, residual foot slide, W/S, quick jump, held-jump flight entry, automatic landing, ready/stowed, repeated draw/sheathe, aimed W/S, fire/empty fire, partial/empty/automatic reload, bolt cycle, flying reload/aim, sniper-only scope/reticle with no rifle geometry visible, camera collision, and repeated interruption attempts. Preserve Generators 110 through 112 until that review is accepted.
+Open `Assets/Scenes/PoweredSuitAimDemo.unity`, press Play, and run the matrix in the root `ROADMAP.md`: cardinal/diagonal locomotion, starts/stops/turns and foot plants, powered walk/run cadence, heat-limited sprint/hover/boost exhaust, quick jump, held-jump flight entry, automatic landing, ready/stowed, repeated draw/sheathe, aimed movement, fire/empty fire, partial/empty/automatic reload, bolt cycle, flying reload/aim, sniper-only scope/reticle, stronger ability/impact feedback, encounter pacing, camera collision, and repeated interruption attempts. This manual pass was intentionally deferred for the current batch. Preserve Generators 110 through 113 until that review is accepted.
