@@ -32,12 +32,25 @@ MonoBehaviour:
   projectileLifetimeSeconds: 4
   projectileRadius: 0.15
   projectilePrewarmCount: 8
+  projectilePrefabOverride: {fileID: 0}
+  projectileDamageType: 0
+  splashDamageRadius: 0
+  splashMinimumDamageMultiplier: 0.35
+  splashImpulse: 0
+  splashStaggerSeconds: 0
   aimSpreadDegrees: 0.15
   hipSpreadDegrees: 1.25
   aimRecoilPitch: 0.9
   aimRecoilYaw: 0.25
   hipRecoilPitch: 1.6
   hipRecoilYaw: 0.5
+  usesChargeShot: 0
+  chargeDurationSeconds: 0.8
+  minimumChargeNormalized: 0.3
+  minimumChargeDamageMultiplier: 0.8
+  maximumChargeDamageMultiplier: 1.6
+  minimumChargeRadiusMultiplier: 0.8
+  maximumChargeRadiusMultiplier: 1.3
   supportsScope: 1
   shoulderFieldOfViewDegrees: 62
   scopedFieldOfViewDegrees: 28

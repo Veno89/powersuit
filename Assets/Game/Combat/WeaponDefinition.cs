@@ -6,7 +6,8 @@ namespace Powersuit.Combat
     public enum WeaponReticleStyle
     {
         PrecisionCross = 0,
-        AssaultDynamic = 1
+        AssaultDynamic = 1,
+        HeavyCharge = 2
     }
 
     [CreateAssetMenu(
@@ -53,6 +54,16 @@ namespace Powersuit.Combat
             "Loadouts prewarm to the largest equipped requirement."
         )]
         [SerializeField, Min(0)] private int projectilePrewarmCount = 8;
+        [SerializeField] private PlayerProjectile projectilePrefabOverride;
+
+        [Header("Projectile Impact")]
+        [SerializeField] private DamageType projectileDamageType =
+            DamageType.Kinetic;
+        [SerializeField, Min(0f)] private float splashDamageRadius;
+        [SerializeField, Range(0f, 1f)]
+        private float splashMinimumDamageMultiplier = 0.35f;
+        [SerializeField, Min(0f)] private float splashImpulse;
+        [SerializeField, Min(0f)] private float splashStaggerSeconds;
 
         [Header("Handling")]
         [SerializeField, Min(0f)] private float aimSpreadDegrees = 0.15f;
@@ -61,6 +72,20 @@ namespace Powersuit.Combat
         [SerializeField, Min(0f)] private float aimRecoilYaw = 0.25f;
         [SerializeField, Min(0f)] private float hipRecoilPitch = 1.6f;
         [SerializeField, Min(0f)] private float hipRecoilYaw = 0.5f;
+
+        [Header("Charge Shot")]
+        [SerializeField] private bool usesChargeShot;
+        [SerializeField, Min(0.01f)] private float chargeDurationSeconds = 0.8f;
+        [SerializeField, Range(0f, 1f)]
+        private float minimumChargeNormalized = 0.3f;
+        [SerializeField, Min(0.01f)]
+        private float minimumChargeDamageMultiplier = 0.8f;
+        [SerializeField, Min(0.01f)]
+        private float maximumChargeDamageMultiplier = 1.6f;
+        [SerializeField, Min(0.01f)]
+        private float minimumChargeRadiusMultiplier = 0.8f;
+        [SerializeField, Min(0.01f)]
+        private float maximumChargeRadiusMultiplier = 1.3f;
 
         [Header("Aim Camera")]
         [SerializeField] private bool supportsScope = true;
@@ -110,12 +135,39 @@ namespace Powersuit.Combat
         public float ProjectileLifetimeSeconds => projectileLifetimeSeconds;
         public float ProjectileRadius => projectileRadius;
         public int ProjectilePrewarmCount => Mathf.Max(0, projectilePrewarmCount);
+        public PlayerProjectile ProjectilePrefabOverride => projectilePrefabOverride;
+        public DamageType ProjectileDamageType => projectileDamageType;
+        public float SplashDamageRadius => Mathf.Max(0f, splashDamageRadius);
+        public float SplashMinimumDamageMultiplier =>
+            Mathf.Clamp01(splashMinimumDamageMultiplier);
+        public float SplashImpulse => Mathf.Max(0f, splashImpulse);
+        public float SplashStaggerSeconds => Mathf.Max(0f, splashStaggerSeconds);
         public float AimSpreadDegrees => aimSpreadDegrees;
         public float HipSpreadDegrees => hipSpreadDegrees;
         public float AimRecoilPitch => aimRecoilPitch;
         public float AimRecoilYaw => aimRecoilYaw;
         public float HipRecoilPitch => hipRecoilPitch;
         public float HipRecoilYaw => hipRecoilYaw;
+        public bool UsesChargeShot =>
+            usesChargeShot && weaponClass == WeaponClass.HeavyWeapon;
+        public float ChargeDurationSeconds =>
+            Mathf.Max(0.01f, chargeDurationSeconds);
+        public float MinimumChargeNormalized =>
+            Mathf.Clamp01(minimumChargeNormalized);
+        public float MinimumChargeDamageMultiplier =>
+            Mathf.Max(0.01f, minimumChargeDamageMultiplier);
+        public float MaximumChargeDamageMultiplier =>
+            Mathf.Max(
+                MinimumChargeDamageMultiplier,
+                maximumChargeDamageMultiplier
+            );
+        public float MinimumChargeRadiusMultiplier =>
+            Mathf.Max(0.01f, minimumChargeRadiusMultiplier);
+        public float MaximumChargeRadiusMultiplier =>
+            Mathf.Max(
+                MinimumChargeRadiusMultiplier,
+                maximumChargeRadiusMultiplier
+            );
         public bool SupportsScope =>
             WeaponScopeEligibility.CanUseMagnifiedScope(weaponClass, supportsScope);
         public float ShoulderFieldOfViewDegrees => shoulderFieldOfViewDegrees;
@@ -184,11 +236,54 @@ namespace Powersuit.Combat
             );
         }
 
+        public WeaponChargeState CreateChargeState()
+        {
+            return UsesChargeShot
+                ? new WeaponChargeState(
+                    ChargeDurationSeconds,
+                    MinimumChargeNormalized,
+                    MinimumChargeDamageMultiplier,
+                    MaximumChargeDamageMultiplier,
+                    MinimumChargeRadiusMultiplier,
+                    MaximumChargeRadiusMultiplier
+                )
+                : null;
+        }
+
         public IReadOnlyList<string> GetValidationErrors()
         {
             List<string> errors = new List<string>();
             errors.AddRange(CreateRuntimeConfig().GetValidationErrors());
             errors.AddRange(CreateAimProfile().GetValidationErrors());
+            if (usesChargeShot && weaponClass != WeaponClass.HeavyWeapon)
+            {
+                errors.Add("Charge shots are currently restricted to HeavyWeapon definitions.");
+            }
+            if (
+                float.IsNaN(splashDamageRadius) ||
+                float.IsInfinity(splashDamageRadius) ||
+                splashDamageRadius < 0f ||
+                float.IsNaN(splashImpulse) ||
+                float.IsInfinity(splashImpulse) ||
+                splashImpulse < 0f ||
+                float.IsNaN(splashStaggerSeconds) ||
+                float.IsInfinity(splashStaggerSeconds) ||
+                splashStaggerSeconds < 0f
+            )
+            {
+                errors.Add("Splash radius, impulse, and stagger must be finite non-negative values.");
+            }
+            if (UsesChargeShot)
+            {
+                try
+                {
+                    CreateChargeState();
+                }
+                catch (System.ArgumentOutOfRangeException exception)
+                {
+                    errors.Add("Invalid charge-shot tuning: " + exception.ParamName + ".");
+                }
+            }
             return errors.ToArray();
         }
     }

@@ -10,11 +10,11 @@ At runtime, `PowerSuitDemoBootstrap`:
 
 1. resolves the player camera after the prefab is instantiated;
 2. instantiates one `PowerSuitCombatSandbox.prefab`;
-3. binds the owned `EnemySpawnDirector` to the player and HUD;
+3. binds the owned `EnemySpawnDirector` and structured `PowerSuitEncounterDirector` to the player and HUD;
 4. suppresses the three legacy scene `SimpleEnemy` rollback actors so only the generated encounter architecture runs; and
 5. restores those legacy actors when its ownership ends.
 
-The generated world prefab contains three connected greybox areas—central landing/combat, open flight/long range, and vertical/aerial combat—plus five spawn zones and 19 ground/flight points. It is tech-demo geometry, not final environment art.
+The generated world prefab contains three connected greybox areas—central landing/combat, open flight/long range, and vertical/aerial combat—plus five spawn zones and 19 ground/flight points. A fixed three-phase encounter activates 7 causeway, 7 foundry, and 9 airfield enemies as the player reaches each zone. It is tech-demo geometry, not final environment art.
 
 ## Ownership boundaries
 
@@ -47,7 +47,7 @@ Keyboard/mouse bindings are:
 - `WASD` movement; `Shift` sprints forward/sideways on stable ground and boosts in flight
 - tap `Space` for a normal ground jump; keep an accepted jump held for about 0.9 seconds to enter flight; `Space` then ascends, while `Ctrl` or `C` descends
 - RMB shoulder aim, RMB + `V` Precision Rifle scope toggle, LMB fire, `R` reload, `Q` draw/stow
-- `1`/`2` equip Precision/Assault; mouse wheel or gamepad west cycles the two-slot loadout
+- `1`/`2`/`3` equip Precision/Assault/Heavy Plasma; mouse wheel or gamepad west cycles the three-slot loadout
 - `G` rocket, hold/release `E` lightning, `X` void ultimate
 - Backquote or `F1` console, `Esc` cancel/release cursor
 
@@ -72,9 +72,9 @@ The base layer owns locomotion/flight, including a dedicated `Run Locomotion` st
 
 `PowerSuitPropulsionHeatState` is the plain-C# shared stamina/heat authority for sprint, flight, and boost. Defaults are 100 capacity, 8/5/14 heat per second for sprint/flight/boost, a one-second cooldown delay, 26 heat per second cooling, and an overheat lock that recovers at 35%. `PowerSuitPropulsionHeat` adapts it to controller state, disables propulsion while locked, resets on respawn, drives HUD state, and informs thruster color without moving the character.
 
-`WeaponDefinition` owns authored weapon tuning, empty-magazine auto-reload policy, projectile prewarm demand, shoulder/scope camera data, and reticle/muzzle/recoil presentation identity. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `WeaponLoadoutState` gives each fixed slot independent runtime state; `PowerSuitWeaponLoadout` routes selection, queues through carry transitions, updates aim/HUD/optic presentation, and preserves cadence so swapping cannot bypass rate of fire. A visible selection change sheathes the current weapon, commits the slot while the model is hidden, then draws the new weapon; selecting while intentionally stowed preserves the stowed endpoint. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
+`WeaponDefinition` owns authored weapon tuning, empty-magazine auto-reload policy, projectile override/prewarm demand, shoulder/scope camera data, radial-impact/charge configuration, and reticle/muzzle/recoil presentation identity. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle; `WeaponChargeState` owns deterministic hold/release authorization and normalized charge. `WeaponLoadoutState` gives each fixed slot independent runtime state; `PowerSuitWeaponLoadout` routes selection, queues through carry transitions, updates aim/HUD/optic presentation, and preserves cadence so swapping cannot bypass rate of fire. A visible selection change sheathes the current weapon, commits the slot while the model is hidden, then draws the new weapon; selecting while intentionally stowed preserves the stowed endpoint. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, charge staging, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
 
-The current loadout starts with the five-round semi-automatic Precision Rifle and adds a 720 RPM automatic Assault Rifle (22 damage, 30-round magazine, 120 reserve, no manual cycle or scope). `PowerSuitWeaponVisualController` selects between the imported precision receiver and a separate generated 16-piece compact Assault Rifle under the same animated `RifleRoot`. The assault receiver uses three shared materials, contains no scope or colliders, and leaves muzzle/grip/gameplay hardpoints rig-owned. Accepted assault shots drive an expanding orange reticle, warmer muzzle flash, and a small presentation-only receiver kick; automatic tracers and projectile direction remain authoritative in `PowerSuitWeapon`. The procedural receiver is tech-demo art and can later be replaced without changing loadout state, input, or combat rules.
+The current loadout contains three deliberately different roles: a five-round semi-automatic Precision Rifle for scoped range, a 720 RPM Assault Rifle (22 damage, 30-round magazine, 120 reserve) for mobile sustained fire, and a four-round Heavy Plasma Cannon for charged area control. `PowerSuitWeaponVisualController` selects the imported precision receiver or generated scope-free Assault/Heavy receivers under the same animated `RifleRoot` without moving rig-owned muzzle/grip hardpoints. Heavy Plasma reaches full charge in 0.8 seconds, rejects releases below its 30% threshold, and scales its 112 base explosive damage and 5.5 m blast radius through a 0.75–1.55 damage and 0.8–1.25 radius range. A slow 35 m/s projectile, radial falloff, stagger, impulse, heavy recoil, magenta charge reticle, and expanding impact rings communicate its role. These procedural receivers are tech-demo art and can later be replaced without changing loadout, input, or combat authority.
 
 ## Abilities
 
@@ -99,11 +99,11 @@ The generated content set contains six `EnemyArchetypeDefinition` assets and mat
 
 `EnemyArchetypeController` combines definition-driven runtime state, movement/flight decisions, target ownership, force response, health, telegraph/attack signals, and complete pool reset. `EnemyAttackEmitter` and the pooled enemy projectile keep attack presentation and projectile lifecycle separate. `EnemyHealthBarPresenter` uses camera-facing mesh renderers with distance culling rather than a Canvas per enemy.
 
-`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, and live diagnostics. The generated default is tuned to a ten-enemy cap, 4.4-second interval, groups up to three, and threat budget 5.5. The world adds a foundry catwalk/AoE pad, causeway bridge/AoE courtyard, and airfield hover platforms/flight gates while keeping the original five zones and 19 spawn points.
+`EnemySpawnDirector` wraps deterministic `SpawnPlanner` and `SpawnDirectorRuntimeState` rules: stable archetype IDs, weighted/threat-budget selection, cap, interval/group size, ground/flight zone compatibility, safe radius, spawn protection, staggered attacks, pool warmup/reuse, death replacement, seed reset, pause/clear, encounter-specific spawning, and live diagnostics. `PowerSuitEncounterDirector` uses the plain-C# `DemoEncounterState` to activate exact zone rosters by player proximity, count authoritative enemy defeats, restart the active phase after player defeat, and publish objective state. The generated sequence is causeway (3 Patrol Riflemen, 2 Sentries, 2 Pursuers), foundry (3 Pursuers, 3 Skirmishers, 1 Heavy Artillery), then airfield (4 Flying Harriers, 3 Skirmishers, 2 Heavy Artillery). The reusable weighted director remains available for console and stress scenarios.
 
 ## HUD and developer console
 
-The HUD consumes a quantized `PowerSuitHudSnapshot` and only rebuilds display strings when visible values change. It covers health, propulsion heat/overheat, ammo/reload, reticle/hit state, rocket/lightning cooldowns, and ultimate meter. The generated Canvas owns a `PowerSuitHudSafeArea`; health and heat sit bottom-left, abilities bottom-center, and ammo/reload bottom-right. The integrated player disables the older IMGUI health and ammunition panels so they cannot overlap the instructions or reload widget. Encounter counts are reported by the developer-console statistics provider rather than the HUD snapshot.
+The HUD consumes a quantized `PowerSuitHudSnapshot` and only rebuilds display strings when visible values change. It covers health, propulsion heat/overheat, ammo/reload/plasma charge, reticle/hit state, rocket/lightning cooldowns, ultimate meter, and the current zone objective/remaining enemy count. The generated Canvas owns a `PowerSuitHudSafeArea`; health and heat sit bottom-left, abilities bottom-center, ammo/reload bottom-right, and the encounter objective top-center. The integrated player disables the older IMGUI health and ammunition panels so they cannot overlap the instructions or reload widget. Detailed encounter counts remain available through developer-console statistics.
 
 The developer console is enabled in the Editor and Development Builds. Its pure registry/parser provides help, errors, history, quoted arguments, typed parsing, and clamping. The Unity overlay owns cursor/input focus. The gameplay pack exposes intentional APIs for player, rifle, ability, enemy, director, seed/spawn, scene, FPS, pool, and projectile commands. Run `help` in game for the complete current list.
 
@@ -131,11 +131,11 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 Accepted gameplay-batch results from 2026-08-10, followed by the 2026-08-11 Development Player certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- EditMode: 254/254 passed.
-- PlayMode: 13/13 passed, including the real sheathe/swap/draw sequence, independent magazine persistence, generated receiver visibility, assault reticle/recoil identity, scope eligibility, and optic restoration.
+- EditMode: 259/259 passed.
+- PlayMode: 14/14 passed, including three-slot sheathe/swap/draw, independent magazine persistence, Heavy Plasma charge gating, generated receiver visibility, scope eligibility/optic restoration, multi-target radial falloff, and the 1,000-projectile pool exercise.
 - Generator114 source validation passed for all 24 animation clips and 35 mandatory renders, including six lateral loops and 0.7130 m lateral foot separation; generated 2D blends, foot planting, propulsion heat/HUD, heat-reactive thrusters, complete-rifle scope suppression, and prefab data passed integration validation.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
-- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the two-weapon player. Its package-level Sentis shader warnings were non-blocking.
+- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the three-weapon player and structured encounter world. Its package-level Sentis shader warnings were non-blocking.
 - A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
 - Final Unity Console inspection reported 0 errors.
 - Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.

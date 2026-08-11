@@ -139,6 +139,23 @@ namespace Powersuit.UI.HUD.Tests
                 Is.EqualTo("RELOADING 43%")
             );
             Assert.That(
+                PowerSuitHudFormatter.FormatReload(
+                    new HudWeaponState(
+                        true,
+                        4,
+                        4,
+                        20,
+                        false,
+                        false,
+                        0f,
+                        "Heavy Plasma Cannon",
+                        isCharging: true,
+                        chargeNormalized: 0.625f
+                    )
+                ),
+                Is.EqualTo("PLASMA CHARGE 63%")
+            );
+            Assert.That(
                 PowerSuitHudFormatter.FormatAmmunition(
                     new HudWeaponState(
                         true,

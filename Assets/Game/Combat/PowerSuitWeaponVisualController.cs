@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Selects the authored receiver for the equipped weapon and adds a small,
-/// data-driven visual kick to the automatic rifle. Gameplay hardpoints remain
+/// data-driven visual kick to the active generated receiver. Gameplay hardpoints remain
 /// on the animated carrier rig, so presentation never changes ballistics.
 /// </summary>
 [DisallowMultipleComponent]
@@ -21,21 +21,31 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
         Array.Empty<Renderer>();
     [SerializeField] private bool[] assaultRendererDefaults =
         Array.Empty<bool>();
+    [SerializeField] private Renderer[] heavyRenderers =
+        Array.Empty<Renderer>();
+    [SerializeField] private bool[] heavyRendererDefaults =
+        Array.Empty<bool>();
     [SerializeField] private Transform assaultFeedbackRoot;
+    [SerializeField] private Transform heavyFeedbackRoot;
     [SerializeField, Min(0.01f)] private float recoilRecoverySharpness = 24f;
 
     private PowerSuitScopeSight scopeSight;
     private Vector3 feedbackBasePosition;
     private Quaternion feedbackBaseRotation = Quaternion.identity;
+    private Vector3 heavyFeedbackBasePosition;
+    private Quaternion heavyFeedbackBaseRotation = Quaternion.identity;
     private float recoilAmount;
     private float recoilYawSign = 1f;
     private bool subscribed;
 
     public int PrecisionRendererCount => precisionRenderers?.Length ?? 0;
     public int AssaultRendererCount => assaultRenderers?.Length ?? 0;
+    public int HeavyRendererCount => heavyRenderers?.Length ?? 0;
     public bool IsAssaultVisualActive { get; private set; }
+    public bool IsHeavyVisualActive { get; private set; }
     public float RecoilAmount => recoilAmount;
     public Transform AssaultFeedbackRoot => assaultFeedbackRoot;
+    public Transform HeavyFeedbackRoot => heavyFeedbackRoot;
 
     private void Awake()
     {
@@ -53,7 +63,10 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (assaultFeedbackRoot == null)
+        Transform activeFeedbackRoot = IsHeavyVisualActive
+            ? heavyFeedbackRoot
+            : assaultFeedbackRoot;
+        if (activeFeedbackRoot == null)
         {
             return;
         }
@@ -72,9 +85,15 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
         float degrees = definition != null
             ? definition.VisualRecoilDegrees
             : 0f;
-        assaultFeedbackRoot.localPosition =
-            feedbackBasePosition + Vector3.back * (distance * recoilAmount);
-        assaultFeedbackRoot.localRotation = feedbackBaseRotation *
+        Vector3 basePosition = IsHeavyVisualActive
+            ? heavyFeedbackBasePosition
+            : feedbackBasePosition;
+        Quaternion baseRotation = IsHeavyVisualActive
+            ? heavyFeedbackBaseRotation
+            : feedbackBaseRotation;
+        activeFeedbackRoot.localPosition =
+            basePosition + Vector3.back * (distance * recoilAmount);
+        activeFeedbackRoot.localRotation = baseRotation *
             Quaternion.Euler(
                 -degrees * recoilAmount,
                 degrees * 0.18f * recoilAmount * recoilYawSign,
@@ -93,7 +112,9 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
         PowerSuitController ownerController,
         Renderer[] authoredPrecisionRenderers,
         Renderer[] authoredAssaultRenderers,
-        Transform feedbackRoot
+        Transform feedbackRoot,
+        Renderer[] authoredHeavyRenderers,
+        Transform authoredHeavyFeedbackRoot
     )
     {
         weapon = ownerWeapon;
@@ -102,7 +123,10 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
         assaultRenderers = CloneRenderers(authoredAssaultRenderers);
         precisionRendererDefaults = CaptureDefaults(precisionRenderers);
         assaultRendererDefaults = CaptureDefaults(assaultRenderers);
+        heavyRenderers = CloneRenderers(authoredHeavyRenderers);
+        heavyRendererDefaults = CaptureDefaults(heavyRenderers);
         assaultFeedbackRoot = feedbackRoot;
+        heavyFeedbackRoot = authoredHeavyFeedbackRoot;
         CaptureFeedbackBaseline();
         ApplyWeaponVisual(weapon != null ? weapon.Definition : null);
     }
@@ -112,17 +136,26 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
         bool useAssault =
             definition != null &&
             definition.WeaponClass == WeaponClass.AssaultRifle;
+        bool useHeavy =
+            definition != null &&
+            definition.WeaponClass == WeaponClass.HeavyWeapon;
         IsAssaultVisualActive = useAssault;
+        IsHeavyVisualActive = useHeavy;
 
         ApplyRendererSet(
             precisionRenderers,
             precisionRendererDefaults,
-            visible: !useAssault
+            visible: !useAssault && !useHeavy
         );
         ApplyRendererSet(
             assaultRenderers,
             assaultRendererDefaults,
             visible: useAssault
+        );
+        ApplyRendererSet(
+            heavyRenderers,
+            heavyRendererDefaults,
+            visible: useHeavy
         );
 
         recoilAmount = 0f;
@@ -174,12 +207,15 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
 
     private void OnShotAccepted(WeaponFireResult result)
     {
-        if (!IsAssaultVisualActive || !result.Fired)
+        if ((!IsAssaultVisualActive && !IsHeavyVisualActive) || !result.Fired)
         {
             return;
         }
 
-        recoilAmount = Mathf.Min(1f, recoilAmount + 0.72f);
+        recoilAmount = Mathf.Min(
+            1f,
+            recoilAmount + (IsHeavyVisualActive ? 1f : 0.72f)
+        );
         recoilYawSign = -recoilYawSign;
     }
 
@@ -187,22 +223,40 @@ public sealed class PowerSuitWeaponVisualController : MonoBehaviour
     {
         if (assaultFeedbackRoot == null)
         {
-            return;
+            feedbackBasePosition = Vector3.zero;
+            feedbackBaseRotation = Quaternion.identity;
+        }
+        else
+        {
+            feedbackBasePosition = assaultFeedbackRoot.localPosition;
+            feedbackBaseRotation = assaultFeedbackRoot.localRotation;
         }
 
-        feedbackBasePosition = assaultFeedbackRoot.localPosition;
-        feedbackBaseRotation = assaultFeedbackRoot.localRotation;
+        if (heavyFeedbackRoot == null)
+        {
+            heavyFeedbackBasePosition = Vector3.zero;
+            heavyFeedbackBaseRotation = Quaternion.identity;
+        }
+        else
+        {
+            heavyFeedbackBasePosition = heavyFeedbackRoot.localPosition;
+            heavyFeedbackBaseRotation = heavyFeedbackRoot.localRotation;
+        }
     }
 
     private void RestoreFeedbackBaseline()
     {
-        if (assaultFeedbackRoot == null)
+        if (assaultFeedbackRoot != null)
         {
-            return;
+            assaultFeedbackRoot.localPosition = feedbackBasePosition;
+            assaultFeedbackRoot.localRotation = feedbackBaseRotation;
         }
 
-        assaultFeedbackRoot.localPosition = feedbackBasePosition;
-        assaultFeedbackRoot.localRotation = feedbackBaseRotation;
+        if (heavyFeedbackRoot != null)
+        {
+            heavyFeedbackRoot.localPosition = heavyFeedbackBasePosition;
+            heavyFeedbackRoot.localRotation = heavyFeedbackBaseRotation;
+        }
     }
 
     private static Renderer[] CloneRenderers(Renderer[] source)

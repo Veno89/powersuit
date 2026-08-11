@@ -24,6 +24,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
 
     private GameObject worldInstance;
     private EnemySpawnDirector spawnDirector;
+    private PowerSuitEncounterDirector encounterDirector;
     private bool worldCreationAttempted;
     private readonly List<SimpleEnemy> suppressedLegacyEnemies =
         new List<SimpleEnemy>(8);
@@ -34,6 +35,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
     public PowerSuitHudPresenter HudPresenter => hudPresenter;
     public GameObject WorldInstance => worldInstance;
     public EnemySpawnDirector SpawnDirector => spawnDirector;
+    public PowerSuitEncounterDirector EncounterDirector => encounterDirector;
     public bool IsInitialized =>
         worldInstance != null &&
         spawnDirector != null &&
@@ -218,6 +220,9 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
             spawnDirector = worldInstance.GetComponentInChildren<EnemySpawnDirector>(
                 includeInactive: true
             );
+            encounterDirector = worldInstance.GetComponentInChildren<
+                PowerSuitEncounterDirector
+            >(includeInactive: true);
         }
 
         if (spawnDirector == null)
@@ -240,6 +245,13 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
             );
         }
 
+        if (encounterDirector != null)
+        {
+            encounterDirector.BindPlayer(
+                owningPlayer,
+                owningPlayer.GetComponent<PlayerHealth>()
+            );
+        }
         BindHudIfPresent();
         SuppressLegacyEnemiesInOwningScene();
         return true;
@@ -263,6 +275,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
             clearExistingEnemies,
             shouldSpawnImmediately
         );
+        encounterDirector?.ResetEncounter();
         BindHudIfPresent();
         return true;
     }
@@ -295,6 +308,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
 
         worldInstance = null;
         spawnDirector = null;
+        encounterDirector = null;
         worldCreationAttempted = false;
         RestoreSuppressedLegacyEnemies();
         LastInitializationError = string.Empty;
@@ -341,6 +355,7 @@ public sealed class PowerSuitDemoBootstrap : MonoBehaviour
             lightning,
             ultimate
         );
+        hudPresenter.BindEncounter(encounterDirector);
     }
 
     private bool Fail(string message)

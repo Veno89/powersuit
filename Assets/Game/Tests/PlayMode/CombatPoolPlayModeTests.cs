@@ -11,6 +11,83 @@ namespace Powersuit.Tests.PlayMode
     public sealed class CombatPoolPlayModeTests
     {
         [UnityTest]
+        public IEnumerator RadialImpact_DamagesMultipleEnemyRootsWithFalloff()
+        {
+            Type executorType = FindType("CombatRadialImpactExecutor");
+            Type damageableType = FindType("DamageableTarget");
+            Type factionType = FindType("Powersuit.Combat.CombatFaction");
+            Type damageType = FindType("Powersuit.Combat.DamageType");
+            object executor = Activator.CreateInstance(
+                executorType,
+                new object[] { 16 }
+            );
+            MethodInfo execute = executorType.GetMethod(
+                "Execute",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(execute, Is.Not.Null);
+
+            GameObject source = new GameObject("Radial Source");
+            GameObject near = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject far = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            near.transform.position = new Vector3(1f, 0f, 0f);
+            far.transform.position = new Vector3(4f, 0f, 0f);
+            Component nearDamageable = near.AddComponent(damageableType);
+            Component farDamageable = far.AddComponent(damageableType);
+            yield return null;
+
+            try
+            {
+                object result = execute.Invoke(
+                    executor,
+                    new object[]
+                    {
+                        Vector3.zero,
+                        Vector3.up,
+                        5.5f,
+                        60f,
+                        0.3f,
+                        0f,
+                        0f,
+                        source,
+                        source.transform,
+                        Enum.Parse(factionType, "Player"),
+                        Enum.Parse(damageType, "Explosive"),
+                        false,
+                        Physics.DefaultRaycastLayers
+                    }
+                );
+
+                Assert.That(
+                    result.GetType().GetProperty("DamagedTargets")
+                        ?.GetValue(result),
+                    Is.EqualTo(2)
+                );
+                float nearHealth = (float)damageableType
+                    .GetProperty("CurrentHealth")
+                    .GetValue(nearDamageable);
+                float farHealth = (float)damageableType
+                    .GetProperty("CurrentHealth")
+                    .GetValue(farDamageable);
+                Assert.That(nearHealth, Is.LessThan(100f));
+                Assert.That(farHealth, Is.LessThan(100f));
+                Assert.That(
+                    nearHealth,
+                    Is.LessThan(farHealth),
+                    "The target nearer the plasma center must take more damage."
+                );
+            }
+            finally
+            {
+                UnityEngine.Object.Destroy(source);
+                UnityEngine.Object.Destroy(near);
+                UnityEngine.Object.Destroy(far);
+            }
+
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator ProjectilePool_ReusesInstanceAndClearsTransientState()
         {
             Type poolType = FindType("CombatFeedbackPool");
@@ -56,7 +133,13 @@ namespace Powersuit.Tests.PlayMode
                 Assert.That(first.activeSelf, Is.True);
 
                 Component firstProjectile = first.GetComponent(projectileType);
-                projectileType.GetMethod("Initialize")?.Invoke(
+                MethodInfo initialize = projectileType.GetMethods(
+                    BindingFlags.Instance | BindingFlags.Public
+                ).Single(method =>
+                    method.Name == "Initialize" &&
+                    method.GetParameters().Length == 7
+                );
+                initialize.Invoke(
                     firstProjectile,
                     new object[]
                     {

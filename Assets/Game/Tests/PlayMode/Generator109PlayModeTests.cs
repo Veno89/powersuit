@@ -1376,6 +1376,43 @@ namespace Powersuit.Tests.PlayMode
             {
                 enemies.SetActive(false);
             }
+            Type encounterType = FindType("PowerSuitEncounterDirector");
+            Type spawnDirectorType = FindType(
+                "Powersuit.Enemies.UnityAdapters.EnemySpawnDirector"
+            );
+            foreach (GameObject root in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                if (encounterType != null)
+                {
+                    foreach (
+                        Component encounter in root.GetComponentsInChildren(
+                            encounterType,
+                            true
+                        )
+                    )
+                    {
+                        if (encounter is Behaviour behaviour)
+                        {
+                            behaviour.enabled = false;
+                        }
+                    }
+                }
+                if (spawnDirectorType != null)
+                {
+                    foreach (
+                        Component director in root.GetComponentsInChildren(
+                            spawnDirectorType,
+                            true
+                        )
+                    )
+                    {
+                        director.GetType().GetMethod("SetDirectorEnabled")
+                            ?.Invoke(director, new object[] { false });
+                        director.GetType().GetMethod("ClearActiveEnemies")
+                            ?.Invoke(director, null);
+                    }
+                }
+            }
 
             Component weapon = player.GetComponent("PowerSuitWeapon");
             Component loadout = player.GetComponent("PowerSuitWeaponLoadout");
@@ -1393,7 +1430,7 @@ namespace Powersuit.Tests.PlayMode
             Assert.That(scopeSight, Is.Not.Null);
             Assert.That(presentation, Is.Not.Null);
             Assert.That(weaponVisuals, Is.Not.Null);
-            Assert.That(GetIntProperty(loadout, "SlotCount"), Is.EqualTo(2));
+            Assert.That(GetIntProperty(loadout, "SlotCount"), Is.EqualTo(3));
             Assert.That(GetIntProperty(loadout, "EquippedIndex"), Is.EqualTo(0));
             Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Precision Rifle"));
 
@@ -1491,6 +1528,55 @@ namespace Powersuit.Tests.PlayMode
                     .GetValue(weaponVisuals),
                 Is.GreaterThan(0f),
                 "An accepted automatic-rifle shot must kick its visible receiver."
+            );
+
+            loadout.GetType().GetMethod("RequestSlot")
+                ?.Invoke(loadout, new object[] { 2 });
+            switchDeadline = Time.realtimeSinceStartup + 4f;
+            while (
+                GetIntProperty(loadout, "EquippedIndex") != 2 ||
+                (bool)loadout.GetType().GetProperty("IsSwitching")
+                    .GetValue(loadout)
+            )
+            {
+                Assert.That(
+                    Time.realtimeSinceStartup,
+                    Is.LessThan(switchDeadline),
+                    "The Assault-to-Heavy visible switch did not finish."
+                );
+                yield return null;
+            }
+            Assert.That(
+                GetWeaponDisplayName(weapon),
+                Is.EqualTo("Heavy Plasma Cannon")
+            );
+            Assert.That(
+                weapon.GetType().GetProperty("CurrentReticleStyle")
+                    ?.GetValue(weapon)?.ToString(),
+                Is.EqualTo("HeavyCharge")
+            );
+            Assert.That(
+                weapon.GetType().GetProperty("IsCharging")?.GetValue(weapon),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                weapon.GetType().GetMethod("RequestFire")?.Invoke(weapon, null),
+                Is.EqualTo(false),
+                "The Heavy Plasma Cannon must not bypass its charge-release gate."
+            );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("IsHeavyVisualActive")
+                    ?.GetValue(weaponVisuals),
+                Is.EqualTo(true)
+            );
+            Transform heavyFeedbackRoot = weaponVisuals.GetType()
+                .GetProperty("HeavyFeedbackRoot")
+                ?.GetValue(weaponVisuals) as Transform;
+            Assert.That(heavyFeedbackRoot, Is.Not.Null);
+            Assert.That(
+                heavyFeedbackRoot.parent.GetComponentsInChildren<Renderer>(true)
+                    .All(renderer => renderer.enabled),
+                Is.True
             );
 
             loadout.GetType().GetMethod("RequestSlot")

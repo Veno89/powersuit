@@ -13,6 +13,7 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
     [SerializeField] private ShoulderRocketAbility shoulderRocketSource;
     [SerializeField] private LightningStrikeAbility lightningSource;
     [SerializeField] private VoidUltimateAbility ultimateSource;
+    [SerializeField] private PowerSuitEncounterDirector encounterSource;
 
     [Header("Health")]
     [SerializeField] private GameObject healthRoot;
@@ -46,10 +47,16 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
     [SerializeField] private Image ultimateFill;
     [SerializeField] private Text ultimateLabel;
 
+    [Header("Encounter Objective")]
+    [SerializeField] private GameObject encounterRoot;
+    [SerializeField] private Image encounterFill;
+    [SerializeField] private Text encounterLabel;
+
     private readonly PowerSuitHudChangeDetector changeDetector =
         new PowerSuitHudChangeDetector();
     private readonly PowerSuitHudTextChangeDetector textChangeDetector =
         new PowerSuitHudTextChangeDetector();
+    private int encounterRevision = int.MinValue;
 
     public PlayerHealth HealthSource => healthSource;
     public PowerSuitWeapon WeaponSource => weaponSource;
@@ -57,6 +64,7 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
     public ShoulderRocketAbility ShoulderRocketSource => shoulderRocketSource;
     public LightningStrikeAbility LightningSource => lightningSource;
     public VoidUltimateAbility UltimateSource => ultimateSource;
+    public PowerSuitEncounterDirector EncounterSource => encounterSource;
     public PowerSuitHudSnapshot CurrentSnapshot { get; private set; }
     public PowerSuitHudDirtyFlags LastDirtyFlags { get; private set; }
     public PowerSuitHudDirtyFlags LastTextDirtyFlags { get; private set; }
@@ -66,11 +74,13 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
         changeDetector.Reset();
         textChangeDetector.Reset();
         RefreshNow();
+        RefreshEncounter();
     }
 
     private void LateUpdate()
     {
         RefreshNow();
+        RefreshEncounter();
     }
 
     private void OnDisable()
@@ -79,6 +89,7 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
         textChangeDetector.Reset();
         LastDirtyFlags = PowerSuitHudDirtyFlags.None;
         LastTextDirtyFlags = PowerSuitHudDirtyFlags.None;
+        encounterRevision = int.MinValue;
     }
 
     public void BindSources(
@@ -131,6 +142,30 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
 
         ApplySnapshot(CurrentSnapshot, LastDirtyFlags, LastTextDirtyFlags);
         return LastDirtyFlags;
+    }
+
+    public void BindEncounter(PowerSuitEncounterDirector encounter)
+    {
+        encounterSource = encounter;
+        encounterRevision = int.MinValue;
+        RefreshEncounter();
+    }
+
+    private void RefreshEncounter()
+    {
+        if (encounterSource == null)
+        {
+            SetVisible(encounterRoot, false);
+            return;
+        }
+
+        SetVisible(encounterRoot, true);
+        SetFill(encounterFill, encounterSource.ProgressNormalized);
+        if (encounterRevision != encounterSource.ObjectiveRevision)
+        {
+            encounterRevision = encounterSource.ObjectiveRevision;
+            SetText(encounterLabel, encounterSource.ObjectiveText);
+        }
     }
 
     private PowerSuitHudSnapshot CaptureSnapshot()
@@ -211,7 +246,9 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
             configuration?.UsesInfiniteAmmo ?? false,
             weaponSource.IsReloading,
             runtime?.ReloadNormalizedTime ?? 0f,
-            configuration?.DisplayName
+            configuration?.DisplayName,
+            weaponSource.IsCharging,
+            weaponSource.ChargeNormalized
         );
     }
 
@@ -250,9 +287,15 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
         {
             SetVisible(
                 reloadRoot,
-                snapshot.Weapon.IsAvailable && snapshot.Weapon.IsReloading
+                snapshot.Weapon.IsAvailable &&
+                    (snapshot.Weapon.IsReloading || snapshot.Weapon.IsCharging)
             );
-            SetFill(reloadFill, snapshot.Weapon.ReloadNormalized);
+            SetFill(
+                reloadFill,
+                snapshot.Weapon.IsCharging
+                    ? snapshot.Weapon.ChargeNormalized
+                    : snapshot.Weapon.ReloadNormalized
+            );
             if ((textDirty & PowerSuitHudDirtyFlags.Reload) != 0)
             {
                 SetText(

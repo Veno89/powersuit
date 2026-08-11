@@ -232,6 +232,7 @@ namespace Powersuit.Enemies.UnityAdapters
         private float enemyHealthMultiplier = 1f;
         private float enemyDamageMultiplier = 1f;
         private float enemySpeedMultiplier = 1f;
+        private string[] allowedZoneIds = Array.Empty<string>();
         private bool initialized;
         private bool isDestroying;
 
@@ -255,10 +256,12 @@ namespace Powersuit.Enemies.UnityAdapters
         public float EnemyDamageMultiplier => enemyDamageMultiplier;
         public float EnemySpeedMultiplier => enemySpeedMultiplier;
         public int TotalSpawned { get; private set; }
+        public int AllowedZoneCount => allowedZoneIds.Length;
         public SpawnPlanResult LastPlanResult { get; private set; }
         public string LastValidationError { get; private set; } = string.Empty;
 
         public event Action<EnemyArchetypeController> EnemySpawned;
+        public event Action<EnemyArchetypeController> EnemyDefeated;
         public event Action<EnemyArchetypeController> EnemyRecycled;
         public event Action<SpawnPlanResult> SpawnCyclePlanned;
 
@@ -495,7 +498,12 @@ namespace Powersuit.Enemies.UnityAdapters
         /// </summary>
         public int SpawnRandom(int requestedCount)
         {
-            return SpawnImmediate(null, requestedCount);
+            return SpawnImmediate(
+                null,
+                requestedCount,
+                runtimeConfig != null ? runtimeConfig.PlayerSafeRadius : 0f,
+                runtimeConfig != null && runtimeConfig.AvoidCameraView
+            );
         }
 
         /// <summary>
@@ -509,7 +517,30 @@ namespace Powersuit.Enemies.UnityAdapters
                 return 0;
             }
 
-            return SpawnImmediate(archetypeId.Trim(), requestedCount);
+            return SpawnImmediate(
+                archetypeId.Trim(),
+                requestedCount,
+                runtimeConfig != null ? runtimeConfig.PlayerSafeRadius : 0f,
+                runtimeConfig != null && runtimeConfig.AvoidCameraView
+            );
+        }
+
+        public int SpawnArchetypeForEncounter(
+            string archetypeId,
+            int requestedCount,
+            float playerSafeRadius = 5f
+        )
+        {
+            if (string.IsNullOrWhiteSpace(archetypeId))
+            {
+                return 0;
+            }
+            return SpawnImmediate(
+                archetypeId.Trim(),
+                requestedCount,
+                Mathf.Max(0f, playerSafeRadius),
+                avoidCamera: false
+            );
         }
 
         public void SetDirectorEnabled(bool isEnabled)
@@ -525,6 +556,64 @@ namespace Powersuit.Enemies.UnityAdapters
             if (initialized)
             {
                 directorState.SetPaused(isPaused);
+            }
+        }
+
+        /// <summary>
+        /// Restricts future spawn candidates to the supplied authored zone ids.
+        /// An empty list restores the ordinary all-zone sandbox behavior.
+        /// Existing enemies are never moved or removed by this filter.
+        /// </summary>
+        public void SetAllowedSpawnZones(IReadOnlyList<string> zoneIds)
+        {
+            if (zoneIds == null || zoneIds.Count == 0)
+            {
+                allowedZoneIds = Array.Empty<string>();
+                return;
+            }
+
+            string[] normalized = new string[zoneIds.Count];
+            int count = 0;
+            for (int index = 0; index < zoneIds.Count; index++)
+            {
+                string id = zoneIds[index];
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    continue;
+                }
+
+                id = id.Trim();
+                bool duplicate = false;
+                for (int prior = 0; prior < count; prior++)
+                {
+                    if (string.Equals(
+                        normalized[prior],
+                        id,
+                        StringComparison.OrdinalIgnoreCase
+                    ))
+                    {
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if (!duplicate)
+                {
+                    normalized[count++] = id;
+                }
+            }
+
+            if (count == 0)
+            {
+                allowedZoneIds = Array.Empty<string>();
+            }
+            else if (count == normalized.Length)
+            {
+                allowedZoneIds = normalized;
+            }
+            else
+            {
+                allowedZoneIds = new string[count];
+                Array.Copy(normalized, allowedZoneIds, count);
             }
         }
 
@@ -714,7 +803,12 @@ namespace Powersuit.Enemies.UnityAdapters
             return runtimeSources[index].RuntimeEntry.Archetype.ArchetypeId;
         }
 
-        private int SpawnImmediate(string archetypeId, int requestedCount)
+        private int SpawnImmediate(
+            string archetypeId,
+            int requestedCount,
+            float playerSafeRadius,
+            bool avoidCamera
+        )
         {
             if (!initialized || playerTarget == null || requestedCount <= 0)
             {
@@ -784,8 +878,8 @@ namespace Powersuit.Enemies.UnityAdapters
                                 entry.Archetype,
                                 candidate,
                                 ToCombatVector(playerTarget.position),
-                                runtimeConfig.PlayerSafeRadius,
-                                runtimeConfig.AvoidCameraView
+                                playerSafeRadius,
+                                avoidCamera
                             ) != SpawnEligibilityFailure.None
                         )
                         {
@@ -1127,6 +1221,7 @@ namespace Powersuit.Enemies.UnityAdapters
                 {
                     active.IsAwaitingRecycle = true;
                     active.DeathRecycleRemaining = deathRecycleDelaySeconds;
+                    EnemyDefeated?.Invoke(active.Controller);
                 }
 
                 active.DeathRecycleRemaining = Mathf.Max(
@@ -1201,7 +1296,11 @@ namespace Powersuit.Enemies.UnityAdapters
             for (int index = 0; index < spawnZones.Length; index++)
             {
                 SpawnZone zone = spawnZones[index];
-                if (zone == null || count >= candidateBuffer.Length)
+                if (
+                    zone == null ||
+                    !IsZoneAllowed(zone.ZoneId) ||
+                    count >= candidateBuffer.Length
+                )
                 {
                     continue;
                 }
@@ -1214,6 +1313,27 @@ namespace Powersuit.Enemies.UnityAdapters
             }
 
             candidateView.Set(candidateBuffer, count);
+        }
+
+        private bool IsZoneAllowed(string zoneId)
+        {
+            if (allowedZoneIds.Length == 0)
+            {
+                return true;
+            }
+
+            for (int index = 0; index < allowedZoneIds.Length; index++)
+            {
+                if (string.Equals(
+                    allowedZoneIds[index],
+                    zoneId,
+                    StringComparison.OrdinalIgnoreCase
+                ))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void BuildRuntimeSources()

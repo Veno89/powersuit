@@ -82,6 +82,10 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private PowerSuitInputSnapshot fallbackInputSnapshot;
     private GameObject fallbackProjectileTemplate;
     private float reticleShotExpansion;
+    private WeaponChargeState chargeState;
+    private bool chargeReleaseAuthorized;
+    private float queuedChargeDamageMultiplier = 1f;
+    private float queuedChargeRadiusMultiplier = 1f;
     private readonly List<ParticleSystem> muzzleParticleBuffer =
         new List<ParticleSystem>(8);
     private readonly List<Light> muzzleLightBuffer = new List<Light>(4);
@@ -157,7 +161,12 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             ? weaponDefinition.ReticleStyle
             : WeaponReticleStyle.PrecisionCross;
     public float CurrentReticleGapPixels =>
-        ResolveReticleBaseGap() + reticleShotExpansion;
+        Mathf.Max(
+            1f,
+            ResolveReticleBaseGap() + reticleShotExpansion - ChargeNormalized * 4f
+        );
+    public bool IsCharging => chargeState != null && chargeState.IsCharging;
+    public float ChargeNormalized => chargeState?.NormalizedCharge ?? 0f;
 
     /// <summary>
     /// Sets the player weapon's outgoing damage multiplier. NaN preserves the
@@ -227,6 +236,9 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public event Action CycleCancelled;
     public event Action<DamageResult> DamageResolved;
     public event Action<WeaponDefinition> WeaponEquipped;
+    public event Action ChargeStarted;
+    public event Action<float> ChargeReleased;
+    public event Action ChargeCancelled;
 
     private void Awake()
     {
@@ -258,10 +270,11 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             audioSource = GetComponent<AudioSource>();
         }
 
-        if (projectilePrefab != null && projectilePrewarmCount > 0)
+        PlayerProjectile initialProjectilePrefab = ResolveActiveProjectilePrefab();
+        if (initialProjectilePrefab != null && projectilePrewarmCount > 0)
         {
             CombatFeedbackPool.Prewarm(
-                projectilePrefab.gameObject,
+                initialProjectilePrefab.gameObject,
                 projectilePrewarmCount
             );
         }
@@ -311,6 +324,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             new UnityWeaponRandomSource()
         );
         activeConfiguration = runtimeState.Configuration;
+        chargeState = definition.CreateChargeState();
+        ResetChargeTransaction(cancelState: false);
         AttachRuntimeEvents();
         RaiseAmmunitionChanged();
         reticleShotExpansion = 0f;
@@ -334,6 +349,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     {
         fireQueuedForForwardPose = false;
         fireQueuedFrame = -1;
+        CancelCharge();
         runtimeState?.PrepareForUnequip();
         muzzleLightTimer = 0f;
         if (muzzleFlashLight != null)
@@ -344,10 +360,15 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
     public void PrewarmProjectiles(int count)
     {
+        PrewarmProjectiles(ResolveActiveProjectilePrefab(), count);
+    }
+
+    public void PrewarmProjectiles(PlayerProjectile prefab, int count)
+    {
         int requested = Mathf.Max(0, count);
-        if (projectilePrefab != null && requested > 0)
+        if (prefab != null && requested > 0)
         {
-            CombatFeedbackPool.Prewarm(projectilePrefab.gameObject, requested);
+            CombatFeedbackPool.Prewarm(prefab.gameObject, requested);
         }
     }
 
@@ -364,6 +385,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private void Update()
     {
         runtimeState?.Advance(Time.deltaTime);
+        PowerSuitInputSnapshot input = ReadInputSnapshot();
 
         if (reticleShotExpansion > 0f)
         {
@@ -377,7 +399,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             }
         }
 
-        if (IsReloadPressed())
+        if (input.ReloadPressed)
         {
             TryStartReload();
         }
@@ -386,7 +408,6 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             TryStartAutomaticReload();
         }
 
-        bool fireRequested = IsFireRequested();
         if (
             fireQueuedForForwardPose &&
             Time.frameCount > fireQueuedFrame
@@ -396,7 +417,11 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             fireQueuedFrame = -1;
             TryFireWeapon();
         }
-        else if (fireRequested)
+        else if (weaponDefinition != null && weaponDefinition.UsesChargeShot)
+        {
+            HandleChargeInput(input);
+        }
+        else if (IsFireRequested(input))
         {
             RequestFire();
         }
@@ -415,6 +440,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     {
         fireQueuedForForwardPose = false;
         fireQueuedFrame = -1;
+        CancelCharge();
     }
 
     /// <summary>
@@ -427,6 +453,15 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public bool RequestFire()
     {
         if (fireQueuedForForwardPose)
+        {
+            return false;
+        }
+
+        if (
+            weaponDefinition != null &&
+            weaponDefinition.UsesChargeShot &&
+            !chargeReleaseAuthorized
+        )
         {
             return false;
         }
@@ -469,11 +504,19 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         WeaponFireResult result = runtimeState.TryFire();
         if (!result.Fired)
         {
+            ResetChargeTransaction(cancelState: false);
             return result;
         }
 
+        float chargeDamageMultiplier = queuedChargeDamageMultiplier;
+        float chargeRadiusMultiplier = queuedChargeRadiusMultiplier;
+        ResetChargeTransaction(cancelState: false);
         controller?.FaceCameraForWeaponFire();
-        FireProjectileAndFeedback(result);
+        FireProjectileAndFeedback(
+            result,
+            chargeDamageMultiplier,
+            chargeRadiusMultiplier
+        );
         if (weaponDefinition != null)
         {
             reticleShotExpansion = Mathf.Max(
@@ -493,7 +536,12 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             return WeaponReloadStartResult.PresentationLocked;
         }
 
-        return runtimeState.TryStartReload();
+        WeaponReloadStartResult result = runtimeState.TryStartReload();
+        if (result == WeaponReloadStartResult.Started)
+        {
+            CancelCharge();
+        }
+        return result;
     }
 
     private void TryStartAutomaticReload()
@@ -545,6 +593,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     {
         fireQueuedForForwardPose = false;
         fireQueuedFrame = -1;
+        CancelCharge();
         runtimeState?.ResetTransientState();
 
         muzzleLightTimer = 0f;
@@ -566,9 +615,15 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
     }
 
-    private void FireProjectileAndFeedback(WeaponFireResult result)
+    private void FireProjectileAndFeedback(
+        WeaponFireResult result,
+        float chargeDamageMultiplier = 1f,
+        float chargeRadiusMultiplier = 1f
+    )
     {
-        float resolvedDamage = CalculateOutgoingDamage(result.Damage);
+        float resolvedDamage = CalculateOutgoingDamage(
+            result.Damage * Mathf.Max(0.01f, chargeDamageMultiplier)
+        );
         Vector3 muzzlePos = GetMuzzlePosition();
         Vector3 aimPoint = controller != null
             ? controller.GetAimPoint(muzzlePos)
@@ -592,10 +647,11 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
         Quaternion muzzleRot = Quaternion.LookRotation(fireDirection, Vector3.up);
 
-        if (projectilePrefab != null)
+        PlayerProjectile activeProjectilePrefab = ResolveActiveProjectilePrefab();
+        if (activeProjectilePrefab != null)
         {
             GameObject projectileObject = CombatFeedbackPool.Spawn(
-                projectilePrefab.gameObject,
+                activeProjectilePrefab.gameObject,
                 muzzlePos,
                 Quaternion.LookRotation(fireDirection)
             );
@@ -612,7 +668,23 @@ public sealed class PowerSuitWeapon : MonoBehaviour
                     activeConfiguration.ProjectileLifetimeSeconds,
                     activeConfiguration.ProjectileRadius,
                     transform,
-                    result.IsCritical
+                    result.IsCritical,
+                    weaponDefinition != null
+                        ? weaponDefinition.ProjectileDamageType
+                        : DamageType.Kinetic,
+                    weaponDefinition != null
+                        ? weaponDefinition.SplashDamageRadius *
+                            Mathf.Max(0.01f, chargeRadiusMultiplier)
+                        : 0f,
+                    weaponDefinition != null
+                        ? weaponDefinition.SplashMinimumDamageMultiplier
+                        : 0.35f,
+                    weaponDefinition != null
+                        ? weaponDefinition.SplashImpulse
+                        : 0f,
+                    weaponDefinition != null
+                        ? weaponDefinition.SplashStaggerSeconds
+                        : 0f
                 );
             }
             else if (projectileObject != null)
@@ -630,7 +702,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
                 muzzlePos,
                 fireDirection,
                 resolvedDamage,
-                result.IsCritical
+                result.IsCritical,
+                chargeRadiusMultiplier
             );
         }
 
@@ -658,6 +731,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             activeConfiguration,
             new UnityWeaponRandomSource()
         );
+        chargeState = weaponDefinition?.CreateChargeState();
+        ResetChargeTransaction(cancelState: false);
         AttachRuntimeEvents();
         RaiseAmmunitionChanged();
     }
@@ -955,7 +1030,8 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         Vector3 position,
         Vector3 direction,
         float resolvedDamage,
-        bool isCritical
+        bool isCritical,
+        float chargeRadiusMultiplier
     )
     {
         GameObject template = GetOrCreateFallbackProjectileTemplate();
@@ -986,7 +1062,23 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             activeConfiguration.ProjectileLifetimeSeconds,
             activeConfiguration.ProjectileRadius,
             transform,
-            isCritical
+            isCritical,
+            weaponDefinition != null
+                ? weaponDefinition.ProjectileDamageType
+                : DamageType.Kinetic,
+            weaponDefinition != null
+                ? weaponDefinition.SplashDamageRadius *
+                    Mathf.Max(0.01f, chargeRadiusMultiplier)
+                : 0f,
+            weaponDefinition != null
+                ? weaponDefinition.SplashMinimumDamageMultiplier
+                : 0.35f,
+            weaponDefinition != null
+                ? weaponDefinition.SplashImpulse
+                : 0f,
+            weaponDefinition != null
+                ? weaponDefinition.SplashStaggerSeconds
+                : 0f
         );
         proj.DamageResolved += RaiseDamageResolved;
     }
@@ -1025,7 +1117,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         return fallbackProjectileTemplate;
     }
 
-    private bool IsFireRequested()
+    private bool IsFireRequested(PowerSuitInputSnapshot input)
     {
         if (controller != null && controller.IsPrimaryFireSuppressed)
         {
@@ -1034,15 +1126,91 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
         bool semiAutomatic =
             activeConfiguration?.TriggerMode == WeaponTriggerMode.SemiAutomatic;
-        PowerSuitInputSnapshot input = ReadInputSnapshot();
         return semiAutomatic
             ? input.FirePressed
             : input.FireHeld;
     }
 
-    private bool IsReloadPressed()
+    private void HandleChargeInput(PowerSuitInputSnapshot input)
     {
-        return ReadInputSnapshot().ReloadPressed;
+        if (chargeState == null)
+        {
+            return;
+        }
+
+        if (
+            (controller != null && controller.IsPrimaryFireSuppressed) ||
+            !PresentationAllowsFire
+        )
+        {
+            CancelCharge();
+            return;
+        }
+
+        if (!chargeState.IsCharging)
+        {
+            if (input.FirePressed && CanFire && chargeState.Begin())
+            {
+                ChargeStarted?.Invoke();
+            }
+            return;
+        }
+
+        if (input.FireHeld)
+        {
+            chargeState.Advance(Time.deltaTime);
+        }
+
+        if (!input.FireReleased && input.FireHeld)
+        {
+            return;
+        }
+
+        WeaponChargeReleaseResult release = chargeState.Release();
+        ChargeReleased?.Invoke(release.NormalizedCharge);
+        if (!release.ShouldFire)
+        {
+            ResetChargeTransaction(cancelState: false);
+            return;
+        }
+
+        queuedChargeDamageMultiplier = release.DamageMultiplier;
+        queuedChargeRadiusMultiplier = release.RadiusMultiplier;
+        chargeReleaseAuthorized = true;
+        if (!RequestFire())
+        {
+            ResetChargeTransaction(cancelState: false);
+        }
+    }
+
+    private bool CancelCharge()
+    {
+        bool cancelled = chargeState != null && chargeState.Cancel();
+        ResetChargeTransaction(cancelState: false);
+        if (cancelled)
+        {
+            ChargeCancelled?.Invoke();
+        }
+        return cancelled;
+    }
+
+    private void ResetChargeTransaction(bool cancelState)
+    {
+        if (cancelState)
+        {
+            chargeState?.Cancel();
+        }
+        chargeReleaseAuthorized = false;
+        queuedChargeDamageMultiplier = 1f;
+        queuedChargeRadiusMultiplier = 1f;
+    }
+
+    private PlayerProjectile ResolveActiveProjectilePrefab()
+    {
+        return weaponDefinition != null &&
+            weaponDefinition.ProjectilePrefabOverride != null
+                ? weaponDefinition.ProjectilePrefabOverride
+                : projectilePrefab;
     }
 
     private PowerSuitInputSnapshot ReadInputSnapshot()
@@ -1110,9 +1278,12 @@ public sealed class PowerSuitWeapon : MonoBehaviour
 
     private void DrawWeaponReticle(float guiX, float guiY, bool isAiming)
     {
-        float thickness = CurrentReticleStyle == WeaponReticleStyle.AssaultDynamic
-            ? 2.5f
-            : 2f;
+        float thickness = CurrentReticleStyle switch
+        {
+            WeaponReticleStyle.AssaultDynamic => 2.5f,
+            WeaponReticleStyle.HeavyCharge => 3f,
+            _ => 2f
+        };
         float armLength = weaponDefinition != null
             ? weaponDefinition.ReticleArmLengthPixels
             : (isAiming ? 12f : 8f);
@@ -1145,9 +1316,12 @@ public sealed class PowerSuitWeapon : MonoBehaviour
             Texture2D.whiteTexture
         );
 
-        float centerSize = CurrentReticleStyle == WeaponReticleStyle.AssaultDynamic
-            ? 2f
-            : 3f;
+        float centerSize = CurrentReticleStyle switch
+        {
+            WeaponReticleStyle.AssaultDynamic => 2f,
+            WeaponReticleStyle.HeavyCharge => 4f + ChargeNormalized * 3f,
+            _ => 3f
+        };
         GUI.DrawTexture(
             new Rect(
                 guiX - centerSize * 0.5f,

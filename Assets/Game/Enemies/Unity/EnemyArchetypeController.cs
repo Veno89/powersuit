@@ -13,6 +13,7 @@ namespace Powersuit.Enemies.UnityAdapters
     public sealed class EnemyArchetypeController : MonoBehaviour,
         IDamageReceiver,
         IExternalForceReceiver,
+        IStaggerReceiver,
         ICombatPoolable
     {
         private enum AttackPhase
@@ -107,6 +108,7 @@ namespace Powersuit.Enemies.UnityAdapters
         public bool CanReceiveDamage =>
             IsInitialized && runtimeState.IsAlive && !runtimeState.IsSpawnProtected;
         public bool CanReceiveExternalForce => IsInitialized && runtimeState.IsAlive;
+        public bool CanReceiveStagger => IsInitialized && runtimeState.IsAlive;
         public float HealthMultiplier => healthMultiplier;
         public float OutgoingDamageMultiplier => outgoingDamageMultiplier;
         public float SpeedMultiplier => speedMultiplier;

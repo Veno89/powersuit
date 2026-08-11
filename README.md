@@ -1,6 +1,6 @@
 # PowerSuit
 
-PowerSuit is an original single-player Unity 6 third-person powered-suit combat sandbox. The current **Feel-First Combat and Flight Tech Demo** is playable end to end: ground movement, flight, precision shooting, three suit abilities, six enemy archetypes, randomized encounters, a three-zone world, HUD, developer console, and pooled combat feedback are integrated into one reusable C# gameplay slice.
+PowerSuit is an original single-player Unity 6 third-person powered-suit combat sandbox. The current **Feel-First Combat and Flight Tech Demo** is playable end to end: ground movement, flight, a three-weapon loadout, three suit abilities, six enemy archetypes, a structured three-zone encounter, HUD, developer console, and pooled combat feedback are integrated into one reusable C# gameplay slice.
 
 The game comes first. Runtime systems are data-driven where tuning benefits, plain-C# logic is separated from Unity adapters where practical, and the generated content pipeline preserves the canonical scene and asset GUIDs.
 
@@ -25,10 +25,10 @@ The player bootstrap instantiates `PowerSuitCombatSandbox.prefab` once, connects
 | `Shift` | Sprint while moving forward/sideways on stable ground / boost in flight |
 | Right mouse | Shoulder aim |
 | Hold Right mouse + `V` | Toggle the Precision Rifle scope while the weapon is ready |
-| Left mouse | Fire |
+| Left mouse | Fire / hold and release to charge the Heavy Plasma Cannon |
 | `R` | Reload |
 | `Q` | Draw or stow the rifle |
-| `1` / `2` or Mouse wheel | Equip Precision Rifle / Assault Rifle or cycle weapons |
+| `1` / `2` / `3` or Mouse wheel | Equip Precision Rifle / Assault Rifle / Heavy Plasma Cannon or cycle weapons |
 | `G` | Fire shoulder micro-rocket |
 | Hold `E`, release | Target and cast lightning; cancel with `Esc` |
 | `X` | Cast the void-orb ultimate when the meter is full |
@@ -42,11 +42,11 @@ The centralized `PowerSuitInputRouter` arbitrates gameplay, targeting, scope, co
 - Ground locomotion has acceleration/deceleration, signed directional movement, coyote time, jump buffering, air control, landing response, backpedalling, and a dedicated run state. Generator114 adds authored left/right loops to the ready, aimed, and stowed sets; signed 2D blend trees combine forward/back/left/right motions for diagonals. Contact-aware foot planting and procedural start/stop, strafe, turn, and braking attitude reduce slide without changing the accepted 6.5 m/s walk or 10.725 m/s sprint speeds.
 - A quick `Space` press performs a normal jump. Keeping that accepted jump held for about 0.9 seconds enters flight; simply holding `Space` while already falling cannot arm flight. Flight includes hover, ascend/descend, braking, boost, banking, automatic touchdown, and flight-compatible aiming, firing, reloading, and abilities. Its 14 m/s cruise and 28 m/s boost profiles use deliberately faster acceleration and release response. `F` is no longer a flight binding.
 - Camera profiles cover exploration, shoulder aim, flight, boost, ability targeting, and the Precision Rifle's actual `ScopePoint`. `V` scope access is restricted to scope-enabled Precision Rifles; the scoped presentation reversibly suppresses the complete `RifleRoot` render hierarchy so no barrel, receiver, or optic can cross the sight picture, while transforms and ballistics remain active. Its circular sight, crosshair, mil ticks, and range stadia align to the weapon aim ray. Collision pull-in and damped release avoid recurrent camera clipping; mouse/pad look, aim sensitivity, camera damping, and aim transitions use the responsive demo profile.
-- The two-slot data-driven loadout includes the semi-automatic Precision Rifle and a 720 RPM automatic Assault Rifle. Each slot preserves its own magazine, reserve, and cadence state. A visible switch sheathes the current weapon, swaps receivers while hidden, then draws the selected weapon; requests can still be queued during another carry transition. The Assault Rifle has 30+120 rounds, 22 base damage, empty-magazine auto-reload, a shoulder-aim profile, and no magnified scope access. It now uses a distinct generated 16-piece compact receiver with three shared materials, no scope, and no colliders. Its expanding orange reticle, warmer muzzle flash, stronger presentation-only receiver kick, and automatic tracer cadence distinguish it from the cyan precision presentation without changing projectile authority.
+- The three-slot data-driven loadout separates clear combat roles: the five-round semi-automatic Precision Rifle owns deliberate long-range scoped shots; the 720 RPM Assault Rifle owns mobile sustained fire with 30+120 rounds and automatic reload; and the four-round Heavy Plasma Cannon owns slow charged area damage. Every slot preserves its own magazine, reserve, and cadence state through a visible sheathe/swap/draw sequence. The Heavy Plasma Cannon charges while LMB is held, cancels sub-threshold releases, reaches full charge in 0.8 seconds, and launches a slow magenta projectile whose damage and 5.5 m base blast radius scale with charge. Its generated receiver, heavy recoil, charge reticle, expanding impact rings, explosive damage, stagger, and impulse keep it visually and mechanically distinct; only the Precision Rifle can use the magnified scope.
 - Shoulder rocket, projected lightning strike, and meter-gated void-orb ultimate use shared cooldown, targeting, faction-safe radial damage, external-force, pooling, and lifecycle boundaries without a monolithic ability framework. Rocket and lightning now render their full damage radius, expanding shockwave/rays, impact flash, lingering aftermath ring, and—in lightning's case—a vertical bolt; the targeting ring pulses before release.
 - Six generated, data-driven enemies are available: Stationary Sentry, Patrol Rifleman, Pursuer, Heavy Artillery, Flying Harrier, and Skirmisher. Their shared runtime/controller/emitter architecture supports distinct movement and attack profiles, longer full-window telegraphs, damage/stagger flashes, target warnings, health bars, force response, death, and pool reset.
-- `PowerSuitCombatSandbox.prefab` supplies three connected greybox zones, separate ground/flight spawn regions, 19 spawn points, a foundry catwalk, causeway bridge/AoE courtyard, airfield hover platforms/flight gates, and a deterministic weighted/threat-budget SpawnDirector. The default live cap is ten enemies with slightly faster, broader groups.
-- The safe-area-aware HUD presents player health, propulsion heat, ammo/reload, reticle/hit state, ability cooldowns, and ultimate meter. Sprint, flight, and boost share a 100-point heat resource; overheating locks propulsion until cooling reaches 35%. The integrated player disables the superseded IMGUI health/ammo panels, eliminating duplicate reload and instruction overlays. Enemy health bars are camera-facing mesh renderers with distance culling; encounter counts remain available through console statistics.
+- `PowerSuitCombatSandbox.prefab` supplies three connected greybox zones, separate ground/flight spawn regions, 19 spawn points, a foundry catwalk, causeway bridge/AoE courtyard, and airfield hover platforms/flight gates. `PowerSuitEncounterDirector` advances a fixed causeway (7), foundry (7), and airfield (9) enemy sequence as the player reaches each area, restarts the active phase after defeat, and leaves the general deterministic SpawnDirector available for console/stress use.
+- The safe-area-aware HUD presents player health, propulsion heat, ammo/reload/charge, reticle/hit state, ability cooldowns, ultimate meter, and the active zone objective with remaining enemy count. Sprint, flight, and boost share a 100-point heat resource; overheating locks propulsion until cooling reaches 35%. The integrated player disables the superseded IMGUI health/ammo panels, eliminating duplicate reload and instruction overlays. Enemy health bars are camera-facing mesh renderers with distance culling.
 - The Development-Build console provides safe, clamped runtime tuning and diagnostics.
 
 ## Developer console
@@ -76,10 +76,10 @@ See [ROADMAP.md](ROADMAP.md) for acceptance status, [PROJECT.md](Assets/Game/Doc
 Accepted gameplay-batch evidence from 2026-08-10, followed by the 2026-08-11 performance certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- Unity EditMode: 254/254 passed.
-- Unity PlayMode: 13/13 passed, including the real sheathe/swap/draw sequence, independent weapon ammunition, assault visual/reticle/recoil identity, scope persistence, and a 1,000-projectile spawn/recycle pool exercise.
+- Unity EditMode: 259/259 passed.
+- Unity PlayMode: 14/14 passed, including three-slot sheathe/swap/draw, independent weapon ammunition, Heavy Plasma charge gating, scoped eligibility, a multi-target radial-impact regression, and a 1,000-projectile spawn/recycle pool exercise.
 - Generated 2D controller blends, Generator114 24-clip importer contract, foot planting, propulsion heat/HUD, heat-reactive thrusters, stronger ability/combat readability, six enemy prefabs/definitions, player prefab, SpawnDirector, and expanded three-zone world validation passed.
-- Windows x64 Development Build completed successfully on 2026-08-11 after the two-weapon integration. Only non-blocking package-level Sentis shader warnings were reported.
+- Windows x64 Development Build completed successfully on 2026-08-11 after the Heavy Plasma and structured-encounter integration. Only non-blocking package-level Sentis shader warnings were reported.
 - A 15-second headless player smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. Expected offline Unity cloud `curl` failures were unrelated to gameplay, and final Unity Console inspection reported 0 errors.
 - Owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounters work and feel decent. The targeted edge-case and measurement gates below remain separate.
 - Development Player certification passed at capped 30/60/120 FPS with 32 concurrent enemies, zero measured main-thread managed allocation, zero post-warmup pool misses, and zero logged errors.
@@ -91,7 +91,7 @@ These checks and the broad owner pass establish the current playable baseline. T
 
 - Owner/manual feel acceptance at Game view Fit/1x, including combined ground/flight/aim/scope/fire/reload/ability inputs, slopes, steps, close cover, and camera framing.
 - Owner/manual acceptance of sprint cadence, tap-jump versus hold-to-flight timing, touchdown transitions, and the unobstructed Precision Rifle scope presentation.
-- Owner/manual acceptance of the distinct Assault Rifle silhouette, visible switching sequence, automatic-fire feedback, and Precision-versus-Assault combat identity. Audio remains intentionally deferred until suitable owned or approved assets exist.
+- Owner/manual acceptance of all three weapon silhouettes, the visible switching sequence, Heavy Plasma charge/blast readability, and Precision-versus-Assault-versus-Heavy combat identity. Audio remains intentionally deferred until suitable owned or approved assets exist.
 - Owner tuning of the implemented shared sprint/flight heat rates, lock threshold, cooldown delay, and HUD readability.
 - Connected render/GPU profiling with usable draw-call and GPU-time counters, plus uncapped headroom and representative target-hardware measurements.
 - Remaining lifecycle validation across player respawn, scene reload, seed reset, spawner toggles, and malformed console input. Repeated enemy/projectile/ability reuse and enemy replacement are covered by the automated two-minute soak.

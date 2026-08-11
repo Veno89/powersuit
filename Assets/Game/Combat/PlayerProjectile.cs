@@ -21,6 +21,11 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
     [SerializeField] private Color projectileColor = new Color(0.2f, 0.8f, 1f, 1f);
     [SerializeField] private CombatFaction sourceFaction = CombatFaction.Player;
     [SerializeField] private DamageType damageType = DamageType.Kinetic;
+    [SerializeField, Min(0f)] private float splashDamageRadius;
+    [SerializeField, Range(0f, 1f)]
+    private float splashMinimumDamageMultiplier = 0.35f;
+    [SerializeField, Min(0f)] private float splashImpulse;
+    [SerializeField, Min(0f)] private float splashStaggerSeconds;
 
     [Header("Trail Visuals")]
     [SerializeField] private float trailTime = 0.15f;
@@ -41,6 +46,8 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
     private bool visualsApplied;
     private MaterialPropertyBlock visualPropertyBlock;
     private RaycastHit[] hitBuffer = new RaycastHit[InitialHitBufferSize];
+    private readonly CombatRadialImpactExecutor radialImpactExecutor =
+        new CombatRadialImpactExecutor(64);
 
     private static Material enemyFallbackMaterial;
     private static Material environmentFallbackMaterial;
@@ -73,6 +80,37 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
         bool criticalHit = false
     )
     {
+        Initialize(
+            travelDirection,
+            travelSpeed,
+            projectileDamage,
+            maxLifetime,
+            projectileRadius,
+            sourceTransform,
+            criticalHit,
+            DamageType.Kinetic,
+            0f,
+            0.35f,
+            0f,
+            0f
+        );
+    }
+
+    public void Initialize(
+        Vector3 travelDirection,
+        float travelSpeed,
+        float projectileDamage,
+        float maxLifetime,
+        float projectileRadius,
+        Transform sourceTransform,
+        bool criticalHit,
+        DamageType impactDamageType,
+        float radialDamageRadius,
+        float radialMinimumDamageMultiplier,
+        float radialImpulse,
+        float radialStaggerSeconds
+    )
+    {
         direction = travelDirection.normalized;
         speed = travelSpeed;
         damage = projectileDamage;
@@ -80,6 +118,13 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
         radius = Mathf.Max(0.05f, projectileRadius);
         sourceRoot = sourceTransform;
         isCritical = criticalHit;
+        damageType = impactDamageType;
+        splashDamageRadius = Mathf.Max(0f, radialDamageRadius);
+        splashMinimumDamageMultiplier = Mathf.Clamp01(
+            radialMinimumDamageMultiplier
+        );
+        splashImpulse = Mathf.Max(0f, radialImpulse);
+        splashStaggerSeconds = Mathf.Max(0f, radialStaggerSeconds);
         isInitialized = true;
         spawnTime = Time.time;
 
@@ -233,22 +278,59 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
         transform.position = hit.point;
         Quaternion impactRotation = Quaternion.LookRotation(hit.normal);
 
-        IDamageReceiver receiver =
-            hit.collider.GetComponentInParent<IDamageReceiver>();
         DamageResult damageResult = DamageResult.Ignored;
-        if (receiver != null)
+        if (splashDamageRadius > 0.01f)
         {
-            damageResult = receiver.ApplyDamage(
-                new DamageInfo(
-                    sourceRoot != null ? sourceRoot.gameObject : gameObject,
-                    sourceFaction,
-                    damageType,
-                    damage,
-                    CombatVectorConversion.ToCombat(hit.point),
-                    CombatVectorConversion.ToCombat(direction),
-                    isCritical
-                )
+            CombatRadialImpactResult radialResult = radialImpactExecutor.Execute(
+                hit.point,
+                hit.normal,
+                splashDamageRadius,
+                damage,
+                splashMinimumDamageMultiplier,
+                splashImpulse,
+                splashStaggerSeconds,
+                sourceRoot != null ? sourceRoot.gameObject : gameObject,
+                sourceRoot,
+                sourceFaction,
+                damageType,
+                isCritical
             );
+            if (radialResult.TotalAppliedDamage > 0f)
+            {
+                damageResult = DamageResult.Applied(
+                    radialResult.TotalAppliedDamage,
+                    radialResult.KilledTargets > 0
+                );
+            }
+        }
+        else
+        {
+            IDamageReceiver receiver =
+                hit.collider.GetComponentInParent<IDamageReceiver>();
+            if (receiver != null)
+            {
+                damageResult = receiver.ApplyDamage(
+                    new DamageInfo(
+                        sourceRoot != null ? sourceRoot.gameObject : gameObject,
+                        sourceFaction,
+                        damageType,
+                        damage,
+                        CombatVectorConversion.ToCombat(hit.point),
+                        CombatVectorConversion.ToCombat(direction),
+                        isCritical
+                    )
+                );
+                if (
+                    damageResult.WasApplied &&
+                    !damageResult.WasKilled &&
+                    splashStaggerSeconds > 0f &&
+                    receiver is IStaggerReceiver staggerReceiver &&
+                    staggerReceiver.CanReceiveStagger
+                )
+                {
+                    staggerReceiver.TryApplyStagger(splashStaggerSeconds);
+                }
+            }
         }
 
         if (damageResult.WasApplied)
@@ -421,6 +503,7 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
         sourceRoot = null;
         isCritical = false;
         isInitialized = false;
+        ResetImpactProfile();
         spawnTime = Time.time;
         if (trailRenderer != null)
         {
@@ -439,6 +522,7 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
         DamageResolved = null;
         isCritical = false;
         isInitialized = false;
+        ResetImpactProfile();
         if (trailRenderer != null)
         {
             trailRenderer.Clear();
@@ -450,5 +534,14 @@ public sealed class PlayerProjectile : MonoBehaviour, ICombatProjectilePoolable
     {
         isInitialized = false;
         CombatFeedbackPool.Recycle(gameObject);
+    }
+
+    private void ResetImpactProfile()
+    {
+        damageType = DamageType.Kinetic;
+        splashDamageRadius = 0f;
+        splashMinimumDamageMultiplier = 0.35f;
+        splashImpulse = 0f;
+        splashStaggerSeconds = 0f;
     }
 }

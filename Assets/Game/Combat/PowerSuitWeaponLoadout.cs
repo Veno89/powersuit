@@ -72,6 +72,10 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
         {
             state.RequestSelection(1);
         }
+        else if (input.WeaponSlot3Pressed)
+        {
+            state.RequestSelection(2);
+        }
         else if (input.WeaponNextPressed)
         {
             state.RequestNext();
@@ -188,6 +192,13 @@ public sealed class PowerSuitWeaponLoadout : MonoBehaviour
                 largestProjectilePrewarm,
                 definition.ProjectilePrewarmCount
             );
+            if (definition.ProjectilePrefabOverride != null)
+            {
+                weapon.PrewarmProjectiles(
+                    definition.ProjectilePrefabOverride,
+                    definition.ProjectilePrewarmCount
+                );
+            }
             for (int prior = 0; prior < index; prior++)
             {
                 if (

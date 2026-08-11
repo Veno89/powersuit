@@ -132,6 +132,10 @@ MonoBehaviour:
   projectileColor: {r: 0.2, g: 0.8, b: 1, a: 1}
   sourceFaction: 1
   damageType: 0
+  splashDamageRadius: 0
+  splashMinimumDamageMultiplier: 0.35
+  splashImpulse: 0
+  splashStaggerSeconds: 0
   trailTime: 0.22
   startWidth: 0.2
   endWidth: 0.025

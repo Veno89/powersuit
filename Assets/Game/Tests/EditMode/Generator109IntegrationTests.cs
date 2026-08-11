@@ -645,7 +645,7 @@ namespace Powersuit.Tests.EditMode
             Assert.That(loadout, Is.Not.Null);
             Assert.That(
                 loadout.GetType().GetProperty("SlotCount")?.GetValue(loadout),
-                Is.EqualTo(2)
+                Is.EqualTo(3)
             );
             object assaultDefinition = loadout.GetType()
                 .GetMethod("GetDefinition")
@@ -665,6 +665,25 @@ namespace Powersuit.Tests.EditMode
                 assaultDefinition.GetType().GetProperty("SupportsScope")
                     ?.GetValue(assaultDefinition),
                 Is.EqualTo(false)
+            );
+            object heavyDefinition = loadout.GetType()
+                .GetMethod("GetDefinition")
+                ?.Invoke(loadout, new object[] { 2 });
+            Assert.That(heavyDefinition, Is.Not.Null);
+            Assert.That(
+                heavyDefinition.GetType().GetProperty("WeaponClass")
+                    ?.GetValue(heavyDefinition)?.ToString(),
+                Is.EqualTo("HeavyWeapon")
+            );
+            Assert.That(
+                heavyDefinition.GetType().GetProperty("UsesChargeShot")
+                    ?.GetValue(heavyDefinition),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                heavyDefinition.GetType().GetProperty("ProjectilePrefabOverride")
+                    ?.GetValue(heavyDefinition),
+                Is.Not.Null
             );
             Component weaponVisuals = player.GetComponent(
                 "PowerSuitWeaponVisualController"
@@ -689,6 +708,16 @@ namespace Powersuit.Tests.EditMode
                 weaponVisuals.GetType().GetProperty("IsAssaultVisualActive")
                     ?.GetValue(weaponVisuals),
                 Is.EqualTo(false)
+            );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("HeavyRendererCount")
+                    ?.GetValue(weaponVisuals),
+                Is.GreaterThanOrEqualTo(14)
+            );
+            Assert.That(
+                weaponVisuals.GetType().GetProperty("HeavyFeedbackRoot")
+                    ?.GetValue(weaponVisuals),
+                Is.Not.Null
             );
             GameObject assaultVisual = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Game/Prefab/Weapons/AssaultRifleVisual.prefab"
@@ -719,6 +748,24 @@ namespace Powersuit.Tests.EditMode
                 assaultVisual.GetComponentsInChildren<Collider>(true),
                 Is.Empty,
                 "The presentation-only receiver must not alter weapon/player collision."
+            );
+            GameObject heavyVisual = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Game/Prefab/Weapons/HeavyPlasmaCannonVisual.prefab"
+            );
+            Assert.That(heavyVisual, Is.Not.Null);
+            Renderer[] heavyVisualRenderers =
+                heavyVisual.GetComponentsInChildren<Renderer>(true);
+            Assert.That(heavyVisualRenderers.Length, Is.GreaterThanOrEqualTo(14));
+            Assert.That(
+                heavyVisualRenderers.Select(renderer => renderer.sharedMaterial)
+                    .Where(material => material != null)
+                    .Distinct()
+                    .Count(),
+                Is.GreaterThanOrEqualTo(3)
+            );
+            Assert.That(
+                heavyVisual.GetComponentsInChildren<Collider>(true),
+                Is.Empty
             );
             object definition = weapon.GetType()
                 .GetProperty("Definition")

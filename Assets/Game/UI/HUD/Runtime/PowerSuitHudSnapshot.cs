@@ -91,7 +91,9 @@ namespace Powersuit.UI.HUD
             bool usesInfiniteAmmo,
             bool isReloading,
             float reloadNormalized,
-            string displayName = null
+            string displayName = null,
+            bool isCharging = false,
+            float chargeNormalized = 0f
         )
         {
             DisplayName = string.IsNullOrWhiteSpace(displayName)
@@ -106,6 +108,8 @@ namespace Powersuit.UI.HUD
                 UsesInfiniteAmmo = false;
                 IsReloading = false;
                 ReloadNormalized = 0f;
+                IsCharging = false;
+                ChargeNormalized = 0f;
                 return;
             }
 
@@ -116,6 +120,10 @@ namespace Powersuit.UI.HUD
             IsReloading = isReloading;
             ReloadNormalized = isReloading
                 ? HudValueMath.Clamp01(reloadNormalized)
+                : 0f;
+            IsCharging = isCharging && !isReloading;
+            ChargeNormalized = IsCharging
+                ? HudValueMath.Clamp01(chargeNormalized)
                 : 0f;
         }
 
@@ -129,6 +137,8 @@ namespace Powersuit.UI.HUD
         public bool UsesInfiniteAmmo { get; }
         public bool IsReloading { get; }
         public float ReloadNormalized { get; }
+        public bool IsCharging { get; }
+        public float ChargeNormalized { get; }
 
         public bool AmmunitionEquals(HudWeaponState other)
         {
@@ -148,7 +158,9 @@ namespace Powersuit.UI.HUD
         {
             return IsAvailable == other.IsAvailable &&
                 IsReloading == other.IsReloading &&
-                ReloadNormalized.Equals(other.ReloadNormalized);
+                ReloadNormalized.Equals(other.ReloadNormalized) &&
+                IsCharging == other.IsCharging &&
+                ChargeNormalized.Equals(other.ChargeNormalized);
         }
 
         public bool Equals(HudWeaponState other)
@@ -173,7 +185,9 @@ namespace Powersuit.UI.HUD
                 hash = (hash * 397) ^ Reserve;
                 hash = (hash * 397) ^ (UsesInfiniteAmmo ? 1 : 0);
                 hash = (hash * 397) ^ (IsReloading ? 1 : 0);
-                return (hash * 397) ^ ReloadNormalized.GetHashCode();
+                hash = (hash * 397) ^ ReloadNormalized.GetHashCode();
+                hash = (hash * 397) ^ (IsCharging ? 1 : 0);
+                return (hash * 397) ^ ChargeNormalized.GetHashCode();
             }
         }
     }
@@ -607,16 +621,31 @@ namespace Powersuit.UI.HUD
             HudWeaponState right
         )
         {
-            bool leftVisible = left.IsAvailable && left.IsReloading;
-            bool rightVisible = right.IsAvailable && right.IsReloading;
+            bool leftVisible = left.IsAvailable &&
+                (left.IsReloading || left.IsCharging);
+            bool rightVisible = right.IsAvailable &&
+                (right.IsReloading || right.IsCharging);
             if (leftVisible != rightVisible)
             {
                 return false;
             }
 
-            return !leftVisible ||
-                ToDisplayedInteger(left.ReloadNormalized * 100f) ==
-                ToDisplayedInteger(right.ReloadNormalized * 100f);
+            if (!leftVisible)
+            {
+                return true;
+            }
+            if (left.IsCharging != right.IsCharging)
+            {
+                return false;
+            }
+            float leftProgress = left.IsCharging
+                ? left.ChargeNormalized
+                : left.ReloadNormalized;
+            float rightProgress = right.IsCharging
+                ? right.ChargeNormalized
+                : right.ReloadNormalized;
+            return ToDisplayedInteger(leftProgress * 100f) ==
+                ToDisplayedInteger(rightProgress * 100f);
         }
 
         private static bool AbilityTextEquals(

@@ -59,6 +59,14 @@ namespace Powersuit.Editor
 
         public const string AssaultRifleVisualPrefabPath =
             "Assets/Game/Prefab/Weapons/AssaultRifleVisual.prefab";
+        public const string HeavyPlasmaDefinitionPath =
+            "Assets/Game/Content/Weapons/HeavyPlasmaCannon.asset";
+        public const string HeavyPlasmaVisualPrefabPath =
+            "Assets/Game/Prefab/Weapons/HeavyPlasmaCannonVisual.prefab";
+        public const string HeavyPlasmaProjectilePrefabPath =
+            "Assets/Game/Prefab/Combat/HeavyPlasmaProjectile.prefab";
+        public const string HeavyPlasmaImpactPrefabPath =
+            "Assets/Game/Prefab/Combat/HeavyPlasmaImpact.prefab";
         private const string WeaponMaterialFolder =
             "Assets/Game/Content/Weapons/Materials";
         private const string AssaultRifleBodyMaterialPath =
@@ -67,6 +75,12 @@ namespace Powersuit.Editor
             WeaponMaterialFolder + "/AssaultRifleArmor.mat";
         private const string AssaultRifleAccentMaterialPath =
             WeaponMaterialFolder + "/AssaultRifleAccent.mat";
+        private const string HeavyPlasmaBodyMaterialPath =
+            WeaponMaterialFolder + "/HeavyPlasmaBody.mat";
+        private const string HeavyPlasmaArmorMaterialPath =
+            WeaponMaterialFolder + "/HeavyPlasmaArmor.mat";
+        private const string HeavyPlasmaEnergyMaterialPath =
+            WeaponMaterialFolder + "/HeavyPlasmaEnergy.mat";
 
         private const string AbilityPrefabFolder =
             "Assets/Game/Prefab/Abilities";
@@ -231,6 +245,7 @@ namespace Powersuit.Editor
 
             ConfigurePrecisionRifleDefinition(overwriteExisting: false);
             ConfigureAssaultRifleDefinition(overwriteExisting: false);
+            ConfigureHeavyPlasmaDefinition(overwriteExisting: false);
             ConfigureWeaponPresentationIdentity();
             ConfigureModelImporter();
             Dictionary<string, AnimationClip> clips = LoadRequiredClips();
@@ -255,11 +270,17 @@ namespace Powersuit.Editor
                         PowerSuitDemoEnemyContentGenerator.Generate();
                 GameObject assaultRifleVisual =
                     CreateOrUpdateAssaultRifleVisualPrefab();
+                HeavyPlasmaPrefabSet heavyPlasma =
+                    CreateOrUpdateHeavyPlasmaPrefabs();
+                ConfigureHeavyPlasmaProjectileReference(
+                    heavyPlasma.Projectile
+                );
                 GameObject variant = CreatePlayerVariant(
                     controller,
                     abilityPrefabs,
                     enemyContent.CombatSandboxPrefab,
-                    assaultRifleVisual
+                    assaultRifleVisual,
+                    heavyPlasma.Visual
                 );
                 if (sceneHandling == DemoSceneHandling.CreateAndPopulate)
                 {
@@ -331,6 +352,7 @@ namespace Powersuit.Editor
         {
             ConfigurePrecisionRifleDefinition(overwriteExisting: true);
             ConfigureAssaultRifleDefinition(overwriteExisting: true);
+            ConfigureHeavyPlasmaDefinition(overwriteExisting: true);
             ConfigureBasePlayerCamera();
             Debug.Log(
                 "[Powersuit] Applied the recommended camera and weapon tuning."
@@ -603,6 +625,122 @@ namespace Powersuit.Editor
             AssetDatabase.SaveAssetIfDirty(definition);
         }
 
+        private static void ConfigureHeavyPlasmaDefinition(
+            bool overwriteExisting
+        )
+        {
+            WeaponDefinition definition =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    HeavyPlasmaDefinitionPath
+                );
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<WeaponDefinition>();
+                AssetDatabase.CreateAsset(definition, HeavyPlasmaDefinitionPath);
+            }
+            else if (!overwriteExisting)
+            {
+                return;
+            }
+
+            SerializedObject serialized = new SerializedObject(definition);
+            SetString(serialized, "weaponId", "heavy-plasma-cannon");
+            SetString(serialized, "displayName", "Heavy Plasma Cannon");
+            SetEnum(serialized, "weaponClass", (int)WeaponClass.HeavyWeapon);
+            SetEnum(serialized, "triggerMode", (int)WeaponTriggerMode.SemiAutomatic);
+            SetFloat(serialized, "baseDamage", 112f);
+            SetFloat(serialized, "roundsPerMinute", 38f);
+            SetFloat(serialized, "criticalChance", 0.04f);
+            SetFloat(serialized, "criticalDamageMultiplier", 1.5f);
+            SetInt(serialized, "magazineCapacity", 4);
+            SetInt(serialized, "startingReserveAmmo", 20);
+            SetInt(serialized, "maximumReserveAmmo", 40);
+            SetBool(serialized, "autoReloadWhenEmpty", true);
+            SetFloat(serialized, "reloadDurationSeconds", 3.4f);
+            SetFloat(serialized, "reloadCommitNormalizedTime", 0.82f);
+            SetBool(serialized, "requiresManualCycle", false);
+            SetFloat(serialized, "manualCycleDurationSeconds", 0f);
+            SetFloat(serialized, "projectileSpeed", 35f);
+            SetFloat(serialized, "projectileLifetimeSeconds", 5f);
+            SetFloat(serialized, "projectileRadius", 0.28f);
+            SetInt(serialized, "projectilePrewarmCount", 8);
+            SetObjectReference(
+                serialized,
+                "projectilePrefabOverride",
+                AssetDatabase.LoadAssetAtPath<PlayerProjectile>(
+                    HeavyPlasmaProjectilePrefabPath
+                )
+            );
+            SetEnum(serialized, "projectileDamageType", (int)DamageType.Explosive);
+            SetFloat(serialized, "splashDamageRadius", 5.5f);
+            SetFloat(serialized, "splashMinimumDamageMultiplier", 0.3f);
+            SetFloat(serialized, "splashImpulse", 12f);
+            SetFloat(serialized, "splashStaggerSeconds", 1.1f);
+            SetFloat(serialized, "aimSpreadDegrees", 0.25f);
+            SetFloat(serialized, "hipSpreadDegrees", 1.6f);
+            SetFloat(serialized, "aimRecoilPitch", 1.8f);
+            SetFloat(serialized, "aimRecoilYaw", 0.4f);
+            SetFloat(serialized, "hipRecoilPitch", 2.8f);
+            SetFloat(serialized, "hipRecoilYaw", 0.75f);
+            SetBool(serialized, "usesChargeShot", true);
+            SetFloat(serialized, "chargeDurationSeconds", 0.8f);
+            SetFloat(serialized, "minimumChargeNormalized", 0.3f);
+            SetFloat(serialized, "minimumChargeDamageMultiplier", 0.75f);
+            SetFloat(serialized, "maximumChargeDamageMultiplier", 1.55f);
+            SetFloat(serialized, "minimumChargeRadiusMultiplier", 0.8f);
+            SetFloat(serialized, "maximumChargeRadiusMultiplier", 1.25f);
+            SetBool(serialized, "supportsScope", false);
+            SetFloat(serialized, "shoulderFieldOfViewDegrees", 66f);
+            SetFloat(serialized, "scopedFieldOfViewDegrees", 28f);
+            SetFloat(serialized, "shoulderLookSensitivityMultiplier", 0.92f);
+            SetFloat(serialized, "scopedLookSensitivityMultiplier", 0.45f);
+            SetFloat(serialized, "aimTransitionSharpness", 20f);
+            SetEnum(serialized, "reticleStyle", (int)WeaponReticleStyle.HeavyCharge);
+            SetColor(
+                serialized,
+                "reticleColor",
+                new Color(0.78f, 0.25f, 1f, 1f)
+            );
+            SetFloat(serialized, "reticleBaseGapPixels", 10f);
+            SetFloat(serialized, "reticleArmLengthPixels", 14f);
+            SetFloat(serialized, "reticleShotExpansionPixels", 16f);
+            SetFloat(serialized, "reticleRecoverySharpness", 12f);
+            SetColor(
+                serialized,
+                "authoredMuzzleFlashColor",
+                new Color(0.76f, 0.18f, 1f, 1f)
+            );
+            SetFloat(serialized, "authoredMuzzleFlashIntensity", 18f);
+            SetFloat(serialized, "authoredMuzzleFlashDuration", 0.12f);
+            SetFloat(serialized, "visualRecoilDistance", 0.065f);
+            SetFloat(serialized, "visualRecoilDegrees", 5f);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(definition);
+            AssetDatabase.SaveAssetIfDirty(definition);
+        }
+
+        private static void ConfigureHeavyPlasmaProjectileReference(
+            PlayerProjectile projectile
+        )
+        {
+            WeaponDefinition definition =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    HeavyPlasmaDefinitionPath
+                );
+            if (definition == null || projectile == null)
+            {
+                throw new InvalidOperationException(
+                    "The Heavy Plasma Cannon definition or projectile is missing."
+                );
+            }
+
+            SerializedObject serialized = new SerializedObject(definition);
+            SetObjectReference(serialized, "projectilePrefabOverride", projectile);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(definition);
+            AssetDatabase.SaveAssetIfDirty(definition);
+        }
+
         private static void ConfigureWeaponPresentationIdentity()
         {
             WeaponDefinition precision =
@@ -613,7 +751,11 @@ namespace Powersuit.Editor
                 AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
                     AssaultRifleDefinitionPath
                 );
-            if (precision == null || assault == null)
+            WeaponDefinition heavy =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    HeavyPlasmaDefinitionPath
+                );
+            if (precision == null || assault == null || heavy == null)
             {
                 throw new InvalidOperationException(
                     "Weapon presentation migration requires both loadout definitions."
@@ -647,6 +789,20 @@ namespace Powersuit.Editor
                 muzzleDuration: 0.045f,
                 recoilDistance: 0.035f,
                 recoilDegrees: 2.8f
+            );
+            ConfigureWeaponPresentationIdentity(
+                heavy,
+                WeaponReticleStyle.HeavyCharge,
+                new Color(0.78f, 0.25f, 1f, 1f),
+                reticleGap: 10f,
+                reticleArm: 14f,
+                shotExpansion: 16f,
+                recoverySharpness: 12f,
+                muzzleColor: new Color(0.76f, 0.18f, 1f, 1f),
+                muzzleIntensity: 18f,
+                muzzleDuration: 0.12f,
+                recoilDistance: 0.065f,
+                recoilDegrees: 5f
             );
         }
 
@@ -1776,6 +1932,332 @@ namespace Powersuit.Editor
             );
         }
 
+        private static HeavyPlasmaPrefabSet CreateOrUpdateHeavyPlasmaPrefabs()
+        {
+            EnsureAssetFolder(WeaponMaterialFolder);
+            EnsureAssetFolder("Assets/Game/Prefab/Weapons");
+            EnsureAssetFolder("Assets/Game/Prefab/Combat");
+
+            Material body = CreateOrUpdateWeaponMaterial(
+                HeavyPlasmaBodyMaterialPath,
+                new Color(0.055f, 0.045f, 0.075f, 1f),
+                metallic: 0.8f,
+                emission: false
+            );
+            Material armor = CreateOrUpdateWeaponMaterial(
+                HeavyPlasmaArmorMaterialPath,
+                new Color(0.22f, 0.16f, 0.28f, 1f),
+                metallic: 0.62f,
+                emission: false
+            );
+            Material energy = CreateOrUpdateWeaponMaterial(
+                HeavyPlasmaEnergyMaterialPath,
+                new Color(0.75f, 0.14f, 1f, 1f),
+                metallic: 0.15f,
+                emission: true
+            );
+
+            GameObject visual = CreateOrUpdateHeavyPlasmaVisualPrefab(
+                body,
+                armor,
+                energy
+            );
+            GameObject impact = CreateOrUpdateHeavyPlasmaImpactPrefab(energy);
+            PlayerProjectile projectile = CreateOrUpdateHeavyPlasmaProjectilePrefab(
+                energy,
+                impact
+            );
+            return new HeavyPlasmaPrefabSet(visual, projectile, impact);
+        }
+
+        private static GameObject CreateOrUpdateHeavyPlasmaVisualPrefab(
+            Material body,
+            Material armor,
+            Material energy
+        )
+        {
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
+            try
+            {
+                GameObject root = new GameObject("HeavyPlasmaCannonVisual");
+                SceneManager.MoveGameObjectToScene(root, previewScene);
+                GameObject feedbackRoot = new GameObject(
+                    "HeavyPlasmaFeedbackRoot"
+                );
+                feedbackRoot.transform.SetParent(root.transform, false);
+
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "ReinforcedStock",
+                    new Vector3(0f, 0f, 0.11f),
+                    new Vector3(0.28f, 0.29f, 0.28f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "CoreHousing",
+                    new Vector3(0f, 0.035f, 0.39f),
+                    new Vector3(0.34f, 0.34f, 0.42f),
+                    Quaternion.identity, body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cylinder, "PlasmaCore",
+                    new Vector3(0f, 0.055f, 0.42f),
+                    new Vector3(0.13f, 0.2f, 0.13f),
+                    Quaternion.Euler(90f, 0f, 0f), energy
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "CoreGuardLeft",
+                    new Vector3(-0.19f, 0.055f, 0.42f),
+                    new Vector3(0.055f, 0.29f, 0.37f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "CoreGuardRight",
+                    new Vector3(0.19f, 0.055f, 0.42f),
+                    new Vector3(0.055f, 0.29f, 0.37f),
+                    Quaternion.identity, armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "ForwardHousing",
+                    new Vector3(0f, 0.04f, 0.72f),
+                    new Vector3(0.3f, 0.28f, 0.28f),
+                    Quaternion.identity, body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cylinder, "EmitterBarrel",
+                    new Vector3(0f, 0.055f, 0.93f),
+                    new Vector3(0.095f, 0.15f, 0.095f),
+                    Quaternion.Euler(90f, 0f, 0f), armor
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cylinder, "EmitterCrown",
+                    new Vector3(0f, 0.055f, 1.08f),
+                    new Vector3(0.15f, 0.065f, 0.15f),
+                    Quaternion.Euler(90f, 0f, 0f), energy
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "PistolGrip",
+                    new Vector3(0f, -0.18f, 0.33f),
+                    new Vector3(0.12f, 0.27f, 0.13f),
+                    Quaternion.Euler(-10f, 0f, 0f), body
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "PowerCell",
+                    new Vector3(0f, -0.18f, 0.52f),
+                    new Vector3(0.16f, 0.25f, 0.17f),
+                    Quaternion.Euler(8f, 0f, 0f), energy
+                );
+                CreateWeaponPrimitive(
+                    feedbackRoot.transform, PrimitiveType.Cube, "ForwardGrip",
+                    new Vector3(0f, -0.15f, 0.72f),
+                    new Vector3(0.1f, 0.22f, 0.1f),
+                    Quaternion.identity, armor
+                );
+                for (int index = -1; index <= 1; index += 2)
+                {
+                    CreateWeaponPrimitive(
+                        feedbackRoot.transform, PrimitiveType.Cube,
+                        index < 0 ? "EnergyRailLeft" : "EnergyRailRight",
+                        new Vector3(index * 0.14f, 0.17f, 0.67f),
+                        new Vector3(0.035f, 0.045f, 0.52f),
+                        Quaternion.identity, energy
+                    );
+                    CreateWeaponPrimitive(
+                        feedbackRoot.transform, PrimitiveType.Cube,
+                        index < 0 ? "EmitterFinLeft" : "EmitterFinRight",
+                        new Vector3(index * 0.16f, 0.055f, 1.02f),
+                        new Vector3(0.09f, 0.055f, 0.2f),
+                        Quaternion.Euler(0f, 0f, index * 12f), armor
+                    );
+                }
+
+                GameObject saved = PrefabUtility.SaveAsPrefabAsset(
+                    root,
+                    HeavyPlasmaVisualPrefabPath
+                );
+                if (saved == null)
+                {
+                    throw new InvalidOperationException(
+                        "Could not save the Heavy Plasma Cannon visual prefab."
+                    );
+                }
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(previewScene);
+            }
+
+            return AssetDatabase.LoadAssetAtPath<GameObject>(
+                HeavyPlasmaVisualPrefabPath
+            );
+        }
+
+        private static GameObject CreateOrUpdateHeavyPlasmaImpactPrefab(
+            Material energy
+        )
+        {
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
+            try
+            {
+                GameObject root = new GameObject(
+                    "HeavyPlasmaImpact",
+                    typeof(AutoRecycleEffect),
+                    typeof(PowerSuitPlasmaImpactPresentation)
+                );
+                SceneManager.MoveGameObjectToScene(root, previewScene);
+                root.GetComponent<AutoRecycleEffect>().SetDuration(0.78f);
+                GameObject ringRootObject = new GameObject("BlastRadiusRings");
+                ringRootObject.transform.SetParent(root.transform, false);
+                LineRenderer[] rings = new LineRenderer[3];
+                for (int index = 0; index < rings.Length; index++)
+                {
+                    GameObject ringObject = new GameObject("Ring" + (index + 1));
+                    ringObject.transform.SetParent(ringRootObject.transform, false);
+                    ringObject.transform.localScale = Vector3.one *
+                        Mathf.Lerp(1f, 0.38f, index / 2f);
+                    rings[index] = CreateCircleLineRenderer(
+                        ringObject,
+                        energy,
+                        new Color(0.78f, 0.25f, 1f, 1f)
+                    );
+                }
+                Light impactLight = root.AddComponent<Light>();
+                impactLight.type = LightType.Point;
+                impactLight.shadows = LightShadows.None;
+                root.GetComponent<PowerSuitPlasmaImpactPresentation>().Configure(
+                    ringRootObject.transform,
+                    rings,
+                    impactLight,
+                    0.75f,
+                    5.5f,
+                    new Color(0.78f, 0.25f, 1f, 1f),
+                    16f
+                );
+
+                GameObject saved = PrefabUtility.SaveAsPrefabAsset(
+                    root,
+                    HeavyPlasmaImpactPrefabPath
+                );
+                if (saved == null)
+                {
+                    throw new InvalidOperationException(
+                        "Could not save the Heavy Plasma impact prefab."
+                    );
+                }
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(previewScene);
+            }
+
+            return AssetDatabase.LoadAssetAtPath<GameObject>(
+                HeavyPlasmaImpactPrefabPath
+            );
+        }
+
+        private static PlayerProjectile CreateOrUpdateHeavyPlasmaProjectilePrefab(
+            Material energy,
+            GameObject impactPrefab
+        )
+        {
+            Scene previewScene = EditorSceneManager.NewPreviewScene();
+            try
+            {
+                GameObject root = new GameObject(
+                    "HeavyPlasmaProjectile",
+                    typeof(TrailRenderer),
+                    typeof(PlayerProjectile)
+                );
+                SceneManager.MoveGameObjectToScene(root, previewScene);
+                GameObject core = CreateWeaponPrimitive(
+                    root.transform,
+                    PrimitiveType.Sphere,
+                    "PlasmaCore",
+                    Vector3.zero,
+                    Vector3.one * 0.52f,
+                    Quaternion.identity,
+                    energy
+                );
+                Renderer coreRenderer = core.GetComponent<Renderer>();
+                if (coreRenderer != null)
+                {
+                    coreRenderer.shadowCastingMode =
+                        UnityEngine.Rendering.ShadowCastingMode.Off;
+                    coreRenderer.receiveShadows = false;
+                }
+                TrailRenderer trail = root.GetComponent<TrailRenderer>();
+                trail.sharedMaterial = energy;
+                trail.time = 0.36f;
+                trail.startWidth = 0.42f;
+                trail.endWidth = 0.04f;
+
+                PlayerProjectile projectile = root.GetComponent<PlayerProjectile>();
+                SerializedObject serialized = new SerializedObject(projectile);
+                SetColor(
+                    serialized,
+                    "projectileColor",
+                    new Color(0.78f, 0.25f, 1f, 1f)
+                );
+                SetFloat(serialized, "trailTime", 0.36f);
+                SetFloat(serialized, "startWidth", 0.42f);
+                SetFloat(serialized, "endWidth", 0.04f);
+                SetObjectReference(serialized, "enemyImpactPrefab", impactPrefab);
+                SetObjectReference(
+                    serialized,
+                    "environmentImpactPrefab",
+                    impactPrefab
+                );
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+
+                GameObject saved = PrefabUtility.SaveAsPrefabAsset(
+                    root,
+                    HeavyPlasmaProjectilePrefabPath
+                );
+                if (saved == null)
+                {
+                    throw new InvalidOperationException(
+                        "Could not save the Heavy Plasma projectile prefab."
+                    );
+                }
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(previewScene);
+            }
+
+            return AssetDatabase.LoadAssetAtPath<PlayerProjectile>(
+                HeavyPlasmaProjectilePrefabPath
+            );
+        }
+
+        private static LineRenderer CreateCircleLineRenderer(
+            GameObject owner,
+            Material material,
+            Color color
+        )
+        {
+            const int segmentCount = 48;
+            LineRenderer line = owner.AddComponent<LineRenderer>();
+            line.useWorldSpace = false;
+            line.loop = true;
+            line.positionCount = segmentCount;
+            line.sharedMaterial = material;
+            line.widthMultiplier = 0.06f;
+            line.startColor = color;
+            line.endColor = color;
+            line.shadowCastingMode =
+                UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            for (int index = 0; index < segmentCount; index++)
+            {
+                float angle = index * Mathf.PI * 2f / segmentCount;
+                line.SetPosition(
+                    index,
+                    new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f)
+                );
+            }
+            return line;
+        }
+
         private static Material CreateOrUpdateWeaponMaterial(
             string path,
             Color color,
@@ -1873,7 +2355,8 @@ namespace Powersuit.Editor
             AnimatorController controller,
             AbilityPrefabSet abilityPrefabs,
             GameObject demoWorldPrefab,
-            GameObject assaultRifleVisualPrefab
+            GameObject assaultRifleVisualPrefab,
+            GameObject heavyPlasmaVisualPrefab
         )
         {
             GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BasePlayerPrefabPath);
@@ -1974,8 +2457,9 @@ namespace Powersuit.Editor
 
                 Renderer[] precisionRenderers =
                     rifleRoot.GetComponentsInChildren<Renderer>(true);
-                GameObject assaultVisualInstance = AttachAssaultRifleVisual(
+                GameObject assaultVisualInstance = AttachWeaponVisual(
                     assaultRifleVisualPrefab,
+                    "AssaultRifleVisual",
                     rifleRoot,
                     stockContact,
                     muzzle,
@@ -1987,10 +2471,26 @@ namespace Powersuit.Editor
                 );
                 Renderer[] assaultRenderers =
                     assaultVisualInstance.GetComponentsInChildren<Renderer>(true);
+                GameObject heavyVisualInstance = AttachWeaponVisual(
+                    heavyPlasmaVisualPrefab,
+                    "HeavyPlasmaCannonVisual",
+                    rifleRoot,
+                    stockContact,
+                    muzzle,
+                    primaryGrip
+                );
+                Transform heavyFeedbackRoot = FindChildRecursive(
+                    heavyVisualInstance.transform,
+                    "HeavyPlasmaFeedbackRoot"
+                );
+                Renderer[] heavyRenderers =
+                    heavyVisualInstance.GetComponentsInChildren<Renderer>(true);
                 if (
                     assaultFeedbackRoot == null ||
+                    heavyFeedbackRoot == null ||
                     precisionRenderers.Length == 0 ||
-                    assaultRenderers.Length < 12
+                    assaultRenderers.Length < 12 ||
+                    heavyRenderers.Length < 14
                 )
                 {
                     throw new InvalidOperationException(
@@ -2039,10 +2539,18 @@ namespace Powersuit.Editor
                     AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
                         AssaultRifleDefinitionPath
                     );
-                if (weaponDefinition == null || assaultRifleDefinition == null)
+                WeaponDefinition heavyPlasmaDefinition =
+                    AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                        HeavyPlasmaDefinitionPath
+                    );
+                if (
+                    weaponDefinition == null ||
+                    assaultRifleDefinition == null ||
+                    heavyPlasmaDefinition == null
+                )
                 {
                     throw new InvalidOperationException(
-                        "The Precision or Assault Rifle WeaponDefinition is missing."
+                        "A required three-slot WeaponDefinition is missing."
                     );
                 }
                 weapon.Definition = weaponDefinition;
@@ -2054,7 +2562,12 @@ namespace Powersuit.Editor
                         instance.AddComponent<PowerSuitWeaponLoadout>();
                 }
                 weaponLoadout.Configure(
-                    new[] { weaponDefinition, assaultRifleDefinition },
+                    new[]
+                    {
+                        weaponDefinition,
+                        assaultRifleDefinition,
+                        heavyPlasmaDefinition
+                    },
                     initialSlot: 0
                 );
                 PowerSuitWeaponVisualController weaponVisuals =
@@ -2069,7 +2582,9 @@ namespace Powersuit.Editor
                     suitController,
                     precisionRenderers,
                     assaultRenderers,
-                    assaultFeedbackRoot
+                    assaultFeedbackRoot,
+                    heavyRenderers,
+                    heavyFeedbackRoot
                 );
                 weapon.ShowLegacyAmmoHud = false;
                 SerializedObject weaponFeedback = new SerializedObject(weapon);
@@ -2375,8 +2890,9 @@ namespace Powersuit.Editor
             return adapter.transform;
         }
 
-        private static GameObject AttachAssaultRifleVisual(
+        private static GameObject AttachWeaponVisual(
             GameObject visualPrefab,
+            string instanceName,
             Transform rifleRoot,
             Transform stockContact,
             Transform muzzle,
@@ -2393,7 +2909,7 @@ namespace Powersuit.Editor
             {
                 throw new ArgumentNullException(
                     nameof(visualPrefab),
-                    "Assault Rifle visual alignment requires every authored hardpoint."
+                    "Weapon visual alignment requires every authored hardpoint."
                 );
             }
 
@@ -2404,10 +2920,10 @@ namespace Powersuit.Editor
             if (instance == null)
             {
                 throw new InvalidOperationException(
-                    "Could not instantiate the Assault Rifle visual prefab."
+                    "Could not instantiate the generated weapon visual prefab."
                 );
             }
-            instance.name = "AssaultRifleVisual";
+            instance.name = instanceName;
 
             Vector3 stockLocal = rifleRoot.InverseTransformPoint(
                 stockContact.position
@@ -2713,6 +3229,15 @@ namespace Powersuit.Editor
                 new Vector2(210f, 44f),
                 TextAnchor.MiddleCenter
             );
+            HudWidget encounterWidget = CreateHudWidget(
+                safeArea,
+                "Encounter",
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(0f, -30f),
+                new Vector2(620f, 52f),
+                TextAnchor.MiddleCenter
+            );
 
             PowerSuitHudPresenter presenter =
                 hudObject.GetComponent<PowerSuitHudPresenter>();
@@ -2763,6 +3288,12 @@ namespace Powersuit.Editor
                 "ultimate",
                 ultimateWidget
             );
+            ConfigureHudWidget(
+                serialized,
+                "encounter",
+                encounterWidget
+            );
+            serialized.ApplyModifiedPropertiesWithoutUndo();
             return presenter;
         }
 
@@ -3745,6 +4276,10 @@ namespace Powersuit.Editor
                 AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
                     AssaultRifleDefinitionPath
                 );
+            WeaponDefinition heavyPlasma =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    HeavyPlasmaDefinitionPath
+                );
             PowerSuitWeaponLoadout loadout =
                 variant.GetComponent<PowerSuitWeaponLoadout>();
             PowerSuitWeaponVisualController weaponVisuals =
@@ -3752,6 +4287,18 @@ namespace Powersuit.Editor
             GameObject assaultVisualPrefab =
                 AssetDatabase.LoadAssetAtPath<GameObject>(
                     AssaultRifleVisualPrefabPath
+                );
+            GameObject heavyVisualPrefab =
+                AssetDatabase.LoadAssetAtPath<GameObject>(
+                    HeavyPlasmaVisualPrefabPath
+                );
+            PlayerProjectile heavyProjectile =
+                AssetDatabase.LoadAssetAtPath<PlayerProjectile>(
+                    HeavyPlasmaProjectilePrefabPath
+                );
+            GameObject heavyImpact =
+                AssetDatabase.LoadAssetAtPath<GameObject>(
+                    HeavyPlasmaImpactPrefabPath
                 );
             Renderer[] assaultPrefabRenderers = assaultVisualPrefab != null
                 ? assaultVisualPrefab.GetComponentsInChildren<Renderer>(true)
@@ -3761,15 +4308,31 @@ namespace Powersuit.Editor
                 .Where(material => material != null)
                 .Distinct()
                 .Count();
+            Renderer[] heavyPrefabRenderers = heavyVisualPrefab != null
+                ? heavyVisualPrefab.GetComponentsInChildren<Renderer>(true)
+                : Array.Empty<Renderer>();
+            int heavyMaterialCount = heavyPrefabRenderers
+                .Select(renderer => renderer.sharedMaterial)
+                .Where(material => material != null)
+                .Distinct()
+                .Count();
             if (
                 weapon == null ||
                 precisionRifle == null ||
                 assaultRifle == null ||
+                heavyPlasma == null ||
                 loadout == null ||
                 weaponVisuals == null ||
                 assaultVisualPrefab == null ||
                 assaultPrefabRenderers.Length < 12 ||
                 assaultMaterialCount < 3 ||
+                heavyVisualPrefab == null ||
+                heavyProjectile == null ||
+                heavyImpact == null ||
+                heavyPrefabRenderers.Length < 14 ||
+                heavyMaterialCount < 3 ||
+                heavyImpact.GetComponent<PowerSuitPlasmaImpactPresentation>() ==
+                    null ||
                 assaultPrefabRenderers.Any(renderer =>
                     renderer.name.IndexOf(
                         "Scope",
@@ -3781,10 +4344,14 @@ namespace Powersuit.Editor
                 weaponVisuals.PrecisionRendererCount == 0 ||
                 weaponVisuals.AssaultRendererCount < 12 ||
                 weaponVisuals.AssaultFeedbackRoot == null ||
+                weaponVisuals.HeavyRendererCount < 14 ||
+                weaponVisuals.HeavyFeedbackRoot == null ||
                 weaponVisuals.IsAssaultVisualActive ||
-                loadout.SlotCount != 2 ||
+                weaponVisuals.IsHeavyVisualActive ||
+                loadout.SlotCount != 3 ||
                 loadout.GetDefinition(0) != precisionRifle ||
                 loadout.GetDefinition(1) != assaultRifle ||
+                loadout.GetDefinition(2) != heavyPlasma ||
                 assaultRifle.WeaponClass != WeaponClass.AssaultRifle ||
                 assaultRifle.TriggerMode != WeaponTriggerMode.Automatic ||
                 assaultRifle.SupportsScope ||
@@ -3793,6 +4360,12 @@ namespace Powersuit.Editor
                     WeaponReticleStyle.AssaultDynamic ||
                 assaultRifle.VisualRecoilDistance < 0.03f ||
                 assaultRifle.MuzzleFlashIntensity < 9f ||
+                heavyPlasma.WeaponClass != WeaponClass.HeavyWeapon ||
+                !heavyPlasma.UsesChargeShot ||
+                heavyPlasma.ProjectileDamageType != DamageType.Explosive ||
+                heavyPlasma.SplashDamageRadius < 5f ||
+                heavyPlasma.ProjectilePrefabOverride != heavyProjectile ||
+                heavyPlasma.ReticleStyle != WeaponReticleStyle.HeavyCharge ||
                 precisionRifle.ReticleStyle !=
                     WeaponReticleStyle.PrecisionCross ||
                 weapon.Definition != precisionRifle ||
@@ -3929,6 +4502,7 @@ namespace Powersuit.Editor
                 hud == null ||
                 hudSafeArea == null ||
                 hudSafeArea.transform.parent != hud.transform ||
+                hudSafeArea.transform.Find("Encounter") == null ||
                 playerHealth == null ||
                 hud.HealthSource != playerHealth ||
                 hud.WeaponSource != weapon ||
@@ -4143,6 +4717,24 @@ namespace Powersuit.Editor
             public LightningStrikeActor Lightning { get; }
             public VoidOrbFieldActor VoidField { get; }
             public AbilityTargetIndicator TargetIndicator { get; }
+        }
+
+        private readonly struct HeavyPlasmaPrefabSet
+        {
+            public HeavyPlasmaPrefabSet(
+                GameObject visual,
+                PlayerProjectile projectile,
+                GameObject impact
+            )
+            {
+                Visual = visual;
+                Projectile = projectile;
+                Impact = impact;
+            }
+
+            public GameObject Visual { get; }
+            public PlayerProjectile Projectile { get; }
+            public GameObject Impact { get; }
         }
 
         private readonly struct HudWidget

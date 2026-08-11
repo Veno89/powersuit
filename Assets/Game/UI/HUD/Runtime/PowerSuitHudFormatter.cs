@@ -60,9 +60,18 @@ namespace Powersuit.UI.HUD
 
         public static string FormatReload(HudWeaponState weapon)
         {
-            if (!weapon.IsAvailable || !weapon.IsReloading)
+            if (!weapon.IsAvailable || (!weapon.IsReloading && !weapon.IsCharging))
             {
                 return string.Empty;
+            }
+
+            if (weapon.IsCharging)
+            {
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "PLASMA CHARGE {0:0}%",
+                    weapon.ChargeNormalized * 100f
+                );
             }
 
             return string.Format(

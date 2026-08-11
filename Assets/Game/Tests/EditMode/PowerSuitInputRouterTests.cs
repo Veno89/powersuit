@@ -55,6 +55,7 @@ namespace Powersuit.Tests.EditMode
 
             object fireReleased = Sample(buffer, 12, Raw());
             Assert.That(GetBool(fireReleased, "FireHeld"), Is.False);
+            Assert.That(GetBool(fireReleased, "FireReleased"), Is.True);
             Assert.That(
                 WasReleased(fireReleased, Button("Fire")),
                 Is.True
@@ -198,6 +199,7 @@ namespace Powersuit.Tests.EditMode
             object selection = CombineButtons(
                 "WeaponSlot1",
                 "WeaponSlot2",
+                "WeaponSlot3",
                 "WeaponNext"
             );
             object snapshot = Sample(
@@ -208,6 +210,7 @@ namespace Powersuit.Tests.EditMode
 
             Assert.That(GetBool(snapshot, "WeaponSlot1Pressed"), Is.True);
             Assert.That(GetBool(snapshot, "WeaponSlot2Pressed"), Is.True);
+            Assert.That(GetBool(snapshot, "WeaponSlot3Pressed"), Is.True);
             Assert.That(GetBool(snapshot, "WeaponNextPressed"), Is.True);
         }
 

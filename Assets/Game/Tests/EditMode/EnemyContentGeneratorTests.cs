@@ -100,6 +100,24 @@ namespace Powersuit.Tests.EditMode
                 Is.EqualTo(4.4f).Within(0.001f)
             );
             Assert.That(directorSettings.FindProperty("maximumGroupSize").intValue, Is.EqualTo(3));
+            Type encounterType = Type.GetType(
+                "PowerSuitEncounterDirector, Assembly-CSharp",
+                throwOnError: true
+            );
+            Component encounter = sandbox.GetComponentInChildren(
+                encounterType,
+                true
+            );
+            Assert.That(encounter, Is.Not.Null);
+            SerializedObject encounterSettings = new SerializedObject(encounter);
+            SerializedProperty phases = encounterSettings.FindProperty("phases");
+            Assert.That(phases, Is.Not.Null);
+            Assert.That(phases.arraySize, Is.EqualTo(3));
+            Assert.That(
+                encounterSettings.FindProperty("spawnDirector")
+                    .objectReferenceValue,
+                Is.EqualTo(director)
+            );
 
             Type readabilityType = Type.GetType(
                 "Powersuit.Enemies.UnityAdapters.EnemyCombatReadabilityPresenter, "

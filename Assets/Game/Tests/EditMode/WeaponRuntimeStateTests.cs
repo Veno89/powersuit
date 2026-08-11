@@ -12,6 +12,90 @@ namespace Powersuit.Tests.EditMode
             "Assets/Game/Content/Weapons/PrecisionRifle.asset";
         private const string AssaultRifleAssetPath =
             "Assets/Game/Content/Weapons/AssaultRifle.asset";
+        private const string HeavyPlasmaAssetPath =
+            "Assets/Game/Content/Weapons/HeavyPlasmaCannon.asset";
+
+        [Test]
+        public void ChargeState_ShortReleaseCancelsWithoutAValidShot()
+        {
+            WeaponChargeState state = new WeaponChargeState(
+                0.8f,
+                0.3f,
+                0.75f,
+                1.55f,
+                0.8f,
+                1.25f
+            );
+
+            Assert.That(state.Begin(), Is.True);
+            state.Advance(0.16f);
+            WeaponChargeReleaseResult release = state.Release();
+
+            Assert.That(release.ShouldFire, Is.False);
+            Assert.That(release.NormalizedCharge, Is.EqualTo(0.2f).Within(0.001f));
+            Assert.That(state.IsCharging, Is.False);
+        }
+
+        [Test]
+        public void ChargeState_FullReleaseReturnsAuthoredDamageAndRadius()
+        {
+            WeaponChargeState state = new WeaponChargeState(
+                0.8f,
+                0.3f,
+                0.75f,
+                1.55f,
+                0.8f,
+                1.25f
+            );
+
+            state.Begin();
+            state.Advance(1f);
+            WeaponChargeReleaseResult release = state.Release();
+
+            Assert.That(release.ShouldFire, Is.True);
+            Assert.That(release.NormalizedCharge, Is.EqualTo(1f));
+            Assert.That(release.DamageMultiplier, Is.EqualTo(1.55f));
+            Assert.That(release.RadiusMultiplier, Is.EqualTo(1.25f));
+        }
+
+        [Test]
+        public void HeavyPlasmaAsset_IsChargedExplosiveThirdRole()
+        {
+            UnityEngine.Object asset = AssetDatabase.LoadMainAssetAtPath(
+                HeavyPlasmaAssetPath
+            );
+
+            Assert.That(asset, Is.Not.Null);
+            WeaponRuntimeConfig config = asset.GetType()
+                .GetMethod("CreateRuntimeConfig")
+                ?.Invoke(asset, null) as WeaponRuntimeConfig;
+
+            Assert.That(config, Is.Not.Null);
+            Assert.That(config.GetValidationErrors(), Is.Empty);
+            Assert.That(config.WeaponClass, Is.EqualTo(WeaponClass.HeavyWeapon));
+            Assert.That(config.TriggerMode, Is.EqualTo(WeaponTriggerMode.SemiAutomatic));
+            Assert.That(config.BaseDamage, Is.EqualTo(112f));
+            Assert.That(config.MagazineCapacity, Is.EqualTo(4));
+            Assert.That(config.ProjectileSpeed, Is.EqualTo(35f));
+            Assert.That(
+                asset.GetType().GetProperty("UsesChargeShot")?.GetValue(asset),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                asset.GetType().GetProperty("SplashDamageRadius")?.GetValue(asset),
+                Is.EqualTo(5.5f).Within(0.001f)
+            );
+            Assert.That(
+                asset.GetType().GetProperty("ProjectilePrefabOverride")
+                    ?.GetValue(asset),
+                Is.Not.Null
+            );
+            Assert.That(
+                asset.GetType().GetProperty("ReticleStyle")?.GetValue(asset)
+                    ?.ToString(),
+                Is.EqualTo("HeavyCharge")
+            );
+        }
 
         [Test]
         public void PrecisionRifleAsset_HasPlannedManualActionConfiguration()

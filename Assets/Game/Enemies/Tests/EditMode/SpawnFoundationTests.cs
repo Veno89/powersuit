@@ -8,6 +8,63 @@ namespace Powersuit.Enemies.Tests
     public sealed class SpawnFoundationTests
     {
         [Test]
+        public void Encounter_RequiresZoneThenAdvancesExactThreePhaseBudgets()
+        {
+            DemoEncounterState state = new DemoEncounterState(
+                new[]
+                {
+                    new DemoEncounterPhaseConfig("causeway", "Causeway", 2),
+                    new DemoEncounterPhaseConfig("foundry", "Foundry", 1),
+                    new DemoEncounterPhaseConfig("airfield", "Airfield", 3)
+                },
+                intermissionSeconds: 0.5f
+            );
+
+            Assert.That(state.Status, Is.EqualTo(DemoEncounterStatus.WaitingForZone));
+            Assert.That(state.TryActivateCurrentPhase(false), Is.False);
+            Assert.That(state.TryActivateCurrentPhase(true), Is.True);
+            Assert.That(state.RegisterSpawned(5), Is.EqualTo(2));
+            Assert.That(state.RegisterDefeat(), Is.True);
+            Assert.That(state.RegisterDefeat(), Is.True);
+            Assert.That(state.RegisterDefeat(), Is.False);
+            Assert.That(state.Advance(0f, noEnemiesRemaining: true), Is.True);
+            Assert.That(state.Status, Is.EqualTo(DemoEncounterStatus.Intermission));
+            Assert.That(state.Advance(0.49f, true), Is.False);
+            Assert.That(state.Advance(0.01f, true), Is.True);
+            Assert.That(state.CurrentPhaseIndex, Is.EqualTo(1));
+            Assert.That(state.Status, Is.EqualTo(DemoEncounterStatus.WaitingForZone));
+        }
+
+        [Test]
+        public void Encounter_FailureRestartsCurrentPhaseWithoutRewindingCampaign()
+        {
+            DemoEncounterState state = new DemoEncounterState(
+                new[]
+                {
+                    new DemoEncounterPhaseConfig("first", "First", 1),
+                    new DemoEncounterPhaseConfig("second", "Second", 2)
+                },
+                intermissionSeconds: 0f
+            );
+            state.TryActivateCurrentPhase(true);
+            state.RegisterSpawned(1);
+            state.RegisterDefeat();
+            state.Advance(0f, true);
+            state.Advance(0f, true);
+            Assert.That(state.CurrentPhaseIndex, Is.EqualTo(1));
+
+            state.TryActivateCurrentPhase(true);
+            state.RegisterSpawned(2);
+            Assert.That(state.Fail(), Is.True);
+            state.RestartCurrentPhase();
+
+            Assert.That(state.CurrentPhaseIndex, Is.EqualTo(1));
+            Assert.That(state.SpawnedThisPhase, Is.Zero);
+            Assert.That(state.DefeatedThisPhase, Is.Zero);
+            Assert.That(state.Status, Is.EqualTo(DemoEncounterStatus.WaitingForZone));
+        }
+
+        [Test]
         public void Eligibility_EnforcesSafeRadiusViewZoneAndSurfaceValidation()
         {
             CombatVector3 player = CombatVector3.Zero;

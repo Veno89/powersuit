@@ -781,10 +781,86 @@ namespace Powersuit.Editor
             EnemySpawnDirector director =
                 directorObject.AddComponent<EnemySpawnDirector>();
             ConfigureDirector(director, zones, definitions, enemyPrefabs);
+            PowerSuitEncounterDirector encounter =
+                directorObject.AddComponent<PowerSuitEncounterDirector>();
+            encounter.ConfigureAuthored(
+                director,
+                CreateAuthoredEncounterPhases(),
+                authoredIntermissionSeconds: 2.5f
+            );
 
             GameObject saved = SavePrefab(root, CombatSandboxPrefabPath);
             UnityEngine.Object.DestroyImmediate(root);
             return saved;
+        }
+
+        private static PowerSuitEncounterPhase[] CreateAuthoredEncounterPhases()
+        {
+            return new[]
+            {
+                CreateEncounterPhase(
+                    "causeway",
+                    "CENTRAL CAUSEWAY",
+                    Vector3.zero,
+                    10f,
+                    new[] { "CausewayGround" },
+                    CreateEncounterSpawn("patrol-rifleman", 3),
+                    CreateEncounterSpawn("stationary-sentry", 2),
+                    CreateEncounterSpawn("pursuer", 2)
+                ),
+                CreateEncounterPhase(
+                    "foundry",
+                    "FOUNDRY YARD",
+                    new Vector3(-18f, 0f, 0f),
+                    10f,
+                    new[] { "FoundryGround", "WesternAirspace" },
+                    CreateEncounterSpawn("pursuer", 3),
+                    CreateEncounterSpawn("skirmisher", 3),
+                    CreateEncounterSpawn("heavy-artillery", 1)
+                ),
+                CreateEncounterPhase(
+                    "airfield",
+                    "AERIAL BASIN",
+                    new Vector3(18f, 0f, 0f),
+                    11f,
+                    new[] { "AirfieldGround", "EasternAirspace" },
+                    CreateEncounterSpawn("flying-harrier", 4),
+                    CreateEncounterSpawn("skirmisher", 3),
+                    CreateEncounterSpawn("heavy-artillery", 2)
+                )
+            };
+        }
+
+        private static PowerSuitEncounterPhase CreateEncounterPhase(
+            string id,
+            string displayName,
+            Vector3 center,
+            float radius,
+            string[] zoneIds,
+            params PowerSuitEncounterSpawnEntry[] spawns
+        )
+        {
+            PowerSuitEncounterPhase phase = new PowerSuitEncounterPhase();
+            phase.Configure(
+                id,
+                displayName,
+                center,
+                radius,
+                zoneIds,
+                spawns
+            );
+            return phase;
+        }
+
+        private static PowerSuitEncounterSpawnEntry CreateEncounterSpawn(
+            string archetypeId,
+            int count
+        )
+        {
+            PowerSuitEncounterSpawnEntry entry =
+                new PowerSuitEncounterSpawnEntry();
+            entry.Configure(archetypeId, count);
+            return entry;
         }
 
         private static void ConfigureDirector(
@@ -1245,6 +1321,49 @@ namespace Powersuit.Editor
             )
             {
                 errors.Add("Sandbox encounter pacing does not match the polished demo profile.");
+            }
+
+            PowerSuitEncounterDirector encounter =
+                sandbox.GetComponentInChildren<PowerSuitEncounterDirector>(true);
+            if (
+                encounter == null ||
+                encounter.SpawnDirector != director ||
+                encounter.PhaseCount != 3
+            )
+            {
+                errors.Add(
+                    "Combat sandbox is missing its authored three-zone encounter flow."
+                );
+            }
+            else
+            {
+                SerializedObject encounterSettings =
+                    new SerializedObject(encounter);
+                SerializedProperty phases =
+                    encounterSettings.FindProperty("phases");
+                int[] expectedDefeatBudgets = { 7, 7, 9 };
+                for (int phaseIndex = 0; phaseIndex < phases.arraySize; phaseIndex++)
+                {
+                    SerializedProperty spawns = phases
+                        .GetArrayElementAtIndex(phaseIndex)
+                        .FindPropertyRelative("spawnEntries");
+                    int budget = 0;
+                    for (int spawnIndex = 0; spawnIndex < spawns.arraySize; spawnIndex++)
+                    {
+                        budget += Mathf.Max(
+                            0,
+                            spawns.GetArrayElementAtIndex(spawnIndex)
+                                .FindPropertyRelative("count").intValue
+                        );
+                    }
+                    if (budget != expectedDefeatBudgets[phaseIndex])
+                    {
+                        errors.Add(
+                            "Combat sandbox encounter defeat budgets must be 7/7/9."
+                        );
+                        break;
+                    }
+                }
             }
         }
 

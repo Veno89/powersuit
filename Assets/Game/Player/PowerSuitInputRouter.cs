@@ -7,7 +7,7 @@ using UnityEngine.InputSystem.Controls;
 #endif
 
 [Flags]
-public enum PowerSuitInputButtons : ushort
+public enum PowerSuitInputButtons : uint
 {
     None = 0,
     Jump = 1 << 0,
@@ -24,7 +24,8 @@ public enum PowerSuitInputButtons : ushort
     Scope = 1 << 12,
     WeaponSlot1 = 1 << 13,
     WeaponSlot2 = 1 << 14,
-    WeaponNext = 1 << 15
+    WeaponNext = 1 << 15,
+    WeaponSlot3 = 1 << 16
 }
 
 /// <summary>
@@ -151,6 +152,7 @@ public readonly struct PowerSuitInputSnapshot
     public bool AimHeld => IsHeld(PowerSuitInputButtons.Aim);
     public bool FireHeld => IsHeld(PowerSuitInputButtons.Fire);
     public bool FirePressed => WasPressed(PowerSuitInputButtons.Fire);
+    public bool FireReleased => WasReleased(PowerSuitInputButtons.Fire);
     public bool ReloadPressed => WasPressed(PowerSuitInputButtons.Reload);
     public bool CarryTogglePressed =>
         WasPressed(PowerSuitInputButtons.CarryToggle);
@@ -170,6 +172,8 @@ public readonly struct PowerSuitInputSnapshot
         WasPressed(PowerSuitInputButtons.WeaponSlot1);
     public bool WeaponSlot2Pressed =>
         WasPressed(PowerSuitInputButtons.WeaponSlot2);
+    public bool WeaponSlot3Pressed =>
+        WasPressed(PowerSuitInputButtons.WeaponSlot3);
     public bool WeaponNextPressed =>
         WasPressed(PowerSuitInputButtons.WeaponNext);
 
@@ -492,6 +496,13 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 ref held,
                 ref pressed,
                 ref released,
+                PowerSuitInputButtons.WeaponSlot3,
+                keyboard.digit3Key
+            );
+            AddButton(
+                ref held,
+                ref pressed,
+                ref released,
                 PowerSuitInputButtons.Console,
                 keyboard.backquoteKey
             );
@@ -756,6 +767,13 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
             ref released,
             PowerSuitInputButtons.WeaponSlot2,
             KeyCode.Alpha2
+        );
+        AddLegacyKey(
+            ref held,
+            ref pressed,
+            ref released,
+            PowerSuitInputButtons.WeaponSlot3,
+            KeyCode.Alpha3
         );
         AddLegacyKey(
             ref held,
