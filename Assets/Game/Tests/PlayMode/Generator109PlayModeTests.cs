@@ -1331,6 +1331,129 @@ namespace Powersuit.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator PoweredSuitAimDemo_WeaponLoadoutSwitchesAndPreservesAmmo()
+        {
+            AsyncOperation loadOperation;
+#if UNITY_EDITOR
+            loadOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(
+                "Assets/Scenes/PoweredSuitAimDemo.unity",
+                new LoadSceneParameters(LoadSceneMode.Single)
+            );
+#else
+            loadOperation = SceneManager.LoadSceneAsync(
+                "PoweredSuitAimDemo",
+                LoadSceneMode.Single
+            );
+#endif
+            Assert.That(loadOperation, Is.Not.Null);
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+
+            yield return null;
+            yield return null;
+
+            GameObject player = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Generator 109 Player"
+            );
+            Assert.That(player, Is.Not.Null);
+            GameObject enemies = FindRoot(
+                SceneManager.GetActiveScene(),
+                "Test Enemies"
+            );
+            if (enemies != null)
+            {
+                enemies.SetActive(false);
+            }
+
+            Component weapon = player.GetComponent("PowerSuitWeapon");
+            Component loadout = player.GetComponent("PowerSuitWeaponLoadout");
+            Component controller = player.GetComponent("PowerSuitController");
+            Component scopeSight = player.GetComponent("PowerSuitScopeSight");
+            Assert.That(weapon, Is.Not.Null);
+            Assert.That(loadout, Is.Not.Null);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(scopeSight, Is.Not.Null);
+            Assert.That(GetIntProperty(loadout, "SlotCount"), Is.EqualTo(2));
+            Assert.That(GetIntProperty(loadout, "EquippedIndex"), Is.EqualTo(0));
+            Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Precision Rifle"));
+
+            int precisionMagazine = GetIntProperty(
+                weapon,
+                "CurrentMagazineAmmo"
+            );
+            Assert.That(precisionMagazine, Is.EqualTo(5));
+
+            object switchResult = loadout.GetType().GetMethod("RequestSlot")
+                ?.Invoke(loadout, new object[] { 1 });
+            Assert.That(switchResult?.ToString(), Is.EqualTo("Queued"));
+            yield return null;
+
+            Assert.That(GetIntProperty(loadout, "EquippedIndex"), Is.EqualTo(1));
+            Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Assault Rifle"));
+            Assert.That(
+                scopeSight.GetType().GetProperty("IsScopeEligible")
+                    ?.GetValue(scopeSight),
+                Is.EqualTo(false),
+                "Only the Precision Rifle may enter magnified scope mode."
+            );
+            Assert.That(GetBoolProperty(controller, "IsScoped"), Is.False);
+
+            Renderer[] scopeRenderers = player
+                .GetComponentsInChildren<Renderer>(true)
+                .Where(renderer => renderer.name.StartsWith("Rifle_Scope"))
+                .ToArray();
+            Assert.That(scopeRenderers.Length, Is.GreaterThan(0));
+            Assert.That(
+                scopeRenderers.All(renderer => !renderer.enabled),
+                Is.True,
+                "The shared prototype receiver must hide its precision optic when the Assault Rifle is equipped."
+            );
+
+            object fireResult = weapon.GetType().GetMethod("TryFireWeapon")
+                ?.Invoke(weapon, null);
+            Assert.That(
+                fireResult?.GetType().GetProperty("Fired")?.GetValue(fireResult),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(29)
+            );
+
+            loadout.GetType().GetMethod("RequestSlot")
+                ?.Invoke(loadout, new object[] { 0 });
+            yield return null;
+            Assert.That(GetWeaponDisplayName(weapon), Is.EqualTo("Precision Rifle"));
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(precisionMagazine),
+                "Switching must not overwrite the Precision Rifle's magazine."
+            );
+            Assert.That(
+                scopeSight.GetType().GetProperty("IsScopeEligible")
+                    ?.GetValue(scopeSight),
+                Is.EqualTo(true)
+            );
+            Assert.That(
+                scopeRenderers.All(renderer => renderer.enabled),
+                Is.True,
+                "Returning to the Precision Rifle must restore the authored optic renderers."
+            );
+
+            loadout.GetType().GetMethod("RequestSlot")
+                ?.Invoke(loadout, new object[] { 1 });
+            yield return null;
+            Assert.That(
+                GetIntProperty(weapon, "CurrentMagazineAmmo"),
+                Is.EqualTo(29),
+                "Each loadout slot must retain its own ammunition state."
+            );
+        }
+
+        [UnityTest]
         public IEnumerator PoweredSuitAimDemo_WeaponActionsPreserveLocomotionAndFlightCarryStates()
         {
             AsyncOperation loadOperation;
@@ -1804,6 +1927,19 @@ namespace Powersuit.Tests.PlayMode
             );
             Assert.That(property, Is.Not.Null, propertyName);
             return (int)property.GetValue(component);
+        }
+
+        private static string GetWeaponDisplayName(Component weapon)
+        {
+            object definition = weapon.GetType().GetProperty("Definition")
+                ?.GetValue(weapon);
+            Assert.That(definition, Is.Not.Null);
+            PropertyInfo displayName = definition.GetType().GetProperty(
+                "DisplayName",
+                BindingFlags.Instance | BindingFlags.Public
+            );
+            Assert.That(displayName, Is.Not.Null);
+            return displayName.GetValue(definition) as string;
         }
 
         private static void AssertWeaponBoreFacesForward(

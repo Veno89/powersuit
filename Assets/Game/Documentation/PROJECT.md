@@ -40,13 +40,14 @@ Important gameplay authority remains in C#. Animation events may align presentat
 
 ## Input and action ownership
 
-`PowerSuitInputRouter` samples keyboard/mouse or gamepad once per frame and exposes an immutable gameplay frame. It arbitrates held/pressed/released actions, cursor recapture, console focus, scope, targeting, and cancel behavior so the player, weapon, and abilities do not independently compete for raw input.
+`PowerSuitInputRouter` samples keyboard/mouse or gamepad once per frame and exposes an immutable gameplay frame. It arbitrates held/pressed/released actions, cursor recapture, console focus, scope, weapon selection, targeting, and cancel behavior so the player, weapon, and abilities do not independently compete for raw input.
 
 Keyboard/mouse bindings are:
 
 - `WASD` movement; `Shift` sprints forward/sideways on stable ground and boosts in flight
 - tap `Space` for a normal ground jump; keep an accepted jump held for about 0.9 seconds to enter flight; `Space` then ascends, while `Ctrl` or `C` descends
 - RMB shoulder aim, RMB + `V` Precision Rifle scope toggle, LMB fire, `R` reload, `Q` draw/stow
+- `1`/`2` equip Precision/Assault; mouse wheel or gamepad west cycles the two-slot loadout
 - `G` rocket, hold/release `E` lightning, `X` void ultimate
 - Backquote or `F1` console, `Esc` cancel/release cursor
 
@@ -71,7 +72,9 @@ The base layer owns locomotion/flight, including a dedicated `Run Locomotion` st
 
 `PowerSuitPropulsionHeatState` is the plain-C# shared stamina/heat authority for sprint, flight, and boost. Defaults are 100 capacity, 8/5/14 heat per second for sprint/flight/boost, a one-second cooldown delay, 26 heat per second cooling, and an overheat lock that recovers at 35%. `PowerSuitPropulsionHeat` adapts it to controller state, disables propulsion while locked, resets on respawn, drives HUD state, and informs thruster color without moving the character.
 
-`WeaponDefinition` owns authored rifle tuning, empty-magazine auto-reload policy, and ground/shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
+`WeaponDefinition` owns authored weapon tuning, empty-magazine auto-reload policy, projectile prewarm demand, and shoulder/scope camera data. `WeaponRuntimeState` owns ammo, cadence, reload availability/commit, critical resolution, and manual cycle. `WeaponLoadoutState` gives each fixed slot independent runtime state; `PowerSuitWeaponLoadout` routes selection, queues through carry transitions, updates aim/HUD/optic presentation, and preserves cadence so swapping cannot bypass rate of fire. `PowerSuitWeapon` owns muzzle-origin physical projectiles, target path, feedback, runtime tuning, pooling, and adapters to HUD/animation. Automatic reload waits for a manual bolt cycle to finish, requires reserve ammunition, and uses the same presentation and animation gates as an explicit reload.
+
+The current loadout starts with the five-round semi-automatic Precision Rifle and adds a 720 RPM automatic Assault Rifle (22 damage, 30-round magazine, 120 reserve, no manual cycle or scope). Both deliberately reuse the current tech-demo receiver; `Rifle_Scope*` renderers are reversibly disabled for the Assault Rifle. A later content pass can replace that visual without changing loadout state or input architecture.
 
 ## Abilities
 
@@ -120,7 +123,7 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 
 ## Validation workflow and current evidence
 
-`PowerSuitValidationRunner` provides menu and callable entry points for the full Unity suites. It writes ignored summaries to:
+`PowerSuitValidationRunner` provides menu, callable, and run-then-exit entry points for the full Unity suites. It writes ignored summaries to:
 
 - `Temp/PowerSuitValidationEditMode.txt`
 - `Temp/PowerSuitValidationPlayMode.txt`
@@ -128,11 +131,11 @@ The local recovery snapshot was audited as semantically equivalent to the commit
 Accepted gameplay-batch results from 2026-08-10, followed by the 2026-08-11 Development Player certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- EditMode: 234/234 passed.
-- PlayMode: 12/12 passed.
+- EditMode: 254/254 passed.
+- PlayMode: 13/13 passed, including live Precision/Assault switching, independent magazine persistence, scope eligibility, and optic visibility.
 - Generator114 source validation passed for all 24 animation clips and 35 mandatory renders, including six lateral loops and 0.7130 m lateral foot separation; generated 2D blends, foot planting, propulsion heat/HUD, heat-reactive thrusters, complete-rifle scope suppression, and prefab data passed integration validation.
 - Generated controller/additive bolt clip, player/ability/enemy/projectile/world prefabs, definition assets, HUD/bootstrap, and SpawnDirector validation passed.
-- Windows x64 Development Build succeeded at 2026-08-10 22:46. Its package-level Sentis shader warnings were non-blocking.
+- Windows x64 Development Build succeeded on 2026-08-11 after regenerating the two-weapon player. Its package-level Sentis shader warnings were non-blocking.
 - A 15-second headless build smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. The only logged errors were expected offline Unity cloud `curl` failures, not gameplay failures.
 - Final Unity Console inspection reported 0 errors.
 - Final runtime observation produced no Unity gameplay errors or recurring warnings. Non-blocking third-party Sentis shader warnings can appear during the build and are not gameplay/compiler failures.

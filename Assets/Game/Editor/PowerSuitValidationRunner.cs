@@ -26,6 +26,8 @@ namespace Powersuit.Editor
             "Powersuit.Validation.Pending";
         private const string ResultPathKey =
             "Powersuit.Validation.ResultPath";
+        private const string ExitAfterRunKey =
+            "Powersuit.Validation.ExitAfterRun";
 
         private static TestRunnerApi activeRunner;
         private static PowerSuitValidationCallbacks activeCallbacks;
@@ -48,12 +50,26 @@ namespace Powersuit.Editor
         [MenuItem("Tools/Powered Suit/Validation/Run All EditMode Tests")]
         public static void RunAllEditModeTests()
         {
+            SessionState.SetBool(ExitAfterRunKey, false);
             Start(TestMode.EditMode, EditModeResultPath);
         }
 
         [MenuItem("Tools/Powered Suit/Validation/Run All PlayMode Tests")]
         public static void RunAllPlayModeTests()
         {
+            SessionState.SetBool(ExitAfterRunKey, false);
+            Start(TestMode.PlayMode, PlayModeResultPath);
+        }
+
+        public static void RunAllEditModeTestsAndExit()
+        {
+            SessionState.SetBool(ExitAfterRunKey, true);
+            Start(TestMode.EditMode, EditModeResultPath);
+        }
+
+        public static void RunAllPlayModeTestsAndExit()
+        {
+            SessionState.SetBool(ExitAfterRunKey, true);
             Start(TestMode.PlayMode, PlayModeResultPath);
         }
 
@@ -71,6 +87,15 @@ namespace Powersuit.Editor
                 throw new ArgumentException(
                     "A result path is required.",
                     nameof(resultPath)
+                );
+            }
+
+            if (!Path.IsPathRooted(resultPath))
+            {
+                string projectRoot = Directory.GetParent(Application.dataPath)
+                    ?.FullName ?? Environment.CurrentDirectory;
+                resultPath = Path.GetFullPath(
+                    Path.Combine(projectRoot, resultPath)
                 );
             }
 
@@ -129,6 +154,16 @@ namespace Powersuit.Editor
             SessionState.EraseBool(PendingKey);
             SessionState.EraseString(ResultPathKey);
         }
+
+        internal static void ExitIfRequested(int exitCode)
+        {
+            bool shouldExit = SessionState.GetBool(ExitAfterRunKey, false);
+            SessionState.EraseBool(ExitAfterRunKey);
+            if (shouldExit)
+            {
+                EditorApplication.Exit(exitCode);
+            }
+        }
     }
 
     public sealed class PowerSuitValidationCallbacks : IErrorCallbacks
@@ -157,6 +192,7 @@ namespace Powersuit.Editor
             );
             Debug.LogError("[PowerSuitValidation] " + message);
             finished?.Invoke();
+            PowerSuitValidationRunner.ExitIfRequested(1);
         }
 
         public void RunFinished(ITestResultAdaptor result)
@@ -177,6 +213,11 @@ namespace Powersuit.Editor
             File.WriteAllText(resultPath, builder.ToString());
             Debug.Log("[PowerSuitValidation] " + builder);
             finished?.Invoke();
+            PowerSuitValidationRunner.ExitIfRequested(
+                result.FailCount == 0 && result.TestStatus != TestStatus.Failed
+                    ? 0
+                    : 1
+            );
         }
 
         private static void AppendFailures(

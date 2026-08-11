@@ -139,6 +139,21 @@ namespace Powersuit.UI.HUD.Tests
                 Is.EqualTo("RELOADING 43%")
             );
             Assert.That(
+                PowerSuitHudFormatter.FormatAmmunition(
+                    new HudWeaponState(
+                        true,
+                        24,
+                        30,
+                        90,
+                        false,
+                        false,
+                        0f,
+                        "Assault Rifle"
+                    )
+                ),
+                Is.EqualTo("ASSAULT RIFLE  24 / 30  RES 90")
+            );
+            Assert.That(
                 PowerSuitHudFormatter.FormatPropulsionHeat(
                     new HudPropulsionHeatState(
                         true,

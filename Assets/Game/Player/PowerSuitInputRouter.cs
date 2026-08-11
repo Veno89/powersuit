@@ -21,7 +21,10 @@ public enum PowerSuitInputButtons : ushort
     Ultimate = 1 << 9,
     Console = 1 << 10,
     Cancel = 1 << 11,
-    Scope = 1 << 12
+    Scope = 1 << 12,
+    WeaponSlot1 = 1 << 13,
+    WeaponSlot2 = 1 << 14,
+    WeaponNext = 1 << 15
 }
 
 /// <summary>
@@ -51,8 +54,7 @@ public static class PowerSuitDefaultInputBindings
     /// <summary>
     /// Resolves one physical gamepad control to its discrete gameplay intent.
     /// Jump/flight is owned by the south button and fire is exclusively on the
-    /// right trigger. The west button is intentionally unassigned now that
-    /// flight is entered by holding Jump instead of a separate toggle.
+    /// right trigger. The west button cycles the compact weapon loadout.
     /// </summary>
     public static PowerSuitInputButtons GetGamepadIntent(
         PowerSuitGamepadControl control
@@ -65,7 +67,7 @@ public static class PowerSuitDefaultInputBindings
             case PowerSuitGamepadControl.ButtonEast:
                 return PowerSuitInputButtons.Cancel;
             case PowerSuitGamepadControl.ButtonWest:
-                return PowerSuitInputButtons.None;
+                return PowerSuitInputButtons.WeaponNext;
             case PowerSuitGamepadControl.ButtonNorth:
                 return PowerSuitInputButtons.Reload;
             case PowerSuitGamepadControl.RightShoulder:
@@ -164,6 +166,12 @@ public readonly struct PowerSuitInputSnapshot
     public bool CancelPressed => WasPressed(PowerSuitInputButtons.Cancel);
     public bool ScopeHeld => IsHeld(PowerSuitInputButtons.Scope);
     public bool ScopePressed => WasPressed(PowerSuitInputButtons.Scope);
+    public bool WeaponSlot1Pressed =>
+        WasPressed(PowerSuitInputButtons.WeaponSlot1);
+    public bool WeaponSlot2Pressed =>
+        WasPressed(PowerSuitInputButtons.WeaponSlot2);
+    public bool WeaponNextPressed =>
+        WasPressed(PowerSuitInputButtons.WeaponNext);
 
     public PowerSuitInputSnapshot(
         int sampleFrame,
@@ -470,6 +478,20 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 ref held,
                 ref pressed,
                 ref released,
+                PowerSuitInputButtons.WeaponSlot1,
+                keyboard.digit1Key
+            );
+            AddButton(
+                ref held,
+                ref pressed,
+                ref released,
+                PowerSuitInputButtons.WeaponSlot2,
+                keyboard.digit2Key
+            );
+            AddButton(
+                ref held,
+                ref pressed,
+                ref released,
                 PowerSuitInputButtons.Console,
                 keyboard.backquoteKey
             );
@@ -512,6 +534,10 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 PowerSuitInputButtons.Fire,
                 mouse.leftButton
             );
+            if (Mathf.Abs(mouse.scroll.ReadValue().y) > 0.01f)
+            {
+                pressed |= PowerSuitInputButtons.WeaponNext;
+            }
         }
 
         Gamepad gamepad = Gamepad.current;
@@ -541,6 +567,13 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
                 ref released,
                 PowerSuitGamepadControl.ButtonEast,
                 gamepad.buttonEast
+            );
+            AddGamepadButton(
+                ref held,
+                ref pressed,
+                ref released,
+                PowerSuitGamepadControl.ButtonWest,
+                gamepad.buttonWest
             );
             AddGamepadButton(
                 ref held,
@@ -710,6 +743,31 @@ public sealed class PowerSuitInputRouter : MonoBehaviour
             KeyCode.V,
             KeyCode.JoystickButton9
         );
+        AddLegacyKey(
+            ref held,
+            ref pressed,
+            ref released,
+            PowerSuitInputButtons.WeaponSlot1,
+            KeyCode.Alpha1
+        );
+        AddLegacyKey(
+            ref held,
+            ref pressed,
+            ref released,
+            PowerSuitInputButtons.WeaponSlot2,
+            KeyCode.Alpha2
+        );
+        AddLegacyKey(
+            ref held,
+            ref pressed,
+            ref released,
+            PowerSuitInputButtons.WeaponNext,
+            KeyCode.JoystickButton2
+        );
+        if (Mathf.Abs(Input.mouseScrollDelta.y) > 0.01f)
+        {
+            pressed |= PowerSuitInputButtons.WeaponNext;
+        }
         AddLegacyKey(
             ref held,
             ref pressed,

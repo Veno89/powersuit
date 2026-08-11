@@ -10,6 +10,8 @@ namespace Powersuit.Tests.EditMode
     {
         private const string PrecisionRifleAssetPath =
             "Assets/Game/Content/Weapons/PrecisionRifle.asset";
+        private const string AssaultRifleAssetPath =
+            "Assets/Game/Content/Weapons/AssaultRifle.asset";
 
         [Test]
         public void PrecisionRifleAsset_HasPlannedManualActionConfiguration()
@@ -44,6 +46,104 @@ namespace Powersuit.Tests.EditMode
             Assert.That(config.RequiresManualCycle, Is.True);
             Assert.That(config.ManualCycleDurationSeconds, Is.EqualTo(0.67f));
             Assert.That(config.ProjectileSpeed, Is.EqualTo(100f));
+        }
+
+        [Test]
+        public void AssaultRifleAsset_IsAutomaticAndDistinctFromPrecisionRifle()
+        {
+            UnityEngine.Object asset = AssetDatabase.LoadMainAssetAtPath(
+                AssaultRifleAssetPath
+            );
+
+            Assert.That(asset, Is.Not.Null);
+            WeaponRuntimeConfig config = asset.GetType()
+                .GetMethod("CreateRuntimeConfig")
+                ?.Invoke(asset, null) as WeaponRuntimeConfig;
+
+            Assert.That(config, Is.Not.Null);
+            Assert.That(config.GetValidationErrors(), Is.Empty);
+            Assert.That(config.WeaponClass, Is.EqualTo(WeaponClass.AssaultRifle));
+            Assert.That(config.TriggerMode, Is.EqualTo(WeaponTriggerMode.Automatic));
+            Assert.That(config.BaseDamage, Is.EqualTo(22f));
+            Assert.That(config.RoundsPerMinute, Is.EqualTo(720f));
+            Assert.That(config.MagazineCapacity, Is.EqualTo(30));
+            Assert.That(config.StartingReserveAmmo, Is.EqualTo(120));
+            Assert.That(config.RequiresManualCycle, Is.False);
+            Assert.That(
+                asset.GetType().GetProperty("SupportsScope")?.GetValue(asset),
+                Is.EqualTo(false)
+            );
+            Assert.That(
+                asset.GetType().GetProperty("ProjectilePrewarmCount")?.GetValue(asset),
+                Is.EqualTo(48)
+            );
+        }
+
+        [Test]
+        public void Loadout_PreservesIndependentAmmoAndCadenceAcrossSwitches()
+        {
+            WeaponRuntimeConfig precision = CreateConfiguration(
+                "precision",
+                WeaponClass.PrecisionRifle,
+                WeaponTriggerMode.SemiAutomatic,
+                roundsPerMinute: 60f,
+                magazineCapacity: 5
+            );
+            WeaponRuntimeConfig assault = CreateConfiguration(
+                "assault",
+                WeaponClass.AssaultRifle,
+                WeaponTriggerMode.Automatic,
+                roundsPerMinute: 600f,
+                magazineCapacity: 30
+            );
+            WeaponLoadoutState loadout = new WeaponLoadoutState(
+                new[] { precision, assault }
+            );
+
+            Assert.That(loadout.EquippedWeapon.TryFire().Fired, Is.True);
+            Assert.That(loadout.EquippedWeapon.CurrentMagazineAmmo, Is.EqualTo(4));
+            Assert.That(
+                loadout.RequestSelection(1),
+                Is.EqualTo(WeaponSelectionRequestResult.Queued)
+            );
+            Assert.That(loadout.TryCommitPendingSelection(false), Is.False);
+            Assert.That(loadout.EquippedIndex, Is.Zero);
+            Assert.That(loadout.TryCommitPendingSelection(true), Is.True);
+
+            Assert.That(loadout.EquippedWeapon.TryFire().Fired, Is.True);
+            Assert.That(loadout.EquippedWeapon.CurrentMagazineAmmo, Is.EqualTo(29));
+            loadout.AdvanceInactive(0.4f);
+            loadout.RequestSelection(0);
+            Assert.That(loadout.TryCommitPendingSelection(true), Is.True);
+            Assert.That(loadout.EquippedWeapon.CurrentMagazineAmmo, Is.EqualTo(4));
+            Assert.That(
+                loadout.EquippedWeapon.CurrentFireBlockReason,
+                Is.EqualTo(WeaponFireBlockReason.FireCadence),
+                "Holstering must not erase the precision rifle's cadence."
+            );
+        }
+
+        [Test]
+        public void PrepareForUnequip_CancelsActionsButPreservesCadenceAndAmmo()
+        {
+            WeaponRuntimeState state = CreateState(
+                roundsPerMinute: 60f,
+                requiresManualCycle: true,
+                manualCycleDuration: 0.67f
+            );
+            int cancelledCycles = 0;
+            state.ManualCycleCancelled += () => cancelledCycles++;
+
+            Assert.That(state.TryFire().Fired, Is.True);
+            state.PrepareForUnequip();
+
+            Assert.That(cancelledCycles, Is.EqualTo(1));
+            Assert.That(state.IsManualCycleInProgress, Is.False);
+            Assert.That(state.CurrentMagazineAmmo, Is.EqualTo(2));
+            Assert.That(
+                state.CurrentFireBlockReason,
+                Is.EqualTo(WeaponFireBlockReason.FireCadence)
+            );
         }
 
         [Test]
@@ -518,6 +618,43 @@ namespace Powersuit.Tests.EditMode
             );
 
             return new WeaponRuntimeState(config, randomSource);
+        }
+
+        private static WeaponRuntimeConfig CreateConfiguration(
+            string id,
+            WeaponClass weaponClass,
+            WeaponTriggerMode triggerMode,
+            float roundsPerMinute,
+            int magazineCapacity
+        )
+        {
+            return new WeaponRuntimeConfig(
+                weaponId: id,
+                displayName: id,
+                weaponClass: weaponClass,
+                triggerMode: triggerMode,
+                baseDamage: 20f,
+                roundsPerMinute: roundsPerMinute,
+                usesInfiniteAmmo: false,
+                magazineCapacity: magazineCapacity,
+                startingReserveAmmo: magazineCapacity * 3,
+                maximumReserveAmmo: magazineCapacity * 6,
+                reloadDurationSeconds: 2.8f,
+                reloadCommitNormalizedTime: 0.89f,
+                criticalChance: 0f,
+                criticalDamageMultiplier: 2f,
+                requiresManualCycle: false,
+                manualCycleDurationSeconds: 0f,
+                projectileSpeed: 90f,
+                projectileLifetimeSeconds: 4f,
+                projectileRadius: 0.1f,
+                aimSpreadDegrees: 0.4f,
+                hipSpreadDegrees: 2f,
+                aimRecoilPitch: 0.25f,
+                aimRecoilYaw: 0.12f,
+                hipRecoilPitch: 0.45f,
+                hipRecoilYaw: 0.2f
+            );
         }
 
         private sealed class SequenceRandomSource : IWeaponRandomSource

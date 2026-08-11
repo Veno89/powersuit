@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e321771ad65fed4187a1c71d7a12d2a, type: 3}
+  m_Name: AssaultRifle
+  m_EditorClassIdentifier: Assembly-CSharp::Powersuit.Combat.WeaponDefinition
+  weaponId: assault-rifle
+  displayName: Assault Rifle
+  weaponClass: 2
+  triggerMode: 1
+  baseDamage: 22
+  roundsPerMinute: 720
+  criticalChance: 0.05
+  criticalDamageMultiplier: 1.6
+  magazineCapacity: 30
+  startingReserveAmmo: 120
+  maximumReserveAmmo: 240
+  autoReloadWhenEmpty: 1
+  reloadDurationSeconds: 2.8
+  reloadCommitNormalizedTime: 0.89
+  requiresManualCycle: 0
+  manualCycleDurationSeconds: 0
+  projectileSpeed: 90
+  projectileLifetimeSeconds: 3
+  projectileRadius: 0.1
+  projectilePrewarmCount: 48
+  aimSpreadDegrees: 0.45
+  hipSpreadDegrees: 2.25
+  aimRecoilPitch: 0.22
+  aimRecoilYaw: 0.12
+  hipRecoilPitch: 0.45
+  hipRecoilYaw: 0.25
+  supportsScope: 0
+  shoulderFieldOfViewDegrees: 64
+  scopedFieldOfViewDegrees: 28
+  shoulderLookSensitivityMultiplier: 0.95
+  scopedLookSensitivityMultiplier: 0.45
+  aimTransitionSharpness: 22

@@ -121,7 +121,7 @@ namespace Powersuit.Tests.EditMode
         }
 
         [Test]
-        public void DefaultGamepadMap_JumpHoldOwnsFlightAndWestIsUnassigned()
+        public void DefaultGamepadMap_JumpHoldOwnsFlightAndWestCyclesWeapons()
         {
             Assert.That(
                 Enum.GetNames(ButtonsType),
@@ -145,8 +145,8 @@ namespace Powersuit.Tests.EditMode
             );
 
             Assert.That(
-                Convert.ToUInt64(westIntent),
-                Is.EqualTo(Convert.ToUInt64(Button("None")))
+                HasButton(westIntent, "WeaponNext"),
+                Is.True
             );
             Assert.That(HasButton(triggerIntent, "Fire"), Is.True);
 
@@ -189,6 +189,26 @@ namespace Powersuit.Tests.EditMode
             Assert.That(GetBool(snapshot, "ScopeHeld"), Is.True);
             Assert.That(GetBool(snapshot, "ScopePressed"), Is.True);
             Assert.That(GetBool(snapshot, "AimHeld"), Is.False);
+        }
+
+        [Test]
+        public void Snapshot_ExposesExplicitAndCycleWeaponSelectionEdges()
+        {
+            object buffer = Activator.CreateInstance(FrameBufferType);
+            object selection = CombineButtons(
+                "WeaponSlot1",
+                "WeaponSlot2",
+                "WeaponNext"
+            );
+            object snapshot = Sample(
+                buffer,
+                61,
+                Raw(pressed: selection)
+            );
+
+            Assert.That(GetBool(snapshot, "WeaponSlot1Pressed"), Is.True);
+            Assert.That(GetBool(snapshot, "WeaponSlot2Pressed"), Is.True);
+            Assert.That(GetBool(snapshot, "WeaponNextPressed"), Is.True);
         }
 
         private static object Raw(

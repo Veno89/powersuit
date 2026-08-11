@@ -28,6 +28,7 @@ The player bootstrap instantiates `PowerSuitCombatSandbox.prefab` once, connects
 | Left mouse | Fire |
 | `R` | Reload |
 | `Q` | Draw or stow the rifle |
+| `1` / `2` or Mouse wheel | Equip Precision Rifle / Assault Rifle or cycle weapons |
 | `G` | Fire shoulder micro-rocket |
 | Hold `E`, release | Target and cast lightning; cancel with `Esc` |
 | `X` | Cast the void-orb ultimate when the meter is full |
@@ -41,7 +42,7 @@ The centralized `PowerSuitInputRouter` arbitrates gameplay, targeting, scope, co
 - Ground locomotion has acceleration/deceleration, signed directional movement, coyote time, jump buffering, air control, landing response, backpedalling, and a dedicated run state. Generator114 adds authored left/right loops to the ready, aimed, and stowed sets; signed 2D blend trees combine forward/back/left/right motions for diagonals. Contact-aware foot planting and procedural start/stop, strafe, turn, and braking attitude reduce slide without changing the accepted 6.5 m/s walk or 10.725 m/s sprint speeds.
 - A quick `Space` press performs a normal jump. Keeping that accepted jump held for about 0.9 seconds enters flight; simply holding `Space` while already falling cannot arm flight. Flight includes hover, ascend/descend, braking, boost, banking, automatic touchdown, and flight-compatible aiming, firing, reloading, and abilities. Its 14 m/s cruise and 28 m/s boost profiles use deliberately faster acceleration and release response. `F` is no longer a flight binding.
 - Camera profiles cover exploration, shoulder aim, flight, boost, ability targeting, and the Precision Rifle's actual `ScopePoint`. `V` scope access is restricted to scope-enabled Precision Rifles; the scoped presentation reversibly suppresses the complete `RifleRoot` render hierarchy so no barrel, receiver, or optic can cross the sight picture, while transforms and ballistics remain active. Its circular sight, crosshair, mil ticks, and range stadia align to the weapon aim ray. Collision pull-in and damped release avoid recurrent camera clipping; mouse/pad look, aim sensitivity, camera damping, and aim transitions use the responsive demo profile.
-- The data-driven Precision Rifle owns finite ammunition, manual and empty-magazine automatic reload, cadence, critical hits, physical pooled projectiles, bolt cycling, weapon-ready presentation, and shoulder/scope aim profiles.
+- The two-slot data-driven loadout includes the semi-automatic Precision Rifle and a 720 RPM automatic Assault Rifle. Each slot preserves its own magazine, reserve, and cadence state; switching cancels reload/cycle presentation safely, updates HUD/aim data, and can be queued through a draw/sheathe transition. The Assault Rifle has 30+120 rounds, 22 base damage, empty-magazine auto-reload, a shoulder-aim profile, and no magnified scope access. Both currently share the tech-demo rifle receiver, with its scope geometry hidden for the Assault Rifle until a distinct production model is authored.
 - Shoulder rocket, projected lightning strike, and meter-gated void-orb ultimate use shared cooldown, targeting, faction-safe radial damage, external-force, pooling, and lifecycle boundaries without a monolithic ability framework. Rocket and lightning now render their full damage radius, expanding shockwave/rays, impact flash, lingering aftermath ring, and—in lightning's case—a vertical bolt; the targeting ring pulses before release.
 - Six generated, data-driven enemies are available: Stationary Sentry, Patrol Rifleman, Pursuer, Heavy Artillery, Flying Harrier, and Skirmisher. Their shared runtime/controller/emitter architecture supports distinct movement and attack profiles, longer full-window telegraphs, damage/stagger flashes, target warnings, health bars, force response, death, and pool reset.
 - `PowerSuitCombatSandbox.prefab` supplies three connected greybox zones, separate ground/flight spawn regions, 19 spawn points, a foundry catwalk, causeway bridge/AoE courtyard, airfield hover platforms/flight gates, and a deterministic weighted/threat-budget SpawnDirector. The default live cap is ten enemies with slightly faster, broader groups.
@@ -75,10 +76,10 @@ See [ROADMAP.md](ROADMAP.md) for acceptance status, [PROJECT.md](Assets/Game/Doc
 Accepted gameplay-batch evidence from 2026-08-10, followed by the 2026-08-11 performance certification below:
 
 - `dotnet build Powersuit.slnx --no-restore`: 18 assemblies, 0 warnings, 0 errors.
-- Unity EditMode: 234/234 passed.
-- Unity PlayMode: 12/12 passed, including a 1,000-projectile spawn/recycle pool exercise.
+- Unity EditMode: 254/254 passed.
+- Unity PlayMode: 13/13 passed, including weapon switching/ammo/scope persistence and a 1,000-projectile spawn/recycle pool exercise.
 - Generated 2D controller blends, Generator114 24-clip importer contract, foot planting, propulsion heat/HUD, heat-reactive thrusters, stronger ability/combat readability, six enemy prefabs/definitions, player prefab, SpawnDirector, and expanded three-zone world validation passed.
-- Windows x64 Development Build completed successfully at 2026-08-10 22:46. Only non-blocking package-level Sentis shader warnings were reported.
+- Windows x64 Development Build completed successfully on 2026-08-11 after the two-weapon integration. Only non-blocking package-level Sentis shader warnings were reported.
 - A 15-second headless player smoke started successfully and remained alive until the intentional stop, with no exception, assertion, or missing-reference pattern. Expected offline Unity cloud `curl` failures were unrelated to gameplay, and final Unity Console inspection reported 0 errors.
 - Owner hands-on evaluation on 2026-08-11 reported that the integrated movement, aiming, heat, effects, abilities, and encounters work and feel decent. The targeted edge-case and measurement gates below remain separate.
 - Development Player certification passed at capped 30/60/120 FPS with 32 concurrent enemies, zero measured main-thread managed allocation, zero post-warmup pool misses, and zero logged errors.
@@ -97,4 +98,4 @@ These checks and the broad owner pass establish the current playable baseline. T
 
 ## Scope exclusions
 
-This milestone does not include multiplayer, networking, loot generation, inventory, rarity, progression, skill trees, crafting, missions, quests, dialogue, story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, or final Asset Store publication.
+This milestone does not include multiplayer, networking, loot generation, a general inventory/equipment system, rarity, progression, skill trees, crafting, missions, quests, dialogue, story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, or final Asset Store publication.

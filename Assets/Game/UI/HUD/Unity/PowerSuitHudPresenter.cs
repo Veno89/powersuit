@@ -210,7 +210,8 @@ public sealed class PowerSuitHudPresenter : MonoBehaviour
             weaponSource.ReserveAmmo,
             configuration?.UsesInfiniteAmmo ?? false,
             weaponSource.IsReloading,
-            runtime?.ReloadNormalizedTime ?? 0f
+            runtime?.ReloadNormalizedTime ?? 0f,
+            configuration?.DisplayName
         );
     }
 

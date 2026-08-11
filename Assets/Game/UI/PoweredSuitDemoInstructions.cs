@@ -11,6 +11,7 @@ public sealed class PoweredSuitDemoInstructions : MonoBehaviour
         new GUIContent("W: forward    S: backpedal    A/D: move    Mouse: look"),
         new GUIContent("Right Mouse: over-shoulder aim    Left Mouse: fire"),
         new GUIContent("Q: draw / stow rifle    R: reload magazine"),
+        new GUIContent("1 / 2 or Mouse Wheel: Precision / Assault Rifle"),
         new GUIContent("Hold Right Mouse + V: toggle Precision Rifle scope"),
         new GUIContent("G: shoulder rocket (explosive AOE)"),
         new GUIContent("Hold / release E: lightning strike (targeted AOE)"),

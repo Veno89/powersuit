@@ -31,6 +31,7 @@ MonoBehaviour:
   projectileSpeed: 100
   projectileLifetimeSeconds: 4
   projectileRadius: 0.15
+  projectilePrewarmCount: 8
   aimSpreadDegrees: 0.15
   hipSpreadDegrees: 1.25
   aimRecoilPitch: 0.9

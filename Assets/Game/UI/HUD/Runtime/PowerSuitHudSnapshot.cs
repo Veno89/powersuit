@@ -90,9 +90,13 @@ namespace Powersuit.UI.HUD
             int reserve,
             bool usesInfiniteAmmo,
             bool isReloading,
-            float reloadNormalized
+            float reloadNormalized,
+            string displayName = null
         )
         {
+            DisplayName = string.IsNullOrWhiteSpace(displayName)
+                ? string.Empty
+                : displayName.Trim();
             IsAvailable = isAvailable;
             if (!isAvailable)
             {
@@ -117,6 +121,7 @@ namespace Powersuit.UI.HUD
 
         public static HudWeaponState Missing => default;
 
+        public string DisplayName { get; }
         public bool IsAvailable { get; }
         public int Magazine { get; }
         public int MagazineCapacity { get; }
@@ -128,6 +133,11 @@ namespace Powersuit.UI.HUD
         public bool AmmunitionEquals(HudWeaponState other)
         {
             return IsAvailable == other.IsAvailable &&
+                string.Equals(
+                    DisplayName,
+                    other.DisplayName,
+                    StringComparison.Ordinal
+                ) &&
                 Magazine == other.Magazine &&
                 MagazineCapacity == other.MagazineCapacity &&
                 Reserve == other.Reserve &&
@@ -156,6 +166,8 @@ namespace Powersuit.UI.HUD
             unchecked
             {
                 int hash = IsAvailable ? 1 : 0;
+                hash = (hash * 397) ^
+                    (DisplayName != null ? DisplayName.GetHashCode() : 0);
                 hash = (hash * 397) ^ Magazine;
                 hash = (hash * 397) ^ MagazineCapacity;
                 hash = (hash * 397) ^ Reserve;

@@ -34,14 +34,24 @@ namespace Powersuit.UI.HUD
                 return "AMMO " + Unavailable;
             }
 
+            bool hasDisplayName = !string.IsNullOrWhiteSpace(
+                weapon.DisplayName
+            );
+            string prefix = hasDisplayName
+                ? weapon.DisplayName.ToUpperInvariant()
+                : "AMMO";
+            string separator = hasDisplayName ? "  " : " ";
+
             if (weapon.UsesInfiniteAmmo)
             {
-                return "AMMO INFINITE";
+                return prefix + separator + "INFINITE";
             }
 
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "AMMO {0} / {1}  RES {2}",
+                "{0}{1}{2} / {3}  RES {4}",
+                prefix,
+                separator,
                 weapon.Magazine,
                 weapon.MagazineCapacity,
                 weapon.Reserve

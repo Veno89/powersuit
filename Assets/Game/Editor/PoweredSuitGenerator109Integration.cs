@@ -51,8 +51,11 @@ namespace Powersuit.Editor
         private const string EnemyPrefabPath =
             "Assets/Game/Prefab/Enemies/EnemyPrototype.prefab";
 
-        private const string PrecisionRifleDefinitionPath =
+        public const string PrecisionRifleDefinitionPath =
             "Assets/Game/Content/Weapons/PrecisionRifle.asset";
+
+        public const string AssaultRifleDefinitionPath =
+            "Assets/Game/Content/Weapons/AssaultRifle.asset";
 
         private const string AbilityPrefabFolder =
             "Assets/Game/Prefab/Abilities";
@@ -216,6 +219,7 @@ namespace Powersuit.Editor
             );
 
             ConfigurePrecisionRifleDefinition(overwriteExisting: false);
+            ConfigureAssaultRifleDefinition(overwriteExisting: false);
             ConfigureModelImporter();
             Dictionary<string, AnimationClip> clips = LoadRequiredClips();
             AnimatorController controller = UpdateAnimatorController(clips);
@@ -311,9 +315,10 @@ namespace Powersuit.Editor
         public static void ApplyRecommendedTuning()
         {
             ConfigurePrecisionRifleDefinition(overwriteExisting: true);
+            ConfigureAssaultRifleDefinition(overwriteExisting: true);
             ConfigureBasePlayerCamera();
             Debug.Log(
-                "[Powersuit] Applied the recommended camera and Precision Rifle tuning."
+                "[Powersuit] Applied the recommended camera and weapon tuning."
             );
         }
 
@@ -455,6 +460,7 @@ namespace Powersuit.Editor
             SetFloat(serialized, "projectileSpeed", 100f);
             SetFloat(serialized, "projectileLifetimeSeconds", 4f);
             SetFloat(serialized, "projectileRadius", 0.15f);
+            SetInt(serialized, "projectilePrewarmCount", 8);
             SetFloat(serialized, "aimSpreadDegrees", 0.15f);
             SetFloat(serialized, "hipSpreadDegrees", 1.25f);
             SetFloat(serialized, "aimRecoilPitch", 0.9f);
@@ -468,6 +474,70 @@ namespace Powersuit.Editor
                 serialized,
                 "shoulderLookSensitivityMultiplier",
                 0.9f
+            );
+            SetFloat(
+                serialized,
+                "scopedLookSensitivityMultiplier",
+                0.45f
+            );
+            SetFloat(serialized, "aimTransitionSharpness", 22f);
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(definition);
+            AssetDatabase.SaveAssetIfDirty(definition);
+        }
+
+        private static void ConfigureAssaultRifleDefinition(
+            bool overwriteExisting
+        )
+        {
+            WeaponDefinition definition =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    AssaultRifleDefinitionPath
+                );
+            if (definition == null)
+            {
+                definition = ScriptableObject.CreateInstance<WeaponDefinition>();
+                AssetDatabase.CreateAsset(definition, AssaultRifleDefinitionPath);
+            }
+            else if (!overwriteExisting)
+            {
+                return;
+            }
+
+            SerializedObject serialized = new SerializedObject(definition);
+            SetString(serialized, "weaponId", "assault-rifle");
+            SetString(serialized, "displayName", "Assault Rifle");
+            SetEnum(serialized, "weaponClass", 2); // AssaultRifle
+            SetEnum(serialized, "triggerMode", 1); // Automatic
+            SetFloat(serialized, "baseDamage", 22f);
+            SetFloat(serialized, "roundsPerMinute", 720f);
+            SetFloat(serialized, "criticalChance", 0.05f);
+            SetFloat(serialized, "criticalDamageMultiplier", 1.6f);
+            SetInt(serialized, "magazineCapacity", 30);
+            SetInt(serialized, "startingReserveAmmo", 120);
+            SetInt(serialized, "maximumReserveAmmo", 240);
+            SetBool(serialized, "autoReloadWhenEmpty", true);
+            SetFloat(serialized, "reloadDurationSeconds", 2.8f);
+            SetFloat(serialized, "reloadCommitNormalizedTime", 0.89f);
+            SetBool(serialized, "requiresManualCycle", false);
+            SetFloat(serialized, "manualCycleDurationSeconds", 0f);
+            SetFloat(serialized, "projectileSpeed", 90f);
+            SetFloat(serialized, "projectileLifetimeSeconds", 3f);
+            SetFloat(serialized, "projectileRadius", 0.1f);
+            SetInt(serialized, "projectilePrewarmCount", 48);
+            SetFloat(serialized, "aimSpreadDegrees", 0.45f);
+            SetFloat(serialized, "hipSpreadDegrees", 2.25f);
+            SetFloat(serialized, "aimRecoilPitch", 0.22f);
+            SetFloat(serialized, "aimRecoilYaw", 0.12f);
+            SetFloat(serialized, "hipRecoilPitch", 0.45f);
+            SetFloat(serialized, "hipRecoilYaw", 0.25f);
+            SetBool(serialized, "supportsScope", false);
+            SetFloat(serialized, "shoulderFieldOfViewDegrees", 64f);
+            SetFloat(serialized, "scopedFieldOfViewDegrees", 28f);
+            SetFloat(
+                serialized,
+                "shoulderLookSensitivityMultiplier",
+                0.95f
             );
             SetFloat(
                 serialized,
@@ -1529,13 +1599,28 @@ namespace Powersuit.Editor
                     AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
                         PrecisionRifleDefinitionPath
                     );
-                if (weaponDefinition == null)
+                WeaponDefinition assaultRifleDefinition =
+                    AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                        AssaultRifleDefinitionPath
+                    );
+                if (weaponDefinition == null || assaultRifleDefinition == null)
                 {
                     throw new InvalidOperationException(
-                        "The Precision Rifle WeaponDefinition is missing."
+                        "The Precision or Assault Rifle WeaponDefinition is missing."
                     );
                 }
                 weapon.Definition = weaponDefinition;
+                PowerSuitWeaponLoadout weaponLoadout =
+                    instance.GetComponent<PowerSuitWeaponLoadout>();
+                if (weaponLoadout == null)
+                {
+                    weaponLoadout =
+                        instance.AddComponent<PowerSuitWeaponLoadout>();
+                }
+                weaponLoadout.Configure(
+                    new[] { weaponDefinition, assaultRifleDefinition },
+                    initialSlot: 0
+                );
                 weapon.ShowLegacyAmmoHud = false;
                 SerializedObject weaponFeedback = new SerializedObject(weapon);
                 SetFloat(weaponFeedback, "flashLightIntensity", 7f);
@@ -1701,13 +1786,14 @@ namespace Powersuit.Editor
                 );
                 DeveloperConsoleOverlay consoleOverlay =
                     ConfigureDeveloperConsole(
-                    instance,
-                    inputRouter,
-                    suitController,
-                    weapon,
-                    presentation,
-                    abilityController
-                );
+                        instance,
+                        inputRouter,
+                        suitController,
+                        weapon,
+                        weaponLoadout,
+                        presentation,
+                        abilityController
+                    );
                 DeveloperConsoleGameplayCommandPack consoleCommands =
                     instance.GetComponent<
                         DeveloperConsoleGameplayCommandPack
@@ -2243,6 +2329,7 @@ namespace Powersuit.Editor
             PowerSuitInputRouter inputRouter,
             PowerSuitController controller,
             PowerSuitWeapon weapon,
+            PowerSuitWeaponLoadout weaponLoadout,
             PowerSuitWeaponPresentation presentation,
             PowerSuitAbilityController abilityController
         )
@@ -2258,15 +2345,17 @@ namespace Powersuit.Editor
             SerializedProperty behaviours = serialized.FindProperty(
                 "gameplayInputBehaviours"
             );
-            behaviours.arraySize = 5;
+            behaviours.arraySize = 6;
             behaviours.GetArrayElementAtIndex(0).objectReferenceValue =
                 inputRouter;
             behaviours.GetArrayElementAtIndex(1).objectReferenceValue =
                 controller;
             behaviours.GetArrayElementAtIndex(2).objectReferenceValue = weapon;
             behaviours.GetArrayElementAtIndex(3).objectReferenceValue =
-                presentation;
+                weaponLoadout;
             behaviours.GetArrayElementAtIndex(4).objectReferenceValue =
+                presentation;
+            behaviours.GetArrayElementAtIndex(5).objectReferenceValue =
                 abilityController;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             return overlay;
@@ -3112,9 +3201,24 @@ namespace Powersuit.Editor
                 AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
                     PrecisionRifleDefinitionPath
                 );
+            WeaponDefinition assaultRifle =
+                AssetDatabase.LoadAssetAtPath<WeaponDefinition>(
+                    AssaultRifleDefinitionPath
+                );
+            PowerSuitWeaponLoadout loadout =
+                variant.GetComponent<PowerSuitWeaponLoadout>();
             if (
                 weapon == null ||
                 precisionRifle == null ||
+                assaultRifle == null ||
+                loadout == null ||
+                loadout.SlotCount != 2 ||
+                loadout.GetDefinition(0) != precisionRifle ||
+                loadout.GetDefinition(1) != assaultRifle ||
+                assaultRifle.WeaponClass != WeaponClass.AssaultRifle ||
+                assaultRifle.TriggerMode != WeaponTriggerMode.Automatic ||
+                assaultRifle.SupportsScope ||
+                assaultRifle.ProjectilePrewarmCount < 48 ||
                 weapon.Definition != precisionRifle ||
                 !precisionRifle.AutoReloadWhenEmpty ||
                 weapon.MuzzleTransform == null ||
@@ -3129,7 +3233,7 @@ namespace Powersuit.Editor
             )
             {
                 throw new InvalidOperationException(
-                    "Generator 109 WeaponMuzzle adapter is not wired to Rifle_Muzzle."
+                    "Generator 109 weapon loadout or WeaponMuzzle adapter is invalid."
                 );
             }
 
@@ -3219,6 +3323,32 @@ namespace Powersuit.Editor
                 variant.GetComponent<DeveloperConsoleOverlay>();
             DeveloperConsoleGameplayCommandPack commandPack =
                 variant.GetComponent<DeveloperConsoleGameplayCommandPack>();
+            bool consoleSuspendsLoadout = false;
+            if (console != null && loadout != null)
+            {
+                SerializedProperty gameplayBehaviours =
+                    new SerializedObject(console).FindProperty(
+                        "gameplayInputBehaviours"
+                    );
+                if (gameplayBehaviours != null)
+                {
+                    for (
+                        int index = 0;
+                        index < gameplayBehaviours.arraySize;
+                        index++
+                    )
+                    {
+                        if (
+                            gameplayBehaviours.GetArrayElementAtIndex(index)
+                                .objectReferenceValue == loadout
+                        )
+                        {
+                            consoleSuspendsLoadout = true;
+                            break;
+                        }
+                    }
+                }
+            }
             if (
                 hud == null ||
                 hudSafeArea == null ||
@@ -3239,6 +3369,7 @@ namespace Powersuit.Editor
                 demoBootstrap.OwningPlayer != variant.transform ||
                 demoBootstrap.HudPresenter != hud ||
                 console == null ||
+                !consoleSuspendsLoadout ||
                 commandPack == null ||
                 commandPack.ConsoleOverlay != console ||
                 commandPack.AbilityController != abilityController

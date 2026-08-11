@@ -641,6 +641,31 @@ namespace Powersuit.Tests.EditMode
 
             Component weapon = player.GetComponent("PowerSuitWeapon");
             Assert.That(weapon, Is.Not.Null);
+            Component loadout = player.GetComponent("PowerSuitWeaponLoadout");
+            Assert.That(loadout, Is.Not.Null);
+            Assert.That(
+                loadout.GetType().GetProperty("SlotCount")?.GetValue(loadout),
+                Is.EqualTo(2)
+            );
+            object assaultDefinition = loadout.GetType()
+                .GetMethod("GetDefinition")
+                ?.Invoke(loadout, new object[] { 1 });
+            Assert.That(assaultDefinition, Is.Not.Null);
+            Assert.That(
+                assaultDefinition.GetType().GetProperty("WeaponClass")
+                    ?.GetValue(assaultDefinition)?.ToString(),
+                Is.EqualTo("AssaultRifle")
+            );
+            Assert.That(
+                assaultDefinition.GetType().GetProperty("TriggerMode")
+                    ?.GetValue(assaultDefinition)?.ToString(),
+                Is.EqualTo("Automatic")
+            );
+            Assert.That(
+                assaultDefinition.GetType().GetProperty("SupportsScope")
+                    ?.GetValue(assaultDefinition),
+                Is.EqualTo(false)
+            );
             object definition = weapon.GetType()
                 .GetProperty("Definition")
                 ?.GetValue(weapon);

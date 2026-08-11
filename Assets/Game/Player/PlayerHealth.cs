@@ -30,6 +30,7 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
     private PowerSuitController movement;
     private PowerSuitAnimationDriver animationDriver;
     private PowerSuitWeapon weapon;
+    private PowerSuitWeaponLoadout weaponLoadout;
     private PowerSuitWeaponPresentation weaponPresentation;
     private CharacterController characterController;
 
@@ -49,6 +50,7 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
         movement = GetComponent<PowerSuitController>();
         animationDriver = GetComponent<PowerSuitAnimationDriver>();
         weapon = GetComponent<PowerSuitWeapon>();
+        weaponLoadout = GetComponent<PowerSuitWeaponLoadout>();
         weaponPresentation = GetComponent<PowerSuitWeaponPresentation>();
         characterController = GetComponent<CharacterController>();
     }
@@ -287,6 +289,7 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
         movement?.ResetForRespawn();
         animationDriver?.ResetForRespawn();
         weapon?.ResetForRespawn();
+        weaponLoadout?.ResetForRespawn();
         weaponPresentation?.ResetForRespawn();
 
         if (movement != null)
@@ -297,6 +300,11 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
         if (weapon != null)
         {
             weapon.enabled = false;
+        }
+
+        if (weaponLoadout != null)
+        {
+            weaponLoadout.enabled = false;
         }
 
         if (weaponPresentation != null)
@@ -325,6 +333,7 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
         movement?.ResetForRespawn();
         animationDriver?.ResetForRespawn();
         weapon?.ResetForRespawn();
+        weaponLoadout?.ResetForRespawn();
         weaponPresentation?.ResetForRespawn();
 
         currentHealth = maximumHealth;
@@ -340,6 +349,11 @@ public sealed class PlayerHealth : MonoBehaviour, IDamageReceiver
         if (weapon != null)
         {
             weapon.enabled = true;
+        }
+
+        if (weaponLoadout != null)
+        {
+            weaponLoadout.enabled = true;
         }
 
         if (weaponPresentation != null)

@@ -66,6 +66,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     private PowerSuitController controller;
     private PowerSuitWeaponAnimationDriver weaponAnimationDriver;
     private PowerSuitInputRouter inputRouter;
+    private PowerSuitScopeSight scopeSight;
     private Camera playerCamera;
     private Light muzzleFlashLight;
     private float muzzleLightTimer;
@@ -108,10 +109,24 @@ public sealed class PowerSuitWeapon : MonoBehaviour
                 return;
             }
 
-            weaponDefinition = value;
             if (Application.isPlaying)
             {
-                RebuildRuntimeState();
+                if (value != null)
+                {
+                    EquipLoadoutWeapon(value, null);
+                }
+                else
+                {
+                    PrepareForUnequip();
+                    weaponDefinition = null;
+                    RebuildRuntimeState();
+                    scopeSight?.Bind(controller, this);
+                    WeaponEquipped?.Invoke(null);
+                }
+            }
+            else
+            {
+                weaponDefinition = value;
             }
         }
     }
@@ -200,6 +215,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
     public event Action CycleCompleted;
     public event Action CycleCancelled;
     public event Action<DamageResult> DamageResolved;
+    public event Action<WeaponDefinition> WeaponEquipped;
 
     private void Awake()
     {
@@ -212,7 +228,7 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         inputRouter = GetComponent<PowerSuitInputRouter>();
         playerCamera = Camera.main;
 
-        PowerSuitScopeSight scopeSight = GetComponent<PowerSuitScopeSight>();
+        scopeSight = GetComponent<PowerSuitScopeSight>();
         if (scopeSight == null)
         {
             scopeSight = gameObject.AddComponent<PowerSuitScopeSight>();
@@ -240,6 +256,86 @@ public sealed class PowerSuitWeapon : MonoBehaviour
         }
 
         EnsureMuzzleFlashLight();
+    }
+
+    /// <summary>
+    /// Equips one loadout slot while preserving the supplied slot's independent
+    /// ammo and cadence state. Passing null creates a fresh runtime state and
+    /// remains the compatibility path used by the Definition property.
+    /// </summary>
+    public WeaponRuntimeState EquipLoadoutWeapon(
+        WeaponDefinition definition,
+        WeaponRuntimeState state
+    )
+    {
+        if (definition == null)
+        {
+            throw new ArgumentNullException(nameof(definition));
+        }
+
+        WeaponRuntimeConfig definitionConfiguration =
+            definition.CreateRuntimeConfig();
+        definitionConfiguration.ValidateOrThrow();
+        if (
+            state != null &&
+            (
+                state.Configuration.WeaponId !=
+                    definitionConfiguration.WeaponId ||
+                state.Configuration.WeaponClass !=
+                    definitionConfiguration.WeaponClass
+            )
+        )
+        {
+            throw new ArgumentException(
+                "The supplied runtime state does not match the weapon definition.",
+                nameof(state)
+            );
+        }
+
+        PrepareForUnequip();
+        DetachRuntimeEvents();
+        weaponDefinition = definition;
+        runtimeState = state ?? new WeaponRuntimeState(
+            definitionConfiguration,
+            new UnityWeaponRandomSource()
+        );
+        activeConfiguration = runtimeState.Configuration;
+        AttachRuntimeEvents();
+        RaiseAmmunitionChanged();
+
+        if (scopeSight == null)
+        {
+            scopeSight = GetComponent<PowerSuitScopeSight>();
+        }
+        scopeSight?.Bind(controller, this);
+        controller?.RefreshAimAvailability();
+        WeaponEquipped?.Invoke(definition);
+        return runtimeState;
+    }
+
+    /// <summary>
+    /// Clears queued feedback and cancelable actions before a slot switch while
+    /// preserving ammunition and the authored fire cadence.
+    /// </summary>
+    public void PrepareForUnequip()
+    {
+        fireQueuedForForwardPose = false;
+        fireQueuedFrame = -1;
+        runtimeState?.PrepareForUnequip();
+        muzzleLightTimer = 0f;
+        if (muzzleFlashLight != null)
+        {
+            muzzleFlashLight.enabled = false;
+        }
+    }
+
+    public void PrewarmProjectiles(int count)
+    {
+        int requested = Mathf.Max(0, count);
+        if (projectilePrefab != null && requested > 0)
+        {
+            CombatFeedbackPool.Prewarm(projectilePrefab.gameObject, requested);
+        }
     }
 
     private void OnDestroy()

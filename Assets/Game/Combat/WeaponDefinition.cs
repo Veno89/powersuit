@@ -42,6 +42,11 @@ namespace Powersuit.Combat
         [SerializeField, Min(0.01f)] private float projectileSpeed = 100f;
         [SerializeField, Min(0.01f)] private float projectileLifetimeSeconds = 4f;
         [SerializeField, Min(0.01f)] private float projectileRadius = 0.15f;
+        [Tooltip(
+            "Shared projectile-pool capacity requested by this weapon. " +
+            "Loadouts prewarm to the largest equipped requirement."
+        )]
+        [SerializeField, Min(0)] private int projectilePrewarmCount = 8;
 
         [Header("Handling")]
         [SerializeField, Min(0f)] private float aimSpreadDegrees = 0.15f;
@@ -82,6 +87,7 @@ namespace Powersuit.Combat
         public float ProjectileSpeed => projectileSpeed;
         public float ProjectileLifetimeSeconds => projectileLifetimeSeconds;
         public float ProjectileRadius => projectileRadius;
+        public int ProjectilePrewarmCount => Mathf.Max(0, projectilePrewarmCount);
         public float AimSpreadDegrees => aimSpreadDegrees;
         public float HipSpreadDegrees => hipSpreadDegrees;
         public float AimRecoilPitch => aimRecoilPitch;
