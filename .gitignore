@@ -43,6 +43,14 @@ crashlytics-build.properties
 /ArtSource/**/renders/
 /ArtSource/**/exports/
 
+# Small, curated NextGen visual-development renders are review evidence. Keep
+# the exceptions candidate-specific so future large render sets remain ignored.
+!/ArtSource/PoweredSuitNextGen/renders/
+!/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_blockout_v001/
+!/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_blockout_v001/*.png
+!/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_blockout_v002/
+!/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_blockout_v002/*.png
+
 # Immutable, approved validation evidence is deliberately versioned.
 !/ArtSource/PoweredSuit/Validation/Generator109/renders/
 !/ArtSource/PoweredSuit/Validation/Generator109/renders/**

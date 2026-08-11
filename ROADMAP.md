@@ -19,6 +19,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | K — HUD | Implemented | Formatter/presenter tests pass | Resolution/readability/accessibility review |
 | L — Developer console | Implemented | Parser, registry and gameplay-command tests pass | Hands-on malformed-command pass |
 | M — Pooling/performance | Pooling, diagnostics, and opt-in Development Build soak implemented | 30/60/120 matrix and two-minute 48-enemy soak pass | Connected GPU/render capture, uncapped and remaining lifecycle cases |
+| N — Hero Suit V2 art | Original Aegis Vanguard concept plus isolated rig-compatible blockout | Generator114/Unity hashes preserved; 23-bone rig and 24 actions retained | Art-direction approval, production modeling, deformation, PBR, LODs, Unity A/B |
 
 ## Completed implementation
 
@@ -92,6 +93,17 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Add an opt-in Development Build stress runner with strict command-line parsing, bounded nonalloc sample collection, JSON reporting, error gates, and per-prefab pool-miss diagnostics.
 - [x] Add stress-only enemy and shared-projectile prewarming sized for concurrent population and replacement overlap without inflating ordinary encounter warmup.
 
+### N — Hero Suit V2 visual development
+
+- [x] Preserve Generator114, its frozen validation archive, the active Unity FBX/GUID, controller, and player prefab as the untouched rollback path.
+- [x] Create the original **Aegis Vanguard** four-view concept and hero material target in a separate `ArtSource/PoweredSuitNextGen/` lane.
+- [x] Build a deterministic review-only v002 mechanical blockout on the existing 23-bone armature while retaining all 24 `PS_*` actions; verify the approved source hashes remain unchanged.
+- [x] Document measurable production targets for silhouette, articulation, rifle docking/camera clearance, hybrid rigid/skinned construction, UV/PBR work, renderer consolidation, and four LODs.
+- [ ] Owner-approve or revise the Aegis Vanguard silhouette, palette, back-thruster arrangement, and helmet language before expensive production modeling.
+- [ ] Replace the procedural shell with authored high-poly armor and a continuous undersuit; retopologize, weight, unwrap, bake, texture, and create LODs in the isolated candidate lane.
+- [ ] Validate all 24 actions, back-stowed rifle clearance, aim/scope framing, hardpoints, flight effects, deformation, draw calls, and representative GPU cost in a separate Unity review prefab/scene.
+- [ ] Promote only after an owner-approved old/new in-game A/B comparison; keep Generator114 available for one-click rollback.
+
 ## Verification completed
 
 - [x] Full solution build: 18 assemblies, 0 warnings, 0 errors.
@@ -118,7 +130,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [ ] Encounter feel: six archetypes are distinguishable and fair; spawn pacing, telegraphs, threat mix, damage, cooldowns, meter gain, and readability suit the intended loop.
 - [ ] Connected Unity Profiler/Frame Debugger or graphics capture for render thread, draw calls, and GPU time; the Development Player backend did not expose usable automated draw/GPU counters. Also record uncapped headroom and representative target hardware.
 - [ ] Extend lifecycle coverage to player respawn, scene reload, seed resets, spawner toggles, and malformed console commands. Repeated enemy/projectile/ability reuse and enemy death/replacement are certified by the two-minute soak.
-- [ ] Replacement-humanoid/retargeting validation, hardpoint and IK robustness, and true art, VFX, audio, animation, UI, and world-content polish.
+- [ ] Complete the tracked Hero Suit V2 production gates in `ArtSource/PoweredSuitNextGen/MASTERPIECE_PLAN.md`, plus replacement-humanoid/retargeting validation, hardpoint and IK robustness, and remaining VFX, audio, animation, UI, and world-content polish.
 - [ ] Owner-tune the implemented propulsion heat drain/cooldown/recovery thresholds and verify the HUD/heat-reactive exhaust during sustained sprint, flight, and boost.
 - [ ] Owner-accept the new cardinal/diagonal blends, foot plants, starts/stops, braking, and sharp-turn presentation at the unchanged gameplay speeds.
 

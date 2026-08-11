@@ -98,6 +98,12 @@ These checks and the broad owner pass establish the current playable baseline. T
 - Remaining lifecycle validation across player respawn, scene reload, seed reset, spawner toggles, and malformed console input. Repeated enemy/projectile/ability reuse and enemy replacement are covered by the automated two-minute soak.
 - Replacement-character/retargeting validation and true art/content polish. The current generated powered suit, enemies, VFX/audio hooks, and three-zone environment remain tech-demo content rather than final production art. Audio hooks stay silent until owned or explicitly approved licensed SFX are available; no external audio was added in this pass.
 
+## Hero Suit V2 visual development
+
+An original high-fidelity successor concept, **Aegis Vanguard**, now has a separate visual-development lane at `ArtSource/PoweredSuitNextGen/`. It includes a four-view design target, a hero material target, a deterministic rig-compatible v002 blockout, validation evidence, and a gated production plan. The blockout is review-only and is intentionally not integrated into Unity.
+
+Generator114 remains the active, fully validated suit. Its Blender source, frozen FBX, active Unity FBX/GUID, controller, and player prefab were not overwritten. A future Hero V2 candidate must pass silhouette approval, all 24 animation/weapon/camera checks, deformation, authored UV/PBR, LOD, renderer/performance, and owner in-game A/B gates before promotion. See `ArtSource/PoweredSuitNextGen/MASTERPIECE_PLAN.md` and `VALIDATION.md`.
+
 ## Scope exclusions
 
 This milestone does not include multiplayer, networking, loot generation, a general inventory/equipment system, rarity, progression, skill trees, crafting, missions, quests, dialogue, story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, or final Asset Store publication.

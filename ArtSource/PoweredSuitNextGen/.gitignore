@@ -1,0 +1,4 @@
+candidates/*.blend
+candidates/*.blend1
+__pycache__/
+*.pyc

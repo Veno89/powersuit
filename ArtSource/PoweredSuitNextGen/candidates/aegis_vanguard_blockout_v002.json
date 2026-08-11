@@ -1,0 +1,25 @@
+{
+  "candidate": "Aegis Vanguard blockout v002",
+  "status": "REVIEW_ONLY_NOT_UNITY_INTEGRATED",
+  "source_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuit\\powersuit_pipeline.blend",
+  "source_sha256_before": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+  "source_sha256_after": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+  "legacy_preserved": true,
+  "candidate_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\aegis_vanguard_blockout_v002.blend",
+  "candidate_blend_sha256": "9040038ee6cec9ee8d01060765263950b1aca9c23036b2f19242533e2003829c",
+  "candidate_mesh_objects": 113,
+  "candidate_polygons": 16676,
+  "candidate_triangles_estimate": 32440,
+  "armature": "PowerSuit_Armature",
+  "bone_count": 23,
+  "render_paths": [
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_blockout_v002\\aegis_vanguard_front_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_blockout_v002\\aegis_vanguard_side.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_blockout_v002\\aegis_vanguard_back_3q.png"
+  ],
+  "limitations": [
+    "Concept blockout; not final production topology or texture bake.",
+    "Existing animations and weapon were preserved but not revalidated against this shell.",
+    "No Unity prefab or FBX was replaced."
+  ]
+}

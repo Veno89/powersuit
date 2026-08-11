@@ -154,6 +154,12 @@ Before accepting the milestone, still perform:
 5. Validate a replacement humanoid/retargeting path and complete final animation, character, enemy, world, UI, VFX, and audio content polish.
 6. Tune and accept the implemented propulsion heat drain/cooldown/recovery behavior and its HUD/heat-reactive exhaust feedback.
 
+### Hero Suit V2 candidate
+
+`ArtSource/PoweredSuitNextGen/` contains the original **Aegis Vanguard** concept, hero material target, a deterministic v002 mechanical blockout, integrity evidence, and the production/approval plan for a future high-fidelity player suit. It is an isolated art-review lane, not a runtime replacement. Generator114 and every active Unity model/prefab contract remain unchanged.
+
+The current candidate proves the existing 23-bone/24-action contract can be retained, but it has not passed production sculpting, continuous-undersuit deformation, UV/PBR, LOD, renderer consolidation, gameplay-camera clearance, performance, or owner A/B approval. Promotion is explicitly blocked until those gates pass.
+
 Automated checks establish technical correctness and sustained capped performance on the certification machine; they do not prove subjective feel, performance on all representative hardware, detailed GPU cost, or production-quality content.
 
 ## Known limitations and exclusions
