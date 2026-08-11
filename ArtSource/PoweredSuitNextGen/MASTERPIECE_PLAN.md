@@ -42,10 +42,11 @@ Generator114 is a reliable gameplay prototype, not a hero art asset:
 - 12 simple constant-value materials;
 - 23 bones and 24 exact animation actions.
 
-The current Candidate003 automated maquette is approximately 63.0k mesh triangles
-across 227 review objects (including four renderable curve objects). It preserves
-the same 23-bone rig and all 24 actions. That is acceptable for silhouette,
-material, and pose iteration, but not the runtime architecture we will ship.
+The current Candidate004 automated maquette is approximately 73.1k mesh triangles
+across 258 review objects. Its four authored cable curves are baked to mesh for
+the formal handoff, yielding 254 renderer-bearing meshes. It preserves the same
+23-bone rig and all 24 actions. That is acceptable for silhouette, material, and
+pose iteration, but not the runtime architecture we will ship.
 
 ## Non-negotiable gameplay contracts
 
@@ -119,16 +120,21 @@ small status lights, and active thruster cores.
 
 - Four-view concept and hero material target exist.
 - Original silhouette and black/carbon/chrome palette targets are defined.
-- Owner requested the black, chrome, carbon-fibre, and layered-pauldron revision;
-  the image target and Candidate003 reflect it.
+- Owner requested a darker, adult, gritty, subtly gothic refinement. The paired
+  front/rear image targets and Candidate004 now encode that direction without
+  adding symbols, spikes, robes, or franchise-specific shapes.
 
-### G2 — gameplay blockout (current)
+### G2 — gameplay blockout (current, measured fail)
 
-- Candidate003 materially improves the helmet, torso hierarchy, layered shoulders,
-  limbs, boots, turbines, material separation, and review lighting over v002.
+- Candidate004 materially improves the helmet, torso hierarchy, layered shoulders,
+  limbs, boots, turbines, material separation, weathering, and review lighting.
 - Test exploration, shoulder aim, scope, stowed rifle, sprint, hover, and flight views.
-- Sweep every animation for armor collisions before adding expensive detail.
-- Prove the back-rifle docking channel and shoulder-camera clearance.
+- The new gate now sweeps 24 actions/162 keyframes. Candidate004 currently fails
+  with 7,837 forbidden instances/304 object-pair groups, so clearance is not an
+  aesthetic judgement or an untracked TODO anymore.
+- Repair the forearm envelopes, pose-specific stowed WeaponRoot and draw/sheathe
+  endpoints, central backpack channel, reload contacts, and shoulder-camera
+  clearance before expensive detail or Unity integration.
 
 ### G3 — high-poly construction
 
@@ -137,12 +143,16 @@ small status lights, and active thruster cores.
 - Add controlled secondary overlaps, pivots, pistons, vents, fasteners, and access panels.
 - Maintain primary/secondary/tertiary detail hierarchy; reject uniform greeble noise.
 
-### G4 — game mesh and deformation
+### G4 — game mesh and deformation (validation lane started)
 
 - Retopologize to the LOD0 budgets.
 - Rigid-weight armor and smoothly skin flexible regions.
 - Validate normals, winding, manifold state, influence counts, and joint clearances.
 - Preserve the exact animation and hardpoint contract.
+- The isolated `HeroV2` gate is implemented. Candidate004's honest baseline is
+  25 errors/16 warnings: 348 n-gons, 80 boundary edges on the four baked cable
+  meshes, no UV0, no continuous skinned undersuit, and 254 renderer-bearing
+  pieces/draw calls.
 
 ### G5 — UV, bake, and material finish
 
@@ -151,12 +161,15 @@ small status lights, and active thruster cores.
 - Paint deliberate PBR materials and usage-based wear.
 - Review in neutral studio, daylight, and dark interior lighting.
 
-### G6 — LOD and runtime performance
+### G6 — LOD and runtime performance (draft generation operational)
 
 - Create and hand-repair LOD1–LOD3.
 - Consolidate to the renderer/material budgets.
 - Verify LOD transitions in gameplay framing rather than only a turntable.
 - Profile in the existing 32-enemy stress scene at target quality levels.
+- Deterministic diagnostic LOD generation currently produces
+  `73,140 -> 36,570 -> 14,344 -> 4,846` triangles while preserving the source
+  hash. These are decimated diagnostics, not hand-repaired release LODs.
 
 ### G7 — parallel Unity candidate
 

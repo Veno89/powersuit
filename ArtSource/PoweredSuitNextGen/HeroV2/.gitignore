@@ -1,0 +1,5 @@
+derivatives/
+fixtures/
+__pycache__/
+tests/__pycache__/
+*.pyc

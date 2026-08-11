@@ -1,0 +1,274 @@
+Aegis Vanguard weapon/suit clearance gate
+===========================================
+Status: FAIL
+Candidate: C:\Users\Zhitn\Powersuit\ArtSource\PoweredSuitNextGen\candidates\aegis_vanguard_candidate_v004.blend
+SHA-256 preserved: True
+Blender: 5.2.0
+Sampling: authored_keyframes
+Actions: 24/24
+Sampled frames: 162
+Allowed contact instances: 1357
+Forbidden intersection instances: 7837
+Forbidden object-pair groups: 304
+
+Action results
+--------------
+FAIL PS_Aim: 3 frames, 42 allowed, 120 forbidden
+FAIL PS_Aim_Walk_Backward: 9 frames, 126 allowed, 360 forbidden
+FAIL PS_Aim_Walk_Forward: 9 frames, 126 allowed, 360 forbidden
+FAIL PS_Aim_Walk_Left: 9 frames, 126 allowed, 378 forbidden
+FAIL PS_Aim_Walk_Right: 9 frames, 117 allowed, 351 forbidden
+FAIL PS_BoltCycle: 6 frames, 30 allowed, 390 forbidden
+FAIL PS_Hover: 3 frames, 27 allowed, 101 forbidden
+FAIL PS_Idle: 3 frames, 33 allowed, 168 forbidden
+FAIL PS_Reload: 8 frames, 77 allowed, 379 forbidden
+FAIL PS_Run_Forward: 9 frames, 112 allowed, 543 forbidden
+FAIL PS_Walk: 5 frames, 53 allowed, 259 forbidden
+FAIL PS_Walk_Backward: 9 frames, 99 allowed, 544 forbidden
+FAIL PS_Walk_Forward: 9 frames, 99 allowed, 544 forbidden
+FAIL PS_Walk_Left: 9 frames, 117 allowed, 549 forbidden
+FAIL PS_Walk_Right: 9 frames, 108 allowed, 558 forbidden
+FAIL PS_WeaponReady_Idle: 3 frames, 33 allowed, 178 forbidden
+FAIL PS_WeaponStowed_Hover: 3 frames, 0 allowed, 116 forbidden
+FAIL PS_WeaponStowed_Idle: 3 frames, 0 allowed, 113 forbidden
+FAIL PS_WeaponStowed_Walk_Backward: 9 frames, 0 allowed, 342 forbidden
+FAIL PS_WeaponStowed_Walk_Forward: 9 frames, 0 allowed, 342 forbidden
+FAIL PS_WeaponStowed_Walk_Left: 9 frames, 0 allowed, 333 forbidden
+FAIL PS_WeaponStowed_Walk_Right: 9 frames, 0 allowed, 351 forbidden
+FAIL PS_Weapon_Draw: 4 frames, 16 allowed, 229 forbidden
+FAIL PS_Weapon_Sheathe: 4 frames, 16 allowed, 229 forbidden
+
+Forbidden groups (highest recurrence first)
+-------------------------------------------
+1. Rifle_Receiver_Core x AV_ForearmUnder.R
+   instances=116; max triangle pairs=68; AABB min-axis proxy=0.177384 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+2. Rifle_Receiver_LowerSpine x AV_ForearmUnder.R
+   instances=112; max triangle pairs=70; AABB min-axis proxy=0.115485 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+3. Rifle_Receiver_Core x AV_ForearmPlate.R
+   instances=112; max triangle pairs=51; AABB min-axis proxy=0.112703 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,16,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+4. Rifle_Receiver_LowerSpine x AV_HandPalm.R
+   instances=112; max triangle pairs=84; AABB min-axis proxy=0.099218 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+5. Rifle_Receiver_LowerSpine x AV_Gauntlet.R
+   instances=112; max triangle pairs=40; AABB min-axis proxy=0.075126 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+6. Rifle_Magazine x AV_HandPalm.L
+   instances=103; max triangle pairs=80; AABB min-axis proxy=0.150338 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+7. Rifle_Magazine x AV_ForearmUnder.L
+   instances=103; max triangle pairs=53; AABB min-axis proxy=0.149339 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+8. Rifle_GripBackstrap x AV_ForearmUnder.R
+   instances=102; max triangle pairs=54; AABB min-axis proxy=0.118978 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,20; PS_Hover=31; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+9. Rifle_Receiver_LowerSpine x AV_Gauntlet.L
+   instances=99; max triangle pairs=36; AABB min-axis proxy=0.089014 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,25,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+10. Rifle_Receiver_Core x AV_HandPalm.L
+   instances=98; max triangle pairs=30; AABB min-axis proxy=0.179764 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+11. Rifle_Magazine x AV_ForearmFrame.L
+   instances=98; max triangle pairs=49; AABB min-axis proxy=0.159096 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+12. Rifle_SupportGrip x AV_ForearmUnder.L
+   instances=98; max triangle pairs=65; AABB min-axis proxy=0.103303 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+13. Rifle_Magazine x AV_Thumb.L
+   instances=98; max triangle pairs=51; AABB min-axis proxy=0.062001 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+14. Rifle_Receiver_Core x AV_ForearmUnder.L
+   instances=97; max triangle pairs=44; AABB min-axis proxy=0.182721 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+15. Rifle_Receiver_LowerSpine x AV_HandPalm.L
+   instances=97; max triangle pairs=62; AABB min-axis proxy=0.143367 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+16. Rifle_Receiver_LowerSpine x AV_ForearmUnder.L
+   instances=97; max triangle pairs=61; AABB min-axis proxy=0.135909 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+17. Rifle_Receiver_LowerSpine x AV_ForearmFrame.L
+   instances=97; max triangle pairs=52; AABB min-axis proxy=0.118768 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+18. Rifle_SupportGrip x AV_ForearmFrame.L
+   instances=97; max triangle pairs=51; AABB min-axis proxy=0.103303 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+19. Rifle_Receiver_Core x AV_Gauntlet.L
+   instances=97; max triangle pairs=31; AABB min-axis proxy=0.093984 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+20. Rifle_Handguard_Core x AV_ForearmUnder.L
+   instances=97; max triangle pairs=35; AABB min-axis proxy=0.089065 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+21. Rifle_Magazine x AV_FingerA2.L
+   instances=97; max triangle pairs=28; AABB min-axis proxy=0.073663 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+22. Rifle_Magazine x AV_FingerA3.L
+   instances=97; max triangle pairs=71; AABB min-axis proxy=0.073663 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+23. Rifle_SupportGrip_Mount x AV_ForearmUnder.L
+   instances=97; max triangle pairs=32; AABB min-axis proxy=0.052152 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+24. Rifle_Magazine x AV_FingerB3.L
+   instances=97; max triangle pairs=36; AABB min-axis proxy=0.050377 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+25. Rifle_Magazine_Base x AV_FingerB3.L
+   instances=97; max triangle pairs=60; AABB min-axis proxy=0.044149 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+26. Rifle_TriggerGuard x AV_Thumb.L
+   instances=97; max triangle pairs=55; AABB min-axis proxy=0.021730 m
+   Hand intersects a weapon component outside its matching semantic grip role.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+27. Rifle_Stock_TopRail x AV_ForearmFrame.R
+   instances=75; max triangle pairs=68; AABB min-axis proxy=0.200812 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+28. Rifle_Stock_TopRail x AV_ForearmUnder.R
+   instances=75; max triangle pairs=53; AABB min-axis proxy=0.197432 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+29. Rifle_Receiver_Core x AV_ForearmFrame.R
+   instances=75; max triangle pairs=62; AABB min-axis proxy=0.194364 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+30. Rifle_StockSpine x AV_ForearmFrame.R
+   instances=71; max triangle pairs=66; AABB min-axis proxy=0.155336 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+31. Rifle_StockSpine x AV_ForearmUnder.R
+   instances=71; max triangle pairs=57; AABB min-axis proxy=0.155336 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+32. Rifle_StockStrut_L x AV_ForearmFrame.R
+   instances=71; max triangle pairs=33; AABB min-axis proxy=0.148002 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+33. Rifle_StockStrut_L x AV_ForearmUnder.R
+   instances=71; max triangle pairs=38; AABB min-axis proxy=0.148002 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,20; PS_Hover=1,31,61; PS_Idle=1,31,61; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk=1,8,16,24,31; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+34. Rifle_Receiver_Core x AV_Pectoral.R
+   instances=64; max triangle pairs=29; AABB min-axis proxy=0.090767 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+35. Rifle_Receiver_UpperShell x AV_Pectoral.R
+   instances=64; max triangle pairs=28; AABB min-axis proxy=0.083429 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+36. Rifle_Receiver_Core x AV_PectoralInset.R
+   instances=64; max triangle pairs=46; AABB min-axis proxy=0.069745 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+37. Rifle_Receiver_UpperShell x AV_PectoralInset.R
+   instances=64; max triangle pairs=48; AABB min-axis proxy=0.069745 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+38. Rifle_ScopeMount_Rear_Crossbar x AV_Pectoral.R
+   instances=64; max triangle pairs=39; AABB min-axis proxy=0.065625 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+39. Rifle_ScopeMount_Rear x AV_Pectoral.R
+   instances=64; max triangle pairs=19; AABB min-axis proxy=0.056650 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+40. Rifle_Receiver_Core x AV_GothicRib.R.0
+   instances=64; max triangle pairs=55; AABB min-axis proxy=0.039778 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+41. Rifle_Receiver_UpperShell x AV_GothicRib.R.0
+   instances=64; max triangle pairs=69; AABB min-axis proxy=0.039778 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+42. Rifle_Receiver_Core x AV_GothicRib.R.1
+   instances=64; max triangle pairs=32; AABB min-axis proxy=0.039586 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+43. Rifle_Receiver_UpperShell x AV_GothicRib.R.1
+   instances=64; max triangle pairs=41; AABB min-axis proxy=0.039586 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+44. Rifle_Receiver_Core x AV_GothicRib.R.2
+   instances=64; max triangle pairs=39; AABB min-axis proxy=0.039366 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+45. Rifle_DataModule x AV_PectoralInset.R
+   instances=64; max triangle pairs=17; AABB min-axis proxy=0.029165 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+46. Rifle_DataModule x AV_GothicRib.R.0
+   instances=64; max triangle pairs=29; AABB min-axis proxy=0.021014 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+47. Rifle_Receiver_Core x AV_ChestFastener.R.0
+   instances=64; max triangle pairs=0; AABB min-axis proxy=0.013963 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+48. Rifle_Receiver_UpperShell x AV_ChestFastener.R.0
+   instances=64; max triangle pairs=36; AABB min-axis proxy=0.013963 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+49. Rifle_Stock_TopRail x AV_ForearmPlate.R
+   instances=60; max triangle pairs=80; AABB min-axis proxy=0.177271 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+50. Rifle_StockSpine x AV_ForearmPlate.R
+   instances=60; max triangle pairs=45; AABB min-axis proxy=0.155012 m
+   Weapon intersects visible suit geometry outside an allowed contact zone.
+   PS_BoltCycle=1,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+... 254 more grouped failures are retained in JSON.
+
+Allowed contact groups
+----------------------
+- allowed_primary_grip_contact: Rifle_PistolGrip x AV_HandPalm.R (112 instances)
+- allowed_primary_grip_contact: Rifle_GripBackstrap x AV_HandPalm.R (112 instances)
+- allowed_primary_grip_contact: Rifle_TriggerGuard x AV_HandPalm.R (112 instances)
+- allowed_primary_grip_contact: Rifle_Trigger x AV_HandPalm.R (112 instances)
+- allowed_primary_grip_contact: Rifle_PistolGrip x AV_FingerA1.R (110 instances)
+- allowed_primary_grip_contact: Rifle_PistolGrip x AV_FingerA2.R (110 instances)
+- allowed_primary_grip_contact: Rifle_PistolGrip x AV_FingerA3.R (110 instances)
+- allowed_primary_grip_contact: Rifle_GripBackstrap x AV_FingerA3.R (110 instances)
+- allowed_primary_grip_contact: Rifle_TriggerGuard x AV_Thumb.R (110 instances)
+- allowed_support_grip_contact: Rifle_SupportGrip x AV_HandPalm.L (98 instances)
+- allowed_support_grip_contact: Rifle_SupportGrip_Mount x AV_HandPalm.L (97 instances)
+- allowed_stock_shoulder_docking: Rifle_Stock_ButtPad x AV_PectoralInset.R (39 instances)
+- allowed_stock_shoulder_docking: Rifle_Stock_ButtPad x AV_Pectoral.R (39 instances)
+- allowed_support_grip_contact: Rifle_SupportGrip x AV_FingerA1.L (30 instances)
+- allowed_primary_grip_contact: Rifle_GripBackstrap x AV_Thumb.R (18 instances)
+- allowed_primary_grip_contact: Rifle_PistolGrip x AV_Thumb.R (15 instances)
+- allowed_primary_grip_contact: Rifle_GripBackstrap x AV_FingerA2.R (14 instances)
+- allowed_primary_grip_contact: Rifle_PistolGrip x AV_FingerA0.R (5 instances)
+- allowed_primary_grip_contact: Rifle_GripBackstrap x AV_Gauntlet.R (3 instances)
+- allowed_primary_grip_contact: Rifle_TriggerGuard x AV_Gauntlet.R (1 instances)
+
+Limitations
+-----------
+- The default sweep samples authored action keyframes; inter-keyframe collisions require --all-frames and fractional high-speed tunnelling still requires denser sampling.
+- BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.
+- AABB overlap depth/volume are prioritisation proxies, not true penetration depth or swept volume.
+- Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.
+- The tool audits weapon versus candidate render geometry only. It does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting.

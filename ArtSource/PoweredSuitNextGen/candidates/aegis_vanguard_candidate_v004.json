@@ -1,0 +1,107 @@
+{
+  "candidate": "Aegis Vanguard Candidate004",
+  "status": "REVIEW_ONLY_NOT_UNITY_INTEGRATED",
+  "source_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuit\\powersuit_pipeline.blend",
+  "source_sha256_before": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+  "source_sha256_after": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+  "legacy_preserved": true,
+  "candidate_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\aegis_vanguard_candidate_v004.blend",
+  "candidate_blend_sha256": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+  "candidate_objects": 258,
+  "candidate_mesh_objects": 254,
+  "candidate_curve_objects": 0,
+  "candidate_curves_baked_to_mesh": 4,
+  "candidate_polygons": 37201,
+  "candidate_mesh_triangles_estimate": 73140,
+  "armature": "PowerSuit_Armature",
+  "bone_count": 23,
+  "runtime_anchor_validation": {
+    "Thruster_Nozzle.L": {
+      "world_position": [
+        0.45,
+        -0.382,
+        1.57
+      ],
+      "parent_object": "AV_TurbineCore.L",
+      "expected_bone": "Chest",
+      "position_error_m": 0.0
+    },
+    "Thruster_Nozzle.R": {
+      "world_position": [
+        -0.45,
+        -0.382,
+        1.57
+      ],
+      "parent_object": "AV_TurbineCore.R",
+      "expected_bone": "Chest",
+      "position_error_m": 0.0
+    },
+    "Heavy_Boot.L": {
+      "world_position": [
+        0.17,
+        -0.145,
+        0.115
+      ],
+      "parent_object": "AV_BootThrusterCore.L",
+      "expected_bone": "Foot.L",
+      "position_error_m": 0.0
+    },
+    "Heavy_Boot.R": {
+      "world_position": [
+        -0.17,
+        -0.145,
+        0.115
+      ],
+      "parent_object": "AV_BootThrusterCore.R",
+      "expected_bone": "Foot.R",
+      "position_error_m": 0.0
+    }
+  },
+  "preserved_actions": [
+    "PS_Aim",
+    "PS_Aim_Walk_Backward",
+    "PS_Aim_Walk_Forward",
+    "PS_Aim_Walk_Left",
+    "PS_Aim_Walk_Right",
+    "PS_BoltCycle",
+    "PS_Hover",
+    "PS_Idle",
+    "PS_Reload",
+    "PS_Run_Forward",
+    "PS_Walk",
+    "PS_Walk_Backward",
+    "PS_Walk_Forward",
+    "PS_Walk_Left",
+    "PS_Walk_Right",
+    "PS_WeaponReady_Idle",
+    "PS_WeaponStowed_Hover",
+    "PS_WeaponStowed_Idle",
+    "PS_WeaponStowed_Walk_Backward",
+    "PS_WeaponStowed_Walk_Forward",
+    "PS_WeaponStowed_Walk_Left",
+    "PS_WeaponStowed_Walk_Right",
+    "PS_Weapon_Draw",
+    "PS_Weapon_Sheathe"
+  ],
+  "render_paths": [
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_front.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_front_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_side.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_back.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_back_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_helmet_close.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_backpack_close.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_clay_front_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_pose_stowed.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_pose_aim.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_pose_run.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_pose_hover.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v004\\aegis_vanguard_pose_reload.png"
+  ],
+  "limitations": [
+    "Procedural concept maquette; not final production topology, UVs, texture bake, or skin deformation.",
+    "Selected poses are rendered, but the separate 24-action weapon-clearance gate must pass before promotion.",
+    "HeroV2_LOD0 is a measurable production handoff, not evidence that UV, topology, renderer, or LOD gates pass.",
+    "No Unity prefab or FBX was replaced."
+  ]
+}

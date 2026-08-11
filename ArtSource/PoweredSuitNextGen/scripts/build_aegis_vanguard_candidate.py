@@ -27,10 +27,10 @@ from powersuit_pipeline_common import activate_action  # type: ignore  # noqa: E
 
 LEGACY_BLEND = ROOT / "ArtSource" / "PoweredSuit" / "powersuit_pipeline.blend"
 OUTPUT_ROOT = ROOT / "ArtSource" / "PoweredSuitNextGen"
-CANDIDATE_BLEND = OUTPUT_ROOT / "candidates" / "aegis_vanguard_candidate_v003.blend"
-RENDER_ROOT = OUTPUT_ROOT / "renders" / "aegis_vanguard_candidate_v003"
-REPORT_PATH = OUTPUT_ROOT / "candidates" / "aegis_vanguard_candidate_v003.json"
-COLLECTION_NAME = "Aegis_Vanguard_Candidate003"
+CANDIDATE_BLEND = OUTPUT_ROOT / "candidates" / "aegis_vanguard_candidate_v004.blend"
+RENDER_ROOT = OUTPUT_ROOT / "renders" / "aegis_vanguard_candidate_v004"
+REPORT_PATH = OUTPUT_ROOT / "candidates" / "aegis_vanguard_candidate_v004.json"
+COLLECTION_NAME = "Aegis_Vanguard_Candidate004"
 RUNTIME_ANCHORS: dict[str, tuple[tuple[float, float, float], str, str]] = {
     "Thruster_Nozzle.L": ((0.450, -0.382, 1.570), "AV_TurbineCore.L", "Chest"),
     "Thruster_Nozzle.R": ((-0.450, -0.382, 1.570), "AV_TurbineCore.R", "Chest"),
@@ -132,7 +132,26 @@ def make_material(
         links.new(coordinates.outputs["Generated"], noise.inputs["Vector"])
         links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
         links.new(noise.outputs["Fac"], color_ramp.inputs["Fac"])
-        links.new(color_ramp.outputs["Color"], shader.inputs["Base Color"])
+        if "Armor" in name:
+            grime = nodes.new("ShaderNodeTexNoise")
+            grime.inputs["Scale"].default_value = 3.4
+            grime.inputs["Detail"].default_value = 5.0
+            grime.inputs["Roughness"].default_value = 0.82
+            grime_ramp = nodes.new("ShaderNodeValToRGB")
+            grime_ramp.color_ramp.elements[0].position = 0.30
+            grime_ramp.color_ramp.elements[1].position = 0.72
+            grime_ramp.color_ramp.elements[0].color = (0.16, 0.17, 0.19, 1.0)
+            grime_ramp.color_ramp.elements[1].color = (0.92, 0.94, 0.98, 1.0)
+            grime_mix = nodes.new("ShaderNodeMixRGB")
+            grime_mix.blend_type = "MULTIPLY"
+            grime_mix.inputs[0].default_value = 0.34
+            links.new(coordinates.outputs["Generated"], grime.inputs["Vector"])
+            links.new(grime.outputs["Fac"], grime_ramp.inputs["Fac"])
+            links.new(color_ramp.outputs["Color"], grime_mix.inputs[1])
+            links.new(grime_ramp.outputs["Color"], grime_mix.inputs[2])
+            links.new(grime_mix.outputs["Color"], shader.inputs["Base Color"])
+        else:
+            links.new(color_ramp.outputs["Color"], shader.inputs["Base Color"])
         links.new(ramp.outputs["Color"], shader.inputs["Roughness"])
         links.new(noise.outputs["Fac"], bump.inputs["Height"])
         links.new(bump.outputs["Normal"], shader.inputs["Normal"])
@@ -168,15 +187,15 @@ def make_carbon_material(
     mapping_a.inputs["Rotation"].default_value[2] = math.radians(45.0)
     mapping_b.inputs["Rotation"].default_value[2] = math.radians(-45.0)
     for mapping in (mapping_a, mapping_b):
-        mapping.inputs["Scale"].default_value = (46.0, 46.0, 46.0)
+        mapping.inputs["Scale"].default_value = (72.0, 72.0, 72.0)
         links.new(coordinates.outputs["Generated"], mapping.inputs["Vector"])
     weave_a = nodes.new("ShaderNodeTexWave")
     weave_b = nodes.new("ShaderNodeTexWave")
     for weave in (weave_a, weave_b):
         weave.wave_type = "BANDS"
         weave.bands_direction = "X"
-        weave.inputs["Scale"].default_value = 5.5
-        weave.inputs["Distortion"].default_value = 0.18
+        weave.inputs["Scale"].default_value = 4.5
+        weave.inputs["Distortion"].default_value = 0.12
         weave.inputs["Detail"].default_value = 2.0
     links.new(mapping_a.outputs["Vector"], weave_a.inputs["Vector"])
     links.new(mapping_b.outputs["Vector"], weave_b.inputs["Vector"])
@@ -191,9 +210,63 @@ def make_carbon_material(
     links.new(multiply.outputs["Color"], color_ramp.inputs["Fac"])
     links.new(color_ramp.outputs["Color"], shader.inputs["Base Color"])
     bump = nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.20
-    bump.inputs["Distance"].default_value = 0.00065
+    bump.inputs["Strength"].default_value = 0.13
+    bump.inputs["Distance"].default_value = 0.00038
     links.new(multiply.outputs["Color"], bump.inputs["Height"])
+    links.new(bump.outputs["Normal"], shader.inputs["Normal"])
+    links.new(shader.outputs["BSDF"], output.inputs["Surface"])
+    return material
+
+
+def make_tarnished_metal(
+    name: str,
+    base_color: tuple[float, float, float, float],
+    roughness: float,
+    tarnish: float,
+) -> bpy.types.Material:
+    """Create cold functional metal with directional wear and oily tarnish."""
+    material = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    shader = nodes.new("ShaderNodeBsdfPrincipled")
+    shader.inputs["Metallic"].default_value = 1.0
+    coordinates = nodes.new("ShaderNodeTexCoord")
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 8.0
+    noise.inputs["Detail"].default_value = 5.0
+    noise.inputs["Roughness"].default_value = 0.72
+    scratches = nodes.new("ShaderNodeTexWave")
+    scratches.wave_type = "BANDS"
+    scratches.bands_direction = "Z"
+    scratches.inputs["Scale"].default_value = 92.0
+    scratches.inputs["Distortion"].default_value = 7.0
+    scratches.inputs["Detail"].default_value = 4.0
+    multiply = nodes.new("ShaderNodeMixRGB")
+    multiply.blend_type = "MULTIPLY"
+    multiply.inputs[0].default_value = 0.72
+    color_ramp = nodes.new("ShaderNodeValToRGB")
+    color_ramp.color_ramp.elements[0].position = 0.24
+    color_ramp.color_ramp.elements[1].position = 0.78
+    color_ramp.color_ramp.elements[0].color = tuple(channel * (0.18 + 0.32 * (1.0 - tarnish)) for channel in base_color[:3]) + (1.0,)
+    color_ramp.color_ramp.elements[1].color = tuple(min(1.0, channel * (1.12 - 0.30 * tarnish) + 0.012) for channel in base_color[:3]) + (1.0,)
+    roughness_ramp = nodes.new("ShaderNodeValToRGB")
+    roughness_ramp.color_ramp.elements[0].color = (roughness * 0.72,) * 3 + (1.0,)
+    roughness_ramp.color_ramp.elements[1].color = (min(1.0, roughness + 0.28 * tarnish),) * 3 + (1.0,)
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.10
+    bump.inputs["Distance"].default_value = 0.00018
+    links.new(coordinates.outputs["Generated"], noise.inputs["Vector"])
+    links.new(coordinates.outputs["Generated"], scratches.inputs["Vector"])
+    links.new(noise.outputs["Fac"], multiply.inputs[1])
+    links.new(scratches.outputs["Color"], multiply.inputs[2])
+    links.new(multiply.outputs["Color"], color_ramp.inputs["Fac"])
+    links.new(noise.outputs["Fac"], roughness_ramp.inputs["Fac"])
+    links.new(color_ramp.outputs["Color"], shader.inputs["Base Color"])
+    links.new(roughness_ramp.outputs["Color"], shader.inputs["Roughness"])
+    links.new(scratches.outputs["Color"], bump.inputs["Height"])
     links.new(bump.outputs["Normal"], shader.inputs["Normal"])
     links.new(shader.outputs["BSDF"], output.inputs["Surface"])
     return material
@@ -201,15 +274,16 @@ def make_carbon_material(
 
 def materials() -> dict[str, bpy.types.Material]:
     return {
-        "ceramic": make_material("AV_SatinBlackArmor", (0.0080, 0.0110, 0.0170, 1.0), 0.13, 0.29),
-        "ceramic_dark": make_carbon_material("AV_CarbonComposite", (0.0035, 0.0050, 0.0080, 1.0), 0.43),
-        "teal": make_carbon_material("AV_BlueBlackCarbon", (0.0040, 0.0120, 0.0180, 1.0), 0.38),
+        "ceramic": make_material("AV_SootBlackArmor", (0.0035, 0.0048, 0.0075, 1.0), 0.06, 0.43),
+        "ceramic_dark": make_carbon_material("AV_CarbonComposite", (0.0022, 0.0032, 0.0050, 1.0), 0.57),
+        "teal": make_carbon_material("AV_BlueBlackCarbon", (0.0022, 0.0062, 0.0100, 1.0), 0.51),
         "undersuit": make_carbon_material("AV_CarbonUndersuit", (0.0015, 0.0020, 0.0030, 1.0), 0.68),
         "rubber": make_carbon_material("AV_BraidedCarbonCable", (0.0018, 0.0022, 0.0030, 1.0), 0.55),
-        "steel": make_material("AV_Chrome", (0.38, 0.44, 0.52, 1.0), 1.0, 0.075),
-        "steel_dark": make_material("AV_BlackChrome", (0.032, 0.042, 0.058, 1.0), 1.0, 0.18),
-        "copper": make_material("AV_BrightChromeDetail", (0.65, 0.72, 0.82, 1.0), 1.0, 0.055),
-        "studio": make_material("AV_StudioMatte", (0.012, 0.014, 0.017, 1.0), 0.0, 0.82),
+        "steel": make_tarnished_metal("AV_TarnishedChrome", (0.24, 0.30, 0.39, 1.0), 0.12, 0.39),
+        "steel_dark": make_tarnished_metal("AV_OilyGunmetal", (0.055, 0.072, 0.095, 1.0), 0.20, 0.66),
+        "copper": make_tarnished_metal("AV_WornChromeDetail", (0.44, 0.53, 0.65, 1.0), 0.09, 0.29),
+        "soot": make_material("AV_ExhaustSoot", (0.0012, 0.0014, 0.0018, 1.0), 0.0, 0.88),
+        "studio": make_material("AV_StudioMatte", (0.005, 0.006, 0.008, 1.0), 0.0, 0.88),
         "clay": make_material("AV_ClayReview", (0.33, 0.35, 0.36, 1.0), 0.0, 0.47),
         "cyan": make_material(
             "AV_CyanEmission",
@@ -217,7 +291,7 @@ def materials() -> dict[str, bpy.types.Material]:
             0.38,
             0.12,
             emission=(0.0, 0.82, 1.0, 1.0),
-            emission_strength=3.6,
+            emission_strength=2.8,
         ),
     }
 
@@ -234,6 +308,12 @@ def parent_to_bone(obj: bpy.types.Object, armature: bpy.types.Object, bone: str)
     obj.parent_bone = bone
     obj.matrix_world = world
     obj["aegis_vanguard_candidate"] = True
+    # Keep intentional hand/weapon contacts semantically distinct for the
+    # production clearance gate.  Everything else remains forbidden by default.
+    if bone == "Hand.R":
+        obj["aegis_contact_zone"] = "primary_grip_hand_right"
+    elif bone == "Hand.L":
+        obj["aegis_contact_zone"] = "support_grip_hand_left"
 
 
 def apply_bevel(obj: bpy.types.Object, width: float, segments: int = 3) -> None:
@@ -569,6 +649,45 @@ def create_runtime_anchors(collection: bpy.types.Collection) -> None:
         anchor["aegis_vanguard_candidate"] = True
 
 
+def convert_candidate_curves_to_mesh(candidate_collection: bpy.types.Collection) -> int:
+    """Bake visible cables so production accounting cannot silently omit them."""
+    converted = 0
+    bpy.ops.object.select_all(action="DESELECT")
+    for obj in sorted(candidate_collection.objects, key=lambda item: item.name_full):
+        if obj.type != "CURVE" or not obj.get("aegis_vanguard_candidate"):
+            continue
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+        bpy.ops.object.convert(target="MESH")
+        obj.select_set(False)
+        converted += 1
+    return converted
+
+
+def create_hero_v2_lod0_handoff(candidate_collection: bpy.types.Collection) -> bpy.types.Collection:
+    """Expose the review shell to the isolated production gate without promoting it.
+
+    Candidate004 is expected to fail UV/topology/renderer budgets.  Linking the
+    actual renderables into this explicit collection makes that debt measurable
+    and gives later retopo/skin work a stable, non-Unity handoff contract.
+    """
+    old = bpy.data.collections.get("HeroV2_LOD0")
+    if old is not None:
+        bpy.data.collections.remove(old)
+    handoff = bpy.data.collections.new("HeroV2_LOD0")
+    bpy.context.scene.collection.children.link(handoff)
+    for obj in candidate_collection.objects:
+        if not obj.get("aegis_vanguard_candidate") or obj.get("aegis_runtime_anchor"):
+            continue
+        if obj.type != "MESH":
+            raise RuntimeError(
+                f"HeroV2_LOD0 renderable '{obj.name}' must be baked to MESH, got {obj.type}."
+            )
+        handoff.objects.link(obj)
+        obj["hero_v2_asset"] = "suit"
+    return handoff
+
+
 def bone_points(armature: bpy.types.Object, name: str) -> tuple[Vector, Vector]:
     bone = armature.data.bones[name]
     return armature.matrix_world @ bone.head_local, armature.matrix_world @ bone.tail_local
@@ -590,9 +709,9 @@ def build_core(collection, armature, mat) -> None:
         armature, "Chest",
     )
 
-    left_chest = [(0.022, 1.665), (0.255, 1.660), (0.350, 1.585), (0.315, 1.465), (0.185, 1.385), (0.058, 1.410)]
-    left_inset = [(0.095, 1.620), (0.245, 1.610), (0.285, 1.565), (0.250, 1.500), (0.140, 1.455), (0.085, 1.475)]
-    left_rib = [(0.055, 1.390), (0.185, 1.370), (0.275, 1.315), (0.235, 1.270), (0.075, 1.285)]
+    left_chest = [(0.024, 1.682), (0.235, 1.665), (0.338, 1.575), (0.286, 1.448), (0.165, 1.375), (0.050, 1.418)]
+    left_inset = [(0.090, 1.625), (0.220, 1.608), (0.270, 1.558), (0.224, 1.490), (0.128, 1.438), (0.075, 1.478)]
+    left_rib = [(0.050, 1.408), (0.168, 1.382), (0.266, 1.314), (0.214, 1.257), (0.067, 1.287)]
     for side, mirror in (("L", False), ("R", True)):
         chest_points = [(-x, z) for x, z in reversed(left_chest)] if mirror else left_chest
         inset_points = [(-x, z) for x, z in reversed(left_inset)] if mirror else left_inset
@@ -601,14 +720,29 @@ def build_core(collection, armature, mat) -> None:
         parent_to_bone(panel_xz(collection, f"AV_PectoralInset.{side}", inset_points, 0.184, 0.020, mat["teal"], bevel=0.008), armature, "Chest")
         parent_to_bone(panel_xz(collection, f"AV_RibPlate.{side}", rib_points, 0.142, 0.040, mat["ceramic_dark"], bevel=0.012), armature, "Spine")
         sign = 1.0 if side == "L" else -1.0
+        # Narrow overlapping oblique ribs give the torso structural gothic rhythm
+        # without adding symbols or decorative spikes.
+        for rib_index, z in enumerate((1.500, 1.445, 1.390)):
+            inner = 0.070 + rib_index * 0.010
+            outer = 0.238 - rib_index * 0.018
+            gothic_rib = [
+                (inner * sign, z + 0.050),
+                (outer * sign, z + 0.022),
+                ((outer - 0.020) * sign, z - 0.012),
+                ((inner + 0.012) * sign, z - 0.032),
+            ]
+            if side == "R":
+                gothic_rib.reverse()
+            parent_to_bone(panel_xz(collection, f"AV_GothicRib.{side}.{rib_index}", gothic_rib, 0.193, 0.018, mat["steel_dark"], bevel=0.004), armature, "Chest")
         for index, z in enumerate((1.445, 1.565)):
             parent_to_bone(fastener(collection, f"AV_ChestFastener.{side}.{index}", (0.245 * sign, 0.198, z), mat["copper"], 0.010, 0.009), armature, "Chest")
 
-    # Central service channel is the suit's strongest identifying motif.
-    parent_to_bone(panel_xz(collection, "AV_SternumFrame", [(-0.055, 1.665), (0.055, 1.665), (0.072, 1.390), (0.0, 1.335), (-0.072, 1.390)], 0.176, 0.042, mat["steel"], bevel=0.012), armature, "Chest")
-    for index, z in enumerate((1.405, 1.485, 1.565, 1.630)):
-        width = 0.034 if index in (0, 3) else 0.043
-        parent_to_bone(cube(collection, f"AV_ReactorSegment.{index}", (0.0, 0.204, z), (width, 0.012, 0.047), mat["cyan"], bevel=0.006), armature, "Chest")
+    # A deep lancet-shaped sternum keel replaces the bright toy-like button stack.
+    sternum = [(-0.052, 1.682), (0.052, 1.682), (0.066, 1.440), (0.0, 1.332), (-0.066, 1.440)]
+    parent_to_bone(panel_xz(collection, "AV_SternumFrame", sternum, 0.174, 0.050, mat["steel_dark"], bevel=0.009), armature, "Chest")
+    parent_to_bone(panel_xz(collection, "AV_SternumKeel", [(-0.021, 1.648), (0.021, 1.648), (0.032, 1.430), (0.0, 1.362), (-0.032, 1.430)], 0.205, 0.018, mat["ceramic"], bevel=0.004), armature, "Chest")
+    for index, z in enumerate((1.470, 1.585)):
+        parent_to_bone(cube(collection, f"AV_ReactorSegment.{index}", (0.0, 0.220, z), (0.025, 0.010, 0.036), mat["cyan"], bevel=0.004), armature, "Chest")
 
     # Telescoping abdomen and pelvis plates leave black articulation seams visible.
     ab_profiles = (
@@ -621,6 +755,8 @@ def build_core(collection, armature, mat) -> None:
 
     parent_to_bone(panel_xz(collection, "AV_PelvisFront", [(-0.245, 1.115), (0.245, 1.115), (0.205, 0.985), (0.095, 0.940), (-0.095, 0.940), (-0.205, 0.985)], 0.142, 0.052, mat["ceramic"], bevel=0.018), armature, "Hips")
     parent_to_bone(panel_xz(collection, "AV_PelvisInset", [(-0.105, 1.075), (0.105, 1.075), (0.080, 1.000), (0.0, 0.965), (-0.080, 1.000)], 0.174, 0.020, mat["teal"], bevel=0.008), armature, "Hips")
+    parent_to_bone(panel_xz(collection, "AV_PelvisRear", [(-0.228, 1.105), (0.228, 1.105), (0.238, 1.010), (0.135, 0.948), (0.0, 0.925), (-0.135, 0.948), (-0.238, 1.010)], -0.142, 0.052, mat["ceramic_dark"], bevel=0.014), armature, "Hips")
+    parent_to_bone(panel_xz(collection, "AV_LumbarKeel", [(-0.090, 1.265), (0.090, 1.265), (0.105, 1.105), (0.0, 1.050), (-0.105, 1.105)], -0.166, 0.034, mat["steel_dark"], bevel=0.008), armature, "Spine")
     for side, x in (("L", 0.268), ("R", -0.268)):
         parent_to_bone(ellipsoid(collection, f"AV_HipJoint.{side}", (x, 0.0, 1.005), (0.15, 0.22, 0.23), mat["steel_dark"]), armature, "Hips")
         sign = 1.0 if side == "L" else -1.0
@@ -639,33 +775,36 @@ def build_core(collection, armature, mat) -> None:
 def build_head(collection, armature, mat) -> None:
     # Dark pressure shell first, then a faceted ceramic helmet with a narrow
     # three-part optical band.  The asymmetrical brow prevents a generic robot face.
-    parent_to_bone(ellipsoid(collection, "AV_HelmetChassis", (0.0, -0.005, 1.925), (0.292, 0.275, 0.345), mat["steel_dark"]), armature, "Head")
-    parent_to_bone(panel_xz(collection, "AV_HelmetBrow", [(-0.145, 2.075), (-0.040, 2.115), (0.090, 2.100), (0.155, 2.035), (0.135, 1.985), (-0.135, 1.985)], 0.145, 0.074, mat["ceramic"], bevel=0.014), armature, "Head")
-    parent_to_bone(panel_xz(collection, "AV_FacePlate", [(-0.132, 1.975), (0.132, 1.975), (0.115, 1.865), (0.055, 1.805), (-0.055, 1.805), (-0.115, 1.865)], 0.168, 0.068, mat["ceramic_dark"], bevel=0.013), armature, "Head")
-    parent_to_bone(panel_xz(collection, "AV_ChinPlate", [(-0.070, 1.865), (0.070, 1.865), (0.090, 1.815), (0.0, 1.770), (-0.090, 1.815)], 0.202, 0.045, mat["ceramic"], bevel=0.010), armature, "Head")
+    parent_to_bone(ellipsoid(collection, "AV_HelmetChassis", (0.0, -0.012, 1.930), (0.248, 0.232, 0.300), mat["steel_dark"]), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_HelmetOccipital", [(-0.105, 2.052), (0.105, 2.052), (0.126, 1.955), (0.098, 1.842), (0.0, 1.810), (-0.098, 1.842), (-0.126, 1.955)], -0.132, 0.050, mat["ceramic_dark"], bevel=0.008), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_HelmetBrow", [(-0.126, 2.060), (-0.032, 2.092), (0.078, 2.080), (0.136, 2.022), (0.118, 1.982), (-0.118, 1.982)], 0.130, 0.064, mat["ceramic"], bevel=0.010), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_VisorHood", [(-0.132, 2.016), (0.0, 2.038), (0.132, 2.016), (0.116, 1.980), (0.0, 1.968), (-0.116, 1.980)], 0.174, 0.030, mat["steel_dark"], bevel=0.006), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_FacePlate", [(-0.116, 1.970), (0.116, 1.970), (0.098, 1.866), (0.048, 1.812), (-0.048, 1.812), (-0.098, 1.866)], 0.156, 0.058, mat["ceramic_dark"], bevel=0.010), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_ChinPlate", [(-0.060, 1.868), (0.060, 1.868), (0.076, 1.824), (0.0, 1.782), (-0.076, 1.824)], 0.187, 0.038, mat["ceramic"], bevel=0.008), armature, "Head")
     for side, sign in (("L", 1.0), ("R", -1.0)):
-        cheek = [(0.040 * sign, 1.955), (0.125 * sign, 1.965), (0.112 * sign, 1.875), (0.060 * sign, 1.825), (0.025 * sign, 1.865)]
+        cheek = [(0.036 * sign, 1.954), (0.108 * sign, 1.960), (0.097 * sign, 1.880), (0.053 * sign, 1.832), (0.024 * sign, 1.868)]
         if side == "R":
             cheek.reverse()
         parent_to_bone(panel_xz(collection, f"AV_FaceCheek.{side}", cheek, 0.210, 0.025, mat["teal"], bevel=0.006), armature, "Head")
-    parent_to_bone(panel_xz(collection, "AV_OpticalBand", [(-0.138, 2.004), (-0.042, 2.015), (0.010, 2.007), (0.138, 2.020), (0.126, 1.982), (0.010, 1.973), (-0.045, 1.980), (-0.132, 1.970)], 0.210, 0.018, mat["cyan"], bevel=0.005), armature, "Head")
-    for x in (-0.043, 0.012):
-        parent_to_bone(cube(collection, f"AV_OpticDivider.{x:+.3f}", (x, 0.224, 1.994), (0.010, 0.010, 0.047), mat["steel_dark"], bevel=0.003), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_OpticalBand", [(-0.120, 2.003), (-0.036, 2.010), (0.008, 2.004), (0.120, 2.012), (0.111, 1.986), (0.008, 1.978), (-0.038, 1.983), (-0.114, 1.978)], 0.201, 0.014, mat["cyan"], bevel=0.004), armature, "Head")
+    for x in (-0.037, 0.010):
+        parent_to_bone(cube(collection, f"AV_OpticDivider.{x:+.3f}", (x, 0.211, 1.995), (0.007, 0.008, 0.036), mat["steel_dark"], bevel=0.002), armature, "Head")
 
-    parent_to_bone(panel_xz(collection, "AV_HelmetCrown", [(-0.090, 2.115), (0.075, 2.115), (0.115, 2.070), (0.085, 2.035), (-0.085, 2.045), (-0.120, 2.080)], -0.005, 0.245, mat["ceramic"], bevel=0.014), armature, "Head")
-    for side, x in (("L", 0.145), ("R", -0.145)):
-        side_profile = [(-0.105, 2.070), (0.070, 2.050), (0.145, 1.970), (0.110, 1.845), (-0.020, 1.800), (-0.100, 1.865)]
-        parent_to_bone(panel_yz(collection, f"AV_HelmetSide.{side}", side_profile, x, 0.050, mat["teal" if side == "L" else "ceramic"], bevel=0.010), armature, "Head")
-        parent_to_bone(ring(collection, f"AV_HelmetPivot.{side}", (x * 1.10, -0.005, 1.950), 0.052, 0.012, mat["copper"], axis="X"), armature, "Head")
-        parent_to_bone(ellipsoid(collection, f"AV_HelmetPivotCore.{side}", (x * 1.10, -0.005, 1.950), (0.025, 0.065, 0.065), mat["steel"]), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_HelmetCrown", [(-0.068, 2.091), (0.052, 2.091), (0.096, 2.052), (0.064, 2.022), (-0.066, 2.030), (-0.102, 2.064)], -0.020, 0.205, mat["ceramic"], bevel=0.010), armature, "Head")
+    parent_to_bone(panel_xz(collection, "AV_CrownRib", [(-0.012, 2.094), (0.012, 2.094), (0.016, 2.015), (0.0, 1.990), (-0.016, 2.015)], 0.105, 0.018, mat["copper"], bevel=0.003), armature, "Head")
+    for side, x in (("L", 0.112), ("R", -0.112)):
+        side_profile = [(-0.092, 2.054), (0.054, 2.036), (0.124, 1.968), (0.092, 1.856), (-0.018, 1.818), (-0.084, 1.876)]
+        parent_to_bone(panel_yz(collection, f"AV_HelmetSide.{side}", side_profile, x, 0.028, mat["teal" if side == "L" else "ceramic"], bevel=0.006), armature, "Head")
+        parent_to_bone(ring(collection, f"AV_HelmetPivot.{side}", (x * 1.06, -0.010, 1.950), 0.028, 0.006, mat["steel"], axis="X"), armature, "Head")
+        parent_to_bone(ellipsoid(collection, f"AV_HelmetPivotCore.{side}", (x * 1.06, -0.010, 1.950), (0.014, 0.034, 0.034), mat["steel_dark"]), armature, "Head")
 
     # Recessed respirator/vent stack.
-    for index, x in enumerate((-0.042, -0.014, 0.014, 0.042)):
-        parent_to_bone(cube(collection, f"AV_JawVent.{index}", (x, 0.229, 1.842), (0.014, 0.010, 0.040), mat["steel"], bevel=0.003), armature, "Head")
+    for index, x in enumerate((-0.030, -0.010, 0.010, 0.030)):
+        parent_to_bone(cube(collection, f"AV_JawVent.{index}", (x, 0.207, 1.838), (0.009, 0.008, 0.031), mat["steel"], bevel=0.002), armature, "Head")
 
     # Protective collar arcs visually seat the helmet into the torso.
     for side, sign in (("L", 1.0), ("R", -1.0)):
-        collar = [(0.055 * sign, 1.790), (0.245 * sign, 1.760), (0.300 * sign, 1.700), (0.255 * sign, 1.655), (0.105 * sign, 1.685)]
+        collar = [(0.035 * sign, 1.820), (0.210 * sign, 1.785), (0.268 * sign, 1.720), (0.230 * sign, 1.670), (0.075 * sign, 1.710)]
         if side == "R":
             collar.reverse()
         parent_to_bone(panel_xz(collection, f"AV_Collar.{side}", collar, 0.025, 0.235, mat["ceramic_dark"], bevel=0.016), armature, "Chest")
@@ -690,32 +829,32 @@ def build_limb(collection, armature, mat, side: str) -> None:
         parent_to_bone(loft_between(collection, f"AV_{label}Under{suffix}", start, end, [(0.0, radius, radius * 0.92), (0.5, radius * 0.94, radius * 0.88), (1.0, radius * 0.82, radius * 0.82)], mat["undersuit"], vertices=14, exponent=2.2, bevel=0.003), armature, bone)
 
     shoulder = Vector((0.34 * sign, 0.0, 1.61))
-    parent_to_bone(ellipsoid(collection, "AV_ShoulderJoint" + suffix, shoulder, (0.185, 0.190, 0.185), mat["steel_dark"]), armature, "UpperArm" + suffix)
-    pauldron = [(0.250 * sign, 1.690), (0.405 * sign, 1.720), (0.505 * sign, 1.650), (0.485 * sign, 1.555), (0.350 * sign, 1.525), (0.270 * sign, 1.570)]
+    parent_to_bone(ellipsoid(collection, "AV_ShoulderJoint" + suffix, shoulder, (0.128, 0.132, 0.128), mat["steel_dark"]), armature, "UpperArm" + suffix)
+    pauldron = [(0.260 * sign, 1.688), (0.390 * sign, 1.715), (0.465 * sign, 1.653), (0.455 * sign, 1.570), (0.350 * sign, 1.538), (0.278 * sign, 1.575)]
     if side == "R":
         pauldron.reverse()
-    parent_to_bone(panel_xz(collection, "AV_ShoulderShell" + suffix, pauldron, 0.035, 0.235, mat["ceramic"], bevel=0.012), armature, "UpperArm" + suffix)
-    pauldron_inset = [(0.305 * sign, 1.665), (0.405 * sign, 1.685), (0.458 * sign, 1.640), (0.435 * sign, 1.585), (0.350 * sign, 1.565), (0.300 * sign, 1.595)]
+    parent_to_bone(panel_xz(collection, "AV_ShoulderShell" + suffix, pauldron, 0.012, 0.132, mat["ceramic_dark"], bevel=0.008), armature, "UpperArm" + suffix)
+    pauldron_inset = [(0.305 * sign, 1.664), (0.392 * sign, 1.680), (0.430 * sign, 1.640), (0.415 * sign, 1.595), (0.350 * sign, 1.575), (0.305 * sign, 1.600)]
     if side == "R":
         pauldron_inset.reverse()
-    parent_to_bone(panel_xz(collection, "AV_ShoulderChromeBed" + suffix, pauldron_inset, 0.162, 0.030, mat["steel"], bevel=0.006), armature, "UpperArm" + suffix)
+    parent_to_bone(panel_xz(collection, "AV_ShoulderChromeBed" + suffix, pauldron_inset, 0.124, 0.020, mat["steel"], bevel=0.005), armature, "UpperArm" + suffix)
     inset_center_x = sum(x for x, _z in pauldron_inset) / len(pauldron_inset)
     inset_center_z = sum(z for _x, z in pauldron_inset) / len(pauldron_inset)
     carbon_inset = [
         (inset_center_x + (x - inset_center_x) * 0.88, inset_center_z + (z - inset_center_z) * 0.82)
         for x, z in pauldron_inset
     ]
-    parent_to_bone(panel_xz(collection, "AV_ShoulderInset" + suffix, carbon_inset, 0.181, 0.018, mat["teal"], bevel=0.005), armature, "UpperArm" + suffix)
-    upper_layer = [(0.285 * sign, 1.710), (0.400 * sign, 1.742), (0.505 * sign, 1.685), (0.480 * sign, 1.640), (0.365 * sign, 1.665)]
-    middle_layer = [(0.310 * sign, 1.655), (0.475 * sign, 1.655), (0.490 * sign, 1.595), (0.350 * sign, 1.575), (0.300 * sign, 1.605)]
-    lower_layer = [(0.315 * sign, 1.595), (0.455 * sign, 1.585), (0.445 * sign, 1.525), (0.345 * sign, 1.495), (0.300 * sign, 1.535)]
+    parent_to_bone(panel_xz(collection, "AV_ShoulderInset" + suffix, carbon_inset, 0.139, 0.012, mat["teal"], bevel=0.004), armature, "UpperArm" + suffix)
+    upper_layer = [(0.290 * sign, 1.706), (0.385 * sign, 1.732), (0.465 * sign, 1.682), (0.445 * sign, 1.645), (0.360 * sign, 1.665)]
+    middle_layer = [(0.310 * sign, 1.650), (0.440 * sign, 1.650), (0.450 * sign, 1.602), (0.350 * sign, 1.585), (0.305 * sign, 1.608)]
+    lower_layer = [(0.315 * sign, 1.600), (0.425 * sign, 1.590), (0.418 * sign, 1.542), (0.345 * sign, 1.515), (0.305 * sign, 1.545)]
     if side == "R":
         upper_layer.reverse()
         middle_layer.reverse()
         lower_layer.reverse()
-    parent_to_bone(panel_xz(collection, "AV_ShoulderLayerUpper" + suffix, upper_layer, 0.188, 0.026, mat["ceramic"], bevel=0.007), armature, "UpperArm" + suffix)
-    parent_to_bone(panel_xz(collection, "AV_ShoulderLayerMiddle" + suffix, middle_layer, 0.193, 0.024, mat["ceramic_dark"], bevel=0.006), armature, "UpperArm" + suffix)
-    parent_to_bone(panel_xz(collection, "AV_ShoulderLayerLower" + suffix, lower_layer, 0.198, 0.022, mat["ceramic"], bevel=0.006), armature, "UpperArm" + suffix)
+    parent_to_bone(panel_xz(collection, "AV_ShoulderLayerUpper" + suffix, upper_layer, 0.146, 0.020, mat["ceramic"], bevel=0.006), armature, "UpperArm" + suffix)
+    parent_to_bone(panel_xz(collection, "AV_ShoulderLayerMiddle" + suffix, middle_layer, 0.151, 0.018, mat["ceramic_dark"], bevel=0.005), armature, "UpperArm" + suffix)
+    parent_to_bone(panel_xz(collection, "AV_ShoulderLayerLower" + suffix, lower_layer, 0.156, 0.017, mat["ceramic"], bevel=0.005), armature, "UpperArm" + suffix)
 
     upper_span_start = upper_start.lerp(upper_end, 0.10)
     upper_span_end = upper_start.lerp(upper_end, 0.80)
@@ -724,7 +863,9 @@ def build_limb(collection, armature, mat, side: str) -> None:
     upper_plate = [(top.x - 0.082, top.z - 0.045), (top.x + 0.082, top.z - 0.045), (bottom.x + 0.060, bottom.z + 0.060), (bottom.x, bottom.z + 0.025), (bottom.x - 0.060, bottom.z + 0.060)]
     parent_to_bone(panel_xz(collection, "AV_UpperArmPlate" + suffix, upper_plate, 0.090, 0.036, mat["teal"], bevel=0.007), armature, "UpperArm" + suffix)
 
-    parent_to_bone(ellipsoid(collection, "AV_Elbow" + suffix, upper_end, (0.155, 0.160, 0.155), mat["steel"]), armature, "LowerArm" + suffix)
+    parent_to_bone(ellipsoid(collection, "AV_Elbow" + suffix, upper_end, (0.132, 0.136, 0.132), mat["steel_dark"]), armature, "LowerArm" + suffix)
+    elbow_x = upper_end.x + sign * 0.105
+    parent_to_bone(panel_yz(collection, "AV_ElbowCup" + suffix, [(-0.070, upper_end.z + 0.070), (0.055, upper_end.z + 0.055), (0.078, upper_end.z - 0.025), (0.0, upper_end.z - 0.082), (-0.062, upper_end.z - 0.030)], elbow_x, 0.032, mat["ceramic"], bevel=0.006), armature, "LowerArm" + suffix)
     for ring_index, t in enumerate((0.03, 0.09, 0.15)):
         a = lower_start.lerp(lower_end, t)
         b = lower_start.lerp(lower_end, t + 0.025)
@@ -742,9 +883,10 @@ def build_limb(collection, armature, mat, side: str) -> None:
     # Glove: tapered palm, dorsal plate, curled two-link fingers and an angled thumb.
     palm_start = hand_start.lerp(hand_end, 0.05)
     palm_end = hand_start.lerp(hand_end, 0.55)
-    parent_to_bone(loft_between(collection, "AV_HandPalm" + suffix, palm_start, palm_end, [(0.0, 0.072, 0.070), (1.0, 0.060, 0.062)], mat["steel_dark"], vertices=12, bevel=0.004), armature, "Hand" + suffix)
+    parent_to_bone(loft_between(collection, "AV_HandPalm" + suffix, palm_start, palm_end, [(0.0, 0.076, 0.073), (1.0, 0.064, 0.065)], mat["rubber"], vertices=12, bevel=0.004), armature, "Hand" + suffix)
     hand_mid = palm_start.lerp(palm_end, 0.45)
-    parent_to_bone(cube(collection, "AV_Gauntlet" + suffix, tuple(hand_mid + Vector((0.0, 0.068, 0.0))), (0.125, 0.030, 0.105), mat["ceramic"], bevel=0.008), armature, "Hand" + suffix)
+    parent_to_bone(cube(collection, "AV_Gauntlet" + suffix, tuple(hand_mid + Vector((0.0, 0.062, 0.0))), (0.124, 0.026, 0.098), mat["ceramic"], bevel=0.007), armature, "Hand" + suffix)
+    parent_to_bone(cube(collection, "AV_KnuckleBridge" + suffix, tuple(hand_mid + Vector((0.0, 0.084, -0.025))), (0.118, 0.016, 0.034), mat["steel_dark"], bevel=0.005), armature, "Hand" + suffix)
     for knuckle in range(4):
         parent_to_bone(cube(collection, f"AV_Knuckle{knuckle}{suffix}", (hand_mid.x - 0.043 + knuckle * 0.029, hand_mid.y + 0.089, hand_mid.z - 0.028), (0.021, 0.012, 0.030), mat["teal"], bevel=0.004), armature, "Hand" + suffix)
     for finger in range(4):
@@ -752,11 +894,12 @@ def build_limb(collection, armature, mat, side: str) -> None:
         first_start = hand_end + Vector((x_offset, 0.012, 0.035))
         first_end = first_start + Vector((0.0, 0.020, -0.052))
         second_end = first_end + Vector((0.0, 0.032, -0.042))
-        parent_to_bone(cylinder_between(collection, f"AV_FingerA{finger}{suffix}", first_start, first_end, 0.012, mat["steel"], vertices=12), armature, "Hand" + suffix)
-        parent_to_bone(cylinder_between(collection, f"AV_FingerB{finger}{suffix}", first_end, second_end, 0.010, mat["steel_dark"], vertices=12), armature, "Hand" + suffix)
+        parent_to_bone(loft_between(collection, f"AV_FingerA{finger}{suffix}", first_start, first_end, [(0.0, 0.019, 0.017), (1.0, 0.016, 0.014)], mat["ceramic_dark"], vertices=10, exponent=2.4, bevel=0.002), armature, "Hand" + suffix)
+        parent_to_bone(loft_between(collection, f"AV_FingerB{finger}{suffix}", first_end, second_end, [(0.0, 0.013, 0.012), (1.0, 0.010, 0.009)], mat["ceramic_dark"], vertices=10, exponent=2.4, bevel=0.002), armature, "Hand" + suffix)
+        parent_to_bone(ellipsoid(collection, f"AV_Fingertip{finger}{suffix}", second_end, (0.016, 0.018, 0.014), mat["ceramic"]), armature, "Hand" + suffix)
     thumb_start = hand_start.lerp(hand_end, 0.42) + Vector((0.066 * sign, 0.015, 0.015))
     thumb_end = thumb_start + Vector((0.045 * sign, 0.035, -0.050))
-    parent_to_bone(cylinder_between(collection, "AV_Thumb" + suffix, thumb_start, thumb_end, 0.014, mat["steel"], vertices=12), armature, "Hand" + suffix)
+    parent_to_bone(cylinder_between(collection, "AV_Thumb" + suffix, thumb_start, thumb_end, 0.017, mat["ceramic_dark"], vertices=12), armature, "Hand" + suffix)
 
     # Athletic powered legs: large proximal masses, narrow joints, tapered ankles.
     thigh_span_start = upper_leg_start.lerp(upper_leg_end, 0.08)
@@ -768,7 +911,7 @@ def build_limb(collection, armature, mat, side: str) -> None:
     outer_x = (top.x + bottom.x) * 0.5 + sign * 0.130
     parent_to_bone(panel_yz(collection, "AV_ThighOuter" + suffix, [(-0.095, top.z - 0.070), (0.070, top.z - 0.095), (0.115, bottom.z + 0.110), (-0.055, bottom.z + 0.070)], outer_x, 0.040, mat["teal"], bevel=0.008), armature, "UpperLeg" + suffix)
 
-    parent_to_bone(ellipsoid(collection, "AV_KneeJoint" + suffix, upper_leg_end, (0.165, 0.170, 0.155), mat["steel"]), armature, "LowerLeg" + suffix)
+    parent_to_bone(ellipsoid(collection, "AV_KneeJoint" + suffix, upper_leg_end, (0.145, 0.148, 0.138), mat["steel_dark"]), armature, "LowerLeg" + suffix)
     knee = upper_leg_end
     knee_plate = [(knee.x - 0.092, knee.z + 0.080), (knee.x + 0.092, knee.z + 0.080), (knee.x + 0.075, knee.z - 0.040), (knee.x, knee.z - 0.105), (knee.x - 0.075, knee.z - 0.040)]
     parent_to_bone(panel_xz(collection, "AV_KneeGuard" + suffix, knee_plate, 0.147, 0.060, mat["ceramic"], bevel=0.010), armature, "LowerLeg" + suffix)
@@ -784,20 +927,21 @@ def build_limb(collection, armature, mat, side: str) -> None:
     shin_plate = [(top.x - 0.088, top.z - 0.065), (top.x + 0.088, top.z - 0.065), (bottom.x + 0.060, bottom.z + 0.060), (bottom.x, bottom.z + 0.018), (bottom.x - 0.060, bottom.z + 0.060)]
     parent_to_bone(panel_xz(collection, "AV_ShinPlate" + suffix, shin_plate, 0.143, 0.045, mat["ceramic"], bevel=0.009), armature, "LowerLeg" + suffix)
 
-    foot_center = Vector((0.17 * sign, 0.105, 0.105))
-    boot_profile = [(-0.115, 0.175), (0.055, 0.220), (0.275, 0.145), (0.300, 0.072), (0.235, 0.042), (-0.120, 0.042)]
-    parent_to_bone(panel_yz(collection, "AV_BootBody" + suffix, boot_profile, foot_center.x, 0.205, mat["ceramic_dark"], bevel=0.010), armature, "Foot" + suffix)
-    toe_profile = [(0.035, 0.175), (0.270, 0.140), (0.292, 0.082), (0.225, 0.060), (0.020, 0.082)]
-    parent_to_bone(panel_yz(collection, "AV_BootToe" + suffix, toe_profile, foot_center.x, 0.180, mat["ceramic"], bevel=0.008), armature, "Foot" + suffix)
-    toe_inset = [(0.070, 0.145), (0.245, 0.118), (0.260, 0.086), (0.205, 0.072), (0.060, 0.090)]
-    parent_to_bone(panel_yz(collection, "AV_BootToeInset" + suffix, toe_inset, foot_center.x, 0.188, mat["teal"], bevel=0.005), armature, "Foot" + suffix)
-    parent_to_bone(cube(collection, "AV_BootCuff" + suffix, (foot_center.x, -0.035, 0.205), (0.180, 0.175, 0.095), mat["teal"], bevel=0.010), armature, "Foot" + suffix)
+    foot_center = Vector((0.17 * sign, 0.095, 0.105))
+    boot_profile = [(-0.105, 0.182), (0.040, 0.216), (0.242, 0.142), (0.275, 0.080), (0.215, 0.045), (-0.112, 0.045)]
+    parent_to_bone(panel_yz(collection, "AV_BootBody" + suffix, boot_profile, foot_center.x, 0.172, mat["ceramic_dark"], bevel=0.009), armature, "Foot" + suffix)
+    toe_profile = [(0.028, 0.172), (0.235, 0.138), (0.264, 0.086), (0.205, 0.060), (0.018, 0.082)]
+    parent_to_bone(panel_yz(collection, "AV_BootToe" + suffix, toe_profile, foot_center.x, 0.160, mat["ceramic"], bevel=0.007), armature, "Foot" + suffix)
+    toe_inset = [(0.060, 0.142), (0.215, 0.116), (0.238, 0.088), (0.188, 0.073), (0.052, 0.090)]
+    parent_to_bone(panel_yz(collection, "AV_BootToeInset" + suffix, toe_inset, foot_center.x, 0.166, mat["teal"], bevel=0.004), armature, "Foot" + suffix)
+    cuff_profile = [(-0.128, 0.238), (0.020, 0.225), (0.065, 0.170), (0.025, 0.125), (-0.110, 0.145)]
+    parent_to_bone(panel_yz(collection, "AV_BootCuff" + suffix, cuff_profile, foot_center.x, 0.155, mat["teal"], bevel=0.006), armature, "Foot" + suffix)
     heel_profile = [(-0.165, 0.165), (-0.060, 0.200), (0.018, 0.160), (0.005, 0.062), (-0.145, 0.046)]
-    parent_to_bone(panel_yz(collection, "AV_BootHeel" + suffix, heel_profile, foot_center.x, 0.185, mat["ceramic_dark"], bevel=0.008), armature, "Foot" + suffix)
-    sole_profile = [(-0.165, 0.055), (0.255, 0.055), (0.325, 0.036), (0.312, 0.006), (-0.135, 0.006), (-0.178, 0.024)]
-    parent_to_bone(panel_yz(collection, "AV_Sole" + suffix, sole_profile, foot_center.x, 0.212, mat["steel_dark"], bevel=0.006), armature, "Foot" + suffix)
+    parent_to_bone(panel_yz(collection, "AV_BootHeel" + suffix, heel_profile, foot_center.x, 0.165, mat["ceramic_dark"], bevel=0.007), armature, "Foot" + suffix)
+    sole_profile = [(-0.155, 0.055), (0.235, 0.055), (0.285, 0.036), (0.275, 0.006), (-0.130, 0.006), (-0.168, 0.024)]
+    parent_to_bone(panel_yz(collection, "AV_Sole" + suffix, sole_profile, foot_center.x, 0.174, mat["steel_dark"], bevel=0.005), armature, "Foot" + suffix)
     for tread in range(4):
-        parent_to_bone(cube(collection, f"AV_BootTread{tread}{suffix}", (foot_center.x, -0.065 + tread * 0.100, -0.004), (0.190, 0.055, 0.018), mat["rubber"], bevel=0.003), armature, "Foot" + suffix)
+        parent_to_bone(cube(collection, f"AV_BootTread{tread}{suffix}", (foot_center.x, -0.058 + tread * 0.088, -0.004), (0.164, 0.048, 0.016), mat["rubber"], bevel=0.003), armature, "Foot" + suffix)
     parent_to_bone(ring(collection, "AV_BootThrusterRing" + suffix, (foot_center.x, -0.137, 0.115), 0.044, 0.010, mat["copper"], axis="Y"), armature, "Foot" + suffix)
     parent_to_bone(ellipsoid(collection, "AV_BootThrusterCore" + suffix, (foot_center.x, -0.128, 0.115), (0.052, 0.018, 0.052), mat["cyan"]), armature, "Foot" + suffix)
 
@@ -807,25 +951,53 @@ def build_backpack(collection, armature, mat) -> None:
     # occupying the center-back path used by the stowed precision rifle.
     parent_to_bone(panel_xz(collection, "AV_BackpackSpine", [(-0.105, 1.715), (0.105, 1.715), (0.120, 1.325), (0.0, 1.255), (-0.120, 1.325)], -0.270, 0.105, mat["steel_dark"], bevel=0.012), armature, "Chest")
     parent_to_bone(panel_xz(collection, "AV_BackpackSpineInset", [(-0.065, 1.670), (0.065, 1.670), (0.070, 1.360), (0.0, 1.305), (-0.070, 1.360)], -0.329, 0.018, mat["teal"], bevel=0.006), armature, "Chest")
-    for index, z in enumerate((1.385, 1.465, 1.545, 1.625)):
-        parent_to_bone(cube(collection, f"AV_BackpackStatus.{index}", (0.0, -0.345, z), (0.030, 0.010, 0.043), mat["cyan" if index in (0, 3) else "ceramic"], bevel=0.004), armature, "Chest")
+    for index, z in enumerate((1.405, 1.535, 1.635)):
+        parent_to_bone(cube(collection, f"AV_BackpackStatus.{index}", (0.0, -0.345, z), (0.022, 0.008, 0.034), mat["cyan" if index == 1 else "ceramic"], bevel=0.003), armature, "Chest")
     for side, x in (("L", 0.450), ("R", -0.450)):
+        sign = 1.0 if side == "L" else -1.0
         center = Vector((x, -0.245, 1.570))
         start = center + Vector((0.0, -0.115, 0.0))
         end = center + Vector((0.0, 0.105, 0.0))
-        parent_to_bone(cylinder_between(collection, f"AV_TurbineNacelle.{side}", start, end, 0.145, mat["steel_dark"], radial_scale=(1.0, 1.0), vertices=32), armature, "Chest")
-        parent_to_bone(ring(collection, f"AV_TurbineOuterRim.{side}", (x, -0.374, 1.570), 0.123, 0.018, mat["ceramic"], axis="Y"), armature, "Chest")
-        parent_to_bone(ring(collection, f"AV_TurbineTealRing.{side}", (x, -0.365, 1.570), 0.093, 0.013, mat["teal"], axis="Y"), armature, "Chest")
-        parent_to_bone(ellipsoid(collection, f"AV_TurbineThroat.{side}", (x, -0.347, 1.570), (0.205, 0.030, 0.205), mat["rubber"]), armature, "Chest")
-        for fin in range(10):
-            angle = math.tau * fin / 10.0 + 0.12
-            radial = 0.072
-            fin_center = (x + math.cos(angle) * radial, -0.359, 1.570 + math.sin(angle) * radial)
-            parent_to_bone(cube(collection, f"AV_TurbineBlade.{side}.{fin}", fin_center, (0.058, 0.010, 0.014), mat["steel"], rotation=(0.0, -angle - 0.34, 0.0), bevel=0.003), armature, "Chest")
-        parent_to_bone(ring(collection, f"AV_TurbineHubRing.{side}", (x, -0.352, 1.570), 0.035, 0.008, mat["steel"], axis="Y"), armature, "Chest")
-        parent_to_bone(ellipsoid(collection, f"AV_TurbineCore.{side}", (x, -0.350, 1.570), (0.048, 0.012, 0.048), mat["cyan"]), armature, "Chest")
+        parent_to_bone(cylinder_between(collection, f"AV_TurbineNacelle.{side}", start, end, 0.118, mat["soot"], radial_scale=(1.0, 1.0), vertices=32), armature, "Chest")
+        # The annular unit is buried behind an angular shroud instead of reading
+        # as a bright cartoon eye.  Its lip is nearest the rear camera; blades
+        # and hub are progressively recessed toward +Y.
+        parent_to_bone(ring(collection, f"AV_TurbineOuterRim.{side}", (x, -0.382, 1.570), 0.096, 0.013, mat["steel_dark"], axis="Y"), armature, "Chest")
+        parent_to_bone(ring(collection, f"AV_TurbineHeatRing.{side}", (x, -0.371, 1.570), 0.073, 0.007, mat["copper"], axis="Y"), armature, "Chest")
+        parent_to_bone(ellipsoid(collection, f"AV_TurbineThroat.{side}", (x, -0.349, 1.570), (0.158, 0.024, 0.158), mat["soot"]), armature, "Chest")
+        for fin in range(12):
+            angle = math.tau * fin / 12.0 + 0.12
+            radial = 0.055
+            fin_center = (x + math.cos(angle) * radial, -0.360, 1.570 + math.sin(angle) * radial)
+            parent_to_bone(cube(collection, f"AV_TurbineBlade.{side}.{fin}", fin_center, (0.041, 0.006, 0.009), mat["steel_dark"], rotation=(0.0, -angle - 0.34, 0.0), bevel=0.002), armature, "Chest")
+        parent_to_bone(ring(collection, f"AV_TurbineHubRing.{side}", (x, -0.351, 1.570), 0.025, 0.005, mat["steel"], axis="Y"), armature, "Chest")
+        parent_to_bone(ellipsoid(collection, f"AV_TurbineCore.{side}", (x, -0.345, 1.570), (0.027, 0.008, 0.027), mat["cyan"]), armature, "Chest")
 
-        sign = 1.0 if side == "L" else -1.0
+        upper_shroud = [
+            (0.285 * sign, 1.715), (0.400 * sign, 1.765),
+            (0.575 * sign, 1.720), (0.615 * sign, 1.635),
+            (0.548 * sign, 1.650), (0.455 * sign, 1.692),
+            (0.330 * sign, 1.660),
+        ]
+        lower_shroud = [
+            (0.300 * sign, 1.485), (0.405 * sign, 1.445),
+            (0.525 * sign, 1.445), (0.590 * sign, 1.500),
+            (0.607 * sign, 1.575), (0.550 * sign, 1.535),
+            (0.445 * sign, 1.505), (0.335 * sign, 1.535),
+        ]
+        outer_buttress = [
+            (0.545 * sign, 1.690), (0.625 * sign, 1.625),
+            (0.615 * sign, 1.465), (0.570 * sign, 1.405),
+            (0.535 * sign, 1.470), (0.555 * sign, 1.570),
+        ]
+        if side == "R":
+            upper_shroud.reverse()
+            lower_shroud.reverse()
+            outer_buttress.reverse()
+        parent_to_bone(panel_xz(collection, f"AV_TurbineShroudUpper.{side}", upper_shroud, -0.386, 0.052, mat["ceramic"], bevel=0.007), armature, "Chest")
+        parent_to_bone(panel_xz(collection, f"AV_TurbineShroudLower.{side}", lower_shroud, -0.386, 0.048, mat["ceramic_dark"], bevel=0.007), armature, "Chest")
+        parent_to_bone(panel_xz(collection, f"AV_TurbineButtress.{side}", outer_buttress, -0.395, 0.035, mat["steel_dark"], bevel=0.005), armature, "Chest")
+
         outer_profile = [(0.285 * sign, 1.705), (0.555 * sign, 1.690), (0.605 * sign, 1.600), (0.585 * sign, 1.420), (0.505 * sign, 1.355), (0.320 * sign, 1.405)]
         if side == "R":
             outer_profile.reverse()
@@ -842,9 +1014,9 @@ def add_studio(collection, mat) -> tuple[bpy.types.Object, list[bpy.types.Object
     ground["aegis_studio_only"] = True
     lights = []
     for name, location, energy, color, size in (
-        ("AV_Key", (3.5, 4.0, 4.2), 720.0, (1.0, 0.92, 0.82), 2.4),
-        ("AV_Fill", (-3.8, 2.7, 3.0), 360.0, (0.50, 0.68, 1.0), 2.7),
-        ("AV_Rim", (0.0, -3.8, 3.6), 980.0, (0.24, 0.62, 1.0), 2.0),
+        ("AV_Key", (3.2, 3.7, 3.8), 660.0, (1.0, 0.78, 0.62), 1.55),
+        ("AV_Fill", (-3.4, 2.4, 2.8), 165.0, (0.40, 0.58, 1.0), 2.15),
+        ("AV_Rim", (0.2, -3.5, 3.2), 920.0, (0.18, 0.52, 1.0), 1.15),
     ):
         data = bpy.data.lights.new(name, "AREA")
         data.energy = energy
@@ -876,7 +1048,7 @@ def render_views(collection: bpy.types.Collection, lights: list[bpy.types.Object
         world_background.inputs["Color"].default_value = (0.025, 0.030, 0.040, 1.0)
         world_background.inputs["Strength"].default_value = 0.28
     scene.view_settings.look = "AgX - Medium High Contrast"
-    scene.view_settings.exposure = -0.55
+    scene.view_settings.exposure = -0.78
     scene.render.image_settings.color_mode = "RGBA"
 
     camera_data = bpy.data.cameras.new("AV_ReviewCamera")
@@ -1009,8 +1181,10 @@ def main() -> None:
     build_limb(collection, armature, mat, "L")
     build_limb(collection, armature, mat, "R")
     build_backpack(collection, armature, mat)
+    converted_curve_count = convert_candidate_curves_to_mesh(collection)
     create_runtime_anchors(collection)
     _ground, lights = add_studio(collection, mat)
+    create_hero_v2_lod0_handoff(collection)
 
     CANDIDATE_BLEND.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(CANDIDATE_BLEND), check_existing=False)
@@ -1063,7 +1237,7 @@ def main() -> None:
             "position_error_m": error,
         }
     report = {
-        "candidate": "Aegis Vanguard Candidate003",
+        "candidate": "Aegis Vanguard Candidate004",
         "status": "REVIEW_ONLY_NOT_UNITY_INTEGRATED",
         "source_blend": str(LEGACY_BLEND),
         "source_sha256_before": legacy_hash_before,
@@ -1074,6 +1248,7 @@ def main() -> None:
         "candidate_objects": len(candidate_objects),
         "candidate_mesh_objects": len(mesh_objects),
         "candidate_curve_objects": len(curve_objects),
+        "candidate_curves_baked_to_mesh": converted_curve_count,
         "candidate_polygons": polygon_count,
         "candidate_mesh_triangles_estimate": triangle_count,
         "armature": armature.name,
@@ -1083,7 +1258,8 @@ def main() -> None:
         "render_paths": [str(path) for path in render_paths],
         "limitations": [
             "Procedural concept maquette; not final production topology, UVs, texture bake, or skin deformation.",
-            "Selected action poses are rendered for review, but geometric intersection gates remain pending.",
+            "Selected poses are rendered, but the separate 24-action weapon-clearance gate must pass before promotion.",
+            "HeroV2_LOD0 is a measurable production handoff, not evidence that UV, topology, renderer, or LOD gates pass.",
             "No Unity prefab or FBX was replaced.",
         ],
     }

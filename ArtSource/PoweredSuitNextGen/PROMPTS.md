@@ -49,3 +49,63 @@ chrome. Premium physically based real-time character rendering. No ivory or whit
 armor, no gold, no logos, no text, no watermark, no franchise-specific shapes.
 
 Output: `Concepts/aegis_vanguard_black_chrome_v002.png`.
+
+## Adult gritty industrial-gothic front target
+
+Mode: built-in OpenAI image generation.
+
+Exact prompt:
+
+> Use case: precise-object-edit. Asset type: authoritative high-fidelity
+> game-character target for the Aegis Vanguard HeroV2 production model. Image 1
+> is the edit target. Primary request: make this exact powered-suit design feel
+> more adult, severe, gritty, and subtly industrial-gothic while remaining an
+> original practical military exosuit. Preserve the same character identity,
+> athletic human proportions, black/carbon/chrome palette, cyan optical slit,
+> precision rifle, neutral ready pose, full-body framing, camera, and dark
+> hangar. Refine the silhouette with a slightly smaller/narrower helmet, longer
+> and more anatomical torso, realistic hands and tapered combat boots, denser
+> overlapping armor hierarchy, deeper recessed joints, and three articulated
+> shoulder tiers that clear the rifle. Add restrained gothic engineering
+> language through vertical cathedral-like ribs, narrow lancet-shaped vents,
+> fluted exhaust shrouds, angular gorget plates, and buttressed mechanical load
+> paths-functional structure, not costume decoration. Materials: soot-dark
+> satin armor, clearly woven carbon-fibre undersuit and cable jackets, tarnished
+> cold chrome at pivots/trim/fasteners, heat-darkened turbine hardware, sparse
+> cyan emission. Add believable battle wear: chipped black coating at exposed
+> edges, fine scratches, oil residue at joints, soot near exhausts, grime in
+> recesses, subtle dents and uneven roughness. Lighting/mood: low-key cinematic
+> industrial lighting with enough rim light to read every black layer.
+> Constraints: keep the rifle unobstructed; no skulls, crosses, spikes, capes,
+> cloth robes, fantasy weapons, gold, white armor, logos, text, watermark,
+> franchise-specific shapes, oversized cartoon boots, toy-like hands, or glossy
+> plastic surfaces. Do not add extra characters or props.
+
+Output: `Concepts/aegis_vanguard_gothic_grit_v003.png`.
+
+## Adult gritty industrial-gothic rear target
+
+Mode: built-in OpenAI image generation.
+
+Exact prompt:
+
+> Use case: stylized-concept. Asset type: authoritative rear three-quarter
+> game-character design sheet for Aegis Vanguard HeroV2. Input image: Image 1 is
+> the exact identity, materials, proportions, wear language, and quality
+> reference; do not redesign the character. Primary request: show the same adult
+> gritty industrial-gothic powered suit from a full-body rear three-quarter view
+> in the same dark hangar, with the precision rifle docked diagonally on the back
+> in a visibly engineered clearance channel. Expose two compact annular dorsal
+> turbines recessed deeply inside angular soot-dark shrouds, spaced outboard of
+> the rifle corridor, with fluted exhaust vanes, tarnished chrome load braces,
+> braided carbon-fibre feeds, restrained heat staining, and exact practical boot
+> thruster hardware. Show layered shoulder armor from behind, spinal load-bearing
+> keel, carbon undersuit, believable joint gaps, tapered boots, oil/grime/
+> scratches, and sparse cyan status emission. Composition: full body entirely
+> visible, camera near chest height, clear readable silhouette, no extreme
+> foreshortening. Constraints: preserve the front target's identity and palette;
+> rifle must not intersect turbines, spine, shoulders, or arms; no skulls,
+> crosses, spikes, capes, robes, gold, white armor, logos, text, watermark, extra
+> characters, or franchise-specific shapes.
+
+Output: `Concepts/aegis_vanguard_gothic_grit_rear_v003.png`.

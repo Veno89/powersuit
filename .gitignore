@@ -52,6 +52,8 @@ crashlytics-build.properties
 !/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_blockout_v002/*.png
 !/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_candidate_v003/
 !/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_candidate_v003/*.png
+!/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_candidate_v004/
+!/ArtSource/PoweredSuitNextGen/renders/aegis_vanguard_candidate_v004/*.png
 
 # Immutable, approved validation evidence is deliberately versioned.
 !/ArtSource/PoweredSuit/Validation/Generator109/renders/
