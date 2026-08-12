@@ -1,0 +1,6513 @@
+{
+  "schema_version": 2,
+  "gate": "AEGIS_WEAPON_SUIT_CLEARANCE",
+  "status": "FAIL",
+  "generated_utc": "2026-08-12T14:58:11.628104+00:00",
+  "blender_version": "5.2.0",
+  "candidate_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\aegis_vanguard_candidate_v005.blend",
+  "candidate_blend_sha256_before": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+  "candidate_blend_sha256_after": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+  "candidate_blend_preserved": true,
+  "sample_mode": "authored_keyframes",
+  "collision_geometry_source": "visible",
+  "collision_geometry_scope": "actual visible candidate render geometry",
+  "armature": "PowerSuit_Armature",
+  "candidate_collision_objects": 3,
+  "rifle_collision_objects": 55,
+  "dynamic_collision_objects": [
+    "H2_Armor_LOD0",
+    "H2_Emission_LOD0",
+    "H2_Undersuit_LOD0"
+  ],
+  "action_count": 24,
+  "sampled_frame_count": 162,
+  "allowed_contact_instances": 0,
+  "forbidden_intersection_instances": 3894,
+  "forbidden_object_pair_groups": 72,
+  "contact_classification_counts": {
+    "forbidden_weapon_suit_intersection": 3894
+  },
+  "contact_policy": {
+    "allowed": [
+      "primary-grip components against Hand.R geometry",
+      "support-grip components against Hand.L geometry",
+      "Rifle_Stock_ButtPad against the authored right shoulder/chest stock zone in ready-action families"
+    ],
+    "forbidden": [
+      "all other rifle/suit triangle crossings or detected containment",
+      "all stowed-rifle contacts with backpack/armor geometry",
+      "all draw/sheathe sweep contacts outside matching hand grips"
+    ]
+  },
+  "actions": [
+    {
+      "action": "PS_Aim",
+      "sample_frames": [
+        1,
+        15,
+        30
+      ],
+      "sample_count": 3,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 58,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Backward",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 174,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Forward",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 174,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Left",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 171,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Right",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 184,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_BoltCycle",
+      "sample_frames": [
+        1,
+        4,
+        8,
+        12,
+        16,
+        20
+      ],
+      "sample_count": 6,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 182,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Hover",
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "sample_count": 3,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 114,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Idle",
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "sample_count": 3,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 121,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Reload",
+      "sample_frames": [
+        1,
+        14,
+        25,
+        36,
+        50,
+        64,
+        75,
+        84
+      ],
+      "sample_count": 8,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 187,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Run_Forward",
+      "sample_frames": [
+        1,
+        4,
+        6,
+        9,
+        11,
+        14,
+        16,
+        19,
+        21
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 240,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk",
+      "sample_frames": [
+        1,
+        8,
+        16,
+        24,
+        31
+      ],
+      "sample_count": 5,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 189,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Backward",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 237,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Forward",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 237,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Left",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 225,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Right",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 234,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponReady_Idle",
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "sample_count": 3,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 78,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Hover",
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "sample_count": 3,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 58,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Idle",
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "sample_count": 3,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 50,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Backward",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 195,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Forward",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 195,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Left",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 205,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Right",
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "sample_count": 9,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 198,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Weapon_Draw",
+      "sample_frames": [
+        1,
+        10,
+        18,
+        30
+      ],
+      "sample_count": 4,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 94,
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Weapon_Sheathe",
+      "sample_frames": [
+        1,
+        13,
+        21,
+        30
+      ],
+      "sample_count": 4,
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 94,
+      "status": "FAIL"
+    }
+  ],
+  "allowed_groups": [],
+  "forbidden_groups": [
+    {
+      "weapon_object": "Rifle_Receiver_Core",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 162,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 541,
+      "max_aabb_overlap_min_axis_m": 0.35321,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Receiver_LowerSpine",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 162,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 268,
+      "max_aabb_overlap_min_axis_m": 0.218778,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_PistolGrip",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 161,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 294,
+      "max_aabb_overlap_min_axis_m": 0.156086,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Magazine",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 158,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          31
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          8,
+          16,
+          24
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 275,
+      "max_aabb_overlap_min_axis_m": 0.168929,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_GripBackstrap",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 158,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 115,
+      "max_aabb_overlap_min_axis_m": 0.134999,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Magazine_Base",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 152,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          16
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 140,
+      "max_aabb_overlap_min_axis_m": 0.090489,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Trigger",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 148,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          31
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 62,
+      "max_aabb_overlap_min_axis_m": 0.057429,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_SupportGrip",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 147,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          16
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 70,
+      "max_aabb_overlap_min_axis_m": 0.107799,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_SupportGrip_Mount",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 143,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 26,
+      "max_aabb_overlap_min_axis_m": 0.052152,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_ButtPad",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 127,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 180,
+      "max_aabb_overlap_min_axis_m": 0.121759,
+      "reason": "Buttpad intersects outside the ready-action right shoulder docking zone."
+    },
+    {
+      "weapon_object": "Rifle_TriggerGuard",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 127,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 183,
+      "max_aabb_overlap_min_axis_m": 0.091668,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_BottomRail",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 118,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 155,
+      "max_aabb_overlap_min_axis_m": 0.145986,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Receiver_Core",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 114,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 102,
+      "max_aabb_overlap_min_axis_m": 0.35321,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Receiver_LowerSpine",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 114,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 148,
+      "max_aabb_overlap_min_axis_m": 0.205713,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_StockStrut_R",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 111,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          17,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          17,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 182,
+      "max_aabb_overlap_min_axis_m": 0.148002,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_StockStrut_L",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 106,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          31
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 413,
+      "max_aabb_overlap_min_axis_m": 0.148002,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Magazine",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 105,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          36,
+          50,
+          64,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 51,
+      "max_aabb_overlap_min_axis_m": 0.158964,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_TopRail",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 97,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          13,
+          17,
+          21,
+          25,
+          29
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          5,
+          9,
+          13,
+          17,
+          21
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 627,
+      "max_aabb_overlap_min_axis_m": 0.200812,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_RearBridge",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 91,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          14,
+          64
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          16,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          31
+        ],
+        "PS_WeaponStowed_Idle": [
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 200,
+      "max_aabb_overlap_min_axis_m": 0.134308,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Receiver_UpperShell",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 90,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13
+        ]
+      },
+      "max_triangle_pair_count": 109,
+      "max_aabb_overlap_min_axis_m": 0.268236,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_StockSpine",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 77,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13
+        ]
+      },
+      "max_triangle_pair_count": 490,
+      "max_aabb_overlap_min_axis_m": 0.155336,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_StockSpine",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 75,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 109,
+      "max_aabb_overlap_min_axis_m": 0.155336,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_TopRail",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 69,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          8,
+          24
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 70,
+      "max_aabb_overlap_min_axis_m": 0.200812,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_StockStrut_L",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 69,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          8,
+          24
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 89,
+      "max_aabb_overlap_min_axis_m": 0.148002,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_GripBackstrap",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 69,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Hover": [
+          31
+        ],
+        "PS_Reload": [
+          14
+        ],
+        "PS_Run_Forward": [
+          4,
+          6,
+          11,
+          14
+        ],
+        "PS_Walk": [
+          16
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "max_triangle_pair_count": 79,
+      "max_aabb_overlap_min_axis_m": 0.118978,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_BottomRail",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 68,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          8,
+          24
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 63,
+      "max_aabb_overlap_min_axis_m": 0.145986,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_ButtPad",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 61,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          17,
+          21,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          13,
+          17,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "max_triangle_pair_count": 74,
+      "max_aabb_overlap_min_axis_m": 0.059747,
+      "reason": "Buttpad intersects outside the ready-action right shoulder docking zone."
+    },
+    {
+      "weapon_object": "Rifle_Handguard_Core",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 58,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 31,
+      "max_aabb_overlap_min_axis_m": 0.318682,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_RearBridge",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 51,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 65,
+      "max_aabb_overlap_min_axis_m": 0.059968,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Magazine_Base",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 48,
+      "actions_and_frames": {
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 77,
+      "max_aabb_overlap_min_axis_m": 0.090489,
+      "reason": "Stowed weapon intersects visible suit/backpack geometry."
+    },
+    {
+      "weapon_object": "Rifle_Receiver_Core",
+      "suit_object": "H2_Emission_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 46,
+      "actions_and_frames": {
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 36,
+      "max_aabb_overlap_min_axis_m": 0.108009,
+      "reason": "Stowed weapon intersects visible suit/backpack geometry."
+    },
+    {
+      "weapon_object": "Rifle_Vent_L_3",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 46,
+      "actions_and_frames": {
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.042619,
+      "reason": "Stowed weapon intersects visible suit/backpack geometry."
+    },
+    {
+      "weapon_object": "Rifle_Handguard_BottomRail",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 46,
+      "actions_and_frames": {
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 93,
+      "max_aabb_overlap_min_axis_m": 0.025552,
+      "reason": "Stowed weapon intersects visible suit/backpack geometry."
+    },
+    {
+      "weapon_object": "Rifle_Handguard_Core",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 40,
+      "actions_and_frames": {
+        "PS_Walk": [
+          16
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          10,
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13,
+          21,
+          30
+        ]
+      },
+      "max_triangle_pair_count": 20,
+      "max_aabb_overlap_min_axis_m": 0.28836,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_TriggerGuard",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 39,
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 46,
+      "max_aabb_overlap_min_axis_m": 0.03655,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeOcular",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 35,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "max_triangle_pair_count": 169,
+      "max_aabb_overlap_min_axis_m": 0.110392,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeMount_Rear",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 28,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          9,
+          17,
+          29
+        ],
+        "PS_Walk_Forward": [
+          5,
+          17,
+          25
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.107169,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeMount_Rear_Crossbar",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 26,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Walk_Backward": [
+          13
+        ],
+        "PS_Walk_Forward": [
+          21
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 49,
+      "max_aabb_overlap_min_axis_m": 0.065799,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_PistolGrip",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 24,
+      "actions_and_frames": {
+        "PS_Aim_Walk_Right": [
+          1,
+          13,
+          29,
+          31
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          61
+        ],
+        "PS_Reload": [
+          14
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk": [
+          8
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 49,
+      "max_aabb_overlap_min_axis_m": 0.135686,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_SupportGrip",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 23,
+      "actions_and_frames": {
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.093949,
+      "reason": "Stowed weapon intersects visible suit/backpack geometry."
+    },
+    {
+      "weapon_object": "Rifle_Handguard_SidePanel_R",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 21,
+      "actions_and_frames": {
+        "PS_Walk": [
+          16
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13
+        ]
+      },
+      "max_triangle_pair_count": 25,
+      "max_aabb_overlap_min_axis_m": 0.155979,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ChargingRail_R",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 21,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Run_Forward": [
+          4,
+          9,
+          14,
+          19
+        ],
+        "PS_Walk": [
+          1,
+          24,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13,
+          21
+        ]
+      },
+      "max_triangle_pair_count": 37,
+      "max_aabb_overlap_min_axis_m": 0.111277,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeTube",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 20,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          84
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          31
+        ]
+      },
+      "max_triangle_pair_count": 80,
+      "max_aabb_overlap_min_axis_m": 0.207638,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Vent_L_2",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 19,
+      "actions_and_frames": {
+        "PS_WeaponStowed_Idle": [
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.042619,
+      "reason": "Stowed weapon intersects visible suit/backpack geometry."
+    },
+    {
+      "weapon_object": "Rifle_EjectionPort_R",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 17,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          16
+        ],
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          16,
+          24
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 14,
+      "max_aabb_overlap_min_axis_m": 0.082956,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Receiver_UpperShell",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 15,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 85,
+      "max_aabb_overlap_min_axis_m": 0.252087,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeOcular",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 15,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 54,
+      "max_aabb_overlap_min_axis_m": 0.110392,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeMount_Rear",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 15,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 45,
+      "max_aabb_overlap_min_axis_m": 0.107169,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeMount_Rear_Crossbar",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 15,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13
+        ]
+      },
+      "max_triangle_pair_count": 36,
+      "max_aabb_overlap_min_axis_m": 0.065799,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Trigger",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 14,
+      "actions_and_frames": {
+        "PS_Aim": [
+          15
+        ],
+        "PS_Aim_Walk_Backward": [
+          13,
+          17,
+          25
+        ],
+        "PS_Aim_Walk_Forward": [
+          9,
+          17,
+          21
+        ],
+        "PS_Walk": [
+          16
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.04834,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeTube",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 13,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          16,
+          24,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 110,
+      "max_aabb_overlap_min_axis_m": 0.206623,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeLensRear",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 13,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          16,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 102,
+      "max_aabb_overlap_min_axis_m": 0.054095,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ChargingRail_R",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 10,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 43,
+      "max_aabb_overlap_min_axis_m": 0.094623,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Vent_R_1",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 10,
+      "actions_and_frames": {
+        "PS_Walk": [
+          16
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.034008,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_BoltHandleStem_R",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 10,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          16
+        ],
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.028006,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeWindage",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 9,
+      "actions_and_frames": {
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          16,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.048505,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Stock_RearBridge",
+      "suit_object": "H2_Emission_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 9,
+      "actions_and_frames": {
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.042828,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_BoltHandleKnob_R",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 9,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 26,
+      "max_aabb_overlap_min_axis_m": 0.037763,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeLensRear",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 8,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "PS_Hover": [
+          1,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          16
+        ]
+      },
+      "max_triangle_pair_count": 53,
+      "max_aabb_overlap_min_axis_m": 0.054095,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Handguard_TopRail",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 7,
+      "actions_and_frames": {
+        "PS_Walk": [
+          16
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.046734,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_StockStrut_R",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 6,
+      "actions_and_frames": {
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          8,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 51,
+      "max_aabb_overlap_min_axis_m": 0.054775,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeElevation",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 6,
+      "actions_and_frames": {
+        "PS_Idle": [
+          1,
+          61
+        ],
+        "PS_Walk": [
+          1,
+          8,
+          24,
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.042477,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeMount_Front_Crossbar",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 5,
+      "actions_and_frames": {
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          16,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.065799,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_DataModule",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 4,
+      "actions_and_frames": {
+        "PS_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_Walk": [
+          16
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.100242,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeMount_Front",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 3,
+      "actions_and_frames": {
+        "PS_Walk": [
+          8,
+          16,
+          24
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.089301,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Vent_R_4",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 2,
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.046999,
+      "reason": "Draw/sheathe sweep crosses visible suit geometry."
+    },
+    {
+      "weapon_object": "Rifle_ScopeObjective",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 2,
+      "actions_and_frames": {
+        "PS_Hover": [
+          31
+        ],
+        "PS_Walk": [
+          16
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.045882,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeWindage",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 2,
+      "actions_and_frames": {
+        "PS_Hover": [
+          1,
+          61
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.043306,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_SupportGrip_Mount",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 2,
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          8,
+          12
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.037724,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_ScopeElevation",
+      "suit_object": "H2_Undersuit_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 1,
+      "actions_and_frames": {
+        "PS_Hover": [
+          31
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.048946,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Handguard_SidePanel_L",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 1,
+      "actions_and_frames": {
+        "PS_Walk": [
+          16
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.031419,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    },
+    {
+      "weapon_object": "Rifle_Vent_L_1",
+      "suit_object": "H2_Armor_LOD0",
+      "classification": "forbidden_weapon_suit_intersection",
+      "instance_count": 1,
+      "actions_and_frames": {
+        "PS_Walk": [
+          16
+        ]
+      },
+      "max_triangle_pair_count": 0,
+      "max_aabb_overlap_min_axis_m": 0.018422,
+      "reason": "Weapon intersects visible suit geometry outside an allowed contact zone."
+    }
+  ],
+  "limitations": [
+    "The default sweep samples authored action keyframes; inter-keyframe collisions require --all-frames and fractional high-speed tunnelling still requires denser sampling.",
+    "BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.",
+    "AABB overlap depth/volume are prioritisation proxies, not true penetration depth or swept volume.",
+    "Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.",
+    "Visible mode audits weapon versus the actual evaluated candidate render geometry. Consolidated meshes without face-level contact tags are intentionally classified conservatively.",
+    "The tool does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting."
+  ]
+}

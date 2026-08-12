@@ -13,7 +13,10 @@ Blender 5.2 example (from the repository root)::
 
 Add ``-- --strict`` to make forbidden intersections fail the Blender process
 after both reports have been written.  Add ``-- --all-frames`` for an integer
-frame sweep rather than the default authored-keyframe sweep.
+frame sweep rather than the default authored-keyframe sweep.  The default
+``--geometry-source visible`` audits the actual rendered candidate.  The
+explicit ``--geometry-source proxy`` mode is only a directional diagnostic for
+consolidated candidates and is never production-clearance proof.
 """
 from __future__ import annotations
 
@@ -48,6 +51,7 @@ REPORT_ROOT = (
 )
 CANDIDATE_PROPERTY = "aegis_vanguard_candidate"
 RUNTIME_ANCHOR_PROPERTY = "aegis_runtime_anchor"
+CLEARANCE_PROXY_PROPERTY = "aegis_clearance_proxy"
 RIFLE_PREFIX = "Rifle_"
 BVH_EPSILON_M = 1.0e-6
 AABB_EPSILON_M = 1.0e-6
@@ -134,14 +138,37 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Include every raw contact instance; grouped evidence is the default.",
     )
+    parser.add_argument(
+        "--geometry-source",
+        choices=("visible", "proxy"),
+        default="visible",
+        help=(
+            "Suit collision geometry. 'visible' audits the actual render meshes "
+            "(default); 'proxy' requires explicitly tagged diagnostic proxies."
+        ),
+    )
     return parser.parse_args(argv)
 
 
-def candidate_objects() -> list[bpy.types.Object]:
+def candidate_objects(geometry_source: str) -> list[bpy.types.Object]:
+    proxies = [
+        obj
+        for obj in bpy.data.objects
+        if bool(obj.get(CLEARANCE_PROXY_PROPERTY, False))
+        and obj.type in {"MESH", "CURVE", "SURFACE", "FONT"}
+    ]
+    if geometry_source == "proxy":
+        if not proxies:
+            raise RuntimeError(
+                "--geometry-source proxy requested, but no explicitly tagged "
+                "clearance proxies exist in the candidate."
+            )
+        return sorted(proxies, key=lambda item: item.name)
     result = [
         obj
         for obj in bpy.data.objects
         if bool(obj.get(CANDIDATE_PROPERTY, False))
+        and not bool(obj.get(CLEARANCE_PROXY_PROPERTY, False))
         and not bool(obj.get(RUNTIME_ANCHOR_PROPERTY, False))
         and obj.type in {"MESH", "CURVE", "SURFACE", "FONT"}
     ]
@@ -467,10 +494,10 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
     armature = bpy.data.objects.get(ARMATURE_NAME)
     if armature is None or armature.type != "ARMATURE":
         raise RuntimeError(f"Required armature '{ARMATURE_NAME}' is missing.")
-    suit_objects = candidate_objects()
+    suit_objects = candidate_objects(args.geometry_source)
     weapon_objects = rifle_objects()
     if not suit_objects:
-        raise RuntimeError("No Candidate003/004 collision objects were found.")
+        raise RuntimeError("No candidate collision objects were found.")
     if not weapon_objects:
         raise RuntimeError("No Rifle_* mesh objects were found.")
 
@@ -650,7 +677,7 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
         raise RuntimeError("Open candidate blend changed during read-only validation.")
 
     report: dict[str, object] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "gate": "AEGIS_WEAPON_SUIT_CLEARANCE",
         "status": "PASS" if not forbidden else "FAIL",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
@@ -660,6 +687,12 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
         "candidate_blend_sha256_after": source_hash_after,
         "candidate_blend_preserved": source_hash_before == source_hash_after,
         "sample_mode": "all_integer_frames" if args.all_frames else "authored_keyframes",
+        "collision_geometry_source": args.geometry_source,
+        "collision_geometry_scope": (
+            "actual visible candidate render geometry"
+            if args.geometry_source == "visible"
+            else "hidden tagged diagnostic proxies; not visible-geometry clearance proof"
+        ),
         "armature": armature.name,
         "candidate_collision_objects": len(suit_objects),
         "rifle_collision_objects": len(weapon_objects),
@@ -692,7 +725,13 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
             "BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.",
             "AABB overlap depth/volume are prioritisation proxies, not true penetration depth or swept volume.",
             "Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.",
-            "The tool audits weapon versus candidate render geometry only. It does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting.",
+            (
+                "Visible mode audits weapon versus the actual evaluated candidate render geometry. "
+                "Consolidated meshes without face-level contact tags are intentionally classified conservatively."
+                if args.geometry_source == "visible"
+                else "Proxy mode audits hidden authoring proxies only. Remeshed or smoothly skinned visible surfaces may differ, so this mode is directional comparison evidence, not a clearance gate."
+            ),
+            "The tool does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting.",
         ],
     }
     if args.include_instances:
@@ -709,6 +748,7 @@ def write_text_report(report: dict[str, object], path: Path) -> None:
         f"SHA-256 preserved: {report['candidate_blend_preserved']}",
         f"Blender: {report['blender_version']}",
         f"Sampling: {report['sample_mode']}",
+        f"Collision geometry: {report['collision_geometry_source']} ({report['collision_geometry_scope']})",
         f"Actions: {report['action_count']}/{EXPECTED_ACTION_COUNT}",
         f"Sampled frames: {report['sampled_frame_count']}",
         f"Allowed contact instances: {report['allowed_contact_instances']}",

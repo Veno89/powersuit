@@ -1,0 +1,1380 @@
+{
+  "asset": "Aegis Vanguard HeroV2",
+  "blender_version": "5.2.0 LTS",
+  "derivative": {
+    "generated": true,
+    "path": "ArtSource/PoweredSuitNextGen/HeroV2/derivatives/candidate005_lods.blend",
+    "sha256": "3e982daae3401bb6138e47acdba93b4a0521233a3e96ffc92e79ef9603225bfc"
+  },
+  "issues": [
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_BOUNDARY_EDGES",
+      "limit": 0,
+      "message": "Topology metric boundary_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_NON_MANIFOLD_EDGES",
+      "limit": 0,
+      "message": "Topology metric non_manifold_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_LOOSE_EDGES",
+      "limit": 0,
+      "message": "Topology metric loose_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_LOOSE_VERTICES",
+      "limit": 0,
+      "message": "Topology metric loose_vertices must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_NGONS",
+      "limit": 0,
+      "message": "Topology metric ngons must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_ZERO_AREA_FACES",
+      "limit": 0,
+      "message": "Topology metric zero_area_faces must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_DEGENERATE_EDGES",
+      "limit": 0,
+      "message": "Topology metric degenerate_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TOPOLOGY_DUPLICATE_VERTEX_PAIRS",
+      "limit": 0,
+      "message": "Topology metric duplicate_vertex_pairs must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_TRANSFORMS",
+      "limit": 0,
+      "message": "Mesh transforms must have unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_UNAPPLIED_MODIFIERS",
+      "limit": 0,
+      "message": "Production handoffs should apply non-runtime modifiers before validation.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_UV0_MISSING",
+      "limit": 0,
+      "message": "Every mesh requires an authored UV0 map.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1.0,
+      "code": "LOD0_UV_COVERAGE",
+      "limit": 1.0,
+      "message": "Every polygon must have finite, non-zero UV area.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_UV_ZERO_AREA",
+      "limit": 0,
+      "message": "UV0 must not contain zero-area faces.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_UV_BOUNDS",
+      "limit": 0,
+      "message": "Conventional HeroV2 UV0 coordinates must remain in the 0-1 tile.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD0_RENDERER_HARD_MAX",
+      "limit": 8,
+      "message": "Renderer-bearing mesh count must stay within the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD0_RENDERER_TARGET",
+      "limit": 5,
+      "message": "HeroV2 targets five consolidated renderer meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD0_DRAW_CALL_HARD_MAX",
+      "limit": 8,
+      "message": "Used material slots approximate ordinary draw calls and must meet the hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD0_DRAW_CALL_TARGET",
+      "limit": 6,
+      "message": "HeroV2 targets at most six ordinary suit/weapon draw calls.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1,
+      "code": "LOD0_SLOTS_PER_RENDERER",
+      "limit": 4,
+      "message": "No renderer may exceed the material-slot hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_EMPTY_MATERIAL_ASSIGNMENTS",
+      "limit": 0,
+      "message": "Every used material index must resolve to a material.",
+      "severity": "pass"
+    },
+    {
+      "actual": 88316,
+      "code": "LOD0_COMBINED_TRIANGLES",
+      "limit": 130000,
+      "message": "Combined suit, rifle, and optic triangles must meet the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 88316,
+      "code": "LOD0_SUIT_TRIANGLES",
+      "limit": {
+        "hard_max": 100000,
+        "target_max": 100000,
+        "target_min": 80000
+      },
+      "message": "Suit triangles are evaluated against the authored LOD target.",
+      "severity": "pass"
+    },
+    {
+      "actual": 5.0316,
+      "code": "LOD0_SUIT_TEXEL_DENSITY",
+      "limit": {
+        "target": 10.24,
+        "tolerance_fraction": 0.35
+      },
+      "message": "Texel density is overlap-unaware and is a quality warning, not a UV-overlap proof.",
+      "severity": "warning"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_BOUNDARY_EDGES",
+      "limit": 0,
+      "message": "Topology metric boundary_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_NON_MANIFOLD_EDGES",
+      "limit": 0,
+      "message": "Topology metric non_manifold_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_LOOSE_EDGES",
+      "limit": 0,
+      "message": "Topology metric loose_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_LOOSE_VERTICES",
+      "limit": 0,
+      "message": "Topology metric loose_vertices must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_NGONS",
+      "limit": 0,
+      "message": "Topology metric ngons must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_ZERO_AREA_FACES",
+      "limit": 0,
+      "message": "Topology metric zero_area_faces must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_DEGENERATE_EDGES",
+      "limit": 0,
+      "message": "Topology metric degenerate_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TOPOLOGY_DUPLICATE_VERTEX_PAIRS",
+      "limit": 0,
+      "message": "Topology metric duplicate_vertex_pairs must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_TRANSFORMS",
+      "limit": 0,
+      "message": "Mesh transforms must have unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_UNAPPLIED_MODIFIERS",
+      "limit": 0,
+      "message": "Production handoffs should apply non-runtime modifiers before validation.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_UV0_MISSING",
+      "limit": 0,
+      "message": "Every mesh requires an authored UV0 map.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1.0,
+      "code": "LOD1_UV_COVERAGE",
+      "limit": 1.0,
+      "message": "Every polygon must have finite, non-zero UV area.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_UV_ZERO_AREA",
+      "limit": 0,
+      "message": "UV0 must not contain zero-area faces.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_UV_BOUNDS",
+      "limit": 0,
+      "message": "Conventional HeroV2 UV0 coordinates must remain in the 0-1 tile.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD1_RENDERER_HARD_MAX",
+      "limit": 8,
+      "message": "Renderer-bearing mesh count must stay within the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD1_RENDERER_TARGET",
+      "limit": 5,
+      "message": "HeroV2 targets five consolidated renderer meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD1_DRAW_CALL_HARD_MAX",
+      "limit": 8,
+      "message": "Used material slots approximate ordinary draw calls and must meet the hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD1_DRAW_CALL_TARGET",
+      "limit": 6,
+      "message": "HeroV2 targets at most six ordinary suit/weapon draw calls.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1,
+      "code": "LOD1_SLOTS_PER_RENDERER",
+      "limit": 4,
+      "message": "No renderer may exceed the material-slot hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_EMPTY_MATERIAL_ASSIGNMENTS",
+      "limit": 0,
+      "message": "Every used material index must resolve to a material.",
+      "severity": "pass"
+    },
+    {
+      "actual": 44158,
+      "code": "LOD1_COMBINED_TRIANGLES",
+      "limit": 65000,
+      "message": "Combined suit, rifle, and optic triangles must meet the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 44158,
+      "code": "LOD1_SUIT_TRIANGLES",
+      "limit": {
+        "hard_max": 50000,
+        "target_max": 50000,
+        "target_min": 40000
+      },
+      "message": "Suit triangles are evaluated against the authored LOD target.",
+      "severity": "pass"
+    },
+    {
+      "actual": 5.0224,
+      "code": "LOD1_SUIT_TEXEL_DENSITY",
+      "limit": {
+        "target": 10.24,
+        "tolerance_fraction": 0.35
+      },
+      "message": "Texel density is overlap-unaware and is a quality warning, not a UV-overlap proof.",
+      "severity": "warning"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_BOUNDARY_EDGES",
+      "limit": 0,
+      "message": "Topology metric boundary_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_NON_MANIFOLD_EDGES",
+      "limit": 0,
+      "message": "Topology metric non_manifold_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_LOOSE_EDGES",
+      "limit": 0,
+      "message": "Topology metric loose_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_LOOSE_VERTICES",
+      "limit": 0,
+      "message": "Topology metric loose_vertices must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_NGONS",
+      "limit": 0,
+      "message": "Topology metric ngons must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_ZERO_AREA_FACES",
+      "limit": 0,
+      "message": "Topology metric zero_area_faces must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_DEGENERATE_EDGES",
+      "limit": 0,
+      "message": "Topology metric degenerate_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TOPOLOGY_DUPLICATE_VERTEX_PAIRS",
+      "limit": 0,
+      "message": "Topology metric duplicate_vertex_pairs must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_TRANSFORMS",
+      "limit": 0,
+      "message": "Mesh transforms must have unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_UNAPPLIED_MODIFIERS",
+      "limit": 0,
+      "message": "Production handoffs should apply non-runtime modifiers before validation.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_UV0_MISSING",
+      "limit": 0,
+      "message": "Every mesh requires an authored UV0 map.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1.0,
+      "code": "LOD2_UV_COVERAGE",
+      "limit": 1.0,
+      "message": "Every polygon must have finite, non-zero UV area.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_UV_ZERO_AREA",
+      "limit": 0,
+      "message": "UV0 must not contain zero-area faces.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_UV_BOUNDS",
+      "limit": 0,
+      "message": "Conventional HeroV2 UV0 coordinates must remain in the 0-1 tile.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD2_RENDERER_HARD_MAX",
+      "limit": 8,
+      "message": "Renderer-bearing mesh count must stay within the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD2_RENDERER_TARGET",
+      "limit": 5,
+      "message": "HeroV2 targets five consolidated renderer meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD2_DRAW_CALL_HARD_MAX",
+      "limit": 8,
+      "message": "Used material slots approximate ordinary draw calls and must meet the hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD2_DRAW_CALL_TARGET",
+      "limit": 6,
+      "message": "HeroV2 targets at most six ordinary suit/weapon draw calls.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1,
+      "code": "LOD2_SLOTS_PER_RENDERER",
+      "limit": 4,
+      "message": "No renderer may exceed the material-slot hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_EMPTY_MATERIAL_ASSIGNMENTS",
+      "limit": 0,
+      "message": "Every used material index must resolve to a material.",
+      "severity": "pass"
+    },
+    {
+      "actual": 17660,
+      "code": "LOD2_COMBINED_TRIANGLES",
+      "limit": 26000,
+      "message": "Combined suit, rifle, and optic triangles must meet the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 17660,
+      "code": "LOD2_SUIT_TRIANGLES",
+      "limit": {
+        "hard_max": 20000,
+        "target_max": 20000,
+        "target_min": 16000
+      },
+      "message": "Suit triangles are evaluated against the authored LOD target.",
+      "severity": "pass"
+    },
+    {
+      "actual": 4.9757,
+      "code": "LOD2_SUIT_TEXEL_DENSITY",
+      "limit": {
+        "target": 10.24,
+        "tolerance_fraction": 0.35
+      },
+      "message": "Texel density is overlap-unaware and is a quality warning, not a UV-overlap proof.",
+      "severity": "warning"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_BOUNDARY_EDGES",
+      "limit": 0,
+      "message": "Topology metric boundary_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_NON_MANIFOLD_EDGES",
+      "limit": 0,
+      "message": "Topology metric non_manifold_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_LOOSE_EDGES",
+      "limit": 0,
+      "message": "Topology metric loose_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_LOOSE_VERTICES",
+      "limit": 0,
+      "message": "Topology metric loose_vertices must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_NGONS",
+      "limit": 0,
+      "message": "Topology metric ngons must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_ZERO_AREA_FACES",
+      "limit": 0,
+      "message": "Topology metric zero_area_faces must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_DEGENERATE_EDGES",
+      "limit": 0,
+      "message": "Topology metric degenerate_edges must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TOPOLOGY_DUPLICATE_VERTEX_PAIRS",
+      "limit": 0,
+      "message": "Topology metric duplicate_vertex_pairs must not exceed its production limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_TRANSFORMS",
+      "limit": 0,
+      "message": "Mesh transforms must have unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_UNAPPLIED_MODIFIERS",
+      "limit": 0,
+      "message": "Production handoffs should apply non-runtime modifiers before validation.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_UV0_MISSING",
+      "limit": 0,
+      "message": "Every mesh requires an authored UV0 map.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1.0,
+      "code": "LOD3_UV_COVERAGE",
+      "limit": 1.0,
+      "message": "Every polygon must have finite, non-zero UV area.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_UV_ZERO_AREA",
+      "limit": 0,
+      "message": "UV0 must not contain zero-area faces.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_UV_BOUNDS",
+      "limit": 0,
+      "message": "Conventional HeroV2 UV0 coordinates must remain in the 0-1 tile.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD3_RENDERER_HARD_MAX",
+      "limit": 8,
+      "message": "Renderer-bearing mesh count must stay within the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD3_RENDERER_TARGET",
+      "limit": 5,
+      "message": "HeroV2 targets five consolidated renderer meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD3_DRAW_CALL_HARD_MAX",
+      "limit": 8,
+      "message": "Used material slots approximate ordinary draw calls and must meet the hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 3,
+      "code": "LOD3_DRAW_CALL_TARGET",
+      "limit": 6,
+      "message": "HeroV2 targets at most six ordinary suit/weapon draw calls.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1,
+      "code": "LOD3_SLOTS_PER_RENDERER",
+      "limit": 4,
+      "message": "No renderer may exceed the material-slot hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_EMPTY_MATERIAL_ASSIGNMENTS",
+      "limit": 0,
+      "message": "Every used material index must resolve to a material.",
+      "severity": "pass"
+    },
+    {
+      "actual": 6178,
+      "code": "LOD3_COMBINED_TRIANGLES",
+      "limit": 9000,
+      "message": "Combined suit, rifle, and optic triangles must meet the runtime hard ceiling.",
+      "severity": "pass"
+    },
+    {
+      "actual": 6178,
+      "code": "LOD3_SUIT_TRIANGLES",
+      "limit": {
+        "hard_max": 7000,
+        "target_max": 7000,
+        "target_min": 5000
+      },
+      "message": "Suit triangles are evaluated against the authored LOD target.",
+      "severity": "pass"
+    },
+    {
+      "actual": 4.8783,
+      "code": "LOD3_SUIT_TEXEL_DENSITY",
+      "limit": {
+        "target": 10.24,
+        "tolerance_fraction": 0.35
+      },
+      "message": "Texel density is overlap-unaware and is a quality warning, not a UV-overlap proof.",
+      "severity": "warning"
+    },
+    {
+      "actual": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "code": "SOURCE_BLEND_IMMUTABLE",
+      "limit": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "message": "The source blend SHA-256 is unchanged.",
+      "severity": "pass"
+    }
+  ],
+  "limitations": [
+    "UV area and texel-density metrics do not prove island non-overlap or padding.",
+    "Generated decimation is a deterministic first pass, not an approved final LOD.",
+    "Renderer and draw-call counts assume one Blender mesh object per runtime renderer.",
+    "Animation deformation and weapon-clearance sweeps are separate production gates."
+  ],
+  "lod_generation": {
+    "enabled": true,
+    "method": "Blender COLLAPSE decimate per source renderer; draft LODs require hand repair",
+    "ratios": {
+      "LOD1": 0.5,
+      "LOD2": 0.2,
+      "LOD3": 0.07
+    }
+  },
+  "lods": [
+    {
+      "draw_calls_estimate": 3,
+      "lod": 0,
+      "object_count": 3,
+      "objects": [
+        {
+          "edges": 90702,
+          "faces": 60468,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_ArmorPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_Armor_LOD0",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 60468,
+          "uv": {
+            "covered_faces": 60468,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.16213017,
+            "texel_density_px_per_cm": 5.0566,
+            "world_surface_area_m2": 10.63829532,
+            "zero_area_faces": 0
+          },
+          "vertices": 30650
+        },
+        {
+          "edges": 4968,
+          "faces": 3312,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_EmissionPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_Emission_LOD0",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 3312,
+          "uv": {
+            "covered_faces": 3312,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.0004741,
+            "texel_density_px_per_cm": 5.0694,
+            "world_surface_area_m2": 0.03095109,
+            "zero_area_faces": 0
+          },
+          "vertices": 1672
+        },
+        {
+          "edges": 36804,
+          "faces": 24536,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_UndersuitPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_Undersuit_LOD0",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 24536,
+          "uv": {
+            "covered_faces": 24536,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.0396341,
+            "texel_density_px_per_cm": 4.9327,
+            "world_surface_area_m2": 2.7328619,
+            "zero_area_faces": 0
+          },
+          "vertices": 12270
+        }
+      ],
+      "renderer_count": 3,
+      "selection_method": "collection:HeroV2_LOD0",
+      "texel_density_by_role_px_per_cm": {
+        "suit": 5.0316
+      },
+      "triangle_budget_results": {
+        "suit": {
+          "actual": 88316,
+          "hard_max": 100000,
+          "result": "IN_TARGET",
+          "severity": "pass",
+          "target_max": 100000,
+          "target_min": 80000
+        }
+      },
+      "triangles_by_role": {
+        "suit": 88316
+      },
+      "triangles_total": 88316,
+      "unique_material_count": 3,
+      "unique_materials": [
+        "AV_H2_ArmorPBRPreview",
+        "AV_H2_EmissionPBRPreview",
+        "AV_H2_UndersuitPBRPreview"
+      ]
+    },
+    {
+      "draw_calls_estimate": 3,
+      "lod": 1,
+      "object_count": 3,
+      "objects": [
+        {
+          "edges": 45351,
+          "faces": 30234,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_ArmorPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Armor_LOD0_LOD1",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 30234,
+          "uv": {
+            "covered_faces": 30234,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.16120859,
+            "texel_density_px_per_cm": 5.0466,
+            "world_surface_area_m2": 10.6194992,
+            "zero_area_faces": 0
+          },
+          "vertices": 15533
+        },
+        {
+          "edges": 2484,
+          "faces": 1656,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_EmissionPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Emission_LOD0_LOD1",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 1656,
+          "uv": {
+            "covered_faces": 1656,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.0004665,
+            "texel_density_px_per_cm": 5.0383,
+            "world_surface_area_m2": 0.03083219,
+            "zero_area_faces": 0
+          },
+          "vertices": 844
+        },
+        {
+          "edges": 18402,
+          "faces": 12268,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_UndersuitPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Undersuit_LOD0_LOD1",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 12268,
+          "uv": {
+            "covered_faces": 12268,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.03953508,
+            "texel_density_px_per_cm": 4.9267,
+            "world_surface_area_m2": 2.73268057,
+            "zero_area_faces": 0
+          },
+          "vertices": 6136
+        }
+      ],
+      "renderer_count": 3,
+      "selection_method": "generated:deterministic_decimate",
+      "texel_density_by_role_px_per_cm": {
+        "suit": 5.0224
+      },
+      "triangle_budget_results": {
+        "suit": {
+          "actual": 44158,
+          "hard_max": 50000,
+          "result": "IN_TARGET",
+          "severity": "pass",
+          "target_max": 50000,
+          "target_min": 40000
+        }
+      },
+      "triangles_by_role": {
+        "suit": 44158
+      },
+      "triangles_total": 44158,
+      "unique_material_count": 3,
+      "unique_materials": [
+        "AV_H2_ArmorPBRPreview",
+        "AV_H2_EmissionPBRPreview",
+        "AV_H2_UndersuitPBRPreview"
+      ]
+    },
+    {
+      "draw_calls_estimate": 3,
+      "lod": 2,
+      "object_count": 3,
+      "objects": [
+        {
+          "edges": 18138,
+          "faces": 12092,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_ArmorPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Armor_LOD0_LOD2",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 12092,
+          "uv": {
+            "covered_faces": 12092,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.15732916,
+            "texel_density_px_per_cm": 5.0002,
+            "world_surface_area_m2": 10.55739433,
+            "zero_area_faces": 0
+          },
+          "vertices": 6462
+        },
+        {
+          "edges": 993,
+          "faces": 662,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_EmissionPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Emission_LOD0_LOD2",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 662,
+          "uv": {
+            "covered_faces": 662,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.00045119,
+            "texel_density_px_per_cm": 4.9672,
+            "world_surface_area_m2": 0.03067976,
+            "zero_area_faces": 0
+          },
+          "vertices": 347
+        },
+        {
+          "edges": 7359,
+          "faces": 4906,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_UndersuitPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Undersuit_LOD0_LOD2",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 4906,
+          "uv": {
+            "covered_faces": 4906,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.0387967,
+            "texel_density_px_per_cm": 4.8799,
+            "world_surface_area_m2": 2.73335656,
+            "zero_area_faces": 0
+          },
+          "vertices": 2455
+        }
+      ],
+      "renderer_count": 3,
+      "selection_method": "generated:deterministic_decimate",
+      "texel_density_by_role_px_per_cm": {
+        "suit": 4.9757
+      },
+      "triangle_budget_results": {
+        "suit": {
+          "actual": 17660,
+          "hard_max": 20000,
+          "result": "IN_TARGET",
+          "severity": "pass",
+          "target_max": 20000,
+          "target_min": 16000
+        }
+      },
+      "triangles_by_role": {
+        "suit": 17660
+      },
+      "triangles_total": 17660,
+      "unique_material_count": 3,
+      "unique_materials": [
+        "AV_H2_ArmorPBRPreview",
+        "AV_H2_EmissionPBRPreview",
+        "AV_H2_UndersuitPBRPreview"
+      ]
+    },
+    {
+      "draw_calls_estimate": 3,
+      "lod": 3,
+      "object_count": 3,
+      "objects": [
+        {
+          "edges": 6348,
+          "faces": 4232,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_ArmorPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Armor_LOD0_LOD3",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 4232,
+          "uv": {
+            "covered_faces": 4232,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.14979481,
+            "texel_density_px_per_cm": 4.9086,
+            "world_surface_area_m2": 10.4305504,
+            "zero_area_faces": 0
+          },
+          "vertices": 2532
+        },
+        {
+          "edges": 345,
+          "faces": 230,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_EmissionPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Emission_LOD0_LOD3",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 230,
+          "uv": {
+            "covered_faces": 230,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.00042319,
+            "texel_density_px_per_cm": 4.8475,
+            "world_surface_area_m2": 0.03021438,
+            "zero_area_faces": 0
+          },
+          "vertices": 131
+        },
+        {
+          "edges": 2574,
+          "faces": 1716,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "AV_H2_UndersuitPBRPreview"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "H2_H2_Undersuit_LOD0_LOD3",
+          "role": "suit",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "HeroV2_Armature:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "zero_area_faces": 0
+          },
+          "triangles": 1716,
+          "uv": {
+            "covered_faces": 1716,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "summed_uv_area_overlap_unaware": 0.03697504,
+            "texel_density_px_per_cm": 4.7614,
+            "world_surface_area_m2": 2.73627659,
+            "zero_area_faces": 0
+          },
+          "vertices": 860
+        }
+      ],
+      "renderer_count": 3,
+      "selection_method": "generated:deterministic_decimate",
+      "texel_density_by_role_px_per_cm": {
+        "suit": 4.8783
+      },
+      "triangle_budget_results": {
+        "suit": {
+          "actual": 6178,
+          "hard_max": 7000,
+          "result": "IN_TARGET",
+          "severity": "pass",
+          "target_max": 7000,
+          "target_min": 5000
+        }
+      },
+      "triangles_by_role": {
+        "suit": 6178
+      },
+      "triangles_total": 6178,
+      "unique_material_count": 3,
+      "unique_materials": [
+        "AV_H2_ArmorPBRPreview",
+        "AV_H2_EmissionPBRPreview",
+        "AV_H2_UndersuitPBRPreview"
+      ]
+    }
+  ],
+  "profile": {
+    "path": "ArtSource/PoweredSuitNextGen/HeroV2/production_profile.json",
+    "sha256": "938c4e5329b54f07b990ea8207303d3408fb5197a679c1bb5c51462e6212f0ca"
+  },
+  "schema_version": 1,
+  "source": {
+    "immutable": true,
+    "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v005.blend",
+    "sha256_after": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+    "sha256_before": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84"
+  },
+  "status": "PASS",
+  "summary": {
+    "error": 0,
+    "pass": 89,
+    "warning": 4
+  }
+}

@@ -19,7 +19,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | K — HUD | Implemented | Formatter/presenter tests pass | Resolution/readability/accessibility review |
 | L — Developer console | Implemented | Parser, registry and gameplay-command tests pass | Hands-on malformed-command pass |
 | M — Pooling/performance | Pooling, diagnostics, and opt-in Development Build soak implemented | 30/60/120 matrix and two-minute 48-enemy soak pass | Connected GPU/render capture, uncapped and remaining lifecycle cases |
-| N — Hero Suit V2 art | Adult gritty black/carbon/chrome Aegis Candidate004 plus paired front/rear targets | Generator114/Unity hashes preserved; 23 bones, 24 actions, four anchors, 13 renders, clearance and HeroV2 production gates operational | Repair measured weapon clearance, continuous undersuit/retopo/UV/PBR, consolidate renderers, hand-repair LODs, Unity A/B |
+| N — Hero Suit V2 art | Candidate004 visual maquette plus non-integrated Candidate005 production-architecture prototype | Generator114/Candidate004 preserved; Candidate005 has 3 renderers/draws, 88,316 tris, one connected skinned undersuit, UV0 overlap audit 0, and HeroV2 structural PASS | Repair canonical visible clearance; manual sculpt/retopo/weights/PBR/LODs; Unity A/B |
 
 ## Completed implementation
 
@@ -100,10 +100,12 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Build a deterministic review-only v002 mechanical blockout on the existing 23-bone armature while retaining all 24 `PS_*` actions; verify the approved source hashes remain unchanged.
 - [x] Build Candidate004 with adult gritty industrial-gothic front/rear targets, soot-black armor, carbon fibre, restrained tarnished chrome, three-tier pauldrons, slimmer helmet/boots/gloves, shrouded outboard turbines, exact exhaust anchors, and 13 real-pose/detail renders.
 - [x] Document measurable production targets for silhouette, articulation, rifle docking/camera clearance, hybrid rigid/skinned construction, UV/PBR work, renderer consolidation, and four LODs.
-- [x] Add deterministic 24-action/162-keyframe weapon-clearance validation and record Candidate004's honest fail: 7,837 forbidden instances across 304 object-pair groups.
-- [x] Start the isolated HeroV2 topology/UV/renderer/LOD lane; record the corrected all-mesh baseline of 25 errors/16 warnings and generate diagnostic LOD totals of 73,140/36,570/14,344/4,846 triangles without mutating the source.
-- [ ] Owner-approve or revise Candidate004's adult silhouette, dark material language, turbine arrangement, and helmet before expensive manual sculpt/retopology.
-- [ ] Replace the procedural shell with authored high-poly armor and a continuous undersuit; retopologize, weight, unwrap, bake, texture, and create LODs in the isolated candidate lane.
+- [x] Build Candidate005 as an isolated production-architecture prototype without replacing Candidate004 or the active Generator114/Unity path: 88,316 LOD0 triangles, three skinned renderers/estimated draws, one connected skinned undersuit, complete `UV0`, and zero selected overlap faces/loops in the dedicated audit.
+- [x] Pass the Candidate005 HeroV2 structural gate with 0 errors/4 texel-density warnings and generate diagnostic LOD totals of `88,316 -> 44,158 -> 17,660 -> 6,178` triangles. These automated LODs and preview textures are scaffolds, not release art.
+- [x] Sweep all 24 actions/162 authored keyframes. The deformation scaffold records a 5.801599 maximum local edge-stretch ratio under an intentionally loose 8x catastrophic-failure ceiling; it does not certify artist-quality weighting.
+- [x] Record Candidate005's canonical visible-mesh weapon-clearance **FAIL** at 3,894 forbidden instances/72 object-pair groups. Keep the separate hidden-proxy result of 5,489/240 diagnostic-only; it must not replace the canonical result.
+- [ ] Owner-approve or revise the adult silhouette, dark material language, turbine arrangement, and helmet. Candidate005 is an architecture prototype, not a visual promotion over Candidate004.
+- [ ] Replace or hand-finish the procedural forms with authored high-poly armor and anatomical joint seals; complete production retopology/seams, weight polish, final UV layout and PBR bake/paint, and hand-repaired LODs in the isolated candidate lane.
 - [ ] Validate all 24 actions, back-stowed rifle clearance, aim/scope framing, hardpoints, flight effects, deformation, draw calls, and representative GPU cost in a separate Unity review prefab/scene.
 - [ ] Promote only after an owner-approved old/new in-game A/B comparison; keep Generator114 available for one-click rollback.
 

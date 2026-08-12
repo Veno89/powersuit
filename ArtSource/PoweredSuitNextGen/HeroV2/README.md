@@ -5,9 +5,9 @@ maquettes. It does not export to Unity, replace Generator114, or modify a
 Candidate blend. The source `.blend` is hashed before and after every run, while
 generated LODs are saved only to an ignored derivative beneath this folder.
 
-## Candidate004 handoff contract
+## Candidate005 handoff contract
 
-Candidate004 should provide a recursively searchable collection named
+Candidate005 provides a recursively searchable collection named
 `HeroV2_LOD0`. Every renderable object in that collection must be a mesh and may
 carry these custom properties:
 
@@ -21,12 +21,11 @@ Unlabelled objects are conservatively inferred from their names; anything that
 does not clearly say rifle, weapon, scope, sight, or optic is treated as suit
 geometry. Explicit but unknown roles fail validation.
 
-The production target remains five renderer meshes: upper suit, lower suit,
-visor/emissive, rifle, and optional optic glass. Candidate004's current profile
-deliberately requires only the replacement `suit` role while it inherits the
-Generator114 rifle for pose review. A future promotion profile must require the
-production `rifle` role as well. Separate armor pieces are useful while designing
-but must be joined and correctly skinned before this gate passes.
+Candidate005 uses three suit renderers: one connected skinned undersuit,
+consolidated rigid-weighted armor, and consolidated emission. A future promotion
+profile must additionally require the production `rifle` role and optional optic
+glass, while the current profile deliberately validates only the replacement
+suit and inherits the Generator114 rifle for pose review.
 
 ## What the gate measures
 
@@ -43,7 +42,48 @@ but must be joined and correctly skinned before this gate passes.
 The checker intentionally does **not** claim UV overlap/padding proof, animation
 deformation quality, or weapon clearance. Those need dedicated later gates.
 
-## Validate Candidate004 and generate draft LODs
+## Candidate005 result
+
+The tracked report and derivative refer to Candidate005 SHA-256
+`0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84`.
+The HeroV2 profile passes with 0 errors and four texel-density warnings. Its
+measured handoff contains:
+
+- three suit renderers and three estimated draw calls;
+- 88,316 LOD0 triangles, followed by diagnostic totals of 44,158, 17,660,
+  and 6,178 for LOD1-LOD3;
+- one connected undersuit with 11,594 blended vertices;
+- closed, triangulated geometry within every triangle budget and complete,
+  finite `UV0` coverage at every LOD; and
+- a separate Candidate005 builder audit with zero selected overlapping `UV0`
+  faces or loops across all three LOD0 renderers.
+
+The deformation scaffold evaluates all 162 authored keyframes without a
+collapsed triangle and records a maximum local edge-stretch ratio of 5.801599.
+Its 8x ceiling catches catastrophic automation failures only; it does not certify
+production skin quality, anatomy, joint volume, or final artist weighting.
+
+The four texel-density warnings remain real evidence that UV density/packing is
+provisional. Candidate005 currently exercises these deterministic 1K preview
+maps:
+
+- `../textures/candidate005/AV_H2_Detail_BaseColor.png`
+- `../textures/candidate005/AV_H2_Detail_Normal.png`
+- `../textures/candidate005/AV_H2_Detail_MRAO.png`
+- `../textures/candidate005/AV_H2_Detail_Emission.png`
+
+These maps are not the final unique 4K character atlas. Release art still needs
+final sculpting, deliberate retopology and seams, polished weights, authored 4K
+PBR bakes/painting, and hand-repaired LOD silhouettes.
+
+Weapon clearance also remains blocking. The actual visible-renderer audit fails
+with 3,894 forbidden instances across 72 consolidated object-pair groups. A
+separate hidden-proxy diagnostic reports 5,489/240, but it is not visible-mesh
+clearance proof because the proxy undersuit differs from the remeshed skinned
+surface. Candidate005 is neither Unity-integrated nor visually promoted;
+Generator114 remains the active rollback-safe suit.
+
+## Validate Candidate005 and generate draft LODs
 
 From the repository root:
 
@@ -52,12 +92,11 @@ From the repository root:
   --background `
   --python "ArtSource\PoweredSuitNextGen\HeroV2\validate_and_generate_lods.py" `
   -- `
-  --source "ArtSource\PoweredSuitNextGen\candidates\aegis_vanguard_candidate_v004.blend" `
+  --source "ArtSource\PoweredSuitNextGen\candidates\aegis_vanguard_candidate_v005.blend" `
   --profile "ArtSource\PoweredSuitNextGen\HeroV2\production_profile.json" `
-  --report "ArtSource\PoweredSuitNextGen\HeroV2\reports\candidate004_production.json" `
+  --report "ArtSource\PoweredSuitNextGen\HeroV2\reports\candidate005_production.json" `
   --generate-lods `
-  --require-lods `
-  --output-blend "ArtSource\PoweredSuitNextGen\HeroV2\derivatives\candidate004_lods.blend"
+  --output-blend "ArtSource\PoweredSuitNextGen\HeroV2\derivatives\candidate005_lods.blend"
 ```
 
 Validation failures return exit code 2 after the report is written. Contract or

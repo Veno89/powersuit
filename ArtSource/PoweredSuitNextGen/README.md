@@ -6,8 +6,10 @@ controller, or the canonical player prefab.
 
 ## Current visual target
 
-Candidate004 is the current review candidate. It moves the design away from the
-clean toy-soldier read with:
+Candidate005 is the current production-architecture candidate. It derives from
+the preserved Candidate004 review maquette, keeps its adult industrial-gothic
+direction, and moves the asset from hundreds of rigid review parts toward a
+runtime-shaped handoff with:
 
 - soot-black coated armor, blue-black carbon fibre, oily gunmetal, restrained
   tarnished chrome, sparse cyan optics, and large-scale grime variation;
@@ -26,25 +28,29 @@ The two strongest authored targets are:
 - `Concepts/aegis_vanguard_gothic_grit_rear_v003.png` - rear construction,
   turbine shrouds, and diagonal rifle corridor target.
 
-Candidate004's 13 review renders are under
-`renders/aegis_vanguard_candidate_v004/`. The reproducible local Blender file is
-`candidates/aegis_vanguard_candidate_v004.blend`; `.blend` candidates remain
-ignored until path-scoped Git LFS is configured and verified.
+Candidate005's 13 review renders are under
+`renders/aegis_vanguard_candidate_v005/`. Its reproducible local Blender file is
+`candidates/aegis_vanguard_candidate_v005.blend`; `.blend` candidates remain
+ignored until path-scoped Git LFS is configured and verified. Candidate004 and
+its tracked reports/renders remain the immutable comparison baseline.
 
 ## Safety boundary
 
-The deterministic builder:
+The deterministic Candidate005 builder:
 
-1. requires the approved `ArtSource/PoweredSuit/powersuit_pipeline.blend`;
+1. requires the hash-verified Candidate004 blend;
 2. hashes that source before and after generation;
-3. hides, but never deletes, the approved Generator114 shell in the candidate;
-4. builds Candidate004 on the same armature and actions;
+3. never edits Candidate004, Generator114, or an active Unity asset;
+4. builds Candidate005 on the same 23-bone armature and 24 actions;
 5. writes only beneath `ArtSource/PoweredSuitNextGen/`;
-6. recreates and validates the four exact runtime anchors; and
+6. retains the four exact runtime anchors and all weapon helpers; and
 7. does not export or modify a Unity asset.
 
-The approved source remained exactly
-`6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a`.
+Candidate004 remained exactly
+`86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb`.
+The final Candidate005 evidence refers to local blend SHA-256
+`0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84`.
+The approved Generator114 source and Unity rollback assets also remain untouched.
 
 ## Production work has started
 
@@ -57,29 +63,58 @@ Two isolated gates now make the remaining work explicit:
   texel-density estimates, renderer/material budgets, immutable hashes, and
   deterministic draft LOD1-LOD3 generation.
 
-Candidate004 correctly remains a **FAIL**, not a release asset:
+Candidate005 now **passes the isolated HeroV2 production-geometry profile**:
 
-- 7,837 forbidden weapon/suit frame-object intersections across 304 object-pair
-  groups. The main faults are forearm/receiver and magazine contacts, central
-  back-rifle interference, and reload chest/arm crossings.
-- 25 production errors and 16 warnings: 348 n-gons, 80 boundary edges on the
-  four baked cable meshes, missing UV0, zero UV coverage, 254
-  renderer-bearing objects/draw calls, and no continuous skinned undersuit.
-- Draft diagnostic LOD triangle totals were generated successfully:
-  `73,140 -> 36,570 -> 14,344 -> 4,846`, but every LOD still has 254 objects and
-  requires hand consolidation, UV repair, deformation work, and silhouette QA.
+- exactly three suit renderers/draw calls: continuous skinned undersuit,
+  consolidated rigid-weighted armor, and consolidated emission;
+- 88,316 LOD0 triangles, complete finite `UV0`, closed triangulated topology,
+  no boundary/non-manifold/loose/degenerate/duplicate defects, and normalized
+  one-to-four bone influences;
+- one connected undersuit with 11,594 blended vertices and a separate Blender
+  overlap audit reporting zero selected `UV0` overlap faces or loops;
+- diagnostic LOD totals of `88,316 -> 44,158 -> 17,660 -> 6,178`, all within
+  the authored suit budgets; and
+- 162/162 authored animation keyframes evaluated with finite geometry, no
+  collapsed triangle, and a recorded maximum local edge-stretch ratio of
+  5.801599 under the deliberately permissive 8x catastrophic-failure ceiling.
+  This is deformation-scaffold evidence, not final artist weight polish.
 
-The model is therefore a better visual/engineering target and a measured input
-to retopology - not a Unity replacement.
+The HeroV2 gate reports 0 errors and four texel-density warnings. Candidate005
+wires these deterministic, licence-free 1K preview maps through its UV/material
+path:
 
-## Rebuild Candidate004
+- `textures/candidate005/AV_H2_Detail_BaseColor.png`
+- `textures/candidate005/AV_H2_Detail_Normal.png`
+- `textures/candidate005/AV_H2_Detail_MRAO.png`
+- `textures/candidate005/AV_H2_Detail_Emission.png`
+
+They are material-development scaffolds, not a unique 4K character bake or a
+finished painted wear pass. Final work still requires deliberate sculpting,
+production retopology and seam placement, artist-polished weights, a unique 4K
+PBR bake/paint pass, and hand-repaired LOD silhouettes.
+
+Weapon clearance correctly remains **FAIL**. The canonical visible-geometry
+audit finds 3,894 forbidden instances across 72 consolidated object-pair groups.
+The separate hidden-proxy comparison finds 5,489/240, but that result is
+directional diagnostic evidence only because its rigid per-piece undersuit
+proxies are not equivalent to the remeshed, smoothly skinned visible undersuit.
+The inherited rifle's receiver, grips, stock, stow path, and action poses require
+a coordinated NextGen weapon/animation pass.
+
+Candidate005 has not been exported or integrated into Unity, and the technical
+handoff PASS is not visual promotion. Generator114 remains active until the
+remaining art, clearance, Unity/performance, and owner A/B gates pass.
+
+## Rebuild Candidate005
 
 From the repository root:
 
 ```powershell
+python "ArtSource\PoweredSuitNextGen\HeroV2\generate_candidate005_preview_textures.py"
+
 & "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" `
-  --background "ArtSource\PoweredSuit\powersuit_pipeline.blend" `
-  --python "ArtSource\PoweredSuitNextGen\scripts\build_aegis_vanguard_candidate.py"
+  --background "ArtSource\PoweredSuitNextGen\candidates\aegis_vanguard_candidate_v004.blend" `
+  --python "ArtSource\PoweredSuitNextGen\scripts\build_aegis_vanguard_candidate005.py"
 ```
 
 Then run the commands documented in:

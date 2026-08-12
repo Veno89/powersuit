@@ -48,6 +48,13 @@ the formal handoff, yielding 254 renderer-bearing meshes. It preserves the same
 23-bone rig and all 24 actions. That is acceptable for silhouette, material, and
 pose iteration, but not the runtime architecture we will ship.
 
+Candidate005 is the derived production-architecture prototype, not a visual
+promotion over Candidate004 and not a Unity replacement. It consolidates the
+visible suit to three skinned renderers/estimated draw calls at 88,316 LOD0
+triangles, with one connected skinned undersuit and complete `UV0`. A dedicated
+Blender audit reports zero selected overlap faces or loops. This proves a viable
+data structure; it does not substitute for deliberate character art.
+
 ## Non-negotiable gameplay contracts
 
 Preserve the current character height and gameplay footprint, all existing bone
@@ -129,9 +136,10 @@ small status lights, and active thruster cores.
 - Candidate004 materially improves the helmet, torso hierarchy, layered shoulders,
   limbs, boots, turbines, material separation, weathering, and review lighting.
 - Test exploration, shoulder aim, scope, stowed rifle, sprint, hover, and flight views.
-- The new gate now sweeps 24 actions/162 keyframes. Candidate004 currently fails
-  with 7,837 forbidden instances/304 object-pair groups, so clearance is not an
-  aesthetic judgement or an untracked TODO anymore.
+- The gate sweeps 24 actions/162 authored keyframes. Candidate005's canonical
+  three-visible-mesh result still fails at 3,894 forbidden instances/72
+  object-pair groups, so clearance remains blocking. A separate hidden 254-part
+  proxy reports 5,489/240 only for source-region diagnosis and is not canonical.
 - Repair the forearm envelopes, pose-specific stowed WeaponRoot and draw/sheathe
   endpoints, central backpack channel, reload contacts, and shoulder-camera
   clearance before expensive detail or Unity integration.
@@ -143,20 +151,25 @@ small status lights, and active thruster cores.
 - Add controlled secondary overlaps, pivots, pistons, vents, fasteners, and access panels.
 - Maintain primary/secondary/tertiary detail hierarchy; reject uniform greeble noise.
 
-### G4 — game mesh and deformation (validation lane started)
+### G4 — game mesh and deformation (architecture scaffold passes)
 
 - Retopologize to the LOD0 budgets.
 - Rigid-weight armor and smoothly skin flexible regions.
 - Validate normals, winding, manifold state, influence counts, and joint clearances.
 - Preserve the exact animation and hardpoint contract.
-- The isolated `HeroV2` gate is implemented. Candidate004's honest baseline is
-  25 errors/16 warnings: 348 n-gons, 80 boundary edges on the four baked cable
-  meshes, no UV0, no continuous skinned undersuit, and 254 renderer-bearing
-  pieces/draw calls.
+- Candidate005 passes the isolated HeroV2 structural gate with 0 errors and 4
+  texel-density warnings. It has three skinned renderers/draws and one connected
+  undersuit. The deformation scaffold samples all 162 authored keyframes and
+  records a 5.801599 maximum local edge-stretch ratio under the intentionally
+  permissive 8x catastrophic-failure ceiling. That is automation-failure
+  detection, not approval of seams, joint shapes, deformation, or weights.
+- Manual anatomical/armor sculpting, production retopology and seam placement,
+  joint cleanup, and weight polish remain required.
 
 ### G5 — UV, bake, and material finish
 
-- Author UV0 and material IDs.
+- Hand-author the final UV layout and material IDs; Candidate005's complete,
+  zero-selected-overlap scaffold is structural evidence, not final seam work.
 - Bake cage-based normal, AO, curvature, thickness, position, and ID support maps.
 - Paint deliberate PBR materials and usage-based wear.
 - Review in neutral studio, daylight, and dark interior lighting.
@@ -168,8 +181,9 @@ small status lights, and active thruster cores.
 - Verify LOD transitions in gameplay framing rather than only a turntable.
 - Profile in the existing 32-enemy stress scene at target quality levels.
 - Deterministic diagnostic LOD generation currently produces
-  `73,140 -> 36,570 -> 14,344 -> 4,846` triangles while preserving the source
-  hash. These are decimated diagnostics, not hand-repaired release LODs.
+  `88,316 -> 44,158 -> 17,660 -> 6,178` triangles for Candidate005. These are
+  decimated diagnostics, not hand-repaired release LODs. Candidate005's preview
+  textures likewise prove the PBR data path rather than final authored surfaces.
 
 ### G7 — parallel Unity candidate
 

@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "candidate": "Aegis Vanguard Candidate005",
+  "status": "PRODUCTION_ARCHITECTURE_CANDIDATE_NOT_UNITY_INTEGRATED",
+  "source_candidate004": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\aegis_vanguard_candidate_v004.blend",
+  "source_sha256_before": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+  "source_sha256_after": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+  "source_preserved": true,
+  "candidate_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\aegis_vanguard_candidate_v005.blend",
+  "candidate_blend_sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+  "armature": "PowerSuit_Armature",
+  "bone_count": 23,
+  "preserved_actions": [
+    "PS_Aim",
+    "PS_Aim_Walk_Backward",
+    "PS_Aim_Walk_Forward",
+    "PS_Aim_Walk_Left",
+    "PS_Aim_Walk_Right",
+    "PS_BoltCycle",
+    "PS_Hover",
+    "PS_Idle",
+    "PS_Reload",
+    "PS_Run_Forward",
+    "PS_Walk",
+    "PS_Walk_Backward",
+    "PS_Walk_Forward",
+    "PS_Walk_Left",
+    "PS_Walk_Right",
+    "PS_WeaponReady_Idle",
+    "PS_WeaponStowed_Hover",
+    "PS_WeaponStowed_Idle",
+    "PS_WeaponStowed_Walk_Backward",
+    "PS_WeaponStowed_Walk_Forward",
+    "PS_WeaponStowed_Walk_Left",
+    "PS_WeaponStowed_Walk_Right",
+    "PS_Weapon_Draw",
+    "PS_Weapon_Sheathe"
+  ],
+  "clearance_proxy_count": 254,
+  "source_partition": {
+    "undersuit_seeds": 18,
+    "armor_parts": 218,
+    "emission_parts": 8,
+    "omitted_redundant_joint_gaskets": 10
+  },
+  "production_architecture": {
+    "renderer_count": 3,
+    "draw_call_estimate": 3,
+    "undersuit_connected_components": 1,
+    "undersuit_blended_vertices": 11594,
+    "triangle_counts": {
+      "H2_Undersuit_LOD0": 24536,
+      "H2_Armor_LOD0": 60468,
+      "H2_Emission_LOD0": 3312
+    },
+    "uv0_face_coverage": {
+      "H2_Undersuit_LOD0": 1.0,
+      "H2_Armor_LOD0": 1.0,
+      "H2_Emission_LOD0": 1.0
+    },
+    "armor_boundary_edges_repaired_before_triangulation": 80
+  },
+  "uv0_overlap_audit": {
+    "method": "Blender uv.select_overlap across all three LOD0 renderers",
+    "selected_overlap_faces": 0,
+    "selected_overlap_loops": 0,
+    "per_renderer": {
+      "H2_Undersuit_LOD0": {
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0
+      },
+      "H2_Armor_LOD0": {
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0
+      },
+      "H2_Emission_LOD0": {
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0
+      }
+    }
+  },
+  "deformation_validation": {
+    "sample_mode": "all_authored_keyframes",
+    "sampled_frames": 162,
+    "maximum_edge_stretch_ratio": 5.801599,
+    "maximum_edge_stretch_location": {
+      "action": "PS_Aim_Walk_Backward",
+      "frame": 17.0,
+      "edge": 26063
+    },
+    "minimum_evaluated_triangle_area": 2.849009e-06,
+    "acceptance": {
+      "maximum_edge_stretch_ratio": 8.0,
+      "minimum_triangle_area": 1e-12
+    }
+  },
+  "preview_texture_manifest": {
+    "schema_version": 1,
+    "status": "PROCEDURAL_PREVIEW_NOT_FINAL_CHARACTER_BAKE",
+    "resolution": [
+      1024,
+      1024
+    ],
+    "seed": 5005,
+    "maps": {
+      "base_color": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_BaseColor.png",
+        "sha256": "be76df8aca49536900cd1db27525450b7685be4d558ae8c44b47170f1d345e15",
+        "mode": "RGBA"
+      },
+      "normal": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_Normal.png",
+        "sha256": "03a39ffe8d421419a4c9513a6e8731411ba170fe0c645ca103c0eda2c445c4dc",
+        "mode": "RGBA"
+      },
+      "mrao": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_MRAO.png",
+        "sha256": "57c105686256e0bc7388579347b90cf9c511c92f27f6fce22e4959b2498ba2d1",
+        "mode": "RGBA"
+      },
+      "emission": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_Emission.png",
+        "sha256": "a852358ef7b15d2d3be7eb5ae0f7d1a1e3b6b8910361865ff6c5859798a10d25",
+        "mode": "RGBA"
+      }
+    },
+    "channel_contract": {
+      "MRAO.R": "metallic scaffold",
+      "MRAO.G": "ambient-occlusion scaffold",
+      "MRAO.B": "woven detail mask",
+      "MRAO.A": "smoothness scaffold"
+    }
+  },
+  "render_paths": [
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_front.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_front_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_side.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_back.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_back_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_helmet_close.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_backpack_close.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_clay_front_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_pose_stowed.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_pose_aim.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_pose_run.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_pose_hover.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\aegis_vanguard_candidate_v005\\aegis_vanguard_pose_reload.png"
+  ],
+  "limitations": [
+    "Automated production-architecture pass; final anatomical sculpt, retopology, seam placement, weight polish and authored character bake remain manual art work.",
+    "Preview BaseColor, Normal, packed MRAO and Emission maps exercise the UV/PBR channel path but are deterministic 1K scaffolds, not the final unique 4K character atlas.",
+    "Clearance proxies exactly preserve rigid armor/emission source parts but are not equivalent to the remeshed, smoothly skinned visible undersuit. Proxy results are directional diagnostics only; actual visible geometry is audited separately and remains blocking.",
+    "The automated deformation ceiling catches catastrophic failures, not production skin quality; joint weighting and anatomical deformation remain manual polish work.",
+    "No Unity FBX, GUID, controller, prefab or scene was replaced."
+  ]
+}

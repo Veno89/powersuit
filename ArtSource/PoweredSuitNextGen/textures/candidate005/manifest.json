@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "PROCEDURAL_PREVIEW_NOT_FINAL_CHARACTER_BAKE",
+  "resolution": [
+    1024,
+    1024
+  ],
+  "seed": 5005,
+  "maps": {
+    "base_color": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_BaseColor.png",
+      "sha256": "be76df8aca49536900cd1db27525450b7685be4d558ae8c44b47170f1d345e15",
+      "mode": "RGBA"
+    },
+    "normal": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_Normal.png",
+      "sha256": "03a39ffe8d421419a4c9513a6e8731411ba170fe0c645ca103c0eda2c445c4dc",
+      "mode": "RGBA"
+    },
+    "mrao": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_MRAO.png",
+      "sha256": "57c105686256e0bc7388579347b90cf9c511c92f27f6fce22e4959b2498ba2d1",
+      "mode": "RGBA"
+    },
+    "emission": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate005/AV_H2_Detail_Emission.png",
+      "sha256": "a852358ef7b15d2d3be7eb5ae0f7d1a1e3b6b8910361865ff6c5859798a10d25",
+      "mode": "RGBA"
+    }
+  },
+  "channel_contract": {
+    "MRAO.R": "metallic scaffold",
+    "MRAO.G": "ambient-occlusion scaffold",
+    "MRAO.B": "woven detail mask",
+    "MRAO.A": "smoothness scaffold"
+  }
+}
