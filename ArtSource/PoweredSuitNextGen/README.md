@@ -105,6 +105,37 @@ Candidate005 has not been exported or integrated into Unity, and the technical
 handoff PASS is not visual promotion. Generator114 remains active until the
 remaining art, clearance, Unity/performance, and owner A/B gates pass.
 
+## Candidate006 precision-rifle review candidate
+
+Candidate006 / NextGen Precision Rifle 001 extends the isolated production
+architecture without replacing Candidate005 or the active Unity rifle. Its
+reproducible local blend hashes to
+`093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227`,
+and the production report records that source hash before and after validation.
+The Candidate005 source remains unchanged at
+`0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84`.
+
+The WeaponV2 structural gate reports **PASS**, 156 checks, 0 errors, and 0
+warnings, while `promotion_authorized` remains false. Candidate006 retains
+exactly 23 bones/24 actions, provides rifle-plus-optic LOD totals of
+`23,216 -> 13,168 -> 5,512 -> 1,884`, and combines with Candidate005 at 111,532
+LOD0 triangles, five renderers, and an estimated eight draws—the hard ceiling.
+Its 13 required renders are unique and source-bound. Scope evidence records a
+real inner-aperture proxy within `1.69e-7 m`, 0.021 m eye relief, a six-metre
+target, five successful physical rays, and a readable four-line reticle with
+four range ticks. Aim error is 0.01969 m lateral, 0.01720 m vertical, and
+3.256 degrees on-axis; front clearance is 0.19414 m. Magazine and bolt travel
+are 0.333135 m and 0.095 m, with zero return error.
+
+This is still an isolated production-architecture/review candidate, **not a
+Unity-ready asset**. The authored visible-clearance pass fails with 377
+forbidden instances/17 groups over 162 samples and records 197 allowed contacts:
+301 recurring grip/wrist-shell contacts, 35 containment failures, and 41
+manipulation/transition failures. The full all-frame and dense-transition gates
+were not run because the authored pass already fails. Stow/draw/sheathe,
+reload/bolt, and final PBR/art polish remain blocking. No FBX was exported and
+Generator114 remains active.
+
 ## Rebuild Candidate005
 
 From the repository root:

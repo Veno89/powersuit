@@ -55,6 +55,14 @@ triangles, with one connected skinned undersuit and complete `UV0`. A dedicated
 Blender audit reports zero selected overlap faces or loops. This proves a viable
 data structure; it does not substitute for deliberate character art.
 
+Candidate006 / NextGen Precision Rifle 001 is the parallel weapon-side
+architecture/review candidate. Its WeaponV2 structural gate passes 156 checks
+with no errors or warnings, and its four rifle-plus-optic LODs total
+`23,216 -> 13,168 -> 5,512 -> 1,884`. Combined Candidate005/Candidate006 LOD0 is
+111,532 triangles, five renderers, and eight estimated draws—the hard ceiling.
+This is architecture evidence only: its authored visible-clearance gate still
+fails at 377 instances/17 groups, so it is not Unity-ready.
+
 ## Non-negotiable gameplay contracts
 
 Preserve the current character height and gameplay footprint, all existing bone
@@ -184,6 +192,9 @@ small status lights, and active thruster cores.
   `88,316 -> 44,158 -> 17,660 -> 6,178` triangles for Candidate005. These are
   decimated diagnostics, not hand-repaired release LODs. Candidate005's preview
   textures likewise prove the PBR data path rather than final authored surfaces.
+- Candidate006 fits its rifle LOD budgets and the combined triangle/renderer
+  budgets, but reaches the eight-draw hard ceiling. This requires representative
+  runtime profiling and is not a performance approval.
 
 ### G7 — parallel Unity candidate
 

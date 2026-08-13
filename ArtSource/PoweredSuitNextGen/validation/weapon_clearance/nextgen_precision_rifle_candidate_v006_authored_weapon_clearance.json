@@ -1,0 +1,2164 @@
+{
+  "action_count": 24,
+  "actions": [
+    {
+      "action": "PS_Aim",
+      "allowed_contact_instances": 6,
+      "forbidden_intersection_instances": 9,
+      "sample_count": 3,
+      "sample_frames": [
+        1,
+        15,
+        30
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Backward",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Forward",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Left",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Aim_Walk_Right",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_BoltCycle",
+      "allowed_contact_instances": 12,
+      "forbidden_intersection_instances": 20,
+      "sample_count": 6,
+      "sample_frames": [
+        1,
+        4,
+        8,
+        12,
+        16,
+        20
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Hover",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 1,
+      "sample_count": 3,
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Idle",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 2,
+      "sample_count": 3,
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Reload",
+      "allowed_contact_instances": 11,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 8,
+      "sample_frames": [
+        1,
+        14,
+        25,
+        36,
+        50,
+        64,
+        75,
+        84
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Run_Forward",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        4,
+        6,
+        9,
+        11,
+        14,
+        16,
+        19,
+        21
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 0,
+      "sample_count": 5,
+      "sample_frames": [
+        1,
+        8,
+        16,
+        24,
+        31
+      ],
+      "status": "PASS"
+    },
+    {
+      "action": "PS_Walk_Backward",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Forward",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Left",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Walk_Right",
+      "allowed_contact_instances": 18,
+      "forbidden_intersection_instances": 27,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponReady_Idle",
+      "allowed_contact_instances": 6,
+      "forbidden_intersection_instances": 9,
+      "sample_count": 3,
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Hover",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 3,
+      "sample_count": 3,
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Idle",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 2,
+      "sample_count": 3,
+      "sample_frames": [
+        1,
+        31,
+        61
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Backward",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 8,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Forward",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 8,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Left",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 0,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "PASS"
+    },
+    {
+      "action": "PS_WeaponStowed_Walk_Right",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 9,
+      "sample_count": 9,
+      "sample_frames": [
+        1,
+        5,
+        9,
+        13,
+        17,
+        21,
+        25,
+        29,
+        31
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Weapon_Draw",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 18,
+      "sample_count": 4,
+      "sample_frames": [
+        1,
+        10,
+        18,
+        30
+      ],
+      "status": "FAIL"
+    },
+    {
+      "action": "PS_Weapon_Sheathe",
+      "allowed_contact_instances": 0,
+      "forbidden_intersection_instances": 18,
+      "sample_count": 4,
+      "sample_frames": [
+        1,
+        13,
+        21,
+        30
+      ],
+      "status": "FAIL"
+    }
+  ],
+  "allowed_contact_instances": 197,
+  "allowed_groups": [
+    {
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ]
+      },
+      "classification": "allowed_primary_grip_contact",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 97,
+      "max_aabb_overlap_min_axis_m": 0.370885,
+      "max_pre_tolerance_contact_depth_m": 0.038237676,
+      "max_triangle_pair_count": 146,
+      "reason": "Compatible face semantics intersect inside their explicit authored contact window.",
+      "suit_face_semantic": "primary_hand_right",
+      "suit_face_semantic_id": 101,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "primary_grip",
+      "weapon_face_semantic_id": 201,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ]
+      },
+      "classification": "allowed_support_grip_contact",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 96,
+      "max_aabb_overlap_min_axis_m": 0.275677,
+      "max_pre_tolerance_contact_depth_m": 0.031305857,
+      "max_triangle_pair_count": 141,
+      "reason": "Compatible face semantics intersect inside their explicit authored contact window.",
+      "suit_face_semantic": "support_hand_left",
+      "suit_face_semantic_id": 102,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "support_grip",
+      "weapon_face_semantic_id": 202,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          8,
+          12,
+          16
+        ]
+      },
+      "classification": "allowed_buttpad_contact",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 4,
+      "max_aabb_overlap_min_axis_m": 0.256979,
+      "max_pre_tolerance_contact_depth_m": 0.022285577,
+      "max_triangle_pair_count": 61,
+      "reason": "Compatible face semantics intersect inside their explicit authored contact window.",
+      "suit_face_semantic": "stock_pocket_right",
+      "suit_face_semantic_id": 103,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "buttpad",
+      "weapon_face_semantic_id": 203,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    }
+  ],
+  "armature": "PowerSuit_Armature",
+  "available_action_count": 24,
+  "blender_version": "5.2.0",
+  "candidate_blend": "ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v006.blend",
+  "candidate_blend_preserved": true,
+  "candidate_blend_sha256_after": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+  "candidate_blend_sha256_before": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+  "candidate_collision_object_names": [
+    "H2_Armor_LOD0",
+    "H2_Emission_LOD0",
+    "H2_Undersuit_LOD0"
+  ],
+  "candidate_collision_objects": 3,
+  "clearance_metadata": {
+    "errors": [],
+    "evaluated_objects": [
+      {
+        "asset_role": "suit",
+        "evaluated_geometry_sha256": "10f0f3c15b487d5a9104b68f833493cb8c52a93e2a7b480f3c2f5a9cebbbd7fb",
+        "evaluated_triangle_count": 60468,
+        "evaluated_vertex_count": 30650,
+        "metadata_errors": [],
+        "metadata_status": "PASS",
+        "name": "H2_Armor_LOD0",
+        "object_manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+        "semantic_attribute": "ps_clearance_suit_zone_id",
+        "semantic_counts": {
+          "0": 44435,
+          "101": 5506,
+          "102": 5506,
+          "103": 3293,
+          "104": 864,
+          "105": 864
+        },
+        "topology_semantics_sha256": "d737812a4013230b88115fc211622fcec6da969027d06fcc4b3103497545a98b"
+      },
+      {
+        "asset_role": "suit",
+        "evaluated_geometry_sha256": "94e2696ef9e6a1a5209528874cf0d1f60c4abbf11b8327e5fb62e21cd766610a",
+        "evaluated_triangle_count": 3312,
+        "evaluated_vertex_count": 1672,
+        "metadata_errors": [],
+        "metadata_status": "PASS",
+        "name": "H2_Emission_LOD0",
+        "object_manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+        "semantic_attribute": "ps_clearance_suit_zone_id",
+        "semantic_counts": {
+          "0": 3312
+        },
+        "topology_semantics_sha256": "5212da2ab4ea7cbfb0c30b11b78f20e5c5495f61682a66bc97bfc938fe17ed2f"
+      },
+      {
+        "asset_role": "suit",
+        "evaluated_geometry_sha256": "5bd93bbe5bb9d7341b1a118657a14e1296526ee2a00d47f9a998e147c3032741",
+        "evaluated_triangle_count": 24536,
+        "evaluated_vertex_count": 12270,
+        "metadata_errors": [],
+        "metadata_status": "PASS",
+        "name": "H2_Undersuit_LOD0",
+        "object_manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+        "semantic_attribute": "ps_clearance_suit_zone_id",
+        "semantic_counts": {
+          "0": 24536
+        },
+        "topology_semantics_sha256": "ac2c0a901600beb65bd86be4e422561e59f8568f29a6f54487c39e9c109ed04b"
+      },
+      {
+        "asset_role": "weapon",
+        "evaluated_geometry_sha256": "6acd90c1d18804318500a0d9b684efe0b646c1b29b080cac7387709a4a3bc18a",
+        "evaluated_triangle_count": 1536,
+        "evaluated_vertex_count": 768,
+        "metadata_errors": [],
+        "metadata_status": "PASS",
+        "name": "NGPR001_Optic_LOD0",
+        "object_manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 1536
+        },
+        "topology_semantics_sha256": "5874c5051e0cc6021c486f11468cedbfd9c36f7ff39b55878db54bc502d99b66"
+      },
+      {
+        "asset_role": "weapon",
+        "evaluated_geometry_sha256": "5a84bc5f55323bbcde80659cbb22362aca6f869d6266393fee47d976ea7dba08",
+        "evaluated_triangle_count": 21680,
+        "evaluated_vertex_count": 11048,
+        "metadata_errors": [],
+        "metadata_status": "PASS",
+        "name": "NGPR001_Rifle_LOD0",
+        "object_manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 17290,
+          "201": 625,
+          "202": 836,
+          "203": 879,
+          "204": 593,
+          "205": 1457
+        },
+        "topology_semantics_sha256": "1c2d53c18c2b9aa35d7f1037b12f34c790b993ce302236c9b3c97d05a0ddab2f"
+      }
+    ],
+    "failure_is_hard_error": true,
+    "manifest": {
+      "contact_windows": {
+        "bolt": [
+          {
+            "action": "PS_BoltCycle",
+            "end": 16,
+            "start": 4
+          }
+        ],
+        "buttpad": [
+          {
+            "action": "PS_Aim",
+            "end": 30,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 20,
+            "start": 1
+          },
+          {
+            "action": "PS_Hover",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 84,
+            "start": 1
+          },
+          {
+            "action": "PS_Run_Forward",
+            "end": 21,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "end": 61,
+            "start": 1
+          }
+        ],
+        "primary_grip": [
+          {
+            "action": "PS_Aim",
+            "end": 30,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Hover",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 84,
+            "start": 1
+          },
+          {
+            "action": "PS_Run_Forward",
+            "end": 21,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 3,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 20,
+            "start": 17
+          }
+        ],
+        "reload_mag": [
+          {
+            "action": "PS_Reload",
+            "end": 75,
+            "start": 25
+          }
+        ],
+        "support_grip": [
+          {
+            "action": "PS_Aim",
+            "end": 30,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 20,
+            "start": 1
+          },
+          {
+            "action": "PS_Hover",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Run_Forward",
+            "end": 21,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 24,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 84,
+            "start": 76
+          }
+        ]
+      },
+      "objects": [
+        {
+          "asset_role": "suit",
+          "face_count": 60468,
+          "name": "H2_Armor_LOD0",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "semantic_counts": {
+            "0": 44435,
+            "101": 5506,
+            "102": 5506,
+            "103": 3293,
+            "104": 864,
+            "105": 864
+          },
+          "topology_sha256": "d737812a4013230b88115fc211622fcec6da969027d06fcc4b3103497545a98b"
+        },
+        {
+          "asset_role": "suit",
+          "face_count": 3312,
+          "name": "H2_Emission_LOD0",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "semantic_counts": {
+            "0": 3312
+          },
+          "topology_sha256": "5212da2ab4ea7cbfb0c30b11b78f20e5c5495f61682a66bc97bfc938fe17ed2f"
+        },
+        {
+          "asset_role": "suit",
+          "face_count": 24536,
+          "name": "H2_Undersuit_LOD0",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "semantic_counts": {
+            "0": 24536
+          },
+          "topology_sha256": "ac2c0a901600beb65bd86be4e422561e59f8568f29a6f54487c39e9c109ed04b"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 1536,
+          "name": "NGPR001_Optic_LOD0",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 1536
+          },
+          "topology_sha256": "5874c5051e0cc6021c486f11468cedbfd9c36f7ff39b55878db54bc502d99b66"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 768,
+          "name": "NGPR001_Optic_LOD1",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 768
+          },
+          "topology_sha256": "fa3d60d152d18f406b76bb641e7736c5b84aa2a93ae779046c46296b5b90cc5e"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 512,
+          "name": "NGPR001_Optic_LOD2",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 512
+          },
+          "topology_sha256": "a2f0ce41f273e1b1482c715a20389e4144d6c87dd9401e2a5092eb5c1ce6392f"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 384,
+          "name": "NGPR001_Optic_LOD3",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 384
+          },
+          "topology_sha256": "f2236e91a563f9bc310247635c64fe40b4b16125d1f1c1c18f2bfaf2d863f612"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 21680,
+          "name": "NGPR001_Rifle_LOD0",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 17290,
+            "201": 625,
+            "202": 836,
+            "203": 879,
+            "204": 593,
+            "205": 1457
+          },
+          "topology_sha256": "1c2d53c18c2b9aa35d7f1037b12f34c790b993ce302236c9b3c97d05a0ddab2f"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 12400,
+          "name": "NGPR001_Rifle_LOD1",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 12400
+          },
+          "topology_sha256": "2d0bea33206f272d0b200a3773e88163e1e4ca5ea3a0f64d02c1aef63f988573"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 5000,
+          "name": "NGPR001_Rifle_LOD2",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 5000
+          },
+          "topology_sha256": "056fea169b526b909c262ea2b74c3dd0b57363c559cdd212279cc68a1958bfa9"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 1500,
+          "name": "NGPR001_Rifle_LOD3",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 1500
+          },
+          "topology_sha256": "f430f6d7bdfabba9fe940b6687eb9e623da3910c5f45433a14e2a3e0b3d2c3b6"
+        }
+      ],
+      "policy_version": "PS_CLEARANCE_FACE_POLICY_V1",
+      "schema_version": "PS_CLEARANCE_MANIFEST_V1",
+      "semantic_schema": "PS_CLEARANCE_FACE_SEMANTICS_V1",
+      "source_candidate_sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "suit_asset_id": "AegisVanguardCandidate005",
+      "weapon_asset_id": "PS_NextGenPrecisionRifle001"
+    },
+    "manifest_schema": "PS_CLEARANCE_MANIFEST_V1",
+    "manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+    "manifest_text_name": "PS_CLEARANCE_MANIFEST.json",
+    "policy_version": "PS_CLEARANCE_FACE_POLICY_V1",
+    "semantic_schema": "PS_CLEARANCE_FACE_SEMANTICS_V1",
+    "status": "PASS"
+  },
+  "collision_geometry_scope": "actual visible candidate render geometry",
+  "collision_geometry_source": "visible",
+  "contact_classification_counts": {
+    "allowed_buttpad_contact": 4,
+    "allowed_primary_grip_contact": 97,
+    "allowed_support_grip_contact": 96,
+    "forbidden_bolt_outside_authored_window": 2,
+    "forbidden_containment": 35,
+    "forbidden_incompatible_face_semantics": 334,
+    "forbidden_primary_grip_outside_authored_window": 4,
+    "forbidden_support_grip_outside_authored_window": 2
+  },
+  "contact_policy": {
+    "aabb_metrics_are_penetration_depth": false,
+    "allowed": [
+      "face IDs 101/201: right primary hand / primary grip, only in an explicit manifest window",
+      "face IDs 102/202: left support hand / support grip, only in an explicit manifest window",
+      "face IDs 103/203: right shoulder pocket / buttpad, only in an explicit ready-family manifest window",
+      "face IDs 104/204: left manipulation hand / magazine grasp, only in PS_Reload frames 25-75",
+      "face IDs 105/205: right manipulation hand / bolt handle, only in PS_BoltCycle frames 4-16"
+    ],
+    "classification_domain": "actual intersecting evaluated triangle faces",
+    "contact_depth_metric": "sampled interior-vertex distance to the actual opposing surface; recorded before tolerance",
+    "contact_tolerance_m": 0.0,
+    "forbidden": [
+      "all incompatible, unknown, missing, or out-of-window face pairs",
+      "all containment, including inside otherwise compatible contact zones",
+      "all armor contact while stowed or during draw/sheathe",
+      "all contacts when policy, face coverage, action/frame, or source-manifest evidence is invalid"
+    ]
+  },
+  "deterministic_report": true,
+  "dynamic_collision_objects": [
+    "H2_Armor_LOD0",
+    "H2_Emission_LOD0",
+    "H2_Undersuit_LOD0",
+    "NGPR001_Optic_LOD0",
+    "NGPR001_Rifle_LOD0"
+  ],
+  "forbidden_groups": [
+    {
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          18,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          13,
+          21
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 103,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.077009849,
+      "max_triangle_pair_count": 252,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "primary_grip",
+      "weapon_face_semantic_id": 201,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          14,
+          25,
+          36,
+          50,
+          64,
+          75,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          10,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          21
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 101,
+      "max_aabb_overlap_min_axis_m": 0.370885,
+      "max_pre_tolerance_contact_depth_m": 0.022965405,
+      "max_triangle_pair_count": 199,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Undersuit_LOD0",
+      "weapon_face_semantic": "primary_grip",
+      "weapon_face_semantic_id": 201,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Aim": [
+          1,
+          15,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "PS_Reload": [
+          1,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          4,
+          6,
+          9,
+          11,
+          14,
+          16,
+          19,
+          21
+        ],
+        "PS_Walk_Backward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          31,
+          61
+        ],
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 97,
+      "max_aabb_overlap_min_axis_m": 0.275677,
+      "max_pre_tolerance_contact_depth_m": 0.011002098,
+      "max_triangle_pair_count": 138,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Undersuit_LOD0",
+      "weapon_face_semantic": "support_grip",
+      "weapon_face_semantic_id": 202,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Hover": [
+          31
+        ],
+        "PS_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          31,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          5,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          29,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          5,
+          9,
+          13,
+          17,
+          21,
+          25,
+          29,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1
+        ],
+        "PS_Weapon_Sheathe": [
+          30
+        ]
+      },
+      "classification": "forbidden_containment",
+      "detection_methods": [
+        "weapon_inside_suit"
+      ],
+      "instance_count": 35,
+      "max_aabb_overlap_min_axis_m": 0.11896,
+      "max_pre_tolerance_contact_depth_m": 0.386888206,
+      "max_triangle_pair_count": 0,
+      "reason": "Containment is always forbidden, including compatible contact zones.",
+      "suit_face_semantic": "unknown_or_not_applicable",
+      "suit_face_semantic_id": -1,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "unknown_or_not_applicable",
+      "weapon_face_semantic_id": -1,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Reload": [
+          14,
+          25,
+          36,
+          50,
+          64,
+          75
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 6,
+      "max_aabb_overlap_min_axis_m": 0.370885,
+      "max_pre_tolerance_contact_depth_m": 0.051642243,
+      "max_triangle_pair_count": 164,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "support_hand_left",
+      "suit_face_semantic_id": 102,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "magazine_grasp",
+      "weapon_face_semantic_id": 204,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          8,
+          12
+        ],
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 4,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.164704695,
+      "max_triangle_pair_count": 732,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "primary_hand_right",
+      "suit_face_semantic_id": 101,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "ordinary_forbidden",
+      "weapon_face_semantic_id": 0,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          8,
+          12
+        ],
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 4,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.057571638,
+      "max_triangle_pair_count": 768,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "primary_hand_right",
+      "suit_face_semantic_id": 101,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "bolt_handle",
+      "weapon_face_semantic_id": 205,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          10,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          21
+        ]
+      },
+      "classification": "forbidden_primary_grip_outside_authored_window",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 4,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.068320975,
+      "max_triangle_pair_count": 260,
+      "reason": "Compatible contact faces intersect outside their explicit action/frame window.",
+      "suit_face_semantic": "primary_hand_right",
+      "suit_face_semantic_id": 101,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "primary_grip",
+      "weapon_face_semantic_id": 201,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          8,
+          12
+        ],
+        "PS_Weapon_Draw": [
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 4,
+      "max_aabb_overlap_min_axis_m": 0.343882,
+      "max_pre_tolerance_contact_depth_m": 0.113635249,
+      "max_triangle_pair_count": 244,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "ordinary_forbidden",
+      "weapon_face_semantic_id": 0,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          8,
+          12
+        ],
+        "PS_Weapon_Draw": [
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 4,
+      "max_aabb_overlap_min_axis_m": 0.343882,
+      "max_pre_tolerance_contact_depth_m": 0.026403563,
+      "max_triangle_pair_count": 79,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "bolt_handle",
+      "weapon_face_semantic_id": 205,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Reload": [
+          36,
+          50,
+          64
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 3,
+      "max_aabb_overlap_min_axis_m": 0.370885,
+      "max_pre_tolerance_contact_depth_m": 0.028299861,
+      "max_triangle_pair_count": 126,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Undersuit_LOD0",
+      "weapon_face_semantic": "magazine_grasp",
+      "weapon_face_semantic_id": 204,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 2,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.018604752,
+      "max_triangle_pair_count": 12,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "primary_hand_right",
+      "suit_face_semantic_id": 101,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "magazine_grasp",
+      "weapon_face_semantic_id": 204,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 2,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.001233054,
+      "max_triangle_pair_count": 31,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "bolt_manipulation_right",
+      "suit_face_semantic_id": 105,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "ordinary_forbidden",
+      "weapon_face_semantic_id": 0,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          10
+        ],
+        "PS_Weapon_Sheathe": [
+          21
+        ]
+      },
+      "classification": "forbidden_bolt_outside_authored_window",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 2,
+      "max_aabb_overlap_min_axis_m": 0.396439,
+      "max_pre_tolerance_contact_depth_m": 0.001342879,
+      "max_triangle_pair_count": 13,
+      "reason": "Compatible contact faces intersect outside their explicit action/frame window.",
+      "suit_face_semantic": "bolt_manipulation_right",
+      "suit_face_semantic_id": 105,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "bolt_handle",
+      "weapon_face_semantic_id": 205,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          18
+        ],
+        "PS_Weapon_Sheathe": [
+          13
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 2,
+      "max_aabb_overlap_min_axis_m": 0.343882,
+      "max_pre_tolerance_contact_depth_m": 0.063850924,
+      "max_triangle_pair_count": 524,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "magazine_grasp",
+      "weapon_face_semantic_id": 204,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_Weapon_Draw": [
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1
+        ]
+      },
+      "classification": "forbidden_support_grip_outside_authored_window",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 2,
+      "max_aabb_overlap_min_axis_m": 0.256979,
+      "max_pre_tolerance_contact_depth_m": 0.031305525,
+      "max_triangle_pair_count": 90,
+      "reason": "Compatible contact faces intersect outside their explicit action/frame window.",
+      "suit_face_semantic": "support_hand_left",
+      "suit_face_semantic_id": 102,
+      "suit_object": "H2_Armor_LOD0",
+      "weapon_face_semantic": "support_grip",
+      "weapon_face_semantic_id": 202,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    },
+    {
+      "actions_and_frames": {
+        "PS_BoltCycle": [
+          4,
+          16
+        ]
+      },
+      "classification": "forbidden_incompatible_face_semantics",
+      "detection_methods": [
+        "surface_triangle_crossing"
+      ],
+      "instance_count": 2,
+      "max_aabb_overlap_min_axis_m": 0.256979,
+      "max_pre_tolerance_contact_depth_m": 0.001202377,
+      "max_triangle_pair_count": 16,
+      "reason": "Intersecting suit and weapon faces are not a compatible contact pair.",
+      "suit_face_semantic": "ordinary_forbidden",
+      "suit_face_semantic_id": 0,
+      "suit_object": "H2_Undersuit_LOD0",
+      "weapon_face_semantic": "buttpad",
+      "weapon_face_semantic_id": 203,
+      "weapon_object": "NGPR001_Rifle_LOD0"
+    }
+  ],
+  "forbidden_intersection_instances": 377,
+  "forbidden_object_pair_groups": 17,
+  "gate": "AEGIS_WEAPON_SUIT_CLEARANCE",
+  "limitations": [
+    "The default sweep samples authored action keyframes. Use --all-frames for integer coverage or --frame-step with exact --action filters for denser subframe evidence; all discrete sampling can still miss collisions between samples.",
+    "BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.",
+    "The reported contact-depth metric is a real sampled vertex-to-surface distance, but surface crossings with no interior sampled vertex can report zero; AABB values remain prioritisation proxies only.",
+    "Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.",
+    "Visible mode audits weapon versus the actual evaluated candidate render geometry. Consolidated meshes without face-level contact tags are intentionally classified conservatively.",
+    "The tool does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting."
+  ],
+  "promotion_eligible_geometry_source": true,
+  "report_evidence_sha256": "d8dad2ec96e2dd076c17ecead00373b75409298b345ec3b62930e76a993b67f5",
+  "rifle_collision_object_names": [
+    "NGPR001_Optic_LOD0",
+    "NGPR001_Rifle_LOD0"
+  ],
+  "rifle_collision_objects": 2,
+  "sample_mode": "authored_keyframes",
+  "sampled_frame_count": 162,
+  "sampling": {
+    "action_filters": [],
+    "frame_step": null,
+    "inclusive_action_endpoints": false,
+    "mode": "authored_keyframes",
+    "sampled_frame_count": 162,
+    "selected_action_names": [
+      "PS_Aim",
+      "PS_Aim_Walk_Backward",
+      "PS_Aim_Walk_Forward",
+      "PS_Aim_Walk_Left",
+      "PS_Aim_Walk_Right",
+      "PS_BoltCycle",
+      "PS_Hover",
+      "PS_Idle",
+      "PS_Reload",
+      "PS_Run_Forward",
+      "PS_Walk",
+      "PS_Walk_Backward",
+      "PS_Walk_Forward",
+      "PS_Walk_Left",
+      "PS_Walk_Right",
+      "PS_WeaponReady_Idle",
+      "PS_WeaponStowed_Hover",
+      "PS_WeaponStowed_Idle",
+      "PS_WeaponStowed_Walk_Backward",
+      "PS_WeaponStowed_Walk_Forward",
+      "PS_WeaponStowed_Walk_Left",
+      "PS_WeaponStowed_Walk_Right",
+      "PS_Weapon_Draw",
+      "PS_Weapon_Sheathe"
+    ]
+  },
+  "schema_version": 3,
+  "status": "FAIL"
+}

@@ -106,6 +106,26 @@ Candidate005 preserves all 24 actions. Its deformation scaffold samples their 16
 
 Promotion remains blocked. The canonical gate against Candidate005's three visible consolidated meshes still fails weapon clearance at 3,894 forbidden instances across 72 object-pair groups. A separate hidden 254-part proxy diagnostic reports 5,489/240 and is useful for locating source regions, but it is not the canonical visible result. Manual silhouette/anatomical sculpting, production retopology and seam placement, joint cleanup, weight polish, authored PBR materials, clearance repair, hand-finished LODs, Unity integration/performance checks, and owner in-game A/B acceptance remain. Generator114 is still the active validated suit, and both its rollback assets and Candidate004 remain safe and unmodified. See `ArtSource/PoweredSuitNextGen/MASTERPIECE_PLAN.md` and `VALIDATION.md`.
 
+Candidate006 / **NextGen Precision Rifle 001** is the parallel weapon-side
+production-architecture and review candidate. Its isolated WeaponV2 structural
+gate passes with 156 checks, 0 errors, and 0 warnings while preserving the exact
+23-bone/24-action contract. Rifle-plus-optic LOD totals are
+`23,216 -> 13,168 -> 5,512 -> 1,884` triangles. Combined with Candidate005,
+LOD0 is 111,532 triangles across five renderers and an estimated eight draws,
+which is the documented hard ceiling rather than performance approval. All 13
+required source-bound review renders are present and unique, and the scope proof
+shows a readable four-line reticle with four range ticks through the real inner
+aperture to a six-metre target; all five validation rays hit the target board.
+
+Candidate006 is **not Unity-ready** and `promotion_authorized` remains false.
+Its 162-authored-keyframe visible-clearance audit still fails at 377 forbidden
+instances across 17 groups, with 197 narrowly allowed semantic contacts. Of the
+forbidden result, 301 are recurring grip/wrist-shell contacts, 35 are
+containment, and 41 are manipulation or transition contacts. Because this first
+gate fails, the 923-frame and 324 dense-transition promotion sweeps were not
+run. Stow/draw/sheathe, reload/bolt clearance, and final authored PBR/art polish
+remain blocking; no FBX was exported and no Unity asset was changed.
+
 ## Scope exclusions
 
 This milestone does not include multiplayer, networking, loot generation, a general inventory/equipment system, rarity, progression, skill trees, crafting, missions, quests, dialogue, story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, or final Asset Store publication.

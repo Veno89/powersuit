@@ -11,6 +11,37 @@ This is a bounded precision-rifle phase. It does not upgrade the assault rifle
 or heavy weapon, change weapon gameplay, add audio/VFX, or replace anything in
 Unity.
 
+## Measured Candidate006 status
+
+The isolated build is complete as a production-architecture/review candidate,
+not as a Unity-ready weapon. The blend hashes to
+`093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227`,
+and the production report records that source hash before and after validation;
+Candidate005 remains unchanged at
+`0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84`.
+
+- WeaponV2 structural gate: **PASS**, 156 checks, 0 errors, 0 warnings;
+  `promotion_authorized: false`
+- Exact preserved contract: 23 bones and 24 actions
+- Rifle-plus-optic LOD totals: `23,216 -> 13,168 -> 5,512 -> 1,884`
+- Combined Candidate005/Candidate006 LOD0: 111,532 triangles, 5 renderers,
+  8 estimated draws at the hard ceiling
+- Review package: 13 unique, source-bound renders
+- Scope proof: real aperture proxy within `1.69e-7 m`, 0.021 m eye relief,
+  6 m physical target, all 5 rays hitting the board, and a readable 4-line
+  reticle with 4 range ticks
+- Aim proof: 0.01969 m lateral, 0.01720 m vertical, 3.256 degree axis error,
+  and 0.19414 m front clearance
+- Mechanism proof: 0.333135 m magazine travel and 0.095 m bolt travel, both
+  returning with zero error
+- Authored visible clearance: **FAIL**, 377 forbidden instances/17 groups over
+  162 samples, with 197 allowed contacts. Breakdown: 301 recurring
+  grip/wrist-shell, 35 containment, and 41 manipulation/transition failures.
+
+The 923-integer-frame and 324 dense-transition sweeps were not run because the
+authored prerequisite already fails. Stow/draw/sheathe, reload/bolt, and final
+PBR/art polish remain blocking. No FBX or Unity integration was created.
+
 ## Immutable safety boundary
 
 - Use the hash-pinned Candidate005 blend
@@ -150,7 +181,9 @@ scope, or deep hand penetration.
 5. Sample `PS_Reload`, `PS_BoltCycle`, `PS_Weapon_Draw`, and
    `PS_Weapon_Sheathe` every `0.5` frame. Their inclusive ranges produce 324
    dense transition samples. Required result: zero forbidden instances and
-   zero forbidden groups outside the narrowly allowed tagged contacts.
+   zero forbidden groups outside the narrowly allowed tagged contacts. Use the
+   repeatable exact `--action` filters plus `--frame-step 0.5`; do not combine
+   this dense audit with `--all-frames`.
 6. Re-run rigid-manifest, hierarchy, helper, articulation, sighting, topology,
    UV/PBR, LOD, render-budget, and immutable-hash gates.
 
@@ -180,6 +213,10 @@ reproducible from documented commands; every preserved baseline hash and
 sighting, and clearance gates pass; the 923 integer-frame and 324 dense
 transition-sample visible sweeps contain zero forbidden contacts; and the owner
 approves the review renders.
+
+Candidate006 has **not** reached this definition of done. Its structural gate
+passes, but its authored visible-clearance result and remaining visual polish
+keep the candidate on hold.
 
 Passing this phase authorises preparation of a separate Unity integration
 proposal. It does not itself authorise replacement of the current Unity rifle

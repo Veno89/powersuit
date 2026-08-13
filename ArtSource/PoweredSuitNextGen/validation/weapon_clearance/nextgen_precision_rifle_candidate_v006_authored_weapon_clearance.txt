@@ -1,0 +1,152 @@
+Aegis Vanguard weapon/suit clearance gate
+===========================================
+Status: FAIL
+Candidate: ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v006.blend
+SHA-256 preserved: True
+Blender: 5.2.0
+Sampling: authored_keyframes
+Action filters: all available actions
+Frame step: None
+Collision geometry: visible (actual visible candidate render geometry)
+Policy metadata: PASS
+Manifest SHA-256: dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0
+Report evidence SHA-256: d8dad2ec96e2dd076c17ecead00373b75409298b345ec3b62930e76a993b67f5
+Actions sampled: 24/24
+Sampled frames: 162
+Allowed contact instances: 197
+Forbidden intersection instances: 377
+Forbidden object-pair groups: 17
+
+Action results
+--------------
+FAIL PS_Aim: 3 frames, 6 allowed, 9 forbidden
+FAIL PS_Aim_Walk_Backward: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_Aim_Walk_Forward: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_Aim_Walk_Left: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_Aim_Walk_Right: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_BoltCycle: 6 frames, 12 allowed, 20 forbidden
+FAIL PS_Hover: 3 frames, 0 allowed, 1 forbidden
+FAIL PS_Idle: 3 frames, 0 allowed, 2 forbidden
+FAIL PS_Reload: 8 frames, 11 allowed, 27 forbidden
+FAIL PS_Run_Forward: 9 frames, 18 allowed, 27 forbidden
+PASS PS_Walk: 5 frames, 0 allowed, 0 forbidden
+FAIL PS_Walk_Backward: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_Walk_Forward: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_Walk_Left: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_Walk_Right: 9 frames, 18 allowed, 27 forbidden
+FAIL PS_WeaponReady_Idle: 3 frames, 6 allowed, 9 forbidden
+FAIL PS_WeaponStowed_Hover: 3 frames, 0 allowed, 3 forbidden
+FAIL PS_WeaponStowed_Idle: 3 frames, 0 allowed, 2 forbidden
+FAIL PS_WeaponStowed_Walk_Backward: 9 frames, 0 allowed, 8 forbidden
+FAIL PS_WeaponStowed_Walk_Forward: 9 frames, 0 allowed, 8 forbidden
+PASS PS_WeaponStowed_Walk_Left: 9 frames, 0 allowed, 0 forbidden
+FAIL PS_WeaponStowed_Walk_Right: 9 frames, 0 allowed, 9 forbidden
+FAIL PS_Weapon_Draw: 4 frames, 0 allowed, 18 forbidden
+FAIL PS_Weapon_Sheathe: 4 frames, 0 allowed, 18 forbidden
+
+Forbidden groups (highest recurrence first)
+-------------------------------------------
+1. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=201 (primary_grip)
+   instances=103; max triangle pairs=252; real sampled depth=0.077010 m; AABB min-axis proxy=0.396439 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,18,30; PS_Weapon_Sheathe=1,13,21
+2. NGPR001_Rifle_LOD0 x H2_Undersuit_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=201 (primary_grip)
+   instances=101; max triangle pairs=199; real sampled depth=0.022965 m; AABB min-axis proxy=0.370885 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,20; PS_Reload=1,14,25,36,50,64,75,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+3. NGPR001_Rifle_LOD0 x H2_Undersuit_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=202 (support_grip)
+   instances=97; max triangle pairs=138; real sampled depth=0.011002 m; AABB min-axis proxy=0.275677 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Aim=1,15,30; PS_Aim_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Aim_Walk_Right=1,5,9,13,17,21,25,29,31; PS_BoltCycle=1,4,8,12,16,20; PS_Reload=1,84; PS_Run_Forward=1,4,6,9,11,14,16,19,21; PS_Walk_Backward=1,5,9,13,17,21,25,29,31; PS_Walk_Forward=1,5,9,13,17,21,25,29,31; PS_Walk_Left=1,5,9,13,17,21,25,29,31; PS_Walk_Right=1,5,9,13,17,21,25,29,31; PS_WeaponReady_Idle=1,31,61; PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+4. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=-1 (unknown_or_not_applicable); weapon=-1 (unknown_or_not_applicable)
+   instances=35; max triangle pairs=0; real sampled depth=0.386888 m; AABB min-axis proxy=0.118960 m
+   Containment is always forbidden, including compatible contact zones.
+   PS_Hover=31; PS_Idle=1,61; PS_WeaponStowed_Hover=1,31,61; PS_WeaponStowed_Idle=1,61; PS_WeaponStowed_Walk_Backward=1,5,13,17,21,25,29,31; PS_WeaponStowed_Walk_Forward=1,5,9,13,17,21,29,31; PS_WeaponStowed_Walk_Right=1,5,9,13,17,21,25,29,31; PS_Weapon_Draw=1; PS_Weapon_Sheathe=30
+5. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=102 (support_hand_left); weapon=204 (magazine_grasp)
+   instances=6; max triangle pairs=164; real sampled depth=0.051642 m; AABB min-axis proxy=0.370885 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Reload=14,25,36,50,64,75
+6. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=101 (primary_hand_right); weapon=0 (ordinary_forbidden)
+   instances=4; max triangle pairs=732; real sampled depth=0.164705 m; AABB min-axis proxy=0.396439 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_BoltCycle=8,12; PS_Weapon_Draw=10; PS_Weapon_Sheathe=21
+7. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=101 (primary_hand_right); weapon=205 (bolt_handle)
+   instances=4; max triangle pairs=768; real sampled depth=0.057572 m; AABB min-axis proxy=0.396439 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_BoltCycle=8,12; PS_Weapon_Draw=10; PS_Weapon_Sheathe=21
+8. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=101 (primary_hand_right); weapon=201 (primary_grip)
+   instances=4; max triangle pairs=260; real sampled depth=0.068321 m; AABB min-axis proxy=0.396439 m
+   Compatible contact faces intersect outside their explicit action/frame window.
+   PS_Weapon_Draw=10,30; PS_Weapon_Sheathe=1,21
+9. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=0 (ordinary_forbidden)
+   instances=4; max triangle pairs=244; real sampled depth=0.113635 m; AABB min-axis proxy=0.343882 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_BoltCycle=8,12; PS_Weapon_Draw=18; PS_Weapon_Sheathe=13
+10. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=205 (bolt_handle)
+   instances=4; max triangle pairs=79; real sampled depth=0.026404 m; AABB min-axis proxy=0.343882 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_BoltCycle=8,12; PS_Weapon_Draw=18; PS_Weapon_Sheathe=13
+11. NGPR001_Rifle_LOD0 x H2_Undersuit_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=204 (magazine_grasp)
+   instances=3; max triangle pairs=126; real sampled depth=0.028300 m; AABB min-axis proxy=0.370885 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Reload=36,50,64
+12. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=101 (primary_hand_right); weapon=204 (magazine_grasp)
+   instances=2; max triangle pairs=12; real sampled depth=0.018605 m; AABB min-axis proxy=0.396439 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Weapon_Draw=10; PS_Weapon_Sheathe=21
+13. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=105 (bolt_manipulation_right); weapon=0 (ordinary_forbidden)
+   instances=2; max triangle pairs=31; real sampled depth=0.001233 m; AABB min-axis proxy=0.396439 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Weapon_Draw=10; PS_Weapon_Sheathe=21
+14. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=105 (bolt_manipulation_right); weapon=205 (bolt_handle)
+   instances=2; max triangle pairs=13; real sampled depth=0.001343 m; AABB min-axis proxy=0.396439 m
+   Compatible contact faces intersect outside their explicit action/frame window.
+   PS_Weapon_Draw=10; PS_Weapon_Sheathe=21
+15. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=204 (magazine_grasp)
+   instances=2; max triangle pairs=524; real sampled depth=0.063851 m; AABB min-axis proxy=0.343882 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_Weapon_Draw=18; PS_Weapon_Sheathe=13
+16. NGPR001_Rifle_LOD0 x H2_Armor_LOD0
+   face semantics: suit=102 (support_hand_left); weapon=202 (support_grip)
+   instances=2; max triangle pairs=90; real sampled depth=0.031306 m; AABB min-axis proxy=0.256979 m
+   Compatible contact faces intersect outside their explicit action/frame window.
+   PS_Weapon_Draw=30; PS_Weapon_Sheathe=1
+17. NGPR001_Rifle_LOD0 x H2_Undersuit_LOD0
+   face semantics: suit=0 (ordinary_forbidden); weapon=203 (buttpad)
+   instances=2; max triangle pairs=16; real sampled depth=0.001202 m; AABB min-axis proxy=0.256979 m
+   Intersecting suit and weapon faces are not a compatible contact pair.
+   PS_BoltCycle=4,16
+
+Allowed contact groups
+----------------------
+- allowed_primary_grip_contact: NGPR001_Rifle_LOD0 x H2_Armor_LOD0 (97 instances; suit face 101, weapon face 201)
+- allowed_support_grip_contact: NGPR001_Rifle_LOD0 x H2_Armor_LOD0 (96 instances; suit face 102, weapon face 202)
+- allowed_buttpad_contact: NGPR001_Rifle_LOD0 x H2_Armor_LOD0 (4 instances; suit face 103, weapon face 203)
+
+Metadata/manifest errors
+------------------------
+None.
+
+Limitations
+-----------
+- The default sweep samples authored action keyframes. Use --all-frames for integer coverage or --frame-step with exact --action filters for denser subframe evidence; all discrete sampling can still miss collisions between samples.
+- BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.
+- The reported contact-depth metric is a real sampled vertex-to-surface distance, but surface crossings with no interior sampled vertex can report zero; AABB values remain prioritisation proxies only.
+- Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.
+- Visible mode audits weapon versus the actual evaluated candidate render geometry. Consolidated meshes without face-level contact tags are intentionally classified conservatively.
+- The tool does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting.

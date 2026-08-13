@@ -19,7 +19,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | K — HUD | Implemented | Formatter/presenter tests pass | Resolution/readability/accessibility review |
 | L — Developer console | Implemented | Parser, registry and gameplay-command tests pass | Hands-on malformed-command pass |
 | M — Pooling/performance | Pooling, diagnostics, and opt-in Development Build soak implemented | 30/60/120 matrix and two-minute 48-enemy soak pass | Connected GPU/render capture, uncapped and remaining lifecycle cases |
-| N — Hero Suit V2 art | Candidate004 visual maquette plus non-integrated Candidate005 production-architecture prototype | Generator114/Candidate004 preserved; Candidate005 has 3 renderers/draws, 88,316 tris, one connected skinned undersuit, UV0 overlap audit 0, and HeroV2 structural PASS | Repair canonical visible clearance; manual sculpt/retopo/weights/PBR/LODs; Unity A/B |
+| N — Hero Suit V2 art | Candidate004 visual maquette, non-integrated Candidate005 suit architecture, and isolated Candidate006 precision-rifle architecture/review candidate | Generator114/Candidate004/Candidate005 preserved; Candidate006 WeaponV2 structural PASS is 156/0/0 with exact 23 bones/24 actions, four budgeted LODs, and 13 unique renders | Repair Candidate006 visible clearance and carry/manipulation poses; final PBR/art polish; Unity A/B |
 
 ## Completed implementation
 
@@ -104,8 +104,13 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Pass the Candidate005 HeroV2 structural gate with 0 errors/4 texel-density warnings and generate diagnostic LOD totals of `88,316 -> 44,158 -> 17,660 -> 6,178` triangles. These automated LODs and preview textures are scaffolds, not release art.
 - [x] Sweep all 24 actions/162 authored keyframes. The deformation scaffold records a 5.801599 maximum local edge-stretch ratio under an intentionally loose 8x catastrophic-failure ceiling; it does not certify artist-quality weighting.
 - [x] Record Candidate005's canonical visible-mesh weapon-clearance **FAIL** at 3,894 forbidden instances/72 object-pair groups. Keep the separate hidden-proxy result of 5,489/240 diagnostic-only; it must not replace the canonical result.
+- [x] Build Candidate006 / NextGen Precision Rifle 001 as a parallel, non-integrated production-architecture and review candidate. Preserve Candidate005 at SHA-256 `0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84`, the exact 23-bone/24-action contract, Generator114, and every Unity asset.
+- [x] Pass Candidate006's WeaponV2 structural gate at 156 checks/0 errors/0 warnings. Record rifle-plus-optic LOD totals of `23,216 -> 13,168 -> 5,512 -> 1,884`; combined Candidate005/Candidate006 LOD0 is 111,532 triangles, five renderers, and an estimated eight draws at the hard ceiling.
+- [x] Produce 13 unique source-bound review renders and validate the scope's real inner aperture, 0.021 m eye relief, six-metre target, readable four-line reticle/four range ticks, and five successful physical target rays.
+- [x] Record Candidate006's authored visible-clearance **FAIL** at 377 forbidden instances/17 groups over 162 samples, with 197 allowed contacts. The 301 grip/wrist-shell, 35 containment, and 41 manipulation/transition failures keep promotion blocked; the 923-frame and 324 dense-transition sweeps were intentionally not run after this failure.
 - [ ] Owner-approve or revise the adult silhouette, dark material language, turbine arrangement, and helmet. Candidate005 is an architecture prototype, not a visual promotion over Candidate004.
 - [ ] Replace or hand-finish the procedural forms with authored high-poly armor and anatomical joint seals; complete production retopology/seams, weight polish, final UV layout and PBR bake/paint, and hand-repaired LODs in the isolated candidate lane.
+- [ ] Repair Candidate006 stow/draw/sheathe, reload/bolt, containment, and recurring grip/wrist-shell clearance; then pass both the full 923-integer-frame and 324-sample dense-transition visible sweeps at zero forbidden contacts.
 - [ ] Validate all 24 actions, back-stowed rifle clearance, aim/scope framing, hardpoints, flight effects, deformation, draw calls, and representative GPU cost in a separate Unity review prefab/scene.
 - [ ] Promote only after an owner-approved old/new in-game A/B comparison; keep Generator114 available for one-click rollback.
 

@@ -1,0 +1,2179 @@
+{
+  "schema_version": 1,
+  "candidate": "Candidate006 / NextGen Precision Rifle 001",
+  "status": "ISOLATED_PRODUCTION_WEAPON_CANDIDATE_NOT_UNITY_INTEGRATED",
+  "asset_id": "PS_NextGenPrecisionRifle001",
+  "source_candidate005": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\aegis_vanguard_candidate_v005.blend",
+  "source_sha256_before": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+  "source_sha256_after": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+  "source_preserved": true,
+  "candidate_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\candidates\\nextgen_precision_rifle_candidate_v006.blend",
+  "candidate_blend_sha256": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+  "concept_reference": {
+    "path": "ArtSource/PoweredSuitNextGen/Concepts/nextgen_precision_rifle_reference_v001.png",
+    "sha256": "8c99f32e7584bc0b49abf27b3fb029e417dd19ea77aab4da2b178c21b299db8c",
+    "usage": "visual_direction_only_measured_hardpoints_and_clearance_win"
+  },
+  "rig": {
+    "armature": "PowerSuit_Armature",
+    "bone_count": 23,
+    "bones": [
+      "Chest",
+      "Foot.L",
+      "Foot.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "LowerArm.L",
+      "LowerArm.R",
+      "LowerLeg.L",
+      "LowerLeg.R",
+      "Neck",
+      "Root",
+      "Shoulder.L",
+      "Shoulder.R",
+      "Spine",
+      "UpperArm.L",
+      "UpperArm.R",
+      "UpperLeg.L",
+      "UpperLeg.R",
+      "WeaponBolt",
+      "WeaponMagazine",
+      "WeaponRoot"
+    ]
+  },
+  "hardpoint_contract": {
+    "version": "NGPR001_HARDPOINTS_V1",
+    "weapon_contract_version": 3,
+    "rigid_signature_version": 6,
+    "rigid_signature": "b0a893bb3d5e07806bdf7962ded90e2c612f43d1d0bfbf5b933c4225ffc8a415",
+    "forward_axis": "+Y",
+    "up_axis": "+Z",
+    "support_grip_dogleg_local_m": [
+      0.108,
+      0.3,
+      -0.035
+    ],
+    "primary_grip_local_m": [
+      -0.07,
+      -0.05,
+      -0.04
+    ],
+    "stock_contact_local_m": [
+      -0.112,
+      -0.448,
+      0.132
+    ],
+    "sight_ocular_local_m": [
+      0.0,
+      -0.28,
+      0.315
+    ],
+    "muzzle_local_m": [
+      0.0,
+      1.175,
+      0.145
+    ]
+  },
+  "actions": {
+    "count": 24,
+    "original_signatures": {
+      "PS_Aim": {
+        "range": [
+          1.0,
+          30.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "91b792660cd79a6819c1f9155e0a70fc878d84d7c18f43a3b2ae8edf78f49f4b"
+      },
+      "PS_Aim_Walk_Backward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "3ca2078401e86c7c7fe9720d50ee1a080ca4e13d370b2f01e8dfc7ed0d2ed7aa"
+      },
+      "PS_Aim_Walk_Forward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "712f738591ff215b358394f98f2063bea7829b20fddbab8b6bb504f843b3e0f1"
+      },
+      "PS_Aim_Walk_Left": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "9b3860a0775606f7dfa47a73fe8f2af03a87e70e88c95e86cf159d1598303c74"
+      },
+      "PS_Aim_Walk_Right": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "40bc68f8866f397406ae68d25c371c2e10e213e7fa958f3697b5327bf99b7d46"
+      },
+      "PS_BoltCycle": {
+        "range": [
+          1.0,
+          20.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "d7c84b74a6aedf84462ec1bc3730bce6596998a399d9064d8f6ac18c3f461e1d"
+      },
+      "PS_Hover": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 147,
+        "sha256": "3662f51cc99649a9ef0c09e0b0c25d213d7ae8de3d79bf0ad2fc6f25aa0aafb3"
+      },
+      "PS_Idle": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 147,
+        "sha256": "600da19b7dbb0b633ab26424d1bf314ff744f00a97007f130d8040c898a43d17"
+      },
+      "PS_Reload": {
+        "range": [
+          1.0,
+          84.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "cdcf79a66cc513b97e3542413935fdda1c4a78d5fe43af37fe96d82c941ee92c"
+      },
+      "PS_Run_Forward": {
+        "range": [
+          1.0,
+          21.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "fa59390f8ca446b0e4df54740597a2b06bb773ec3833d336721cb78444196f21"
+      },
+      "PS_Walk": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 147,
+        "sha256": "a5948f2d9a9c57b42db92649145f6a0ece60a0f5555b6f58ba98871d0618e2bf"
+      },
+      "PS_Walk_Backward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "45b8bc0836f6f555e5c4fb30f62cc83f1ff95e27cbd838580c95910997fdb1b7"
+      },
+      "PS_Walk_Forward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "69e371a1f6374b9e96d9018e160bf1b18ccd810ce6a2e4aedc816224c3e63dde"
+      },
+      "PS_Walk_Left": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "833f2a9e7e424b9487237753e9e1f1e590254ef8a5ca2a6a1f7327b4f51ab069"
+      },
+      "PS_Walk_Right": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "40372b119ba06d47e182a063f49b84fbeb4e4e2bc0d40964c698566bb56cff98"
+      },
+      "PS_WeaponReady_Idle": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "9f798324fc50ca91c85530cb5abe5caf020f38f519e84468fb996b6e89338922"
+      },
+      "PS_WeaponStowed_Hover": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "a5a4669d626f79109a4c1e9b513816b2d58adcf7c04b5b19d01bf89b3f1b3054"
+      },
+      "PS_WeaponStowed_Idle": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "287d6642c548e2c912a4d6746860b83c1af455e18d6a3c4543da29e80cddf39f"
+      },
+      "PS_WeaponStowed_Walk_Backward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "49e81ed0a2e04eff318ad688365849eb899450b68a2ba624420633e6a23adab3"
+      },
+      "PS_WeaponStowed_Walk_Forward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "090359ce7e7dae79945021336fd104c9066b1037a39a4561d76f1817446ec81a"
+      },
+      "PS_WeaponStowed_Walk_Left": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "b2c29e1991310d35a126156b2c5bad5762e2fe5fedcdc434d0eec2f29af1ef46"
+      },
+      "PS_WeaponStowed_Walk_Right": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "c008f37f925a7b4f0334f24c6f4cb827bf2265f28c7e4d036611edf1a2e3b4ed"
+      },
+      "PS_Weapon_Draw": {
+        "range": [
+          1.0,
+          30.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "c7b1ceac612667a4f62b60cfb84e54bdecb5d984e89e4579675db052dbf5f80d"
+      },
+      "PS_Weapon_Sheathe": {
+        "range": [
+          1.0,
+          30.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "60eb5c44c002023052fb171179565ed62b9a2521b5d4c049af9758f39bf86d8c"
+      }
+    },
+    "candidate_signatures": {
+      "PS_Aim": {
+        "range": [
+          1.0,
+          30.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "139e98e50d962b1d6c2b12dc057424390741818044211344a82ef15050e50098"
+      },
+      "PS_Aim_Walk_Backward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "ec2ff282c89a90b576def7461b90d725f7232d7876fa767bd0ccfd6d68516419"
+      },
+      "PS_Aim_Walk_Forward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "f25bd4b0c1646852bc93c535079ced9c96e860f5c80474db5be47777e0ba5faf"
+      },
+      "PS_Aim_Walk_Left": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "dd34eafe84ec29d7b3291cd6f5fec003bbb51162ddcd70bafffa6c49741813cc"
+      },
+      "PS_Aim_Walk_Right": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "f7855d7d8ab5af44b35bae2bb3055a78c63bbb64d7025a9716dbc3c7f1fd8c6e"
+      },
+      "PS_BoltCycle": {
+        "range": [
+          1.0,
+          20.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "652d4c5a69d72f869dccde41b7fea1c32b261aefe67d27aa53693f4dd0aabf0e"
+      },
+      "PS_Hover": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 147,
+        "sha256": "4d71176dfa04f95c230d7616f74464f23546caf0005c9ff0d809827fed66edcb"
+      },
+      "PS_Idle": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 147,
+        "sha256": "078c9d2ea572a794c2c7e9a18b242d2b4bc116410f6d00dc43f75d0ae985a420"
+      },
+      "PS_Reload": {
+        "range": [
+          1.0,
+          84.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "62a13c72bfede8f789e12f20a4c0498a90cb8c83615586df803f66b7dfd0e85d"
+      },
+      "PS_Run_Forward": {
+        "range": [
+          1.0,
+          21.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "e166e88d02f6b065a62fa94cbad41f70c7b38c0fe2608972d793dbc3d8df59a0"
+      },
+      "PS_Walk": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 147,
+        "sha256": "6f07b4d4ed774b2c207027d27864e4561c421c484c64cca5114078ef4b3ffc0d"
+      },
+      "PS_Walk_Backward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "8c108865652b1d2b1fd5521ff720f0d435ae85f9bc5375d7657a4ab22ce82626"
+      },
+      "PS_Walk_Forward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "cfe2cd41c61f81bd7f249580183a57426a5c6146ddeb952ae4f4561024a7e015"
+      },
+      "PS_Walk_Left": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "bda84ba4f1e0e3679fde3f4f6158ada83e2e7dd707287d0260206411ec295275"
+      },
+      "PS_Walk_Right": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "99e007f19985e8f3b7aba32892d870fb4f94ca6f19a7d0c4c1975ccf11e7a321"
+      },
+      "PS_WeaponReady_Idle": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "abb983ea7b8f97e868b1141fb4bcf67fe132edf26f2b261947ee4145564f4e3b"
+      },
+      "PS_WeaponStowed_Hover": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "75424ef9e01920a3b055ca1bf388f5abead90aa81350db8861bc2fea9d0bb49e"
+      },
+      "PS_WeaponStowed_Idle": {
+        "range": [
+          1.0,
+          61.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "2944cfc123bf4d408e396f061b94454f9bfbcb189aa273504c15ddd7bca648a5"
+      },
+      "PS_WeaponStowed_Walk_Backward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "25b8564d4d3175dea9472c15dc4d0e8ddd563d45f812b5bb0218c629a533f382"
+      },
+      "PS_WeaponStowed_Walk_Forward": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "18a6bc3106a791005efa33a986fc1c9e65aef3b7fb40c95602b4029c7ba50afa"
+      },
+      "PS_WeaponStowed_Walk_Left": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "7da4625f277fdc22000af6599a278f157366311d8a2e0702a0e0d28cc259d09a"
+      },
+      "PS_WeaponStowed_Walk_Right": {
+        "range": [
+          1.0,
+          31.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "75d261e854baed7658c8f1274fb745c93a882f61d261018c0b27108887ef3cf8"
+      },
+      "PS_Weapon_Draw": {
+        "range": [
+          1.0,
+          30.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "088ba0b70afb25fbd73318239a524ac3213a69984ff01e52c0779ca1fa7dd5f5"
+      },
+      "PS_Weapon_Sheathe": {
+        "range": [
+          1.0,
+          30.0
+        ],
+        "slot_count": 1,
+        "curve_count": 207,
+        "sha256": "6598fe82c2d1918d651c627bf07e180ccc834b82f6173c19d85c8fd62ad5847d"
+      }
+    },
+    "reauthored": [
+      "PS_Aim",
+      "PS_Aim_Walk_Backward",
+      "PS_Aim_Walk_Forward",
+      "PS_Aim_Walk_Left",
+      "PS_Aim_Walk_Right",
+      "PS_BoltCycle",
+      "PS_Hover",
+      "PS_Idle",
+      "PS_Reload",
+      "PS_Run_Forward",
+      "PS_Walk",
+      "PS_Walk_Backward",
+      "PS_Walk_Forward",
+      "PS_Walk_Left",
+      "PS_Walk_Right",
+      "PS_WeaponReady_Idle",
+      "PS_WeaponStowed_Hover",
+      "PS_WeaponStowed_Idle",
+      "PS_WeaponStowed_Walk_Backward",
+      "PS_WeaponStowed_Walk_Forward",
+      "PS_WeaponStowed_Walk_Left",
+      "PS_WeaponStowed_Walk_Right",
+      "PS_Weapon_Draw",
+      "PS_Weapon_Sheathe"
+    ],
+    "preserved_exactly": false,
+    "reauthor_evidence": {
+      "schema_version": 1,
+      "reauthor_version": "CANDIDATE006_WEAPON_ACTIONS_V3",
+      "action_signature_schema": "CANDIDATE006_ACTION_SEMANTICS_V2",
+      "input_bone_count": 23,
+      "normalization_bone_count": 20,
+      "output_bone_count": 23,
+      "normalization": {
+        "legacy_control_curves_removed": {
+          "PS_Idle": 27,
+          "PS_Walk": 27,
+          "PS_Hover": 27,
+          "PS_Aim": 27
+        },
+        "magazine_objects": [
+          "NGPR_Magazine",
+          "NGPR_MagazineBase",
+          "NGPR_MagazineRib_L",
+          "NGPR_MagazineRib_R",
+          "NGPR_MagwellCollar"
+        ],
+        "bolt_objects": [
+          "NGPR_BoltKnob",
+          "NGPR_BoltRootCollar",
+          "NGPR_BoltStem",
+          "NGPR_ChargingRail"
+        ]
+      },
+      "intentionally_reauthored_actions": [
+        "PS_Aim",
+        "PS_WeaponReady_Idle",
+        "PS_WeaponStowed_Idle",
+        "PS_Weapon_Draw",
+        "PS_Weapon_Sheathe",
+        "PS_Walk_Forward",
+        "PS_Walk_Backward",
+        "PS_Walk_Left",
+        "PS_Walk_Right",
+        "PS_Aim_Walk_Forward",
+        "PS_Aim_Walk_Backward",
+        "PS_Aim_Walk_Left",
+        "PS_Aim_Walk_Right",
+        "PS_Reload",
+        "PS_BoltCycle",
+        "PS_WeaponStowed_Walk_Forward",
+        "PS_WeaponStowed_Walk_Backward",
+        "PS_WeaponStowed_Walk_Left",
+        "PS_WeaponStowed_Walk_Right",
+        "PS_WeaponStowed_Hover",
+        "PS_Run_Forward"
+      ],
+      "carrier_only_retargeted_actions": [
+        "PS_Idle",
+        "PS_Walk",
+        "PS_Hover"
+      ],
+      "changed_action_signatures": {
+        "PS_Aim": {
+          "before": {
+            "range": [
+              1,
+              30
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "3017d63db77a215d214ce0e96c7a6d6db9a11cd9e8c4b946ab2b1e4389f530c4"
+          },
+          "after": {
+            "range": [
+              1,
+              30
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "2e89cff87f149c3873a88ffb2ab37dd9822c538519d1aed6c31fb6e4ade21b2a"
+          }
+        },
+        "PS_WeaponReady_Idle": {
+          "before": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "3c34769de9913040fcbfc3a40550d398d2c556fd7c9331b63c11eaddbc6b1c65"
+          },
+          "after": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "526d52dfdcea96e9e56a7acf34021338ccbefe066da12595dcbe94a4b5c354b3"
+          }
+        },
+        "PS_WeaponStowed_Idle": {
+          "before": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "ba885ba7f85df367301b9afc15ca26c4a9a5c13b582e9736e8fc0f2c67e7a84c"
+          },
+          "after": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "24cc0ab1bfde65c9f433fd895d587dae2fbba345af8bb84573dd1ac20e3a5d68"
+          }
+        },
+        "PS_Weapon_Draw": {
+          "before": {
+            "range": [
+              1,
+              30
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "7f5c2fb5f21014de1017323952c0cad61fa7cc7402ff5fe886b9273211189667"
+          },
+          "after": {
+            "range": [
+              1,
+              30
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "b90a821b526d7a92fcfd03494c8a583f94d7509938fd5d08663806ad446e2d10"
+          }
+        },
+        "PS_Weapon_Sheathe": {
+          "before": {
+            "range": [
+              1,
+              30
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "fdc7d86773a76ae047f393e93c924102462282d20d535421b5601c9006eebe52"
+          },
+          "after": {
+            "range": [
+              1,
+              30
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "fcf4c17dc8d88fe1630ecb166a7e7b7244424b28b514bfd8f7db24d3cc5ef208"
+          }
+        },
+        "PS_Walk_Forward": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "11d111ba2f34f2883586fa552b985e37d7d3cbb612a88f708c7e062bf2681697"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "1e9c579bd6aa5168e566e59cb9ae96ee35eae5e2a748e9f4b775c0e9f29365e1"
+          }
+        },
+        "PS_Walk_Backward": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "0a559342922c91ad26a2431a8981bc8b94c2c9a6cece9bff77993a0bb2b97a33"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "0c4a02844a4a6f08842cbc6b980641ba9b10828a9e912299cd022c8e4c35f3a9"
+          }
+        },
+        "PS_Walk_Left": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "5b424f0c19d8f8063876add3daff9c36db8f376531c6386316f7e857a21ff01d"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "803f521223404b13bf4795b924b0c832b7e94c54698673c5399b20be09c610a0"
+          }
+        },
+        "PS_Walk_Right": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "d030a54bdbfebdb086f798a51b42559e8022c3e862f8429396bafa74642cb668"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "4bfcdd81524315593a5d1ce6e1383c9e8c92485844b91171b38023900eca817d"
+          }
+        },
+        "PS_Aim_Walk_Forward": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "be1ea63894ce6afa5a697819b981c0e0bcd317d4592312b5bfb3e4199b9a4c5c"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "f1d549aa6091c2fb3f47d842d8bdff8c925d3938f5a6f157e928f42b5d4ae316"
+          }
+        },
+        "PS_Aim_Walk_Backward": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "7032119e1d0c23e4e37dc51a0509bd457be02004f40ea13c3901a7889e64f6cb"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "9738a0ed29851a0e8b9dfcf86425464a184949c789a10ec8fd594d747f4a9b89"
+          }
+        },
+        "PS_Aim_Walk_Left": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "35532855d16a22257826136eae4ba4746bdb0ac3e85a20bb46a9318bd64462a6"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "f8ea0186baf61f3f55e74cb9fd0ca17eaf47da19795e30d71e3719904977c48f"
+          }
+        },
+        "PS_Aim_Walk_Right": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "bef1266ce6a59b25c2120b367cb24467f2851ca0b901e8b22489e347221b1c73"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "ebf8ceaafcaa2061b358879d12258d1816ea1fed863d36d79afd507b71991d74"
+          }
+        },
+        "PS_Reload": {
+          "before": {
+            "range": [
+              1,
+              84
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "3c3ffd5ef209d68a0e16f4d57fe826323fbc9e1d06664320a81562c603e6202b"
+          },
+          "after": {
+            "range": [
+              1,
+              84
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "da985bca3f9c77f8f79de65cfb5ff4ca4802eb2bdd31ab82d72776d98b39a46b"
+          }
+        },
+        "PS_BoltCycle": {
+          "before": {
+            "range": [
+              1,
+              20
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "26011041c4d8719d93df0ce85e71da4ce427a6c42e043a00c8bd4686286b4a8f"
+          },
+          "after": {
+            "range": [
+              1,
+              20
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "e73f2e74fa3ef3fad65c3573ade61dcf5106bbc9ae35d2aab25696fadd337034"
+          }
+        },
+        "PS_WeaponStowed_Walk_Forward": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "572b1159fc1f4f0459eb2d9817fa0c42e138f1aacdee43c9f96ccb19770f4bdd"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "c89d7d0e1aa71cfedeb1dbc426bd796fa69d0dfebf9f2c95d17b6612c5a84949"
+          }
+        },
+        "PS_WeaponStowed_Walk_Backward": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "c26ea8d9ebb399f3f90590015665cd2f002dd627406f933166fbb07ed9b579ad"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "9103484b26fae7475aa2c18ba60abd29e665530d09c17df9052fde8ade0dacee"
+          }
+        },
+        "PS_WeaponStowed_Walk_Left": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "a5bec3c2118a4cb9365a5d0f2f057843a19c53634db672381524ca39a490fd93"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "4d10dcc5427f9d2b703eb436768282eebb19fb588d7f00353363d132b8135b3c"
+          }
+        },
+        "PS_WeaponStowed_Walk_Right": {
+          "before": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "f0119afcca519d6ede43af2705539c33eacd0151936c87fb8bd03c0a704000af"
+          },
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "801be1eba9272960b13debbbfccf9eeac1812b4cc1374c7bd4eeee11d4b06b85"
+          }
+        },
+        "PS_WeaponStowed_Hover": {
+          "before": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "ea02d5c80fd96305f1ada379c84d832d3b2166b8ad5c811a0bfb214c9818e433"
+          },
+          "after": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "2803cd4dc17fe9100134d092ef3e2f3b012798d2d4b504c7e5d21b8d6fb65483"
+          }
+        },
+        "PS_Run_Forward": {
+          "before": {
+            "range": [
+              1,
+              21
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "6519f9cb222e7b8d543e8672327af03a4bd50ed6445505a63c705bdf0c81f2de"
+          },
+          "after": {
+            "range": [
+              1,
+              21
+            ],
+            "slot_count": 1,
+            "curve_count": 207,
+            "sha256": "93fca1fb037b10c5f452e9b5fee0e4bc8020729b02c9a47490511dcbdc16b407"
+          }
+        }
+      },
+      "preserved_body_actions": {
+        "PS_Idle": {
+          "body_curve_semantic_sha256": "da57188127f0847bbb35196a24c1a0cb075f3e013f0692adb6c0e71101376b7d",
+          "after": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 147,
+            "sha256": "78a1dc047c57846d27287b62817d6fec6d9ee1055c8026a13ccf195bd0023b61"
+          }
+        },
+        "PS_Walk": {
+          "body_curve_semantic_sha256": "313e79fb19f8f05d8fa690710b0a0847a6ae05ad2b19bf9871c01f596b76897a",
+          "after": {
+            "range": [
+              1,
+              31
+            ],
+            "slot_count": 1,
+            "curve_count": 147,
+            "sha256": "4ae1bd25fd2739076b70a395b83c2c5bf52f045cb3b9240b11221420848a6b48"
+          }
+        },
+        "PS_Hover": {
+          "body_curve_semantic_sha256": "0d3b7a9849096abe65db1f9ec0dbefc7d4e200a473a21cc179ef3bb4fb2abd6e",
+          "after": {
+            "range": [
+              1,
+              61
+            ],
+            "slot_count": 1,
+            "curve_count": 147,
+            "sha256": "c6b987e42aaae6f8856c0c795dc4d760c69909690f22adbb96eb2c2c6de6c377"
+          }
+        }
+      },
+      "action_count": 24,
+      "carrier_parent": "PowerSuit_Armature",
+      "carrier_parent_bone": "WeaponRoot",
+      "carrier_to_root_matrix": [
+        0.9975599051,
+        -0.0697710514,
+        0.0025032223,
+        -0.1598771513,
+        0.0680206344,
+        0.9793613553,
+        0.190326646,
+        0.6376963854,
+        -0.0157308504,
+        -0.1896919012,
+        0.9817177653,
+        1.4776831865,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "ready_pose_mode": "forward_preaim_head_neutral",
+      "transition_pose_mode": "outward_extract_then_rotate_symmetric",
+      "transition_evidence": {
+        "endpoint_max_matrix_error": 0.0,
+        "full_frame_reversal_max_matrix_error": 4.6938657760620117e-07
+      },
+      "legacy_carrier_mode": "idle_walk_hover_stowed__aim_solved",
+      "stance_profile": {
+        "stock_inward_m": 0.045,
+        "stock_forward_m": 0.035,
+        "stock_up_m": 0.07,
+        "weapon_pitch_deg": -6.0,
+        "trigger_shoulder_forward_deg": 14.0,
+        "support_shoulder_forward_deg": 38.0,
+        "aiming_eye_outward_m": 0.055
+      },
+      "stow_rearward_delta_m": 0.23,
+      "stow_outward_delta_m": 0.04,
+      "draw_extraction_back_clearance_m": 0.08,
+      "draw_extraction_lateral_m": 0.04,
+      "reload_hand_outward_m": 0.05,
+      "reload_magazine_outward_m": 0.05,
+      "bolt_hand_outward_m": 0.04,
+      "pinned_pipeline_blend": "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuit\\powersuit_pipeline.blend",
+      "pinned_pipeline_sha256": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a"
+    }
+  },
+  "production_renderers": {
+    "count": 8,
+    "per_lod": {
+      "LOD0": [
+        "NGPR001_Rifle_LOD0",
+        "NGPR001_Optic_LOD0"
+      ],
+      "LOD1": [
+        "NGPR001_Rifle_LOD1",
+        "NGPR001_Optic_LOD1"
+      ],
+      "LOD2": [
+        "NGPR001_Rifle_LOD2",
+        "NGPR001_Optic_LOD2"
+      ],
+      "LOD3": [
+        "NGPR001_Rifle_LOD3",
+        "NGPR001_Optic_LOD3"
+      ]
+    },
+    "triangle_counts": {
+      "NGPR001_Rifle_LOD0": 21680,
+      "NGPR001_Optic_LOD0": 1536,
+      "NGPR001_Rifle_LOD1": 12400,
+      "NGPR001_Optic_LOD1": 768,
+      "NGPR001_Rifle_LOD2": 5000,
+      "NGPR001_Optic_LOD2": 512,
+      "NGPR001_Rifle_LOD3": 1500,
+      "NGPR001_Optic_LOD3": 384
+    },
+    "topology_metrics": {
+      "NGPR001_Rifle_LOD0": {
+        "vertices": 11048,
+        "triangles": 21680,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Optic_LOD0": {
+        "vertices": 768,
+        "triangles": 1536,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Rifle_LOD1": {
+        "vertices": 6408,
+        "triangles": 12400,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Optic_LOD1": {
+        "vertices": 384,
+        "triangles": 768,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Rifle_LOD2": {
+        "vertices": 2708,
+        "triangles": 5000,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Optic_LOD2": {
+        "vertices": 256,
+        "triangles": 512,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Rifle_LOD3": {
+        "vertices": 958,
+        "triangles": 1500,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      },
+      "NGPR001_Optic_LOD3": {
+        "vertices": 192,
+        "triangles": 384,
+        "boundary_edges": 0,
+        "non_manifold_edges": 0,
+        "zero_area_faces": 0,
+        "duplicate_vertex_pairs": 0
+      }
+    },
+    "topology_blockers": {},
+    "weapon_skin_contract": {
+      "controls": {
+        "WeaponRoot": {
+          "use_deform": true,
+          "rest_determinant": 1.0,
+          "rest_delta_from_root": 0.0
+        },
+        "WeaponMagazine": {
+          "use_deform": true,
+          "rest_determinant": 1.0,
+          "rest_delta_from_root": 0.0
+        },
+        "WeaponBolt": {
+          "use_deform": true,
+          "rest_determinant": 1.0,
+          "rest_delta_from_root": 0.0
+        }
+      },
+      "renderers": {
+        "NGPR001_Rifle_LOD0": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 10416,
+            "WeaponMagazine": 280,
+            "WeaponBolt": 352
+          }
+        },
+        "NGPR001_Optic_LOD0": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 768,
+            "WeaponMagazine": 0,
+            "WeaponBolt": 0
+          }
+        },
+        "NGPR001_Rifle_LOD1": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 5891,
+            "WeaponMagazine": 247,
+            "WeaponBolt": 270
+          }
+        },
+        "NGPR001_Optic_LOD1": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 384,
+            "WeaponMagazine": 0,
+            "WeaponBolt": 0
+          }
+        },
+        "NGPR001_Rifle_LOD2": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 2526,
+            "WeaponMagazine": 80,
+            "WeaponBolt": 102
+          }
+        },
+        "NGPR001_Optic_LOD2": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 256,
+            "WeaponMagazine": 0,
+            "WeaponBolt": 0
+          }
+        },
+        "NGPR001_Rifle_LOD3": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 894,
+            "WeaponMagazine": 32,
+            "WeaponBolt": 32
+          }
+        },
+        "NGPR001_Optic_LOD3": {
+          "armature_modifier_count": 1,
+          "armature_target": "PowerSuit_Armature",
+          "object_alignment_error": 0.0,
+          "rigid_vertex_counts": {
+            "WeaponRoot": 192,
+            "WeaponMagazine": 0,
+            "WeaponBolt": 0
+          }
+        }
+      }
+    },
+    "weapon_skin_motion": {
+      "schema_version": 1,
+      "manual_skin_tolerance_m": 0.001,
+      "samples": {
+        "PS_Aim@1": {
+          "maximum_manual_skin_error_m": 1.71e-07,
+          "helper_envelope_error_m": 0.0,
+          "per_renderer_error_m": {
+            "NGPR001_Rifle_LOD0": 1.71e-07,
+            "NGPR001_Optic_LOD0": 6.1e-08,
+            "NGPR001_Rifle_LOD1": 1.71e-07,
+            "NGPR001_Optic_LOD1": 6.1e-08,
+            "NGPR001_Rifle_LOD2": 1.71e-07,
+            "NGPR001_Optic_LOD2": 6.1e-08,
+            "NGPR001_Rifle_LOD3": 1.71e-07,
+            "NGPR001_Optic_LOD3": 6.1e-08
+          }
+        },
+        "PS_WeaponReady_Idle@1": {
+          "maximum_manual_skin_error_m": 1.71e-07,
+          "helper_envelope_error_m": 0.0,
+          "per_renderer_error_m": {
+            "NGPR001_Rifle_LOD0": 1.71e-07,
+            "NGPR001_Optic_LOD0": 6.1e-08,
+            "NGPR001_Rifle_LOD1": 1.71e-07,
+            "NGPR001_Optic_LOD1": 6.1e-08,
+            "NGPR001_Rifle_LOD2": 1.71e-07,
+            "NGPR001_Optic_LOD2": 6.1e-08,
+            "NGPR001_Rifle_LOD3": 1.71e-07,
+            "NGPR001_Optic_LOD3": 6.1e-08
+          }
+        },
+        "PS_WeaponStowed_Idle@1": {
+          "maximum_manual_skin_error_m": 3.21e-07,
+          "helper_envelope_error_m": 0.0,
+          "per_renderer_error_m": {
+            "NGPR001_Rifle_LOD0": 3.11e-07,
+            "NGPR001_Optic_LOD0": 1.78e-07,
+            "NGPR001_Rifle_LOD1": 3.21e-07,
+            "NGPR001_Optic_LOD1": 1.72e-07,
+            "NGPR001_Rifle_LOD2": 3.11e-07,
+            "NGPR001_Optic_LOD2": 1.69e-07,
+            "NGPR001_Rifle_LOD3": 3.05e-07,
+            "NGPR001_Optic_LOD3": 1.69e-07
+          }
+        },
+        "PS_Reload@50": {
+          "maximum_manual_skin_error_m": 1.69e-07,
+          "helper_envelope_error_m": 0.0,
+          "per_renderer_error_m": {
+            "NGPR001_Rifle_LOD0": 1.69e-07,
+            "NGPR001_Optic_LOD0": 1.24e-07,
+            "NGPR001_Rifle_LOD1": 1.69e-07,
+            "NGPR001_Optic_LOD1": 1.24e-07,
+            "NGPR001_Rifle_LOD2": 1.69e-07,
+            "NGPR001_Optic_LOD2": 1.24e-07,
+            "NGPR001_Rifle_LOD3": 1.69e-07,
+            "NGPR001_Optic_LOD3": 1.24e-07
+          }
+        },
+        "PS_BoltCycle@12": {
+          "maximum_manual_skin_error_m": 1.71e-07,
+          "helper_envelope_error_m": 0.0,
+          "per_renderer_error_m": {
+            "NGPR001_Rifle_LOD0": 1.71e-07,
+            "NGPR001_Optic_LOD0": 6.1e-08,
+            "NGPR001_Rifle_LOD1": 1.71e-07,
+            "NGPR001_Optic_LOD1": 6.1e-08,
+            "NGPR001_Rifle_LOD2": 1.71e-07,
+            "NGPR001_Optic_LOD2": 6.1e-08,
+            "NGPR001_Rifle_LOD3": 1.71e-07,
+            "NGPR001_Optic_LOD3": 6.1e-08
+          }
+        }
+      },
+      "draw_sheathe_endpoint_errors": {
+        "draw_start_to_stowed": 0.0,
+        "draw_end_to_ready": 0.0,
+        "sheathe_start_to_ready": 0.0,
+        "sheathe_end_to_stowed": 0.0,
+        "shared_midpoint": 0.0
+      },
+      "draw_sheathe_midpoint_separation": {
+        "from_ready": 0.731966641,
+        "from_stowed": 0.698734168,
+        "ready_from_stowed": 1.043349866
+      },
+      "articulation": {
+        "magazine_travel_m": 0.333134922,
+        "magazine_return_error": 0.0,
+        "bolt_travel_m": 0.095000022,
+        "bolt_return_error": 0.0
+      }
+    },
+    "renderer_bind_matrix": [
+      0.997559905,
+      -0.069771051,
+      0.002503222,
+      -0.159877151,
+      0.068020634,
+      0.979361355,
+      0.190326646,
+      0.637696385,
+      -0.01573085,
+      -0.189691901,
+      0.981717765,
+      1.477683187,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "applied_unit_positive_transforms": true,
+    "runtime_armature_adapters": {
+      "NGPR001_Rifle_LOD0": 1,
+      "NGPR001_Optic_LOD0": 1,
+      "NGPR001_Rifle_LOD1": 1,
+      "NGPR001_Optic_LOD1": 1,
+      "NGPR001_Rifle_LOD2": 1,
+      "NGPR001_Optic_LOD2": 1,
+      "NGPR001_Rifle_LOD3": 1,
+      "NGPR001_Optic_LOD3": 1
+    },
+    "authoring_modifiers_remaining": {
+      "NGPR001_Rifle_LOD0": 0,
+      "NGPR001_Optic_LOD0": 0,
+      "NGPR001_Rifle_LOD1": 0,
+      "NGPR001_Optic_LOD1": 0,
+      "NGPR001_Rifle_LOD2": 0,
+      "NGPR001_Optic_LOD2": 0,
+      "NGPR001_Rifle_LOD3": 0,
+      "NGPR001_Optic_LOD3": 0
+    }
+  },
+  "texture_manifest": {
+    "schema_version": 1,
+    "asset_id": "PS_NextGenPrecisionRifle001",
+    "status": "PROCEDURAL_2K_PREVIEW_NOT_FINAL_WEAPON_BAKE",
+    "resolution": [
+      2048,
+      2048
+    ],
+    "seed": 6006,
+    "maps": {
+      "base_color": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_BaseColor.png",
+        "sha256": "4df2fb519e398595230cc0e12e57930b175e9c8bfa62acf962719b26c0588de1",
+        "mode": "RGBA"
+      },
+      "normal": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Normal.png",
+        "sha256": "a66010f3d27e867ee0f07c41a33bcdc4765dacbd83febbe5794d7ac8afba70d5",
+        "mode": "RGBA"
+      },
+      "mrao": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_MRAO.png",
+        "sha256": "ab7e3d4034632686064399274e1903c25ea11f4f10a4eeb0acd194dbeec114df",
+        "mode": "RGBA"
+      },
+      "emission": {
+        "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Emission.png",
+        "sha256": "49e69eb70decc575896e3e83c071a5a250f028ae5a9a96bfb7edcb09de0c062a",
+        "mode": "RGBA"
+      }
+    },
+    "channel_contract": {
+      "MRAO.R": "metallic multiplier",
+      "MRAO.G": "ambient occlusion",
+      "MRAO.B": "forged-carbon detail mask",
+      "MRAO.A": "smoothness"
+    }
+  },
+  "clearance_manifest": {
+    "sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0",
+    "manifest": {
+      "schema_version": "PS_CLEARANCE_MANIFEST_V1",
+      "policy_version": "PS_CLEARANCE_FACE_POLICY_V1",
+      "semantic_schema": "PS_CLEARANCE_FACE_SEMANTICS_V1",
+      "suit_asset_id": "AegisVanguardCandidate005",
+      "weapon_asset_id": "PS_NextGenPrecisionRifle001",
+      "source_candidate_sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "objects": [
+        {
+          "name": "H2_Armor_LOD0",
+          "asset_role": "suit",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "face_count": 60468,
+          "topology_sha256": "d737812a4013230b88115fc211622fcec6da969027d06fcc4b3103497545a98b",
+          "semantic_counts": {
+            "0": 44435,
+            "101": 5506,
+            "102": 5506,
+            "103": 3293,
+            "104": 864,
+            "105": 864
+          }
+        },
+        {
+          "name": "H2_Emission_LOD0",
+          "asset_role": "suit",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "face_count": 3312,
+          "topology_sha256": "5212da2ab4ea7cbfb0c30b11b78f20e5c5495f61682a66bc97bfc938fe17ed2f",
+          "semantic_counts": {
+            "0": 3312
+          }
+        },
+        {
+          "name": "H2_Undersuit_LOD0",
+          "asset_role": "suit",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "face_count": 24536,
+          "topology_sha256": "ac2c0a901600beb65bd86be4e422561e59f8568f29a6f54487c39e9c109ed04b",
+          "semantic_counts": {
+            "0": 24536
+          }
+        },
+        {
+          "name": "NGPR001_Optic_LOD0",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 1536,
+          "topology_sha256": "5874c5051e0cc6021c486f11468cedbfd9c36f7ff39b55878db54bc502d99b66",
+          "semantic_counts": {
+            "0": 1536
+          }
+        },
+        {
+          "name": "NGPR001_Optic_LOD1",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 768,
+          "topology_sha256": "fa3d60d152d18f406b76bb641e7736c5b84aa2a93ae779046c46296b5b90cc5e",
+          "semantic_counts": {
+            "0": 768
+          }
+        },
+        {
+          "name": "NGPR001_Optic_LOD2",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 512,
+          "topology_sha256": "a2f0ce41f273e1b1482c715a20389e4144d6c87dd9401e2a5092eb5c1ce6392f",
+          "semantic_counts": {
+            "0": 512
+          }
+        },
+        {
+          "name": "NGPR001_Optic_LOD3",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 384,
+          "topology_sha256": "f2236e91a563f9bc310247635c64fe40b4b16125d1f1c1c18f2bfaf2d863f612",
+          "semantic_counts": {
+            "0": 384
+          }
+        },
+        {
+          "name": "NGPR001_Rifle_LOD0",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 21680,
+          "topology_sha256": "1c2d53c18c2b9aa35d7f1037b12f34c790b993ce302236c9b3c97d05a0ddab2f",
+          "semantic_counts": {
+            "0": 17290,
+            "201": 625,
+            "202": 836,
+            "203": 879,
+            "204": 593,
+            "205": 1457
+          }
+        },
+        {
+          "name": "NGPR001_Rifle_LOD1",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 12400,
+          "topology_sha256": "2d0bea33206f272d0b200a3773e88163e1e4ca5ea3a0f64d02c1aef63f988573",
+          "semantic_counts": {
+            "0": 12400
+          }
+        },
+        {
+          "name": "NGPR001_Rifle_LOD2",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 5000,
+          "topology_sha256": "056fea169b526b909c262ea2b74c3dd0b57363c559cdd212279cc68a1958bfa9",
+          "semantic_counts": {
+            "0": 5000
+          }
+        },
+        {
+          "name": "NGPR001_Rifle_LOD3",
+          "asset_role": "weapon",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "face_count": 1500,
+          "topology_sha256": "f430f6d7bdfabba9fe940b6687eb9e623da3910c5f45433a14e2a3e0b3d2c3b6",
+          "semantic_counts": {
+            "0": 1500
+          }
+        }
+      ],
+      "contact_windows": {
+        "primary_grip": [
+          {
+            "action": "PS_Aim",
+            "start": 1,
+            "end": 30
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Hover",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Idle",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Reload",
+            "start": 1,
+            "end": 84
+          },
+          {
+            "action": "PS_Run_Forward",
+            "start": 1,
+            "end": 21
+          },
+          {
+            "action": "PS_Walk",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Left",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Right",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_BoltCycle",
+            "start": 1,
+            "end": 3
+          },
+          {
+            "action": "PS_BoltCycle",
+            "start": 17,
+            "end": 20
+          }
+        ],
+        "support_grip": [
+          {
+            "action": "PS_Aim",
+            "start": 1,
+            "end": 30
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_BoltCycle",
+            "start": 1,
+            "end": 20
+          },
+          {
+            "action": "PS_Hover",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Idle",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Run_Forward",
+            "start": 1,
+            "end": 21
+          },
+          {
+            "action": "PS_Walk",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Left",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Right",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Reload",
+            "start": 1,
+            "end": 24
+          },
+          {
+            "action": "PS_Reload",
+            "start": 76,
+            "end": 84
+          }
+        ],
+        "buttpad": [
+          {
+            "action": "PS_Aim",
+            "start": 1,
+            "end": 30
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_BoltCycle",
+            "start": 1,
+            "end": 20
+          },
+          {
+            "action": "PS_Hover",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Idle",
+            "start": 1,
+            "end": 61
+          },
+          {
+            "action": "PS_Reload",
+            "start": 1,
+            "end": 84
+          },
+          {
+            "action": "PS_Run_Forward",
+            "start": 1,
+            "end": 21
+          },
+          {
+            "action": "PS_Walk",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Left",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_Walk_Right",
+            "start": 1,
+            "end": 31
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "start": 1,
+            "end": 61
+          }
+        ],
+        "reload_mag": [
+          {
+            "action": "PS_Reload",
+            "start": 25,
+            "end": 75
+          }
+        ],
+        "bolt": [
+          {
+            "action": "PS_BoltCycle",
+            "start": 4,
+            "end": 16
+          }
+        ]
+      }
+    }
+  },
+  "render_paths": [
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_neutral_front.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_neutral_side.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_neutral_front_3q.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_aim.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_hip_fire.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_scope_ocular.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_reload.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_bolt.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_run.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_hover.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_stowed.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_draw.png",
+    "C:\\Users\\Zhitn\\Powersuit\\ArtSource\\PoweredSuitNextGen\\renders\\nextgen_precision_rifle_candidate_v006\\nextgen_precision_rifle_pose_sheathe.png"
+  ],
+  "render_manifest": {
+    "candidate_blend_sha256": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+    "files": [
+      {
+        "filename": "nextgen_precision_rifle_neutral_front.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_front.png",
+        "sha256": "157ed856617e5807a5029507264a44712d48304b1820003c1de09ae36830d793",
+        "size_bytes": 1279096
+      },
+      {
+        "filename": "nextgen_precision_rifle_neutral_side.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_side.png",
+        "sha256": "f05adbbd5c185172d6d552aa8dc2a7b7d2823bf7c304b1a18737a66a02a14b63",
+        "size_bytes": 1263655
+      },
+      {
+        "filename": "nextgen_precision_rifle_neutral_front_3q.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_front_3q.png",
+        "sha256": "04835ea0b3cf728e86ae2bc49031b6a7349007969184baf3970f592400bde1dd",
+        "size_bytes": 1272770
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_aim.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_aim.png",
+        "sha256": "94f2054a9af150e80523e36a1f2bbcbd41106468da2ff6a50057424d44bf15c7",
+        "size_bytes": 1648538
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_hip_fire.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_hip_fire.png",
+        "sha256": "8b15cda08ab4a213bd6a4dcdd5fe6d14aead2f62368012b8426f663963879818",
+        "size_bytes": 1510251
+      },
+      {
+        "filename": "nextgen_precision_rifle_scope_ocular.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_scope_ocular.png",
+        "sha256": "312ab35e467fd91ece2115a6c21e489d61ad0950402a1c9090bd4cb194a58104",
+        "size_bytes": 1510676
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_reload.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_reload.png",
+        "sha256": "ac9f496c16066f0f3fb06801e46206588c385777bf878c6054e550c1178d1914",
+        "size_bytes": 1576639
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_bolt.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_bolt.png",
+        "sha256": "1f980cb5cd0b412148faa5f6358867cdaa2273a3fd460539e9d86662c225d482",
+        "size_bytes": 1610955
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_run.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_run.png",
+        "sha256": "c50b345e7752b49901ae969ed84ac501c021d9c0875b1508f6e28fd9f51d8bff",
+        "size_bytes": 1549546
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_hover.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_hover.png",
+        "sha256": "65d4c331a16eace2fc4806b4f00313358432a7e548ffdc2e41dcb69595739429",
+        "size_bytes": 1497739
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_stowed.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_stowed.png",
+        "sha256": "a5f6f7d019730d6220f9f65fcf4481cf7f21d1298bbe1c81c837b13fc9d82320",
+        "size_bytes": 1549015
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_draw.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_draw.png",
+        "sha256": "0555f2eb2430bfca464413761c4ed417300903a75a152a2894dd357c021115d6",
+        "size_bytes": 1472686
+      },
+      {
+        "filename": "nextgen_precision_rifle_pose_sheathe.png",
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_sheathe.png",
+        "sha256": "e56a54b02b9f03a2601d1ce879f8243266f3116f3d71a483bb435fa3e65b915c",
+        "size_bytes": 1522296
+      }
+    ]
+  },
+  "render_set_complete": true,
+  "projection_evidence": {
+    "render_resolution": [
+      1280,
+      960
+    ],
+    "schema_version": 3,
+    "views": {
+      "nextgen_precision_rifle_neutral_front.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.707479,
+        "viewport_max_x": 0.6318,
+        "viewport_max_y": 0.878836,
+        "viewport_min_x": 0.371596,
+        "viewport_min_y": 0.171356,
+        "viewport_width": 0.260204,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_neutral_front_3q.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.449582,
+        "viewport_max_x": 0.828328,
+        "viewport_max_y": 0.714908,
+        "viewport_min_x": 0.12659,
+        "viewport_min_y": 0.265326,
+        "viewport_width": 0.701738,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_neutral_side.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.384056,
+        "viewport_max_x": 0.875973,
+        "viewport_max_y": 0.691747,
+        "viewport_min_x": 0.114983,
+        "viewport_min_y": 0.307691,
+        "viewport_width": 0.76099,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_aim.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.671129,
+        "viewport_max_x": 0.837781,
+        "viewport_max_y": 0.847961,
+        "viewport_min_x": 0.16203,
+        "viewport_min_y": 0.176832,
+        "viewport_width": 0.675752,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_bolt.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.626701,
+        "viewport_max_x": 0.837642,
+        "viewport_max_y": 0.821664,
+        "viewport_min_x": 0.160507,
+        "viewport_min_y": 0.194963,
+        "viewport_width": 0.677135,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_draw.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.685258,
+        "viewport_max_x": 0.622938,
+        "viewport_max_y": 0.828449,
+        "viewport_min_x": 0.407397,
+        "viewport_min_y": 0.143191,
+        "viewport_width": 0.215541,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_hip_fire.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.569404,
+        "viewport_max_x": 0.838676,
+        "viewport_max_y": 0.792114,
+        "viewport_min_x": 0.164041,
+        "viewport_min_y": 0.22271,
+        "viewport_width": 0.674635,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_hover.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.684757,
+        "viewport_max_x": 0.733431,
+        "viewport_max_y": 0.850923,
+        "viewport_min_x": 0.254578,
+        "viewport_min_y": 0.166167,
+        "viewport_width": 0.478853,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_reload.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.659352,
+        "viewport_max_x": 0.748546,
+        "viewport_max_y": 0.83084,
+        "viewport_min_x": 0.251187,
+        "viewport_min_y": 0.171488,
+        "viewport_width": 0.497359,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_run.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.694711,
+        "viewport_max_x": 0.781235,
+        "viewport_max_y": 0.82307,
+        "viewport_min_x": 0.29356,
+        "viewport_min_y": 0.12836,
+        "viewport_width": 0.487676,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_sheathe.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.680549,
+        "viewport_max_x": 0.72588,
+        "viewport_max_y": 0.840581,
+        "viewport_min_x": 0.262899,
+        "viewport_min_y": 0.160032,
+        "viewport_width": 0.462981,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_pose_stowed.png": {
+        "evidence_kind": "weapon_bounds_5_95",
+        "helper_envelope_error_m": 0.0,
+        "studio_ground_visible": false,
+        "viewport_height": 0.680518,
+        "viewport_max_x": 0.72729,
+        "viewport_max_y": 0.838553,
+        "viewport_min_x": 0.258586,
+        "viewport_min_y": 0.158035,
+        "viewport_width": 0.468704,
+        "weapon_bounds_sample_count": 2978
+      },
+      "nextgen_precision_rifle_scope_ocular.png": {
+        "aperture_center_x": 0.5,
+        "aperture_center_y": 0.5,
+        "aperture_geometry_source": "exact_source_proxy_inner_rim",
+        "aperture_object": "NGPR_OpticOcular",
+        "aperture_proxy_max_distance_m": 1.69e-07,
+        "aperture_radius_x": 0.185848,
+        "aperture_radius_y": 0.247797,
+        "aperture_sample_count": 64,
+        "camera_to_ocular_rear_m": 0.021,
+        "corridor_clear": true,
+        "evidence_kind": "ocular_corridor",
+        "helper_envelope_error_m": 0.0,
+        "nested_occluder_count": 0,
+        "objective_visible": true,
+        "range_tick_count": 4,
+        "reticle_center_x": 0.5,
+        "reticle_center_y": 0.5,
+        "reticle_line_count": 4,
+        "reticle_visible": true,
+        "sampled_first_hits": [
+          "NGPR_ScopeTargetBoard",
+          "NGPR_ScopeTargetBoard",
+          "NGPR_ScopeTargetBoard",
+          "NGPR_ScopeTargetBoard",
+          "NGPR_ScopeTargetBoard"
+        ],
+        "sight_picture_sample_count": 296,
+        "sight_picture_viewport_height": 0.36096,
+        "sight_picture_viewport_width": 0.27072,
+        "studio_ground_visible": false,
+        "target_center_x": 0.5,
+        "target_center_y": 0.5,
+        "target_distance_m": 6.0,
+        "target_viewport_height": 0.420349,
+        "target_viewport_width": 0.315262,
+        "target_visible": true
+      }
+    }
+  },
+  "limitations": [
+    "This automated asset establishes production-shaped geometry, LOD/UV/PBR plumbing and versioned hardpoints; final hand-authored weapon texturing remains outstanding.",
+    "Candidate006 weapon actions were solver-reauthored around the new immutable hardpoints; visible strict clearance remains the promotion gate.",
+    "Procedural 2K preview maps are licence-free pipeline evidence, not the final authored rifle bake.",
+    "No FBX or Unity asset was exported, replaced, or modified."
+  ]
+}

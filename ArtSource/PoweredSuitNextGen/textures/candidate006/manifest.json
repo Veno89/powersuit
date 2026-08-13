@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "asset_id": "PS_NextGenPrecisionRifle001",
+  "status": "PROCEDURAL_2K_PREVIEW_NOT_FINAL_WEAPON_BAKE",
+  "resolution": [
+    2048,
+    2048
+  ],
+  "seed": 6006,
+  "maps": {
+    "base_color": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_BaseColor.png",
+      "sha256": "4df2fb519e398595230cc0e12e57930b175e9c8bfa62acf962719b26c0588de1",
+      "mode": "RGBA"
+    },
+    "normal": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Normal.png",
+      "sha256": "a66010f3d27e867ee0f07c41a33bcdc4765dacbd83febbe5794d7ac8afba70d5",
+      "mode": "RGBA"
+    },
+    "mrao": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_MRAO.png",
+      "sha256": "ab7e3d4034632686064399274e1903c25ea11f4f10a4eeb0acd194dbeec114df",
+      "mode": "RGBA"
+    },
+    "emission": {
+      "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Emission.png",
+      "sha256": "49e69eb70decc575896e3e83c071a5a250f028ae5a9a96bfb7edcb09de0c062a",
+      "mode": "RGBA"
+    }
+  },
+  "channel_contract": {
+    "MRAO.R": "metallic multiplier",
+    "MRAO.G": "ambient occlusion",
+    "MRAO.B": "forged-carbon detail mask",
+    "MRAO.A": "smoothness"
+  }
+}

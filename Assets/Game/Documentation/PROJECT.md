@@ -162,6 +162,27 @@ Candidate005 preserves the existing 23-bone/24-action contract while consolidati
 
 The deformation scaffold samples all 162 authored keyframes across the 24 actions and records a maximum local edge-stretch ratio of 5.801599. Its deliberately permissive 8x threshold catches catastrophic automation failures only and does not certify weight quality. Weapon clearance remains blocking: the canonical test of the three consolidated visible meshes fails at 3,894 forbidden instances across 72 object-pair groups. A separate hidden 254-part proxy diagnostic reports 5,489/240 only to help locate source geometry; it is not the canonical release result. Manual sculpting, production retopology/seam placement, joint and weight polish, authored PBR work, clearance repairs, hand-finished LODs, Unity/performance validation, and owner A/B approval remain mandatory.
 
+Candidate006 / NextGen Precision Rifle 001 is a separate weapon-side
+production-architecture and review candidate, not a runtime weapon. Its
+WeaponV2 structural report is **PASS** with 156 checks, 0 errors, and 0
+warnings. It preserves exactly 23 bones and 24 actions, supplies rifle-plus-optic
+LOD totals of `23,216 -> 13,168 -> 5,512 -> 1,884`, and produces 13 unique,
+source-bound review renders. Combined Candidate005/Candidate006 LOD0 is 111,532
+triangles across five renderers and an estimated eight draws, exactly the hard
+ceiling and therefore still requiring representative Unity performance review.
+The verified scope has 0.021 m eye relief, a real inner-aperture proxy matching
+within `1.69e-7 m`, a readable four-line reticle plus four range ticks, and five
+physical rays that all reach the actual six-metre target board.
+
+Weapon promotion remains on **HOLD**. Candidate006's visible audit of all 162
+authored keyframes finds 377 forbidden instances across 17 groups and 197
+allowed semantic contacts: 301 recurring grip/wrist-shell contacts, 35
+containment failures, and 41 manipulation/transition failures. The full
+923-integer-frame and 324 dense-transition sweeps were not run because the
+authored pass already fails. Stow/draw/sheathe, reload/bolt, and final PBR/art
+polish remain open. No Candidate006 FBX or Unity integration exists; Generator114
+remains active and every current Unity asset is unchanged.
+
 Automated checks establish technical correctness and sustained capped performance on the certification machine; they do not prove subjective feel, performance on all representative hardware, detailed GPU cost, or production-quality content.
 
 ## Known limitations and exclusions

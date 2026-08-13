@@ -1,0 +1,4655 @@
+{
+  "asset": {
+    "candidate_id": "NextGen Precision Rifle 001",
+    "candidate_number": 6,
+    "status": "PARALLEL_REVIEW_CANDIDATE_NOT_UNITY_INTEGRATED"
+  },
+  "blender_version": "5.2.0 LTS",
+  "clearance_semantics": {
+    "errors": [],
+    "manifest": {
+      "contact_windows": {
+        "bolt": [
+          {
+            "action": "PS_BoltCycle",
+            "end": 16,
+            "start": 4
+          }
+        ],
+        "buttpad": [
+          {
+            "action": "PS_Aim",
+            "end": 30,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 20,
+            "start": 1
+          },
+          {
+            "action": "PS_Hover",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 84,
+            "start": 1
+          },
+          {
+            "action": "PS_Run_Forward",
+            "end": 21,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "end": 61,
+            "start": 1
+          }
+        ],
+        "primary_grip": [
+          {
+            "action": "PS_Aim",
+            "end": 30,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Hover",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 84,
+            "start": 1
+          },
+          {
+            "action": "PS_Run_Forward",
+            "end": 21,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 3,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 20,
+            "start": 17
+          }
+        ],
+        "reload_mag": [
+          {
+            "action": "PS_Reload",
+            "end": 75,
+            "start": 25
+          }
+        ],
+        "support_grip": [
+          {
+            "action": "PS_Aim",
+            "end": 30,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Aim_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_BoltCycle",
+            "end": 20,
+            "start": 1
+          },
+          {
+            "action": "PS_Hover",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Run_Forward",
+            "end": 21,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Backward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Forward",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Left",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_Walk_Right",
+            "end": 31,
+            "start": 1
+          },
+          {
+            "action": "PS_WeaponReady_Idle",
+            "end": 61,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 24,
+            "start": 1
+          },
+          {
+            "action": "PS_Reload",
+            "end": 84,
+            "start": 76
+          }
+        ]
+      },
+      "objects": [
+        {
+          "asset_role": "suit",
+          "face_count": 60468,
+          "name": "H2_Armor_LOD0",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "semantic_counts": {
+            "0": 44435,
+            "101": 5506,
+            "102": 5506,
+            "103": 3293,
+            "104": 864,
+            "105": 864
+          },
+          "topology_sha256": "d737812a4013230b88115fc211622fcec6da969027d06fcc4b3103497545a98b"
+        },
+        {
+          "asset_role": "suit",
+          "face_count": 3312,
+          "name": "H2_Emission_LOD0",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "semantic_counts": {
+            "0": 3312
+          },
+          "topology_sha256": "5212da2ab4ea7cbfb0c30b11b78f20e5c5495f61682a66bc97bfc938fe17ed2f"
+        },
+        {
+          "asset_role": "suit",
+          "face_count": 24536,
+          "name": "H2_Undersuit_LOD0",
+          "semantic_attribute": "ps_clearance_suit_zone_id",
+          "semantic_counts": {
+            "0": 24536
+          },
+          "topology_sha256": "ac2c0a901600beb65bd86be4e422561e59f8568f29a6f54487c39e9c109ed04b"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 1536,
+          "name": "NGPR001_Optic_LOD0",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 1536
+          },
+          "topology_sha256": "5874c5051e0cc6021c486f11468cedbfd9c36f7ff39b55878db54bc502d99b66"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 768,
+          "name": "NGPR001_Optic_LOD1",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 768
+          },
+          "topology_sha256": "fa3d60d152d18f406b76bb641e7736c5b84aa2a93ae779046c46296b5b90cc5e"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 512,
+          "name": "NGPR001_Optic_LOD2",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 512
+          },
+          "topology_sha256": "a2f0ce41f273e1b1482c715a20389e4144d6c87dd9401e2a5092eb5c1ce6392f"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 384,
+          "name": "NGPR001_Optic_LOD3",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 384
+          },
+          "topology_sha256": "f2236e91a563f9bc310247635c64fe40b4b16125d1f1c1c18f2bfaf2d863f612"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 21680,
+          "name": "NGPR001_Rifle_LOD0",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 17290,
+            "201": 625,
+            "202": 836,
+            "203": 879,
+            "204": 593,
+            "205": 1457
+          },
+          "topology_sha256": "1c2d53c18c2b9aa35d7f1037b12f34c790b993ce302236c9b3c97d05a0ddab2f"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 12400,
+          "name": "NGPR001_Rifle_LOD1",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 12400
+          },
+          "topology_sha256": "2d0bea33206f272d0b200a3773e88163e1e4ca5ea3a0f64d02c1aef63f988573"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 5000,
+          "name": "NGPR001_Rifle_LOD2",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 5000
+          },
+          "topology_sha256": "056fea169b526b909c262ea2b74c3dd0b57363c559cdd212279cc68a1958bfa9"
+        },
+        {
+          "asset_role": "weapon",
+          "face_count": 1500,
+          "name": "NGPR001_Rifle_LOD3",
+          "semantic_attribute": "ps_clearance_weapon_zone_id",
+          "semantic_counts": {
+            "0": 1500
+          },
+          "topology_sha256": "f430f6d7bdfabba9fe940b6687eb9e623da3910c5f45433a14e2a3e0b3d2c3b6"
+        }
+      ],
+      "policy_version": "PS_CLEARANCE_FACE_POLICY_V1",
+      "schema_version": "PS_CLEARANCE_MANIFEST_V1",
+      "semantic_schema": "PS_CLEARANCE_FACE_SEMANTICS_V1",
+      "source_candidate_sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "suit_asset_id": "AegisVanguardCandidate005",
+      "weapon_asset_id": "PS_NextGenPrecisionRifle001"
+    },
+    "manifest_objects": [
+      {
+        "asset_role": "suit",
+        "face_count": 60468,
+        "name": "H2_Armor_LOD0",
+        "semantic_attribute": "ps_clearance_suit_zone_id",
+        "semantic_counts": {
+          "0": 44435,
+          "101": 5506,
+          "102": 5506,
+          "103": 3293,
+          "104": 864,
+          "105": 864
+        },
+        "topology_sha256": "d737812a4013230b88115fc211622fcec6da969027d06fcc4b3103497545a98b"
+      },
+      {
+        "asset_role": "suit",
+        "face_count": 3312,
+        "name": "H2_Emission_LOD0",
+        "semantic_attribute": "ps_clearance_suit_zone_id",
+        "semantic_counts": {
+          "0": 3312
+        },
+        "topology_sha256": "5212da2ab4ea7cbfb0c30b11b78f20e5c5495f61682a66bc97bfc938fe17ed2f"
+      },
+      {
+        "asset_role": "suit",
+        "face_count": 24536,
+        "name": "H2_Undersuit_LOD0",
+        "semantic_attribute": "ps_clearance_suit_zone_id",
+        "semantic_counts": {
+          "0": 24536
+        },
+        "topology_sha256": "ac2c0a901600beb65bd86be4e422561e59f8568f29a6f54487c39e9c109ed04b"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 1536,
+        "name": "NGPR001_Optic_LOD0",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 1536
+        },
+        "topology_sha256": "5874c5051e0cc6021c486f11468cedbfd9c36f7ff39b55878db54bc502d99b66"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 768,
+        "name": "NGPR001_Optic_LOD1",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 768
+        },
+        "topology_sha256": "fa3d60d152d18f406b76bb641e7736c5b84aa2a93ae779046c46296b5b90cc5e"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 512,
+        "name": "NGPR001_Optic_LOD2",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 512
+        },
+        "topology_sha256": "a2f0ce41f273e1b1482c715a20389e4144d6c87dd9401e2a5092eb5c1ce6392f"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 384,
+        "name": "NGPR001_Optic_LOD3",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 384
+        },
+        "topology_sha256": "f2236e91a563f9bc310247635c64fe40b4b16125d1f1c1c18f2bfaf2d863f612"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 21680,
+        "name": "NGPR001_Rifle_LOD0",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 17290,
+          "201": 625,
+          "202": 836,
+          "203": 879,
+          "204": 593,
+          "205": 1457
+        },
+        "topology_sha256": "1c2d53c18c2b9aa35d7f1037b12f34c790b993ce302236c9b3c97d05a0ddab2f"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 12400,
+        "name": "NGPR001_Rifle_LOD1",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 12400
+        },
+        "topology_sha256": "2d0bea33206f272d0b200a3773e88163e1e4ca5ea3a0f64d02c1aef63f988573"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 5000,
+        "name": "NGPR001_Rifle_LOD2",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 5000
+        },
+        "topology_sha256": "056fea169b526b909c262ea2b74c3dd0b57363c559cdd212279cc68a1958bfa9"
+      },
+      {
+        "asset_role": "weapon",
+        "face_count": 1500,
+        "name": "NGPR001_Rifle_LOD3",
+        "semantic_attribute": "ps_clearance_weapon_zone_id",
+        "semantic_counts": {
+          "0": 1500
+        },
+        "topology_sha256": "f430f6d7bdfabba9fe940b6687eb9e623da3910c5f45433a14e2a3e0b3d2c3b6"
+      }
+    ],
+    "manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0"
+  },
+  "evidence": {
+    "clearance_semantics": true,
+    "immutable_inputs": true,
+    "lod_and_render_budget": true,
+    "pbr_materials": true,
+    "review_renders": true,
+    "rig_and_actions": true,
+    "rigid_geometry": true,
+    "sight_and_ocular": true,
+    "source_immutability": true,
+    "topology_and_uv": true,
+    "weapon_contract": true,
+    "weapon_skin_motion": true
+  },
+  "immutable_inputs": {
+    "candidate004_blend": {
+      "actual_sha256": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+      "expected_sha256": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+      "matches": true,
+      "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v004.blend"
+    },
+    "candidate005_blend": {
+      "actual_sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "expected_sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "matches": true,
+      "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v005.blend"
+    },
+    "candidate005_manifest": {
+      "actual_sha256": "a5d687145e5676482dea415213fc53eee38ddb069e718cc4104d08e8ee5e0341",
+      "expected_sha256": "a5d687145e5676482dea415213fc53eee38ddb069e718cc4104d08e8ee5e0341",
+      "matches": true,
+      "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v005.json"
+    },
+    "candidate005_production_report": {
+      "actual_sha256": "48c637c32a349f284eedeb1a923d8273bebd8ede6ff004f4cdc64e50f010e0b3",
+      "expected_sha256": "48c637c32a349f284eedeb1a923d8273bebd8ede6ff004f4cdc64e50f010e0b3",
+      "matches": true,
+      "path": "ArtSource/PoweredSuitNextGen/HeroV2/reports/candidate005_production.json"
+    },
+    "concept_reference": {
+      "actual_sha256": "8c99f32e7584bc0b49abf27b3fb029e417dd19ea77aab4da2b178c21b299db8c",
+      "expected_sha256": "8c99f32e7584bc0b49abf27b3fb029e417dd19ea77aab4da2b178c21b299db8c",
+      "matches": true,
+      "path": "ArtSource/PoweredSuitNextGen/Concepts/nextgen_precision_rifle_reference_v001.png"
+    },
+    "generator114_action_manifest": {
+      "actual_sha256": "6ce5c612b35a118076357d33de27da3ff669e6b743eb812eccd0956652c1faaf",
+      "expected_sha256": "6ce5c612b35a118076357d33de27da3ff669e6b743eb812eccd0956652c1faaf",
+      "matches": true,
+      "path": "ArtSource/PoweredSuit/Validation/Generator114/export_manifest.json"
+    },
+    "generator114_generated_blend": {
+      "actual_sha256": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+      "expected_sha256": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+      "matches": true,
+      "path": "ArtSource/PoweredSuit/powersuit_pipeline.blend"
+    },
+    "generator114_recovered_source": {
+      "actual_sha256": "49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4",
+      "expected_sha256": "49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4",
+      "matches": true,
+      "path": "ArtSource/PoweredSuit/source/powersuit_source.blend"
+    }
+  },
+  "issues": [
+    {
+      "actual": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+      "code": "IMMUTABLE_CANDIDATE004_BLEND",
+      "expected": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "code": "IMMUTABLE_CANDIDATE005_BLEND",
+      "expected": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "a5d687145e5676482dea415213fc53eee38ddb069e718cc4104d08e8ee5e0341",
+      "code": "IMMUTABLE_CANDIDATE005_MANIFEST",
+      "expected": "a5d687145e5676482dea415213fc53eee38ddb069e718cc4104d08e8ee5e0341",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "48c637c32a349f284eedeb1a923d8273bebd8ede6ff004f4cdc64e50f010e0b3",
+      "code": "IMMUTABLE_CANDIDATE005_PRODUCTION_REPORT",
+      "expected": "48c637c32a349f284eedeb1a923d8273bebd8ede6ff004f4cdc64e50f010e0b3",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "8c99f32e7584bc0b49abf27b3fb029e417dd19ea77aab4da2b178c21b299db8c",
+      "code": "IMMUTABLE_CONCEPT_REFERENCE",
+      "expected": "8c99f32e7584bc0b49abf27b3fb029e417dd19ea77aab4da2b178c21b299db8c",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "6ce5c612b35a118076357d33de27da3ff669e6b743eb812eccd0956652c1faaf",
+      "code": "IMMUTABLE_GENERATOR114_ACTION_MANIFEST",
+      "expected": "6ce5c612b35a118076357d33de27da3ff669e6b743eb812eccd0956652c1faaf",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+      "code": "IMMUTABLE_GENERATOR114_GENERATED_BLEND",
+      "expected": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": "49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4",
+      "code": "IMMUTABLE_GENERATOR114_RECOVERED_SOURCE",
+      "expected": "49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4",
+      "message": "Immutable baseline must exist and match its pinned SHA-256.",
+      "severity": "pass"
+    },
+    {
+      "actual": [
+        "Chest",
+        "Foot.L",
+        "Foot.R",
+        "Hand.L",
+        "Hand.R",
+        "Head",
+        "Hips",
+        "LowerArm.L",
+        "LowerArm.R",
+        "LowerLeg.L",
+        "LowerLeg.R",
+        "Neck",
+        "Root",
+        "Shoulder.L",
+        "Shoulder.R",
+        "Spine",
+        "UpperArm.L",
+        "UpperArm.R",
+        "UpperLeg.L",
+        "UpperLeg.R",
+        "WeaponBolt",
+        "WeaponMagazine",
+        "WeaponRoot"
+      ],
+      "code": "RIG_EXACT_23_BONES",
+      "expected": [
+        "Chest",
+        "Foot.L",
+        "Foot.R",
+        "Hand.L",
+        "Hand.R",
+        "Head",
+        "Hips",
+        "LowerArm.L",
+        "LowerArm.R",
+        "LowerLeg.L",
+        "LowerLeg.R",
+        "Neck",
+        "Root",
+        "Shoulder.L",
+        "Shoulder.R",
+        "Spine",
+        "UpperArm.L",
+        "UpperArm.R",
+        "UpperLeg.L",
+        "UpperLeg.R",
+        "WeaponBolt",
+        "WeaponMagazine",
+        "WeaponRoot"
+      ],
+      "message": "The bone set must remain exactly the pinned 23-bone contract.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "WeaponBolt": true,
+        "WeaponMagazine": true,
+        "WeaponRoot": true
+      },
+      "code": "RIG_DEFORMING_WEAPON_CONTROLS",
+      "expected": {
+        "WeaponBolt": true,
+        "WeaponMagazine": true,
+        "WeaponRoot": true
+      },
+      "message": "Candidate006 requires WeaponRoot, WeaponMagazine and WeaponBolt to deform their one-hot weighted production renderers.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "PS_Aim": [
+          1,
+          30
+        ],
+        "PS_Aim_Walk_Backward": [
+          1,
+          31
+        ],
+        "PS_Aim_Walk_Forward": [
+          1,
+          31
+        ],
+        "PS_Aim_Walk_Left": [
+          1,
+          31
+        ],
+        "PS_Aim_Walk_Right": [
+          1,
+          31
+        ],
+        "PS_BoltCycle": [
+          1,
+          20
+        ],
+        "PS_Hover": [
+          1,
+          61
+        ],
+        "PS_Idle": [
+          1,
+          61
+        ],
+        "PS_Reload": [
+          1,
+          84
+        ],
+        "PS_Run_Forward": [
+          1,
+          21
+        ],
+        "PS_Walk": [
+          1,
+          31
+        ],
+        "PS_Walk_Backward": [
+          1,
+          31
+        ],
+        "PS_Walk_Forward": [
+          1,
+          31
+        ],
+        "PS_Walk_Left": [
+          1,
+          31
+        ],
+        "PS_Walk_Right": [
+          1,
+          31
+        ],
+        "PS_WeaponReady_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Hover": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Idle": [
+          1,
+          61
+        ],
+        "PS_WeaponStowed_Walk_Backward": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Forward": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Left": [
+          1,
+          31
+        ],
+        "PS_WeaponStowed_Walk_Right": [
+          1,
+          31
+        ],
+        "PS_Weapon_Draw": [
+          1,
+          30
+        ],
+        "PS_Weapon_Sheathe": [
+          1,
+          30
+        ]
+      },
+      "code": "RIG_ACTION_CONTRACT",
+      "message": "All 24 action names, ranges and one-slot counts match Generator114.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "PS_Aim": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            30
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Aim_Walk_Backward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Aim_Walk_Forward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Aim_Walk_Left": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Aim_Walk_Right": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_BoltCycle": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            20
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Hover": {
+          "curve_count": 147,
+          "frame_range": [
+            1,
+            61
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Idle": {
+          "curve_count": 147,
+          "frame_range": [
+            1,
+            61
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Reload": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            84
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Run_Forward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            21
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Walk": {
+          "curve_count": 147,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Walk_Backward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Walk_Forward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Walk_Left": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Walk_Right": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponReady_Idle": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            61
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponStowed_Hover": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            61
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponStowed_Idle": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            61
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponStowed_Walk_Backward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponStowed_Walk_Forward": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponStowed_Walk_Left": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_WeaponStowed_Walk_Right": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            31
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Weapon_Draw": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            30
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        },
+        "PS_Weapon_Sheathe": {
+          "curve_count": 207,
+          "frame_range": [
+            1,
+            30
+          ],
+          "root_location_range_m": 0.0,
+          "slot_count": 1,
+          "slot_target_id_type": "OBJECT",
+          "weapon_control_curve_bones": [
+            "WeaponBolt",
+            "WeaponMagazine",
+            "WeaponRoot"
+          ]
+        }
+      },
+      "code": "RIG_ACTION_SLOT_CONTROL_ROOT_MOTION",
+      "message": "Every action must target one armature slot, animate all weapon controls, and contain zero root motion.",
+      "severity": "pass"
+    },
+    {
+      "actual": 30.0,
+      "code": "RIG_ACTION_FPS",
+      "expected": 30,
+      "message": "Candidate006 must preserve the 30 FPS animation contract.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "ps_weapon_active": true,
+        "ps_weapon_contract_version": 3,
+        "ps_weapon_family": "long_gun",
+        "ps_weapon_forward_axis": "+Y",
+        "ps_weapon_id": "PS_NextGenPrecisionRifle001",
+        "ps_weapon_rigid": true,
+        "ps_weapon_rigid_signature_version": 6,
+        "ps_weapon_stance_family": "shouldered_precision",
+        "ps_weapon_up_axis": "+Z"
+      },
+      "code": "WEAPON_ROOT_METADATA",
+      "expected": {
+        "ps_weapon_active": true,
+        "ps_weapon_contract_version": 3,
+        "ps_weapon_family": "long_gun",
+        "ps_weapon_forward_axis": "+Y",
+        "ps_weapon_id": "PS_NextGenPrecisionRifle001",
+        "ps_weapon_rigid": true,
+        "ps_weapon_rigid_signature_version": 6,
+        "ps_weapon_stance_family": "shouldered_precision",
+        "ps_weapon_up_axis": "+Z"
+      },
+      "message": "RifleRoot metadata must exactly identify the parallel Candidate006 weapon.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "parent": "PowerSuit_Armature",
+        "parent_bone": "WeaponRoot",
+        "parent_type": "BONE"
+      },
+      "code": "WEAPON_ROOT_HIERARCHY",
+      "expected": {
+        "parent": "PowerSuit_Armature",
+        "parent_bone": "WeaponRoot",
+        "parent_type": "BONE"
+      },
+      "message": "RifleRoot must be bone-parented to WeaponRoot.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "muzzle": {
+          "direct_child": true,
+          "local_position": [
+            2.0489096641540527e-08,
+            1.1750000715255737,
+            0.1450001448392868
+          ],
+          "object": "Rifle_Muzzle"
+        },
+        "primary_grip": {
+          "contact_offset_local": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "direct_child": true,
+          "local_position": [
+            -0.06999997794628143,
+            -0.05000000447034836,
+            -0.040000010281801224
+          ],
+          "object": "Rifle_PrimaryGrip",
+          "target_semantic": "wrist_head"
+        },
+        "sight_ocular": {
+          "direct_child": true,
+          "local_position": [
+            2.9802322387695312e-08,
+            -0.28000009059906006,
+            0.3149999976158142
+          ],
+          "object": "Rifle_SightOcular"
+        },
+        "stock_contact": {
+          "direct_child": true,
+          "local_position": [
+            -0.1120000034570694,
+            -0.44800013303756714,
+            0.13200001418590546
+          ],
+          "object": "Rifle_StockContact"
+        },
+        "support_grip": {
+          "contact_offset_local": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "direct_child": true,
+          "local_position": [
+            0.1080000251531601,
+            0.30000001192092896,
+            -0.0350000336766243
+          ],
+          "object": "Rifle_SupportGripTarget",
+          "target_semantic": "wrist_head"
+        }
+      },
+      "code": "WEAPON_HELPERS",
+      "expected": [
+        "muzzle",
+        "primary_grip",
+        "sight_ocular",
+        "stock_contact",
+        "support_grip"
+      ],
+      "message": "All five unique direct-child hardpoints must exist with valid canonical geometry.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "errors": [],
+        "hardpoints": {
+          "muzzle": [
+            2.0489096641540527e-08,
+            1.1750000715255737,
+            0.1450001448392868
+          ],
+          "primary_grip": [
+            -0.06999997794628143,
+            -0.05000000447034836,
+            -0.040000010281801224
+          ],
+          "sight_ocular": [
+            2.9802322387695312e-08,
+            -0.28000009059906006,
+            0.3149999976158142
+          ],
+          "stock_contact": [
+            -0.1120000034570694,
+            -0.44800013303756714,
+            0.13200001418590546
+          ],
+          "support_grip": [
+            0.1080000251531601,
+            0.30000001192092896,
+            -0.0350000336766243
+          ]
+        }
+      },
+      "code": "WEAPON_HARDPOINT_ENVELOPES",
+      "expected": {
+        "muzzle": {
+          "x": [
+            -0.005,
+            0.005
+          ],
+          "y": [
+            1.1,
+            1.25
+          ],
+          "z": [
+            0.13,
+            0.16
+          ]
+        },
+        "primary_grip": {
+          "x": [
+            -0.08,
+            -0.06
+          ],
+          "y": [
+            -0.06,
+            -0.04
+          ],
+          "z": [
+            -0.05,
+            -0.03
+          ]
+        },
+        "sight_ocular": {
+          "x": [
+            -0.005,
+            0.005
+          ],
+          "y": [
+            -0.32,
+            -0.24
+          ],
+          "z": [
+            0.29,
+            0.34
+          ]
+        },
+        "stock_contact": {
+          "x": [
+            -0.13,
+            -0.09
+          ],
+          "y": [
+            -0.48,
+            -0.4
+          ],
+          "z": [
+            0.1,
+            0.16
+          ]
+        },
+        "support_grip": {
+          "x": [
+            0.103,
+            0.113
+          ],
+          "y": [
+            0.291,
+            0.311
+          ],
+          "z": [
+            -0.045,
+            -0.025
+          ]
+        }
+      },
+      "message": "Versioned local hardpoints must remain inside the bounded ergonomic design envelope.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "bolt": {
+          "expected_bone": "WeaponBolt",
+          "objects": [
+            "NGPR_BoltKnob",
+            "NGPR_BoltRootCollar",
+            "NGPR_BoltStem",
+            "NGPR_ChargingRail"
+          ],
+          "valid": true
+        },
+        "magazine": {
+          "expected_bone": "WeaponMagazine",
+          "objects": [
+            "NGPR_Magazine",
+            "NGPR_MagazineBase",
+            "NGPR_MagazineRib_L",
+            "NGPR_MagazineRib_R",
+            "NGPR_MagwellCollar"
+          ],
+          "valid": true
+        }
+      },
+      "code": "WEAPON_ARTICULATED_HIERARCHY",
+      "message": "Magazine and bolt components must use only their approved armature controls.",
+      "severity": "pass"
+    },
+    {
+      "actual": "b0a893bb3d5e07806bdf7962ded90e2c612f43d1d0bfbf5b933c4225ffc8a415",
+      "code": "WEAPON_RIGID_SIGNATURE",
+      "message": "The actual weapon hierarchy matches its frozen rigid v6 manifest.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "WEAPON_NO_OBJECT_ACTIONS",
+      "expected": [],
+      "message": "Weapon motion must live only in the synchronized armature actions.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "0": {
+          "draw_calls": 3,
+          "renderers": 3,
+          "triangles": 88316
+        },
+        "1": {
+          "draw_calls": 3,
+          "renderers": 3,
+          "triangles": 44158
+        },
+        "2": {
+          "draw_calls": 3,
+          "renderers": 3,
+          "triangles": 17660
+        },
+        "3": {
+          "draw_calls": 3,
+          "renderers": 3,
+          "triangles": 6178
+        }
+      },
+      "code": "CANDIDATE005_RUNTIME_METRICS",
+      "message": "Combined runtime budgets require all four pinned Candidate005 LOD metrics.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "optic": 1,
+        "rifle": 1
+      },
+      "code": "LOD0_RENDERER_ROLES",
+      "expected": {
+        "optic": "0 or 1",
+        "rifle": 1
+      },
+      "message": "Each WeaponV2 LOD needs one rifle renderer and at most one optic renderer.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_OPTIC_LOD0_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD0_NGPR001_OPTIC_LOD0_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD0_NGPR001_OPTIC_LOD0_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 1536,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD0_NGPR001_OPTIC_LOD0_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 1,
+        "used_materials": [
+          "NGPR_OpticGlass"
+        ],
+        "used_slot_count": 1
+      },
+      "code": "LOD0_NGPR001_OPTIC_LOD0_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD0_NGPR001_OPTIC_LOD0_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD0_NGPR001_RIFLE_LOD0_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD0_NGPR001_RIFLE_LOD0_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD0_NGPR001_RIFLE_LOD0_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 21680,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD0_NGPR001_RIFLE_LOD0_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 4,
+        "used_materials": [
+          "NGPR_CarbonComposite",
+          "NGPR_SootBlackArmor",
+          "NGPR_OilyGunmetal",
+          "NGPR_CyanStatus"
+        ],
+        "used_slot_count": 4
+      },
+      "code": "LOD0_NGPR001_RIFLE_LOD0_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD0_NGPR001_RIFLE_LOD0_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponBolt",
+        "WeaponMagazine",
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 21680,
+      "code": "LOD0_RIFLE_TRIANGLES",
+      "expected": {
+        "hard_max": 30000,
+        "target_max": 30000,
+        "target_min": 20000
+      },
+      "message": "Visible rifle triangles are evaluated against the Candidate006 target.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 111532
+      },
+      "code": "LOD0_COMBINED_RUNTIME_BUDGET",
+      "expected": {
+        "draw_calls": 8,
+        "renderers": 8,
+        "triangles": 130000,
+        "weapon_renderers": 2
+      },
+      "message": "Candidate005 suit plus actual Candidate006 visible meshes must meet combined hard ceilings.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "optic": 1,
+        "rifle": 1
+      },
+      "code": "LOD1_RENDERER_ROLES",
+      "expected": {
+        "optic": "0 or 1",
+        "rifle": 1
+      },
+      "message": "Each WeaponV2 LOD needs one rifle renderer and at most one optic renderer.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_OPTIC_LOD1_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD1_NGPR001_OPTIC_LOD1_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD1_NGPR001_OPTIC_LOD1_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 768,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD1_NGPR001_OPTIC_LOD1_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 1,
+        "used_materials": [
+          "NGPR_OpticGlass"
+        ],
+        "used_slot_count": 1
+      },
+      "code": "LOD1_NGPR001_OPTIC_LOD1_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD1_NGPR001_OPTIC_LOD1_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD1_NGPR001_RIFLE_LOD1_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD1_NGPR001_RIFLE_LOD1_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD1_NGPR001_RIFLE_LOD1_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 12400,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD1_NGPR001_RIFLE_LOD1_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 4,
+        "used_materials": [
+          "NGPR_CarbonComposite",
+          "NGPR_SootBlackArmor",
+          "NGPR_OilyGunmetal",
+          "NGPR_CyanStatus"
+        ],
+        "used_slot_count": 4
+      },
+      "code": "LOD1_NGPR001_RIFLE_LOD1_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD1_NGPR001_RIFLE_LOD1_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponBolt",
+        "WeaponMagazine",
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 12400,
+      "code": "LOD1_RIFLE_TRIANGLES",
+      "expected": {
+        "hard_max": 15000,
+        "target_max": 15000,
+        "target_min": 10000
+      },
+      "message": "Visible rifle triangles are evaluated against the Candidate006 target.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 57326
+      },
+      "code": "LOD1_COMBINED_RUNTIME_BUDGET",
+      "expected": {
+        "draw_calls": 8,
+        "renderers": 8,
+        "triangles": 65000,
+        "weapon_renderers": 2
+      },
+      "message": "Candidate005 suit plus actual Candidate006 visible meshes must meet combined hard ceilings.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "optic": 1,
+        "rifle": 1
+      },
+      "code": "LOD2_RENDERER_ROLES",
+      "expected": {
+        "optic": "0 or 1",
+        "rifle": 1
+      },
+      "message": "Each WeaponV2 LOD needs one rifle renderer and at most one optic renderer.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_OPTIC_LOD2_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD2_NGPR001_OPTIC_LOD2_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD2_NGPR001_OPTIC_LOD2_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 512,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD2_NGPR001_OPTIC_LOD2_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 1,
+        "used_materials": [
+          "NGPR_OpticGlass"
+        ],
+        "used_slot_count": 1
+      },
+      "code": "LOD2_NGPR001_OPTIC_LOD2_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD2_NGPR001_OPTIC_LOD2_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD2_NGPR001_RIFLE_LOD2_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD2_NGPR001_RIFLE_LOD2_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD2_NGPR001_RIFLE_LOD2_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 5000,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD2_NGPR001_RIFLE_LOD2_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 4,
+        "used_materials": [
+          "NGPR_CarbonComposite",
+          "NGPR_SootBlackArmor",
+          "NGPR_OilyGunmetal",
+          "NGPR_CyanStatus"
+        ],
+        "used_slot_count": 4
+      },
+      "code": "LOD2_NGPR001_RIFLE_LOD2_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD2_NGPR001_RIFLE_LOD2_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponBolt",
+        "WeaponMagazine",
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 5000,
+      "code": "LOD2_RIFLE_TRIANGLES",
+      "expected": {
+        "hard_max": 6000,
+        "target_max": 6000,
+        "target_min": 4000
+      },
+      "message": "Visible rifle triangles are evaluated against the Candidate006 target.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 23172
+      },
+      "code": "LOD2_COMBINED_RUNTIME_BUDGET",
+      "expected": {
+        "draw_calls": 8,
+        "renderers": 8,
+        "triangles": 26000,
+        "weapon_renderers": 2
+      },
+      "message": "Candidate005 suit plus actual Candidate006 visible meshes must meet combined hard ceilings.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "optic": 1,
+        "rifle": 1
+      },
+      "code": "LOD3_RENDERER_ROLES",
+      "expected": {
+        "optic": "0 or 1",
+        "rifle": 1
+      },
+      "message": "Each WeaponV2 LOD needs one rifle renderer and at most one optic renderer.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_OPTIC_LOD3_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD3_NGPR001_OPTIC_LOD3_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD3_NGPR001_OPTIC_LOD3_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 384,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD3_NGPR001_OPTIC_LOD3_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 1,
+        "used_materials": [
+          "NGPR_OpticGlass"
+        ],
+        "used_slot_count": 1
+      },
+      "code": "LOD3_NGPR001_OPTIC_LOD3_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD3_NGPR001_OPTIC_LOD3_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_BOUNDARY_EDGES",
+      "expected": 0,
+      "message": "Production topology metric boundary_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_NON_MANIFOLD_EDGES",
+      "expected": 0,
+      "message": "Production topology metric non_manifold_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_LOOSE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric loose_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_LOOSE_VERTICES",
+      "expected": 0,
+      "message": "Production topology metric loose_vertices must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_NGONS",
+      "expected": 0,
+      "message": "Production topology metric ngons must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_UNTRIANGULATED_FACES",
+      "expected": 0,
+      "message": "Production topology metric untriangulated_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_ZERO_AREA_FACES",
+      "expected": 0,
+      "message": "Production topology metric zero_area_faces must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_DEGENERATE_EDGES",
+      "expected": 0,
+      "message": "Production topology metric degenerate_edges must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": 0,
+      "code": "LOD3_NGPR001_RIFLE_LOD3_DUPLICATE_VERTEX_PAIRS",
+      "expected": 0,
+      "message": "Production topology metric duplicate_vertex_pairs must meet its limit.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "boundary_edges": 0,
+        "degenerate_edges": 0,
+        "duplicate_vertex_pairs": 0,
+        "loose_edges": 0,
+        "loose_vertices": 0,
+        "negative_transform_determinant": false,
+        "ngons": 0,
+        "non_manifold_edges": 0,
+        "runtime_modifiers": [
+          "WeaponRig:ARMATURE"
+        ],
+        "unapplied_authoring_modifiers": [],
+        "unapplied_scale": false,
+        "untriangulated_faces": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD3_NGPR001_RIFLE_LOD3_TRANSFORMS",
+      "message": "Visible renderer transforms must use unit scale and positive determinant.",
+      "severity": "pass"
+    },
+    {
+      "actual": [],
+      "code": "LOD3_NGPR001_RIFLE_LOD3_MODIFIERS",
+      "message": "Only an Armature runtime modifier may remain on production meshes.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "covered_faces": 1500,
+        "face_coverage": 1.0,
+        "invalid_values": 0,
+        "out_of_bounds_loops": 0,
+        "present": true,
+        "required_map": "UV0",
+        "selected_overlap_faces": 0,
+        "selected_overlap_loops": 0,
+        "zero_area_faces": 0
+      },
+      "code": "LOD3_NGPR001_RIFLE_LOD3_UV0",
+      "message": "UV0 requires complete finite in-bounds non-overlapping face coverage.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "empty_used_slots": 0,
+        "slot_count": 4,
+        "used_materials": [
+          "NGPR_CarbonComposite",
+          "NGPR_SootBlackArmor",
+          "NGPR_OilyGunmetal",
+          "NGPR_CyanStatus"
+        ],
+        "used_slot_count": 4
+      },
+      "code": "LOD3_NGPR001_RIFLE_LOD3_MATERIALS",
+      "message": "Every used material assignment must be non-empty and within slot budget.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "armature_modifiers": [
+          {
+            "name": "WeaponRig",
+            "object": "PowerSuit_Armature"
+          }
+        ],
+        "binding_valid": true,
+        "first_violations": [],
+        "represented_control_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ],
+        "violation_count": 0
+      },
+      "code": "LOD3_NGPR001_RIFLE_LOD3_RIGID_WEIGHTS",
+      "expected": [
+        "WeaponBolt",
+        "WeaponMagazine",
+        "WeaponRoot"
+      ],
+      "message": "Every visible vertex must have exactly one weight-1 weapon control influence.",
+      "severity": "pass"
+    },
+    {
+      "actual": 1500,
+      "code": "LOD3_RIFLE_TRIANGLES",
+      "expected": {
+        "hard_max": 2000,
+        "target_max": 2000,
+        "target_min": 1000
+      },
+      "message": "Visible rifle triangles are evaluated against the Candidate006 target.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 8062
+      },
+      "code": "LOD3_COMBINED_RUNTIME_BUDGET",
+      "expected": {
+        "draw_calls": 8,
+        "renderers": 8,
+        "triangles": 9000,
+        "weapon_renderers": 2
+      },
+      "message": "Candidate005 suit plus actual Candidate006 visible meshes must meet combined hard ceilings.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "errors": [],
+        "metrics": {
+          "bolt_return_matrix_error": 0.0,
+          "bolt_travel_m": 0.09500002157570868,
+          "magazine_return_matrix_error": 0.0,
+          "magazine_travel_m": 0.3331349219768943,
+          "root_ready_to_stowed_travel_m": 1.475118031466804,
+          "root_transition_return_matrix_error": 0.0,
+          "samples": {
+            "PS_Aim@1": {
+              "maximum_manual_skin_error_m": 1.7120130796843852e-07,
+              "per_renderer_error_m": {
+                "NGPR001_Optic_LOD0": 6.143906154658885e-08,
+                "NGPR001_Rifle_LOD0": 1.7120130796843852e-07
+              }
+            },
+            "PS_BoltCycle@12": {
+              "maximum_manual_skin_error_m": 1.7120130796843852e-07,
+              "per_renderer_error_m": {
+                "NGPR001_Optic_LOD0": 6.143906154658885e-08,
+                "NGPR001_Rifle_LOD0": 1.7120130796843852e-07
+              }
+            },
+            "PS_Reload@50": {
+              "maximum_manual_skin_error_m": 1.6924465733171325e-07,
+              "per_renderer_error_m": {
+                "NGPR001_Optic_LOD0": 1.2377834115800373e-07,
+                "NGPR001_Rifle_LOD0": 1.6924465733171325e-07
+              }
+            },
+            "PS_WeaponStowed_Idle@1": {
+              "maximum_manual_skin_error_m": 3.11145380404906e-07,
+              "per_renderer_error_m": {
+                "NGPR001_Optic_LOD0": 1.7760690213829602e-07,
+                "NGPR001_Rifle_LOD0": 3.11145380404906e-07
+              }
+            }
+          }
+        }
+      },
+      "code": "WEAPON_SKIN_MOTION",
+      "expected": {
+        "bolt_travel_min_m": 0.08,
+        "magazine_travel_min_m": 0.25,
+        "manual_skin_tolerance_m": 0.001,
+        "required_samples": [
+          {
+            "action": "PS_Aim",
+            "frame": 1
+          },
+          {
+            "action": "PS_WeaponStowed_Idle",
+            "frame": 1
+          },
+          {
+            "action": "PS_Reload",
+            "frame": 50
+          },
+          {
+            "action": "PS_BoltCycle",
+            "frame": 12
+          }
+        ],
+        "return_matrix_tolerance": 0.0001,
+        "root_ready_to_stowed_min_m": 0.2
+      },
+      "message": "LOD0 must match the explicit pose/rest skin equation and show reversible root, magazine and bolt motion.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "errors": [],
+        "manifest": {
+          "maps": {
+            "base_color": {
+              "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_BaseColor.png",
+              "sha256": "4df2fb519e398595230cc0e12e57930b175e9c8bfa62acf962719b26c0588de1"
+            },
+            "emission": {
+              "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Emission.png",
+              "sha256": "49e69eb70decc575896e3e83c071a5a250f028ae5a9a96bfb7edcb09de0c062a"
+            },
+            "mrao": {
+              "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_MRAO.png",
+              "sha256": "ab7e3d4034632686064399274e1903c25ea11f4f10a4eeb0acd194dbeec114df"
+            },
+            "normal": {
+              "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Normal.png",
+              "sha256": "a66010f3d27e867ee0f07c41a33bcdc4765dacbd83febbe5794d7ac8afba70d5"
+            }
+          },
+          "resolution": [
+            2048,
+            2048
+          ],
+          "schema_version": 1
+        }
+      },
+      "code": "PBR_TEXTURE_MANIFEST",
+      "message": "Candidate006 requires four existing hash-verified 2K PBR maps.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "base_color": [
+          2048,
+          2048
+        ],
+        "emission": [
+          2048,
+          2048
+        ],
+        "mrao": [
+          2048,
+          2048
+        ],
+        "normal": [
+          2048,
+          2048
+        ]
+      },
+      "code": "PBR_TEXTURE_DIMENSIONS",
+      "expected": [
+        2048,
+        2048
+      ],
+      "message": "Each hash-bound PBR map must decode at exactly 2048x2048.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "NGPR_CarbonComposite": {
+          "base_color": true,
+          "emission": true,
+          "metallic": true,
+          "normal": true,
+          "roughness": true
+        },
+        "NGPR_CyanStatus": {
+          "base_color": true,
+          "emission": true,
+          "metallic": true,
+          "normal": true,
+          "roughness": true
+        },
+        "NGPR_OilyGunmetal": {
+          "base_color": true,
+          "emission": true,
+          "metallic": true,
+          "normal": true,
+          "roughness": true
+        },
+        "NGPR_OpticGlass": {
+          "base_color": true,
+          "emission": true,
+          "metallic": true,
+          "normal": true,
+          "roughness": true
+        },
+        "NGPR_SootBlackArmor": {
+          "base_color": true,
+          "emission": true,
+          "metallic": true,
+          "normal": true,
+          "roughness": true
+        }
+      },
+      "code": "PBR_PRINCIPLED_CHANNELS",
+      "message": "Every LOD0 render material must exercise all required Principled PBR channels.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "manifest_schema": true,
+        "manifest_text": true,
+        "policy": true,
+        "semantic_schema": true,
+        "suit_attribute": true,
+        "weapon_attribute": true
+      },
+      "code": "CLEARANCE_SHARED_CONTRACT",
+      "message": "WeaponV2 must import the same face-policy identifiers as the clearance gate.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "errors": [],
+        "manifest_sha256": "dd1b1670bee9242c49df9ee645de39e9da525ad2c87d9f31a8d0ca5cda20cbd0"
+      },
+      "code": "CLEARANCE_MANIFEST",
+      "message": "The embedded canonical clearance manifest must validate without policy errors.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "errors": [],
+        "objects": [
+          {
+            "asset_role": "suit",
+            "face_count": 60468,
+            "name": "H2_Armor_LOD0",
+            "semantic_attribute": "ps_clearance_suit_zone_id",
+            "semantic_counts": {
+              "0": 44435,
+              "101": 5506,
+              "102": 5506,
+              "103": 3293,
+              "104": 864,
+              "105": 864
+            },
+            "topology_sha256": "d737812a4013230b88115fc211622fcec6da969027d06fcc4b3103497545a98b"
+          },
+          {
+            "asset_role": "suit",
+            "face_count": 3312,
+            "name": "H2_Emission_LOD0",
+            "semantic_attribute": "ps_clearance_suit_zone_id",
+            "semantic_counts": {
+              "0": 3312
+            },
+            "topology_sha256": "5212da2ab4ea7cbfb0c30b11b78f20e5c5495f61682a66bc97bfc938fe17ed2f"
+          },
+          {
+            "asset_role": "suit",
+            "face_count": 24536,
+            "name": "H2_Undersuit_LOD0",
+            "semantic_attribute": "ps_clearance_suit_zone_id",
+            "semantic_counts": {
+              "0": 24536
+            },
+            "topology_sha256": "ac2c0a901600beb65bd86be4e422561e59f8568f29a6f54487c39e9c109ed04b"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 1536,
+            "name": "NGPR001_Optic_LOD0",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 1536
+            },
+            "topology_sha256": "5874c5051e0cc6021c486f11468cedbfd9c36f7ff39b55878db54bc502d99b66"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 768,
+            "name": "NGPR001_Optic_LOD1",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 768
+            },
+            "topology_sha256": "fa3d60d152d18f406b76bb641e7736c5b84aa2a93ae779046c46296b5b90cc5e"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 512,
+            "name": "NGPR001_Optic_LOD2",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 512
+            },
+            "topology_sha256": "a2f0ce41f273e1b1482c715a20389e4144d6c87dd9401e2a5092eb5c1ce6392f"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 384,
+            "name": "NGPR001_Optic_LOD3",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 384
+            },
+            "topology_sha256": "f2236e91a563f9bc310247635c64fe40b4b16125d1f1c1c18f2bfaf2d863f612"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 21680,
+            "name": "NGPR001_Rifle_LOD0",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 17290,
+              "201": 625,
+              "202": 836,
+              "203": 879,
+              "204": 593,
+              "205": 1457
+            },
+            "topology_sha256": "1c2d53c18c2b9aa35d7f1037b12f34c790b993ce302236c9b3c97d05a0ddab2f"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 12400,
+            "name": "NGPR001_Rifle_LOD1",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 12400
+            },
+            "topology_sha256": "2d0bea33206f272d0b200a3773e88163e1e4ca5ea3a0f64d02c1aef63f988573"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 5000,
+            "name": "NGPR001_Rifle_LOD2",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 5000
+            },
+            "topology_sha256": "056fea169b526b909c262ea2b74c3dd0b57363c559cdd212279cc68a1958bfa9"
+          },
+          {
+            "asset_role": "weapon",
+            "face_count": 1500,
+            "name": "NGPR001_Rifle_LOD3",
+            "semantic_attribute": "ps_clearance_weapon_zone_id",
+            "semantic_counts": {
+              "0": 1500
+            },
+            "topology_sha256": "f430f6d7bdfabba9fe940b6687eb9e623da3910c5f45433a14e2a3e0b3d2c3b6"
+          }
+        ]
+      },
+      "code": "CLEARANCE_VISIBLE_WEAPON_SEMANTICS",
+      "message": "Every actual visible LOD0 weapon renderer needs complete hash-bound face semantics.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "action": "PS_Aim",
+        "aiming_eye_world": [
+          -0.0949544608592987,
+          0.22393247485160828,
+          1.90193772315979
+        ],
+        "corridor_hits": [],
+        "frame": 15,
+        "helmet_optic_overlap_pairs": 0,
+        "muzzle_forward_distance_m": 1.4550000298768282,
+        "muzzle_world": [
+          -0.23783063888549805,
+          1.8165054321289062,
+          1.3901565074920654
+        ],
+        "ocular_front_clearance_m": 0.1941399360075593,
+        "ocular_to_muzzle_point_angle_deg": 6.664080425014087,
+        "ocular_world": [
+          -0.13868969678878784,
+          0.42541253566741943,
+          1.8384381532669067
+        ],
+        "sight_axis_angle_deg": 3.2556109159860607,
+        "sight_bore_lateral_offset_m": 5.122274160385132e-08,
+        "sight_lateral_m": 0.019685730803757906,
+        "sight_vertical_m": 0.017196343280375004,
+        "visible_suit_optic_overlap_pairs": 0
+      },
+      "code": "SIGHT_ALIGNMENT",
+      "expected": {
+        "aim_action": "PS_Aim",
+        "aim_frame": 15,
+        "corridor_half_width_m": 0.008,
+        "lateral_tolerance_m": 0.035,
+        "ocular_front_max_m": 0.2,
+        "ocular_front_min_m": 0.015,
+        "sight_axis_tolerance_deg": 5.0,
+        "vertical_tolerance_m": 0.04
+      },
+      "message": "Aim-frame ocular and bore alignment must meet the shouldered precision envelope.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "corridor_hits": [],
+        "helmet_optic_overlap_pairs": 0,
+        "visible_suit_optic_overlap_pairs": 0
+      },
+      "code": "SIGHT_OCULAR_OBSTRUCTION",
+      "expected": {
+        "corridor_hits": [],
+        "helmet_optic_overlap_pairs": 0,
+        "visible_suit_optic_overlap_pairs": 0
+      },
+      "message": "Five evaluated rays through the ocular corridor must remain clear, and the optic must not overlap actual visible suit or helmet geometry.",
+      "severity": "pass"
+    },
+    {
+      "actual": {
+        "builder_manifest_canonical_sha256": "16f868c7b26b1fd2eaf4ca63e2adf2b4ca35e8f79510a91f224e52a91e1e219f",
+        "builder_manifest_path": "ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v006.json",
+        "errors": [],
+        "files": [
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_front.png",
+            "sha256": "157ed856617e5807a5029507264a44712d48304b1820003c1de09ae36830d793",
+            "size_bytes": 1279096
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_side.png",
+            "sha256": "f05adbbd5c185172d6d552aa8dc2a7b7d2823bf7c304b1a18737a66a02a14b63",
+            "size_bytes": 1263655
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_front_3q.png",
+            "sha256": "04835ea0b3cf728e86ae2bc49031b6a7349007969184baf3970f592400bde1dd",
+            "size_bytes": 1272770
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_aim.png",
+            "sha256": "94f2054a9af150e80523e36a1f2bbcbd41106468da2ff6a50057424d44bf15c7",
+            "size_bytes": 1648538
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_hip_fire.png",
+            "sha256": "8b15cda08ab4a213bd6a4dcdd5fe6d14aead2f62368012b8426f663963879818",
+            "size_bytes": 1510251
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_scope_ocular.png",
+            "sha256": "312ab35e467fd91ece2115a6c21e489d61ad0950402a1c9090bd4cb194a58104",
+            "size_bytes": 1510676
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_reload.png",
+            "sha256": "ac9f496c16066f0f3fb06801e46206588c385777bf878c6054e550c1178d1914",
+            "size_bytes": 1576639
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_bolt.png",
+            "sha256": "1f980cb5cd0b412148faa5f6358867cdaa2273a3fd460539e9d86662c225d482",
+            "size_bytes": 1610955
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_run.png",
+            "sha256": "c50b345e7752b49901ae969ed84ac501c021d9c0875b1508f6e28fd9f51d8bff",
+            "size_bytes": 1549546
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_hover.png",
+            "sha256": "65d4c331a16eace2fc4806b4f00313358432a7e548ffdc2e41dcb69595739429",
+            "size_bytes": 1497739
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_stowed.png",
+            "sha256": "a5f6f7d019730d6220f9f65fcf4481cf7f21d1298bbe1c81c837b13fc9d82320",
+            "size_bytes": 1549015
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_draw.png",
+            "sha256": "0555f2eb2430bfca464413761c4ed417300903a75a152a2894dd357c021115d6",
+            "size_bytes": 1472686
+          },
+          {
+            "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_sheathe.png",
+            "sha256": "e56a54b02b9f03a2601d1ce879f8243266f3116f3d71a483bb435fa3e65b915c",
+            "size_bytes": 1522296
+          }
+        ],
+        "projection_errors": []
+      },
+      "code": "REVIEW_RENDER_MANIFEST",
+      "message": "Review evidence must contain 13 unique, source-bound, correctly framed PNGs.",
+      "severity": "pass"
+    },
+    {
+      "actual": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+      "code": "SOURCE_IMMUTABLE",
+      "expected": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+      "message": "Validation must not mutate the Candidate006 source blend.",
+      "severity": "pass"
+    }
+  ],
+  "lods": [
+    {
+      "candidate005_suit_metrics": {
+        "draw_calls": 3,
+        "renderers": 3,
+        "triangles": 88316
+      },
+      "combined_runtime_metrics": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 111532
+      },
+      "draw_calls_estimate": 5,
+      "lod": 0,
+      "objects": [
+        {
+          "edges": 2304,
+          "faces": 1536,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "NGPR_OpticGlass"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "NGPR001_Optic_LOD0",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "optic",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 1536,
+          "uv": {
+            "covered_faces": 1536,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 768
+        },
+        {
+          "edges": 32520,
+          "faces": 21680,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 4,
+            "used_materials": [
+              "NGPR_CarbonComposite",
+              "NGPR_SootBlackArmor",
+              "NGPR_OilyGunmetal",
+              "NGPR_CyanStatus"
+            ],
+            "used_slot_count": 4
+          },
+          "name": "NGPR001_Rifle_LOD0",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponBolt",
+              "WeaponMagazine",
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "rifle",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 21680,
+          "uv": {
+            "covered_faces": 21680,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 11048
+        }
+      ],
+      "renderer_count": 2,
+      "selection_method": "collection:WeaponV2_LOD0",
+      "triangle_budget_result": {
+        "actual": 21680,
+        "hard_max": 30000,
+        "result": "IN_TARGET",
+        "severity": "pass",
+        "target_max": 30000,
+        "target_min": 20000
+      },
+      "triangles_by_role": {
+        "optic": 1536,
+        "rifle": 21680
+      },
+      "triangles_total": 23216
+    },
+    {
+      "candidate005_suit_metrics": {
+        "draw_calls": 3,
+        "renderers": 3,
+        "triangles": 44158
+      },
+      "combined_runtime_metrics": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 57326
+      },
+      "draw_calls_estimate": 5,
+      "lod": 1,
+      "objects": [
+        {
+          "edges": 1152,
+          "faces": 768,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "NGPR_OpticGlass"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "NGPR001_Optic_LOD1",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "optic",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 768,
+          "uv": {
+            "covered_faces": 768,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 384
+        },
+        {
+          "edges": 18600,
+          "faces": 12400,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 4,
+            "used_materials": [
+              "NGPR_CarbonComposite",
+              "NGPR_SootBlackArmor",
+              "NGPR_OilyGunmetal",
+              "NGPR_CyanStatus"
+            ],
+            "used_slot_count": 4
+          },
+          "name": "NGPR001_Rifle_LOD1",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponBolt",
+              "WeaponMagazine",
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "rifle",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 12400,
+          "uv": {
+            "covered_faces": 12400,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 6408
+        }
+      ],
+      "renderer_count": 2,
+      "selection_method": "collection:WeaponV2_LOD1",
+      "triangle_budget_result": {
+        "actual": 12400,
+        "hard_max": 15000,
+        "result": "IN_TARGET",
+        "severity": "pass",
+        "target_max": 15000,
+        "target_min": 10000
+      },
+      "triangles_by_role": {
+        "optic": 768,
+        "rifle": 12400
+      },
+      "triangles_total": 13168
+    },
+    {
+      "candidate005_suit_metrics": {
+        "draw_calls": 3,
+        "renderers": 3,
+        "triangles": 17660
+      },
+      "combined_runtime_metrics": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 23172
+      },
+      "draw_calls_estimate": 5,
+      "lod": 2,
+      "objects": [
+        {
+          "edges": 768,
+          "faces": 512,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "NGPR_OpticGlass"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "NGPR001_Optic_LOD2",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "optic",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 512,
+          "uv": {
+            "covered_faces": 512,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 256
+        },
+        {
+          "edges": 7500,
+          "faces": 5000,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 4,
+            "used_materials": [
+              "NGPR_CarbonComposite",
+              "NGPR_SootBlackArmor",
+              "NGPR_OilyGunmetal",
+              "NGPR_CyanStatus"
+            ],
+            "used_slot_count": 4
+          },
+          "name": "NGPR001_Rifle_LOD2",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponBolt",
+              "WeaponMagazine",
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "rifle",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 5000,
+          "uv": {
+            "covered_faces": 5000,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 2708
+        }
+      ],
+      "renderer_count": 2,
+      "selection_method": "collection:WeaponV2_LOD2",
+      "triangle_budget_result": {
+        "actual": 5000,
+        "hard_max": 6000,
+        "result": "IN_TARGET",
+        "severity": "pass",
+        "target_max": 6000,
+        "target_min": 4000
+      },
+      "triangles_by_role": {
+        "optic": 512,
+        "rifle": 5000
+      },
+      "triangles_total": 5512
+    },
+    {
+      "candidate005_suit_metrics": {
+        "draw_calls": 3,
+        "renderers": 3,
+        "triangles": 6178
+      },
+      "combined_runtime_metrics": {
+        "draw_calls": 8,
+        "renderers": 5,
+        "triangles": 8062
+      },
+      "draw_calls_estimate": 5,
+      "lod": 3,
+      "objects": [
+        {
+          "edges": 576,
+          "faces": 384,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 1,
+            "used_materials": [
+              "NGPR_OpticGlass"
+            ],
+            "used_slot_count": 1
+          },
+          "name": "NGPR001_Optic_LOD3",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "optic",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 384,
+          "uv": {
+            "covered_faces": 384,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 192
+        },
+        {
+          "edges": 2250,
+          "faces": 1500,
+          "materials": {
+            "empty_used_slots": 0,
+            "slot_count": 4,
+            "used_materials": [
+              "NGPR_CarbonComposite",
+              "NGPR_SootBlackArmor",
+              "NGPR_OilyGunmetal",
+              "NGPR_CyanStatus"
+            ],
+            "used_slot_count": 4
+          },
+          "name": "NGPR001_Rifle_LOD3",
+          "rigid_weights": {
+            "armature_modifiers": [
+              {
+                "name": "WeaponRig",
+                "object": "PowerSuit_Armature"
+              }
+            ],
+            "binding_valid": true,
+            "first_violations": [],
+            "represented_control_bones": [
+              "WeaponBolt",
+              "WeaponMagazine",
+              "WeaponRoot"
+            ],
+            "violation_count": 0
+          },
+          "role": "rifle",
+          "topology": {
+            "boundary_edges": 0,
+            "degenerate_edges": 0,
+            "duplicate_vertex_pairs": 0,
+            "loose_edges": 0,
+            "loose_vertices": 0,
+            "negative_transform_determinant": false,
+            "ngons": 0,
+            "non_manifold_edges": 0,
+            "runtime_modifiers": [
+              "WeaponRig:ARMATURE"
+            ],
+            "unapplied_authoring_modifiers": [],
+            "unapplied_scale": false,
+            "untriangulated_faces": 0,
+            "zero_area_faces": 0
+          },
+          "triangles": 1500,
+          "uv": {
+            "covered_faces": 1500,
+            "face_coverage": 1.0,
+            "invalid_values": 0,
+            "out_of_bounds_loops": 0,
+            "present": true,
+            "required_map": "UV0",
+            "zero_area_faces": 0
+          },
+          "uv_overlap_audit": {
+            "selected_overlap_faces": 0,
+            "selected_overlap_loops": 0
+          },
+          "vertices": 958
+        }
+      ],
+      "renderer_count": 2,
+      "selection_method": "collection:WeaponV2_LOD3",
+      "triangle_budget_result": {
+        "actual": 1500,
+        "hard_max": 2000,
+        "result": "IN_TARGET",
+        "severity": "pass",
+        "target_max": 2000,
+        "target_min": 1000
+      },
+      "triangles_by_role": {
+        "optic": 384,
+        "rifle": 1500
+      },
+      "triangles_total": 1884
+    }
+  ],
+  "pbr": {
+    "image_dimensions": {
+      "base_color": [
+        2048,
+        2048
+      ],
+      "emission": [
+        2048,
+        2048
+      ],
+      "mrao": [
+        2048,
+        2048
+      ],
+      "normal": [
+        2048,
+        2048
+      ]
+    },
+    "materials": {
+      "NGPR_CarbonComposite": {
+        "base_color": true,
+        "emission": true,
+        "metallic": true,
+        "normal": true,
+        "roughness": true
+      },
+      "NGPR_CyanStatus": {
+        "base_color": true,
+        "emission": true,
+        "metallic": true,
+        "normal": true,
+        "roughness": true
+      },
+      "NGPR_OilyGunmetal": {
+        "base_color": true,
+        "emission": true,
+        "metallic": true,
+        "normal": true,
+        "roughness": true
+      },
+      "NGPR_OpticGlass": {
+        "base_color": true,
+        "emission": true,
+        "metallic": true,
+        "normal": true,
+        "roughness": true
+      },
+      "NGPR_SootBlackArmor": {
+        "base_color": true,
+        "emission": true,
+        "metallic": true,
+        "normal": true,
+        "roughness": true
+      }
+    },
+    "texture_manifest": {
+      "maps": {
+        "base_color": {
+          "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_BaseColor.png",
+          "sha256": "4df2fb519e398595230cc0e12e57930b175e9c8bfa62acf962719b26c0588de1"
+        },
+        "emission": {
+          "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Emission.png",
+          "sha256": "49e69eb70decc575896e3e83c071a5a250f028ae5a9a96bfb7edcb09de0c062a"
+        },
+        "mrao": {
+          "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_MRAO.png",
+          "sha256": "ab7e3d4034632686064399274e1903c25ea11f4f10a4eeb0acd194dbeec114df"
+        },
+        "normal": {
+          "path": "ArtSource/PoweredSuitNextGen/textures/candidate006/NGPR001_Normal.png",
+          "sha256": "a66010f3d27e867ee0f07c41a33bcdc4765dacbd83febbe5794d7ac8afba70d5"
+        }
+      },
+      "resolution": [
+        2048,
+        2048
+      ],
+      "schema_version": 1
+    }
+  },
+  "profile": {
+    "path": "ArtSource/PoweredSuitNextGen/WeaponV2/production_profile.json",
+    "sha256": "9175f49e46028851ed4070ac689a3890506c624e5a14cb5cffe0b1fed1f9bb15"
+  },
+  "promotion_authorized": false,
+  "promotion_blockers_remaining": [
+    "canonical visible all-frame clearance sweep",
+    "dense transition clearance sweep",
+    "owner visual approval",
+    "separate Unity integration approval"
+  ],
+  "review_renders": {
+    "builder_manifest_canonical_sha256": "16f868c7b26b1fd2eaf4ca63e2adf2b4ca35e8f79510a91f224e52a91e1e219f",
+    "builder_manifest_path": "ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v006.json",
+    "directory": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006",
+    "errors": [],
+    "files": [
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_front.png",
+        "sha256": "157ed856617e5807a5029507264a44712d48304b1820003c1de09ae36830d793",
+        "size_bytes": 1279096
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_side.png",
+        "sha256": "f05adbbd5c185172d6d552aa8dc2a7b7d2823bf7c304b1a18737a66a02a14b63",
+        "size_bytes": 1263655
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_neutral_front_3q.png",
+        "sha256": "04835ea0b3cf728e86ae2bc49031b6a7349007969184baf3970f592400bde1dd",
+        "size_bytes": 1272770
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_aim.png",
+        "sha256": "94f2054a9af150e80523e36a1f2bbcbd41106468da2ff6a50057424d44bf15c7",
+        "size_bytes": 1648538
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_hip_fire.png",
+        "sha256": "8b15cda08ab4a213bd6a4dcdd5fe6d14aead2f62368012b8426f663963879818",
+        "size_bytes": 1510251
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_scope_ocular.png",
+        "sha256": "312ab35e467fd91ece2115a6c21e489d61ad0950402a1c9090bd4cb194a58104",
+        "size_bytes": 1510676
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_reload.png",
+        "sha256": "ac9f496c16066f0f3fb06801e46206588c385777bf878c6054e550c1178d1914",
+        "size_bytes": 1576639
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_bolt.png",
+        "sha256": "1f980cb5cd0b412148faa5f6358867cdaa2273a3fd460539e9d86662c225d482",
+        "size_bytes": 1610955
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_run.png",
+        "sha256": "c50b345e7752b49901ae969ed84ac501c021d9c0875b1508f6e28fd9f51d8bff",
+        "size_bytes": 1549546
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_hover.png",
+        "sha256": "65d4c331a16eace2fc4806b4f00313358432a7e548ffdc2e41dcb69595739429",
+        "size_bytes": 1497739
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_stowed.png",
+        "sha256": "a5f6f7d019730d6220f9f65fcf4481cf7f21d1298bbe1c81c837b13fc9d82320",
+        "size_bytes": 1549015
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_draw.png",
+        "sha256": "0555f2eb2430bfca464413761c4ed417300903a75a152a2894dd357c021115d6",
+        "size_bytes": 1472686
+      },
+      {
+        "path": "ArtSource/PoweredSuitNextGen/renders/nextgen_precision_rifle_candidate_v006/nextgen_precision_rifle_pose_sheathe.png",
+        "sha256": "e56a54b02b9f03a2601d1ce879f8243266f3116f3d71a483bb435fa3e65b915c",
+        "size_bytes": 1522296
+      }
+    ],
+    "projection_errors": []
+  },
+  "rig_and_actions": {
+    "actions": {
+      "PS_Aim": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          30
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Aim_Walk_Backward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Aim_Walk_Forward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Aim_Walk_Left": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Aim_Walk_Right": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_BoltCycle": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          20
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Hover": {
+        "curve_count": 147,
+        "frame_range": [
+          1,
+          61
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Idle": {
+        "curve_count": 147,
+        "frame_range": [
+          1,
+          61
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Reload": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          84
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Run_Forward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          21
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Walk": {
+        "curve_count": 147,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Walk_Backward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Walk_Forward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Walk_Left": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Walk_Right": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponReady_Idle": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          61
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponStowed_Hover": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          61
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponStowed_Idle": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          61
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponStowed_Walk_Backward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponStowed_Walk_Forward": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponStowed_Walk_Left": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_WeaponStowed_Walk_Right": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          31
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Weapon_Draw": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          30
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      },
+      "PS_Weapon_Sheathe": {
+        "curve_count": 207,
+        "frame_range": [
+          1,
+          30
+        ],
+        "root_location_range_m": 0.0,
+        "slot_count": 1,
+        "slot_target_id_type": "OBJECT",
+        "weapon_control_curve_bones": [
+          "WeaponBolt",
+          "WeaponMagazine",
+          "WeaponRoot"
+        ]
+      }
+    },
+    "armature": "PowerSuit_Armature",
+    "bone_count": 23,
+    "bone_names": [
+      "Chest",
+      "Foot.L",
+      "Foot.R",
+      "Hand.L",
+      "Hand.R",
+      "Head",
+      "Hips",
+      "LowerArm.L",
+      "LowerArm.R",
+      "LowerLeg.L",
+      "LowerLeg.R",
+      "Neck",
+      "Root",
+      "Shoulder.L",
+      "Shoulder.R",
+      "Spine",
+      "UpperArm.L",
+      "UpperArm.R",
+      "UpperLeg.L",
+      "UpperLeg.R",
+      "WeaponBolt",
+      "WeaponMagazine",
+      "WeaponRoot"
+    ],
+    "deforming_weapon_controls": {
+      "WeaponBolt": true,
+      "WeaponMagazine": true,
+      "WeaponRoot": true
+    },
+    "fps": 30.0
+  },
+  "schema_version": 1,
+  "sighting": {
+    "action": "PS_Aim",
+    "aiming_eye_world": [
+      -0.0949544608592987,
+      0.22393247485160828,
+      1.90193772315979
+    ],
+    "corridor_hits": [],
+    "frame": 15,
+    "helmet_optic_overlap_pairs": 0,
+    "muzzle_forward_distance_m": 1.4550000298768282,
+    "muzzle_world": [
+      -0.23783063888549805,
+      1.8165054321289062,
+      1.3901565074920654
+    ],
+    "ocular_front_clearance_m": 0.1941399360075593,
+    "ocular_to_muzzle_point_angle_deg": 6.664080425014087,
+    "ocular_world": [
+      -0.13868969678878784,
+      0.42541253566741943,
+      1.8384381532669067
+    ],
+    "sight_axis_angle_deg": 3.2556109159860607,
+    "sight_bore_lateral_offset_m": 5.122274160385132e-08,
+    "sight_lateral_m": 0.019685730803757906,
+    "sight_vertical_m": 0.017196343280375004,
+    "visible_suit_optic_overlap_pairs": 0
+  },
+  "source": {
+    "immutable": true,
+    "path": "ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v006.blend",
+    "sha256_after": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227",
+    "sha256_before": "093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227"
+  },
+  "status": "PASS",
+  "structural_gate_passed": true,
+  "summary": {
+    "error": 0,
+    "pass": 156,
+    "warning": 0
+  },
+  "weapon_contract": {
+    "articulated_components": {
+      "bolt": {
+        "expected_bone": "WeaponBolt",
+        "objects": [
+          "NGPR_BoltKnob",
+          "NGPR_BoltRootCollar",
+          "NGPR_BoltStem",
+          "NGPR_ChargingRail"
+        ],
+        "valid": true
+      },
+      "magazine": {
+        "expected_bone": "WeaponMagazine",
+        "objects": [
+          "NGPR_Magazine",
+          "NGPR_MagazineBase",
+          "NGPR_MagazineRib_L",
+          "NGPR_MagazineRib_R",
+          "NGPR_MagwellCollar"
+        ],
+        "valid": true
+      }
+    },
+    "helpers": {
+      "muzzle": {
+        "direct_child": true,
+        "local_position": [
+          2.0489096641540527e-08,
+          1.1750000715255737,
+          0.1450001448392868
+        ],
+        "object": "Rifle_Muzzle"
+      },
+      "primary_grip": {
+        "contact_offset_local": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "direct_child": true,
+        "local_position": [
+          -0.06999997794628143,
+          -0.05000000447034836,
+          -0.040000010281801224
+        ],
+        "object": "Rifle_PrimaryGrip",
+        "target_semantic": "wrist_head"
+      },
+      "sight_ocular": {
+        "direct_child": true,
+        "local_position": [
+          2.9802322387695312e-08,
+          -0.28000009059906006,
+          0.3149999976158142
+        ],
+        "object": "Rifle_SightOcular"
+      },
+      "stock_contact": {
+        "direct_child": true,
+        "local_position": [
+          -0.1120000034570694,
+          -0.44800013303756714,
+          0.13200001418590546
+        ],
+        "object": "Rifle_StockContact"
+      },
+      "support_grip": {
+        "contact_offset_local": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "direct_child": true,
+        "local_position": [
+          0.1080000251531601,
+          0.30000001192092896,
+          -0.0350000336766243
+        ],
+        "object": "Rifle_SupportGripTarget",
+        "target_semantic": "wrist_head"
+      }
+    },
+    "object_action_owners": [],
+    "rigid_signature": "b0a893bb3d5e07806bdf7962ded90e2c612f43d1d0bfbf5b933c4225ffc8a415",
+    "root": "RifleRoot",
+    "root_properties": {
+      "ps_weapon_active": true,
+      "ps_weapon_contract_version": 3,
+      "ps_weapon_family": "long_gun",
+      "ps_weapon_forward_axis": "+Y",
+      "ps_weapon_id": "PS_NextGenPrecisionRifle001",
+      "ps_weapon_rigid": true,
+      "ps_weapon_rigid_signature_version": 6,
+      "ps_weapon_stance_family": "shouldered_precision",
+      "ps_weapon_up_axis": "+Z"
+    }
+  },
+  "weapon_skin_motion": {
+    "bolt_return_matrix_error": 0.0,
+    "bolt_travel_m": 0.09500002157570868,
+    "magazine_return_matrix_error": 0.0,
+    "magazine_travel_m": 0.3331349219768943,
+    "root_ready_to_stowed_travel_m": 1.475118031466804,
+    "root_transition_return_matrix_error": 0.0,
+    "samples": {
+      "PS_Aim@1": {
+        "maximum_manual_skin_error_m": 1.7120130796843852e-07,
+        "per_renderer_error_m": {
+          "NGPR001_Optic_LOD0": 6.143906154658885e-08,
+          "NGPR001_Rifle_LOD0": 1.7120130796843852e-07
+        }
+      },
+      "PS_BoltCycle@12": {
+        "maximum_manual_skin_error_m": 1.7120130796843852e-07,
+        "per_renderer_error_m": {
+          "NGPR001_Optic_LOD0": 6.143906154658885e-08,
+          "NGPR001_Rifle_LOD0": 1.7120130796843852e-07
+        }
+      },
+      "PS_Reload@50": {
+        "maximum_manual_skin_error_m": 1.6924465733171325e-07,
+        "per_renderer_error_m": {
+          "NGPR001_Optic_LOD0": 1.2377834115800373e-07,
+          "NGPR001_Rifle_LOD0": 1.6924465733171325e-07
+        }
+      },
+      "PS_WeaponStowed_Idle@1": {
+        "maximum_manual_skin_error_m": 3.11145380404906e-07,
+        "per_renderer_error_m": {
+          "NGPR001_Optic_LOD0": 1.7760690213829602e-07,
+          "NGPR001_Rifle_LOD0": 3.11145380404906e-07
+        }
+      }
+    }
+  }
+}

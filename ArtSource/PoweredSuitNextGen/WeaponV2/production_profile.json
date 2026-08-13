@@ -1,0 +1,234 @@
+{
+  "asset": {
+    "candidate_id": "NextGen Precision Rifle 001",
+    "candidate_number": 6,
+    "status": "PARALLEL_REVIEW_CANDIDATE_NOT_UNITY_INTEGRATED"
+  },
+  "clearance": {
+    "manifest_schema": "PS_CLEARANCE_MANIFEST_V1",
+    "manifest_text": "PS_CLEARANCE_MANIFEST.json",
+    "policy_version": "PS_CLEARANCE_FACE_POLICY_V1",
+    "semantic_schema": "PS_CLEARANCE_FACE_SEMANTICS_V1",
+    "suit_attribute": "ps_clearance_suit_zone_id",
+    "weapon_attribute": "ps_clearance_weapon_zone_id"
+  },
+  "immutable_inputs": {
+    "candidate004_blend": {
+      "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v004.blend",
+      "sha256": "86fccc2779b0d87658bdc5164bfcb01d8466e7d05d3f92a8172cc0382a01daeb"
+    },
+    "candidate005_blend": {
+      "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v005.blend",
+      "sha256": "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84"
+    },
+    "candidate005_manifest": {
+      "path": "ArtSource/PoweredSuitNextGen/candidates/aegis_vanguard_candidate_v005.json",
+      "sha256": "a5d687145e5676482dea415213fc53eee38ddb069e718cc4104d08e8ee5e0341"
+    },
+    "candidate005_production_report": {
+      "path": "ArtSource/PoweredSuitNextGen/HeroV2/reports/candidate005_production.json",
+      "sha256": "48c637c32a349f284eedeB1a923d8273bebd8ede6ff004f4cdc64e50f010e0b3"
+    },
+    "concept_reference": {
+      "path": "ArtSource/PoweredSuitNextGen/Concepts/nextgen_precision_rifle_reference_v001.png",
+      "sha256": "8c99f32e7584bc0b49abf27b3fb029e417dd19ea77aab4da2b178c21b299db8c"
+    },
+    "generator114_action_manifest": {
+      "path": "ArtSource/PoweredSuit/Validation/Generator114/export_manifest.json",
+      "sha256": "6ce5c612b35a118076357d33de27da3ff669e6b743eb812eccd0956652c1faaf"
+    },
+    "generator114_generated_blend": {
+      "path": "ArtSource/PoweredSuit/powersuit_pipeline.blend",
+      "sha256": "6f2e09a53b46408ba2c3d485303b8c28811c263f1dae9a1e230fd3bafcda3f8a"
+    },
+    "generator114_recovered_source": {
+      "path": "ArtSource/PoweredSuit/source/powersuit_source.blend",
+      "sha256": "49c2a9a09c71989a72e6b81c97045e609d825c2bf41e21a62f216adc277402f4"
+    }
+  },
+  "lods": {
+    "rifle_triangle_budgets": {
+      "LOD0": {"hard_max": 30000, "target_max": 30000, "target_min": 20000},
+      "LOD1": {"hard_max": 15000, "target_max": 15000, "target_min": 10000},
+      "LOD2": {"hard_max": 6000, "target_max": 6000, "target_min": 4000},
+      "LOD3": {"hard_max": 2000, "target_max": 2000, "target_min": 1000}
+    }
+  },
+  "pbr": {
+    "manifest_property": "weapon_v2_texture_manifest_json",
+    "manifest_text": "PS_WEAPON_V2_TEXTURE_MANIFEST.json",
+    "required_maps": ["base_color", "normal", "mrao", "emission"],
+    "texture_resolution": [2048, 2048]
+  },
+  "renders": {
+    "minimum_file_size_bytes": 4096,
+    "required_filenames": [
+      "nextgen_precision_rifle_neutral_front.png",
+      "nextgen_precision_rifle_neutral_side.png",
+      "nextgen_precision_rifle_neutral_front_3q.png",
+      "nextgen_precision_rifle_pose_aim.png",
+      "nextgen_precision_rifle_pose_hip_fire.png",
+      "nextgen_precision_rifle_scope_ocular.png",
+      "nextgen_precision_rifle_pose_reload.png",
+      "nextgen_precision_rifle_pose_bolt.png",
+      "nextgen_precision_rifle_pose_run.png",
+      "nextgen_precision_rifle_pose_hover.png",
+      "nextgen_precision_rifle_pose_stowed.png",
+      "nextgen_precision_rifle_pose_draw.png",
+      "nextgen_precision_rifle_pose_sheathe.png"
+    ]
+  },
+  "report": {
+    "required_evidence": [
+      "immutable_inputs",
+      "source_immutability",
+      "rig_and_actions",
+      "weapon_contract",
+      "rigid_geometry",
+      "weapon_skin_motion",
+      "topology_and_uv",
+      "pbr_materials",
+      "lod_and_render_budget",
+      "sight_and_ocular",
+      "clearance_semantics",
+      "review_renders"
+    ]
+  },
+  "rig": {
+    "action_fps": 30,
+    "action_ranges": {
+      "PS_Aim": [1, 30],
+      "PS_Aim_Walk_Backward": [1, 31],
+      "PS_Aim_Walk_Forward": [1, 31],
+      "PS_Aim_Walk_Left": [1, 31],
+      "PS_Aim_Walk_Right": [1, 31],
+      "PS_BoltCycle": [1, 20],
+      "PS_Hover": [1, 61],
+      "PS_Idle": [1, 61],
+      "PS_Reload": [1, 84],
+      "PS_Run_Forward": [1, 21],
+      "PS_Walk": [1, 31],
+      "PS_Walk_Backward": [1, 31],
+      "PS_Walk_Forward": [1, 31],
+      "PS_Walk_Left": [1, 31],
+      "PS_Walk_Right": [1, 31],
+      "PS_WeaponReady_Idle": [1, 61],
+      "PS_WeaponStowed_Hover": [1, 61],
+      "PS_WeaponStowed_Idle": [1, 61],
+      "PS_WeaponStowed_Walk_Backward": [1, 31],
+      "PS_WeaponStowed_Walk_Forward": [1, 31],
+      "PS_WeaponStowed_Walk_Left": [1, 31],
+      "PS_WeaponStowed_Walk_Right": [1, 31],
+      "PS_Weapon_Draw": [1, 30],
+      "PS_Weapon_Sheathe": [1, 30]
+    },
+    "action_slot_count": 1,
+    "action_slot_id_type": "OBJECT",
+    "armature_name": "PowerSuit_Armature",
+    "bone_names": [
+      "Root", "Hips", "Spine", "Chest", "Neck", "Head",
+      "Shoulder.L", "UpperArm.L", "LowerArm.L", "Hand.L",
+      "Shoulder.R", "UpperArm.R", "LowerArm.R", "Hand.R",
+      "UpperLeg.L", "LowerLeg.L", "Foot.L",
+      "UpperLeg.R", "LowerLeg.R", "Foot.R",
+      "WeaponRoot", "WeaponMagazine", "WeaponBolt"
+    ],
+    "root_motion_tolerance_m": 0.00001,
+    "weapon_control_bones": ["WeaponRoot", "WeaponMagazine", "WeaponBolt"],
+    "weapon_control_deform_required": true
+  },
+  "runtime_budget": {
+    "combined_triangle_hard_max": {
+      "LOD0": 130000,
+      "LOD1": 65000,
+      "LOD2": 26000,
+      "LOD3": 9000
+    },
+    "draw_call_hard_max": 8,
+    "draw_call_target_max": 6,
+    "material_slots_per_renderer_hard_max": 4,
+    "renderer_hard_max": 8,
+    "renderer_target_max": 5,
+    "weapon_renderer_hard_max": 2,
+    "weapon_renderer_target_max": 2
+  },
+  "schema_version": 1,
+  "selection": {
+    "collection_prefix": "WeaponV2_LOD",
+    "lod_property": "weapon_v2_lod",
+    "optional_roles": ["optic"],
+    "required_roles": ["rifle"],
+    "role_property": "weapon_v2_role"
+  },
+  "skin_motion": {
+    "bolt_travel_min_m": 0.08,
+    "magazine_travel_min_m": 0.25,
+    "manual_skin_tolerance_m": 0.001,
+    "required_samples": [
+      {"action": "PS_Aim", "frame": 1},
+      {"action": "PS_WeaponStowed_Idle", "frame": 1},
+      {"action": "PS_Reload", "frame": 50},
+      {"action": "PS_BoltCycle", "frame": 12}
+    ],
+    "return_matrix_tolerance": 0.0001,
+    "root_ready_to_stowed_min_m": 0.2
+  },
+  "sighting": {
+    "aim_action": "PS_Aim",
+    "aim_frame": 15,
+    "corridor_half_width_m": 0.008,
+    "lateral_tolerance_m": 0.035,
+    "ocular_front_max_m": 0.2,
+    "ocular_front_min_m": 0.015,
+    "sight_axis_tolerance_deg": 5.0,
+    "vertical_tolerance_m": 0.04
+  },
+  "topology": {
+    "duplicate_position_epsilon_m": 0.000001,
+    "max_boundary_edges": 0,
+    "max_degenerate_edges": 0,
+    "max_duplicate_vertex_pairs": 0,
+    "max_loose_edges": 0,
+    "max_loose_vertices": 0,
+    "max_ngons": 0,
+    "max_non_manifold_edges": 0,
+    "max_untriangulated_faces": 0,
+    "max_zero_area_faces": 0,
+    "zero_area_epsilon_m2": 1e-10
+  },
+  "uv": {
+    "bounds_epsilon": 0.00001,
+    "max_out_of_bounds_loops": 0,
+    "max_overlap_faces": 0,
+    "max_zero_area_faces": 0,
+    "min_face_coverage": 1.0,
+    "required_map": "UV0",
+    "zero_area_epsilon": 1e-12
+  },
+  "weapon": {
+    "articulated_component_bones": {
+      "bolt": "WeaponBolt",
+      "magazine": "WeaponMagazine"
+    },
+    "contract_version": 3,
+    "forward_axis": "+Y",
+    "hardpoint_envelopes_m": {
+      "muzzle": {"x": [-0.005, 0.005], "y": [1.1, 1.25], "z": [0.13, 0.16]},
+      "primary_grip": {"x": [-0.08, -0.06], "y": [-0.06, -0.04], "z": [-0.05, -0.03]},
+      "sight_ocular": {"x": [-0.005, 0.005], "y": [-0.32, -0.24], "z": [0.29, 0.34]},
+      "stock_contact": {"x": [-0.13, -0.09], "y": [-0.48, -0.4], "z": [0.1, 0.16]},
+      "support_grip": {"x": [0.103, 0.113], "y": [0.291, 0.311], "z": [-0.045, -0.025]}
+    },
+    "helper_property": "ps_weapon_helper_role",
+    "required_helper_roles": [
+      "primary_grip", "support_grip", "stock_contact", "sight_ocular", "muzzle"
+    ],
+    "rigid_signature_version": 6,
+    "root_bone": "WeaponRoot",
+    "root_name": "RifleRoot",
+    "stance_family": "shouldered_precision",
+    "up_axis": "+Z",
+    "weapon_family": "long_gun",
+    "weapon_id": "PS_NextGenPrecisionRifle001"
+  }
+}

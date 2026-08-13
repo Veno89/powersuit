@@ -1,6 +1,6 @@
 # Aegis Vanguard candidate validation
 
-Validated through Candidate005 on 2026-08-12 with Blender 5.2 LTS.
+Validated through isolated Candidate006 on 2026-08-13 with Blender 5.2 LTS.
 
 ## Rollback integrity
 
@@ -12,6 +12,8 @@ Validated through Candidate005 on 2026-08-12 with Blender 5.2 LTS.
   scene was overwritten by the NextGen lane.
 - Candidate004 remains preserved as the visual maquette; Candidate005 is a
   derived architecture prototype and has not replaced it or Generator114.
+- Candidate005 remains byte-identical at SHA-256
+  `0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84`.
 
 ## Candidate004 visual/contract evidence
 
@@ -87,6 +89,33 @@ Highest-priority repairs:
 5. keep only explicit primary-grip, support-grip, and stock-pocket contacts as
    allowed semantic zones.
 
+## Candidate006 precision-rifle evidence
+
+Candidate006 / NextGen Precision Rifle 001 is an isolated
+production-architecture/review candidate. Its final blend hashes to
+`093d5f8dcaede5eb7e7317bb63b98d08776d204f3fbaaf627a271bb899fb1227`,
+and the production report records that source hash before and after validation.
+
+- WeaponV2 structural status: **PASS**; 156 checks; 0 errors; 0 warnings
+- Promotion: `false`
+- Contract: exactly 23 bones and 24 actions
+- Rifle-plus-optic LOD totals: `23,216 -> 13,168 -> 5,512 -> 1,884`
+- Combined Candidate005/Candidate006 LOD0: 111,532 triangles; 5 renderers;
+  8 estimated draws at the hard ceiling
+- Review evidence: 13 unique, source-bound renders
+- Scope: real inner-aperture proxy maximum distance `1.69e-7 m`; 0.021 m eye
+  relief; target at 6 m; all 5 physical rays hit the actual board; readable
+  4-line reticle plus 4 range ticks
+- Aim: 0.01969 m lateral; 0.01720 m vertical; 3.256 degrees axis error;
+  0.19414 m front clearance
+- Articulation: 0.333135 m magazine travel; 0.095 m bolt travel; zero return error
+
+The authored visible-clearance gate remains **FAIL**: 377 forbidden instances
+across 17 groups over 162 samples, with 197 allowed contacts. The forbidden
+result comprises 301 recurring grip/wrist-shell contacts, 35 containment
+failures, and 41 manipulation/transition contacts. The 923-integer-frame and
+324 dense-transition sweeps were not run because this prerequisite failed.
+
 ## Release status
 
 `PRODUCTION_ARCHITECTURE_PROTOTYPE_NOT_UNITY_INTEGRATED`
@@ -97,3 +126,8 @@ seam placement, joint cleanup, weight polish, authored PBR materials, clearance
 repair, hand-finished LODs, Unity integration/performance validation, and owner
 A/B approval remain mandatory. Candidate004 remains the visual-review maquette;
 Generator114 remains the active Unity suit and rollback path.
+
+Candidate006 likewise remains on visual/clearance **HOLD**. Stow/draw/sheathe,
+reload/bolt, and final PBR/art polish require another production pass. No FBX or
+Unity integration was created, and the structural PASS does not authorize
+promotion.

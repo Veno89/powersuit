@@ -109,3 +109,40 @@ Exact prompt:
 > characters, or franchise-specific shapes.
 
 Output: `Concepts/aegis_vanguard_gothic_grit_rear_v003.png`.
+
+## NextGen precision rifle target
+
+Mode: built-in OpenAI image generation followed by one built-in edit.
+
+The initial generation established a realistic multi-view black precision
+rifle, but remained too close to a conventional sporting rifle and gave the
+forward grip an ambiguous bipod-like read. The retained revision used this
+targeted edit prompt:
+
+> Edit the provided precision-rifle reference sheet while preserving its dark
+> multi-view production-sheet layout and overall mechanical realism. Evolve the
+> rifle into a more original powered-exosuit weapon with stronger Aegis
+> Vanguard industrial-gothic form language. Replace the vertical forward grip
+> with one unmistakable canted side-yoke support grip that doglegs toward the
+> support side and forward; it must never resemble a bipod, and there must be no
+> paired legs. Offset the firing pistol grip slightly toward the firing
+> shoulder. Slim the receiver and lower spine, reduce the scope bulk by about
+> 20 percent, keep the ocular and complete sight tunnel unobstructed, and make
+> the detachable magazine narrower. Add layered soot-black receiver shells,
+> blue-black carbon structural webs and two recessed braided-carbon cable runs,
+> oily gunmetal mechanisms, restrained tarnished-chrome wear edges/fasteners,
+> tiny cyan status slits, subtle soot and heat tint. Give the stock a slimmer
+> skeletal magnetic-docking frame with a clear diagonal stow profile. The result
+> should feel severe, adult, bespoke, and compatible with a bulky powered suit,
+> while remaining mechanically plausible. Keep a dominant clean left-side
+> orthographic profile plus smaller three-quarter, top, rear-ocular, and
+> diagonal stowed inset views on a neutral dark-grey studio. No character,
+> hands, text, logos, watermark, symbols, spikes, skulls, crosses, fantasy
+> ornament, suppressor, bipod, floating parts, neon overload, or copied
+> franchise motifs.
+
+Output: `Concepts/nextgen_precision_rifle_reference_v001.png`.
+
+This is visual direction only. Candidate006's versioned hardpoints, fixed yoke
+geometry, dimensions, poses, and stow path are decided by the measured rig,
+sighting, topology, and visible-clearance gates rather than copied from pixels.
