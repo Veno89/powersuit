@@ -19,6 +19,11 @@ POLICY_VERSION = "PS_CLEARANCE_FACE_POLICY_V1"
 SEMANTIC_SCHEMA = "PS_CLEARANCE_FACE_SEMANTICS_V1"
 MANIFEST_SCHEMA = "PS_CLEARANCE_MANIFEST_V1"
 MANIFEST_TEXT_NAME = "PS_CLEARANCE_MANIFEST.json"
+CONTACT_WINDOW_POLICY_VERSION = "PS_CLEARANCE_CONTACT_WINDOWS_V1"
+CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION = (
+    "PS_CLEARANCE_CONTACT_WINDOWS_CANDIDATE007_V3"
+)
+CANDIDATE007_WEAPON_ASSET_ID = "PS_NextGenPrecisionRifle002"
 SOURCE_CANDIDATE_SHA256 = (
     "0e800bbfaabdd320415d530a69d0efc7ef67716a0da33cd55a39e79e1f0f3f84"
 )
@@ -67,8 +72,12 @@ CONTACT_PAIR_BY_KEY = {
 CONTACT_KEY_BY_PAIR = {value: key for key, value in CONTACT_PAIR_BY_KEY.items()}
 REQUIRED_CONTACT_KEYS = tuple(CONTACT_PAIR_BY_KEY)
 
-# Contacts are possible only in active weapon actions.  Draw, sheathe, and all
-# stowed actions are intentionally absent and therefore fail closed.
+# Contacts are possible only in active weapon actions under the baseline
+# policy. Candidate007 has one separately versioned exception for each measured
+# grip acquisition/release corridor beside the Ready endpoints of draw and
+# sheathe. The firing hand catches/releases before the support hand. Every other
+# transition frame and all stowed actions remain absent and therefore fail
+# closed.
 READY_ACTIONS = frozenset({
     "PS_Aim",
     "PS_Aim_Walk_Backward",
@@ -86,6 +95,18 @@ READY_ACTIONS = frozenset({
     "PS_Walk_Left",
     "PS_Walk_Right",
     "PS_WeaponReady_Idle",
+})
+
+CANDIDATE007_TRANSITION_CONTACT_WINDOWS = frozenset({
+    ("primary_grip", "PS_Weapon_Draw", 26.75, 30.0),
+    ("primary_grip", "PS_Weapon_Sheathe", 1.0, 4.25),
+    ("support_grip", "PS_Weapon_Draw", 29.0, 30.0),
+    ("support_grip", "PS_Weapon_Sheathe", 1.0, 2.0),
+})
+CANDIDATE007_STOWED_LEGACY_ACTIONS = frozenset({
+    "PS_Idle",
+    "PS_Walk",
+    "PS_Hover",
 })
 
 
@@ -169,7 +190,11 @@ def semantic_counts(values: Iterable[int]) -> dict[str, int]:
     return dict(sorted(counts.items(), key=lambda item: int(item[0])))
 
 
-def _window_errors(contact_key: str, windows: object) -> list[str]:
+def _window_errors(
+    contact_key: str,
+    windows: object,
+    contact_window_policy_version: str = CONTACT_WINDOW_POLICY_VERSION,
+) -> list[str]:
     errors: list[str] = []
     if not isinstance(windows, list) or not windows:
         return [f"contact_windows.{contact_key} must be a non-empty list"]
@@ -198,14 +223,34 @@ def _window_errors(contact_key: str, windows: object) -> list[str]:
         ):
             errors.append(f"{label} must have finite start <= end")
             continue
-        if contact_key == "reload_mag":
+        if (
+            contact_window_policy_version
+            == CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION
+            and action in CANDIDATE007_STOWED_LEGACY_ACTIONS
+        ):
+            errors.append(
+                f"{label}.action carries Candidate007 stowed and cannot authorize contact"
+            )
+        elif contact_key == "reload_mag":
             if action != "PS_Reload" or float(start) < 25.0 or float(end) > 75.0:
                 errors.append(f"{label} must stay within PS_Reload frames 25-75")
         elif contact_key == "bolt":
             if action != "PS_BoltCycle" or float(start) < 4.0 or float(end) > 16.0:
                 errors.append(f"{label} must stay within PS_BoltCycle frames 4-16")
         elif action not in READY_ACTIONS:
-            errors.append(f"{label}.action is not an active ready-family action")
+            candidate007_transition_contact = (
+                contact_window_policy_version
+                == CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION
+                and (
+                    contact_key,
+                    action,
+                    float(start),
+                    float(end),
+                )
+                in CANDIDATE007_TRANSITION_CONTACT_WINDOWS
+            )
+            if not candidate007_transition_contact:
+                errors.append(f"{label}.action is not an active ready-family action")
         elif (
             contact_key == "primary_grip"
             and action == "PS_BoltCycle"
@@ -251,6 +296,29 @@ def validate_manifest(manifest: object) -> list[str]:
             "source_candidate_sha256 must match the hash-pinned Candidate005 source"
         )
 
+    declared_contact_window_policy = manifest.get("contact_window_policy_version")
+    if declared_contact_window_policy is None:
+        contact_window_policy_version = CONTACT_WINDOW_POLICY_VERSION
+    elif declared_contact_window_policy not in {
+        CONTACT_WINDOW_POLICY_VERSION,
+        CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION,
+    }:
+        contact_window_policy_version = CONTACT_WINDOW_POLICY_VERSION
+        errors.append(
+            "contact_window_policy_version must name a supported contact-window policy"
+        )
+    else:
+        contact_window_policy_version = str(declared_contact_window_policy)
+    if (
+        contact_window_policy_version
+        == CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION
+        and manifest.get("weapon_asset_id") != CANDIDATE007_WEAPON_ASSET_ID
+    ):
+        errors.append(
+            "Candidate007 contact-window policy is restricted to "
+            f"{CANDIDATE007_WEAPON_ASSET_ID}"
+        )
+
     windows = manifest.get("contact_windows")
     if not isinstance(windows, Mapping):
         errors.append("contact_windows must be an object")
@@ -259,7 +327,50 @@ def validate_manifest(manifest: object) -> list[str]:
         if unknown:
             errors.append(f"contact_windows has unknown keys: {', '.join(unknown)}")
         for contact_key in REQUIRED_CONTACT_KEYS:
-            errors.extend(_window_errors(contact_key, windows.get(contact_key)))
+            errors.extend(
+                _window_errors(
+                    contact_key,
+                    windows.get(contact_key),
+                    contact_window_policy_version,
+                )
+            )
+        if (
+            contact_window_policy_version
+            == CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION
+        ):
+            actual_windows: set[tuple[str, str, float, float]] = set()
+            for contact_key in ("primary_grip", "support_grip"):
+                contact_windows = windows.get(contact_key)
+                if not isinstance(contact_windows, list):
+                    continue
+                for window in contact_windows:
+                    if not isinstance(window, Mapping):
+                        continue
+                    action = window.get("action")
+                    start = window.get("start")
+                    end = window.get("end")
+                    if not isinstance(action, str) or not action:
+                        continue
+                    if (
+                        not isinstance(start, (int, float))
+                        or isinstance(start, bool)
+                        or not isinstance(end, (int, float))
+                        or isinstance(end, bool)
+                        or not math.isfinite(float(start))
+                        or not math.isfinite(float(end))
+                    ):
+                        continue
+                    actual_windows.add(
+                        (contact_key, action, float(start), float(end))
+                    )
+            missing_transition_contacts = sorted(
+                CANDIDATE007_TRANSITION_CONTACT_WINDOWS - actual_windows
+            )
+            if missing_transition_contacts:
+                errors.append(
+                    "Candidate007 contact-window policy is missing exact transition "
+                    f"contact windows: {missing_transition_contacts}"
+                )
 
     objects = manifest.get("objects")
     if not isinstance(objects, list) or not objects:

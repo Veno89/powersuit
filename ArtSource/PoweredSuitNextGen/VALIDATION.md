@@ -1,6 +1,6 @@
 # Aegis Vanguard candidate validation
 
-Validated through isolated Candidate006 on 2026-08-13 with Blender 5.2 LTS.
+Validated through isolated Candidate007 on 2026-08-14 with Blender 5.2 LTS.
 
 ## Rollback integrity
 
@@ -116,9 +116,42 @@ result comprises 301 recurring grip/wrist-shell contacts, 35 containment
 failures, and 41 manipulation/transition contacts. The 923-integer-frame and
 324 dense-transition sweeps were not run because this prerequisite failed.
 
+## Candidate007 precision-rifle evidence
+
+Candidate007 / NextGen Precision Rifle 002 is the parallel clearance successor.
+It was built directly from preserved Candidate005; Candidate006 remains
+predecessor and rollback-comparison evidence rather than a build input. The
+final Candidate007 blend hashes to
+`686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`,
+and every final report records that hash unchanged before and after validation.
+
+- WeaponV3 structural status: **PASS**; 173 checks; 0 errors; 0 warnings
+- Structural gate: `true`; promotion: `false`
+- Promotion blockers: owner visual approval; separate Unity integration approval
+- Contract: exactly 23 bones and 24 actions
+- Authoring: `CANDIDATE007_WEAPON_ACTIONS_V11`;
+  `CANDIDATE007_ACTION_SEMANTICS_V10`; manipulation densification V5
+- Clearance: face policy V1 with Candidate007 contact-window policy V3
+- Review evidence: 13 unique renders whose size and SHA-256 match the manifest
+
+All required strict visible-geometry sweeps pass:
+
+| Sweep | Actions / samples | Allowed contacts | Forbidden instances | Groups | Status |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Authored keyframes | 24 / 483 | 783 | 0 | 0 | **PASS** |
+| All integer frames | 24 / 923 | 922 | 0 | 0 | **PASS** |
+| Dense transitions, `0.125` frame | 4 / 1,284 | 1,565 | 0 | 0 | **PASS** |
+
+The dense report contains exact coverage of BoltCycle 153, Reload 665, Draw
+233, and Sheathe 233 samples. Draw18 documents the powered guided/magnetic
+transit rather than a conventional reach-to-back grab; Sheathe3 documents the
+hand-owned release and the separate stowed render supplies destination context.
+Candidate007 still reuses hash-pinned procedural 2K preview maps, not final
+hand-authored rifle textures. No FBX or Unity integration was created.
+
 ## Release status
 
-`PRODUCTION_ARCHITECTURE_PROTOTYPE_NOT_UNITY_INTEGRATED`
+`CANDIDATE007_STRUCTURAL_PASS_NOT_UNITY_INTEGRATED`
 
 Candidate005 passes the automated structural contract but is not production art
 and is not clearance-safe. Manual anatomical/armor sculpting, retopology and
@@ -127,7 +160,9 @@ repair, hand-finished LODs, Unity integration/performance validation, and owner
 A/B approval remain mandatory. Candidate004 remains the visual-review maquette;
 Generator114 remains the active Unity suit and rollback path.
 
-Candidate006 likewise remains on visual/clearance **HOLD**. Stow/draw/sheathe,
-reload/bolt, and final PBR/art polish require another production pass. No FBX or
-Unity integration was created, and the structural PASS does not authorize
-promotion.
+Candidate006 remains an archived visual/clearance **HOLD** with its measured
+377/17 authored failure intact; Candidate007 does not rewrite that historical
+result. Candidate007 clears the isolated structural and visible-clearance gates,
+but `promotion_authorized` remains false. Final hand-authored rifle texturing,
+owner visual approval, a separately approved Unity integration, representative
+runtime validation, and owner in-game A/B acceptance remain mandatory.

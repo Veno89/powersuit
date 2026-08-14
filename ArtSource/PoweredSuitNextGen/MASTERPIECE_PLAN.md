@@ -63,6 +63,19 @@ with no errors or warnings, and its four rifle-plus-optic LODs total
 This is architecture evidence only: its authored visible-clearance gate still
 fails at 377 instances/17 groups, so it is not Unity-ready.
 
+Candidate007 / NextGen Precision Rifle 002 is the isolated parallel successor,
+built directly from pinned Candidate005 while preserving Candidate006 as
+historical evidence. Its final blend hashes to
+`686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`.
+Its WeaponV3 structural gate passes 173 checks with no errors or warnings.
+Strict visible clearance also passes at zero forbidden contacts/groups over 483
+authored samples, all 923 integer frames, and the exact 1,284-sample
+`0.125`-frame manipulation/transition sweep. The 13 final renders are unique
+and manifest-matching; Draw18 records powered guided/magnetic transit and
+Sheathe3 the hand-owned release. This remains Blender-only architecture and
+handling evidence: procedural preview textures, owner visual approval, separate
+Unity integration, runtime validation, and final promotion are still open.
+
 ## Non-negotiable gameplay contracts
 
 Preserve the current character height and gameplay footprint, all existing bone
@@ -139,7 +152,7 @@ small status lights, and active thruster cores.
   front/rear image targets and Candidate004 now encode that direction without
   adding symbols, spikes, robes, or franchise-specific shapes.
 
-### G2 — gameplay blockout (current, measured fail)
+### G2 — gameplay blockout (historical suit fail, isolated rifle pass)
 
 - Candidate004 materially improves the helmet, torso hierarchy, layered shoulders,
   limbs, boots, turbines, material separation, weathering, and review lighting.
@@ -148,9 +161,13 @@ small status lights, and active thruster cores.
   three-visible-mesh result still fails at 3,894 forbidden instances/72
   object-pair groups, so clearance remains blocking. A separate hidden 254-part
   proxy reports 5,489/240 only for source-region diagnosis and is not canonical.
-- Repair the forearm envelopes, pose-specific stowed WeaponRoot and draw/sheathe
-  endpoints, central backpack channel, reload contacts, and shoulder-camera
-  clearance before expensive detail or Unity integration.
+- Candidate007 resolves the weapon-side carry/manipulation blockers in a
+  separate source-bound lane. Its V11/schema-V10/densification-V5 authoring and
+  Candidate007 policy V3 pass 483 authored, 923 integer, and 1,284 dense visible
+  samples with zero forbidden contacts. This does not retroactively turn the
+  Candidate005 or Candidate006 archived reports into passes.
+- Continue deliberate suit/art review and shoulder-camera validation before
+  expensive final detail or any separately approved Unity integration.
 
 ### G3 — high-poly construction
 
@@ -195,6 +212,9 @@ small status lights, and active thruster cores.
 - Candidate006 fits its rifle LOD budgets and the combined triangle/renderer
   budgets, but reaches the eight-draw hard ceiling. This requires representative
   runtime profiling and is not a performance approval.
+- Candidate007 likewise passes its isolated WeaponV3 structural and LOD/render
+  budget checks, but has no Unity runtime measurements. Its 173/0/0 gate and
+  zero-forbidden Blender clearance reports are not performance approval.
 
 ### G7 — parallel Unity candidate
 

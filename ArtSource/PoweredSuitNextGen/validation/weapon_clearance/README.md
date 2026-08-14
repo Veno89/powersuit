@@ -3,9 +3,9 @@
 `validate_weapon_clearance.py` is an isolated, read-only Blender 5.2 audit for
 the NextGen suit lane. It evaluates the real `PowerSuit_Armature`, all 24
 `PS_*` actions, the selected suit collision geometry, and the explicit
-Candidate006 LOD0 weapon renderers (with a legacy `Rifle_*` fallback). It does
-not save the open blend or modify Generator114, an FBX, a Unity prefab, a
-controller, or a scene.
+Candidate006 or Candidate007 LOD0 weapon renderers (with a legacy `Rifle_*`
+fallback). It does not save the open blend or modify Generator114, an FBX, a
+Unity prefab, a controller, or a scene.
 
 ## Geometry-source modes
 
@@ -109,6 +109,57 @@ Schema-3 reports retain the legacy top-level `sample_mode` and
 requested filters, canonical selected-action order, frame step, inclusive-
 endpoint flag, and repeated sample count.
 
+## Run Candidate007 certification
+
+Candidate007 requires three strict, visible-geometry reports bound to the exact
+same source blend. Run the authored-keyframe prerequisite first:
+
+```powershell
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" `
+  --python-exit-code 1 `
+  --background "ArtSource\PoweredSuitNextGen\candidates\nextgen_precision_rifle_candidate_v007.blend" `
+  --python "ArtSource\PoweredSuitNextGen\scripts\validate_weapon_clearance.py" `
+  -- `
+  --geometry-source visible `
+  --strict `
+  --output-dir "ArtSource\PoweredSuitNextGen\validation\weapon_clearance" `
+  --label nextgen_precision_rifle_candidate_v007_authored_weapon_clearance
+```
+
+Then certify every integer frame across all 24 actions:
+
+```powershell
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" `
+  --python-exit-code 1 `
+  --background "ArtSource\PoweredSuitNextGen\candidates\nextgen_precision_rifle_candidate_v007.blend" `
+  --python "ArtSource\PoweredSuitNextGen\scripts\validate_weapon_clearance.py" `
+  -- `
+  --geometry-source visible `
+  --all-frames `
+  --strict `
+  --output-dir "ArtSource\PoweredSuitNextGen\validation\weapon_clearance" `
+  --label nextgen_precision_rifle_candidate_v007_all_frames_weapon_clearance
+```
+
+Finally, certify the four fast actions at inclusive `0.125`-frame cadence:
+
+```powershell
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" `
+  --python-exit-code 1 `
+  --background "ArtSource\PoweredSuitNextGen\candidates\nextgen_precision_rifle_candidate_v007.blend" `
+  --python "ArtSource\PoweredSuitNextGen\scripts\validate_weapon_clearance.py" `
+  -- `
+  --geometry-source visible `
+  --action PS_BoltCycle `
+  --action PS_Reload `
+  --action PS_Weapon_Draw `
+  --action PS_Weapon_Sheathe `
+  --frame-step 0.125 `
+  --strict `
+  --output-dir "ArtSource\PoweredSuitNextGen\validation\weapon_clearance" `
+  --label nextgen_precision_rifle_candidate_v007_dense_transition_weapon_clearance
+```
+
 ## Candidate005 results
 
 Both final reports audit the same preserved Candidate005 blend:
@@ -161,6 +212,25 @@ The durable authored reports are
 Candidate006 remains an isolated review candidate; it has not been exported or
 integrated into Unity.
 
+## Candidate007 certified result
+
+Candidate007 is a parallel successor, not a rewrite of Candidate006's archived
+failure. Its final source hashes to
+`686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`,
+and every final report records that SHA-256 unchanged before and after the run.
+
+| Sweep | Geometry | Actions / samples | Allowed contacts | Forbidden | Groups | Status |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Authored | Candidate005 suit + Candidate007 LOD0 rifle/optic | 24 / 483 | 783 | 0 | 0 | **PASS** |
+| All integer frames | Candidate005 suit + Candidate007 LOD0 rifle/optic | 24 / 923 | 922 | 0 | 0 | **PASS** |
+| Dense `0.125` frame | Candidate005 suit + Candidate007 LOD0 rifle/optic | 4 / 1,284 | 1,565 | 0 | 0 | **PASS** |
+
+The dense action coverage is exact: BoltCycle 153, Reload 665, Draw 233, and
+Sheathe 233 samples. These reports are
+`nextgen_precision_rifle_candidate_v007_{authored,all_frames,dense_transition}_weapon_clearance.{json,txt}`.
+They certify sampled Blender geometry only; no Candidate007 FBX or Unity
+integration exists.
+
 ## Face policy and manifest contract
 
 Visible mode uses policy `PS_CLEARANCE_FACE_POLICY_V1`, semantic schema
@@ -175,12 +245,18 @@ faces carry `INT`/`FACE` attributes:
 
 An exception requires the exact compatible pair and an explicit manifest
 action/frame window. Magazine contact is hard-bounded to `PS_Reload` frames
-25-75, bolt contact to `PS_BoltCycle` frames 4-16, and grip/buttpad windows to
-active ready-family actions. Primary-grip windows cannot overlap the bolt
-manipulation interval, and support-grip windows cannot overlap the magazine
-manipulation interval. Stowed, draw, and sheathe actions cannot declare an
-allowed window. Containment is always forbidden, even between otherwise
-compatible zones.
+25-75 and bolt contact to `PS_BoltCycle` frames 4-16. Primary-grip windows cannot
+overlap the bolt manipulation interval, and support-grip windows cannot overlap
+the magazine manipulation interval. The archived Candidate006 baseline declares
+no draw/sheathe contact windows.
+
+Candidate007 retains face policy V1 and semantic schema V1 while declaring
+contact-window policy `PS_CLEARANCE_CONTACT_WINDOWS_CANDIDATE007_V3`. It rejects
+primary-grip, support-grip, and buttpad windows for stowed and legacy
+idle/walk/hover carry states. The only transition exceptions are primary grip at
+Draw 26.75-30 / Sheathe 1-4.25 and support grip at Draw 29-30 / Sheathe 1-2;
+there is no transition buttpad window. Containment is always forbidden, even
+between otherwise compatible zones.
 
 Every evaluated render object must match its manifest entry and carry
 `ps_clearance_asset_role`, `ps_clearance_policy_version`,
@@ -218,8 +294,9 @@ They are comparison evidence, not promotion waivers.
 ## Limitations
 
 - The default authored-keyframe pass cannot see an inter-keyframe collision.
-  Integer `--all-frames` sampling is stronger; use the documented filtered
-  `--frame-step 0.5` audit for the four fast transition actions. Even that is
+  Integer `--all-frames` sampling is stronger. Candidate006's historical target
+  used `--frame-step 0.5`; Candidate007 certification uses the documented
+  filtered `--frame-step 0.125` audit for the four fast actions. Even that is
   discrete evidence rather than continuous swept-collision proof.
 - Visible mode evaluates rendered triangles; proxy mode intentionally does not.
 - BVH surface crossings are exact for the evaluated triangles. Full containment

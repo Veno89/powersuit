@@ -136,6 +136,40 @@ were not run because the authored pass already fails. Stow/draw/sheathe,
 reload/bolt, and final PBR/art polish remain blocking. No FBX was exported and
 Generator114 remains active.
 
+## Candidate007 precision-rifle clearance successor
+
+Candidate007 / NextGen Precision Rifle 002 is a parallel successor built from
+the pinned Candidate005 source, not from Candidate006. It preserves Candidate006
+as historical rollback-comparison evidence and hashes to
+`686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`.
+The WeaponV3 gate reports **PASS** with 173 checks, 0 errors, and 0 warnings;
+`structural_gate_passed` is true. The exact 23-bone/24-action contract remains
+under `CANDIDATE007_WEAPON_ACTIONS_V11`,
+`CANDIDATE007_ACTION_SEMANTICS_V10`, manipulation densification V5, and
+Candidate007 contact-window policy V3.
+
+All three strict visible-geometry reports are source-bound to that exact blend
+and pass with zero forbidden contacts or groups:
+
+| Sweep | Actions / samples | Allowed contacts | Forbidden / groups | Status |
+| --- | ---: | ---: | ---: | ---: |
+| Authored keyframes | 24 / 483 | 783 | 0 / 0 | **PASS** |
+| All integer frames | 24 / 923 | 922 | 0 / 0 | **PASS** |
+| Dense transitions, `0.125` frame | 4 / 1,284 | 1,565 | 0 / 0 | **PASS** |
+
+The 13 required review renders are unique and match the source-adjacent
+manifest. Draw18 deliberately records a powered guided/magnetic transit with a
+late hand catch; it is not a conventional reach-to-back draw. Sheathe3 records
+the hand-owned release, while the separate stowed view establishes the final
+back-mount destination.
+
+This is isolated Blender certification, not promotion. Candidate007 deliberately
+reuses Candidate006's hash-pinned procedural 2K preview maps, which are pipeline
+evidence rather than final authored rifle textures. No FBX or Unity asset was
+exported, replaced, or modified. `promotion_authorized` remains false pending
+owner visual approval and separate Unity-integration approval; Generator114
+remains active.
+
 ## Rebuild Candidate005
 
 From the repository root:

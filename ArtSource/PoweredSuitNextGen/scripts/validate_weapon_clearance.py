@@ -87,6 +87,8 @@ CLEARANCE_PROXY_PROPERTY = "aegis_clearance_proxy"
 RIFLE_PREFIX = "Rifle_"
 WEAPON_V2_ROLE_PROPERTY = "weapon_v2_role"
 WEAPON_V2_LOD_PROPERTY = "weapon_v2_lod"
+WEAPON_V3_ROLE_PROPERTY = "weapon_v3_role"
+WEAPON_V3_LOD_PROPERTY = "weapon_v3_lod"
 ASSET_ROLE_PROPERTY = "ps_clearance_asset_role"
 POLICY_PROPERTY = "ps_clearance_policy_version"
 SEMANTIC_SCHEMA_PROPERTY = "ps_clearance_semantic_schema"
@@ -254,15 +256,23 @@ def rifle_objects() -> list[bpy.types.Object]:
     # Candidate006 and later declare the production weapon renderer explicitly.
     # Prefer only LOD0 from that contract so retained legacy/source pieces and
     # generated lower LODs cannot silently enter the canonical audit.
-    weapon_v2 = [
+    declared = [
         obj
         for obj in bpy.data.objects
         if obj.type == "MESH"
-        and str(obj.get(WEAPON_V2_ROLE_PROPERTY, "")) in {"rifle", "optic"}
-        and obj.get(WEAPON_V2_LOD_PROPERTY, -1) == 0
+        and (
+            (
+                str(obj.get(WEAPON_V3_ROLE_PROPERTY, "")) in {"rifle", "optic"}
+                and obj.get(WEAPON_V3_LOD_PROPERTY, -1) == 0
+            )
+            or (
+                str(obj.get(WEAPON_V2_ROLE_PROPERTY, "")) in {"rifle", "optic"}
+                and obj.get(WEAPON_V2_LOD_PROPERTY, -1) == 0
+            )
+        )
     ]
-    if weapon_v2:
-        return sorted(weapon_v2, key=lambda item: item.name)
+    if declared:
+        return sorted(declared, key=lambda item: item.name)
     return sorted(
         [
             obj
@@ -847,7 +857,9 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
     if not suit_objects:
         raise RuntimeError("No candidate collision objects were found.")
     if not weapon_objects:
-        raise RuntimeError("No Rifle_* mesh objects were found.")
+        raise RuntimeError(
+            "No declared WeaponV2/WeaponV3 LOD0 or Rifle_* mesh objects were found."
+        )
 
     available_actions = sorted(
         [action for action in bpy.data.actions if action.name.startswith("PS_")],
@@ -1289,7 +1301,7 @@ def audit(args: argparse.Namespace) -> dict[str, object]:
             "forbidden": [
                 "all incompatible, unknown, missing, or out-of-window face pairs",
                 "all containment, including inside otherwise compatible contact zones",
-                "all armor contact while stowed or during draw/sheathe",
+                "all armor contact while stowed, plus draw/sheathe contact not explicitly windowed by compatible face semantics",
                 "all contacts when policy, face coverage, action/frame, or source-manifest evidence is invalid",
             ],
             "contact_tolerance_m": CONTACT_TOLERANCE_M,

@@ -1,0 +1,70 @@
+Aegis Vanguard weapon/suit clearance gate
+===========================================
+Status: PASS
+Candidate: ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v007.blend
+SHA-256 preserved: True
+Blender: 5.2.0
+Sampling: authored_keyframes
+Action filters: all available actions
+Frame step: None
+Collision geometry: visible (actual visible candidate render geometry)
+Policy metadata: PASS
+Manifest SHA-256: d66a02b819d0d5b815594fe4902fc6273c26f1715be65650f0af836dc2cefdb4
+Report evidence SHA-256: aae0a3e1e67fc793d06b0ae8dc1a9645123bcb2ff930c756ac91abbb38c3c9f4
+Actions sampled: 24/24
+Sampled frames: 483
+Allowed contact instances: 783
+Forbidden intersection instances: 0
+Forbidden object-pair groups: 0
+
+Action results
+--------------
+PASS PS_Aim: 3 frames, 6 allowed, 0 forbidden
+PASS PS_Aim_Walk_Backward: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Aim_Walk_Forward: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Aim_Walk_Left: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Aim_Walk_Right: 9 frames, 18 allowed, 0 forbidden
+PASS PS_BoltCycle: 76 frames, 148 allowed, 0 forbidden
+PASS PS_Hover: 3 frames, 0 allowed, 0 forbidden
+PASS PS_Idle: 3 frames, 0 allowed, 0 forbidden
+PASS PS_Reload: 213 frames, 411 allowed, 0 forbidden
+PASS PS_Run_Forward: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Walk: 5 frames, 0 allowed, 0 forbidden
+PASS PS_Walk_Backward: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Walk_Forward: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Walk_Left: 9 frames, 18 allowed, 0 forbidden
+PASS PS_Walk_Right: 9 frames, 18 allowed, 0 forbidden
+PASS PS_WeaponReady_Idle: 3 frames, 6 allowed, 0 forbidden
+PASS PS_WeaponStowed_Hover: 3 frames, 0 allowed, 0 forbidden
+PASS PS_WeaponStowed_Idle: 3 frames, 0 allowed, 0 forbidden
+PASS PS_WeaponStowed_Walk_Backward: 9 frames, 0 allowed, 0 forbidden
+PASS PS_WeaponStowed_Walk_Forward: 9 frames, 0 allowed, 0 forbidden
+PASS PS_WeaponStowed_Walk_Left: 9 frames, 0 allowed, 0 forbidden
+PASS PS_WeaponStowed_Walk_Right: 9 frames, 0 allowed, 0 forbidden
+PASS PS_Weapon_Draw: 27 frames, 25 allowed, 0 forbidden
+PASS PS_Weapon_Sheathe: 27 frames, 25 allowed, 0 forbidden
+
+Forbidden groups (highest recurrence first)
+-------------------------------------------
+None.
+
+Allowed contact groups
+----------------------
+- allowed_primary_grip_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (352 instances; suit face 101, weapon face 201)
+- allowed_reload_mag_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (193 instances; suit face 104, weapon face 204)
+- allowed_support_grip_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (182 instances; suit face 102, weapon face 202)
+- allowed_bolt_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (41 instances; suit face 105, weapon face 205)
+- allowed_buttpad_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (15 instances; suit face 103, weapon face 203)
+
+Metadata/manifest errors
+------------------------
+None.
+
+Limitations
+-----------
+- The default sweep samples authored action keyframes. Use --all-frames for integer coverage or --frame-step with exact --action filters for denser subframe evidence; all discrete sampling can still miss collisions between samples.
+- BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.
+- The reported contact-depth metric is a real sampled vertex-to-surface distance, but surface crossings with no interior sampled vertex can report zero; AABB values remain prioritisation proxies only.
+- Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.
+- Visible mode audits weapon versus the actual evaluated candidate render geometry. Consolidated meshes without face-level contact tags are intentionally classified conservatively.
+- The tool does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting.

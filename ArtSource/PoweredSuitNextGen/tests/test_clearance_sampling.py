@@ -49,6 +49,25 @@ class ClearanceSamplingTests(unittest.TestCase):
             324,
         )
 
+    def test_candidate007_certification_samples_between_dense_authored_keys(self) -> None:
+        ranges = {
+            "PS_Reload": (1, 84),
+            "PS_BoltCycle": (1, 20),
+            "PS_Weapon_Draw": (1, 30),
+            "PS_Weapon_Sheathe": (1, 30),
+        }
+        counts = {
+            name: len(inclusive_frame_samples(*frame_range, 0.25))
+            for name, frame_range in ranges.items()
+        }
+        self.assertEqual(counts, {
+            "PS_Reload": 333,
+            "PS_BoltCycle": 77,
+            "PS_Weapon_Draw": 117,
+            "PS_Weapon_Sheathe": 117,
+        })
+        self.assertEqual(total_dense_sample_count(ranges.values(), 0.25), 644)
+
     def test_dense_samples_include_both_action_endpoints(self) -> None:
         frames = inclusive_frame_samples(1, 2, 0.4)
         self.assertEqual(frames, [1.0, 1.4, 1.8, 2.0])

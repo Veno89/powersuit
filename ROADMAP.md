@@ -19,7 +19,7 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 | K — HUD | Implemented | Formatter/presenter tests pass | Resolution/readability/accessibility review |
 | L — Developer console | Implemented | Parser, registry and gameplay-command tests pass | Hands-on malformed-command pass |
 | M — Pooling/performance | Pooling, diagnostics, and opt-in Development Build soak implemented | 30/60/120 matrix and two-minute 48-enemy soak pass | Connected GPU/render capture, uncapped and remaining lifecycle cases |
-| N — Hero Suit V2 art | Candidate004 visual maquette, non-integrated Candidate005 suit architecture, and isolated Candidate006 precision-rifle architecture/review candidate | Generator114/Candidate004/Candidate005 preserved; Candidate006 WeaponV2 structural PASS is 156/0/0 with exact 23 bones/24 actions, four budgeted LODs, and 13 unique renders | Repair Candidate006 visible clearance and carry/manipulation poses; final PBR/art polish; Unity A/B |
+| N — Hero Suit V2 art | Candidate004 visual maquette, non-integrated Candidate005 suit architecture, historical Candidate006 rifle baseline, and isolated Candidate007 rifle successor | Generator114/Candidate004/Candidate005/Candidate006 preserved; Candidate007 WeaponV3 structural PASS is 173/0/0 and all three strict visible-clearance sweeps pass at zero forbidden contacts | Owner visual approval; final authored PBR/art polish; separate Unity integration and A/B |
 
 ## Completed implementation
 
@@ -108,9 +108,13 @@ This is the canonical status ledger for the compact 10–15 minute combat-and-fl
 - [x] Pass Candidate006's WeaponV2 structural gate at 156 checks/0 errors/0 warnings. Record rifle-plus-optic LOD totals of `23,216 -> 13,168 -> 5,512 -> 1,884`; combined Candidate005/Candidate006 LOD0 is 111,532 triangles, five renderers, and an estimated eight draws at the hard ceiling.
 - [x] Produce 13 unique source-bound review renders and validate the scope's real inner aperture, 0.021 m eye relief, six-metre target, readable four-line reticle/four range ticks, and five successful physical target rays.
 - [x] Record Candidate006's authored visible-clearance **FAIL** at 377 forbidden instances/17 groups over 162 samples, with 197 allowed contacts. The 301 grip/wrist-shell, 35 containment, and 41 manipulation/transition failures keep promotion blocked; the 923-frame and 324 dense-transition sweeps were intentionally not run after this failure.
+- [x] Build Candidate007 / NextGen Precision Rifle 002 directly from the pinned Candidate005 source as a parallel successor, preserving Candidate006 as rollback-comparison evidence. Freeze weapon-action authoring V11, action-semantics schema V10, manipulation densification V5, and Candidate007 contact-window policy V3.
+- [x] Pass Candidate007's WeaponV3 structural gate at 173 checks/0 errors/0 warnings and preserve its final blend at SHA-256 `686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`.
+- [x] Pass Candidate007's strict visible-geometry clearance gates at zero forbidden contacts/groups: 24/483 authored samples, 24/923 integer samples, and 4/1,284 dense samples at `0.125`-frame cadence. Record 783, 922, and 1,565 allowed semantic contacts respectively.
+- [x] Produce 13 unique, manifest-matching Candidate007 renders. Draw18 records the powered guided/magnetic transit and Sheathe3 the hand-owned release; neither is evidence of a conventional reach-to-back motion.
 - [ ] Owner-approve or revise the adult silhouette, dark material language, turbine arrangement, and helmet. Candidate005 is an architecture prototype, not a visual promotion over Candidate004.
 - [ ] Replace or hand-finish the procedural forms with authored high-poly armor and anatomical joint seals; complete production retopology/seams, weight polish, final UV layout and PBR bake/paint, and hand-repaired LODs in the isolated candidate lane.
-- [ ] Repair Candidate006 stow/draw/sheathe, reload/bolt, containment, and recurring grip/wrist-shell clearance; then pass both the full 923-integer-frame and 324-sample dense-transition visible sweeps at zero forbidden contacts.
+- [ ] Replace Candidate007's hash-pinned procedural preview maps with final hand-authored rifle textures and obtain owner visual approval; its machine PASS does not authorize promotion.
 - [ ] Validate all 24 actions, back-stowed rifle clearance, aim/scope framing, hardpoints, flight effects, deformation, draw calls, and representative GPU cost in a separate Unity review prefab/scene.
 - [ ] Promote only after an owner-approved old/new in-game A/B comparison; keep Generator114 available for one-click rollback.
 

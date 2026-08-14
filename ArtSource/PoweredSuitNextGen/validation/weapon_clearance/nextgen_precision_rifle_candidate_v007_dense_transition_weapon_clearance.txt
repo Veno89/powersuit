@@ -1,0 +1,50 @@
+Aegis Vanguard weapon/suit clearance gate
+===========================================
+Status: PASS
+Candidate: ArtSource/PoweredSuitNextGen/candidates/nextgen_precision_rifle_candidate_v007.blend
+SHA-256 preserved: True
+Blender: 5.2.0
+Sampling: uniform_dense_frames
+Action filters: PS_BoltCycle, PS_Reload, PS_Weapon_Draw, PS_Weapon_Sheathe
+Frame step: 0.125
+Collision geometry: visible (actual visible candidate render geometry)
+Policy metadata: PASS
+Manifest SHA-256: d66a02b819d0d5b815594fe4902fc6273c26f1715be65650f0af836dc2cefdb4
+Report evidence SHA-256: f6a08d9cf222999e6496d7488c166e7fba33ca6a7666d1ba57e9dbff4ad0a590
+Actions sampled: 4/24
+Sampled frames: 1284
+Allowed contact instances: 1565
+Forbidden intersection instances: 0
+Forbidden object-pair groups: 0
+
+Action results
+--------------
+PASS PS_BoltCycle: 153 frames, 300 allowed, 0 forbidden
+PASS PS_Reload: 665 frames, 1197 allowed, 0 forbidden
+PASS PS_Weapon_Draw: 233 frames, 34 allowed, 0 forbidden
+PASS PS_Weapon_Sheathe: 233 frames, 34 allowed, 0 forbidden
+
+Forbidden groups (highest recurrence first)
+-------------------------------------------
+None.
+
+Allowed contact groups
+----------------------
+- allowed_primary_grip_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (749 instances; suit face 101, weapon face 201)
+- allowed_reload_mag_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (385 instances; suit face 104, weapon face 204)
+- allowed_support_grip_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (314 instances; suit face 102, weapon face 202)
+- allowed_bolt_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (79 instances; suit face 105, weapon face 205)
+- allowed_buttpad_contact: NGPR002_Rifle_LOD0 x H2_Armor_LOD0 (38 instances; suit face 103, weapon face 203)
+
+Metadata/manifest errors
+------------------------
+None.
+
+Limitations
+-----------
+- The default sweep samples authored action keyframes. Use --all-frames for integer coverage or --frame-step with exact --action filters for denser subframe evidence; all discrete sampling can still miss collisions between samples.
+- BVH surface crossings are exact for evaluated render triangles; full containment uses deterministic vertex/ray sampling and may miss pathological concave or open meshes.
+- The reported contact-depth metric is a real sampled vertex-to-surface distance, but surface crossings with no interior sampled vertex can report zero; AABB values remain prioritisation proxies only.
+- Allowed contacts are semantic authoring policy, not a physics or comfort judgement; visual review remains required.
+- Visible mode audits weapon versus the actual evaluated candidate render geometry. Consolidated meshes without face-level contact tags are intentionally classified conservatively.
+- The tool does not test suit self-intersection, cloth, Unity colliders, skin quality, or runtime retargeting.

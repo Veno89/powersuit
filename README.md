@@ -126,6 +126,26 @@ gate fails, the 923-frame and 324 dense-transition promotion sweeps were not
 run. Stow/draw/sheathe, reload/bolt clearance, and final authored PBR/art polish
 remain blocking; no FBX was exported and no Unity asset was changed.
 
+Candidate007 / **NextGen Precision Rifle 002** is the parallel successor that
+resolves those clearance blockers without mutating Candidate006 or Candidate005.
+Its final blend hashes to
+`686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`.
+The isolated WeaponV3 production gate reports **PASS** with 173 checks, 0 errors,
+and 0 warnings; the 23-bone/24-action contract is preserved under weapon-action
+authoring V11, action-semantics schema V10, manipulation densification V5, and
+Candidate007 contact-window policy V3.
+
+All three strict visible-geometry clearance gates pass with zero forbidden
+contacts or groups: 24 actions/483 authored samples with 783 allowed contacts,
+24 actions/923 integer-frame samples with 922 allowed contacts, and the exact
+four-action `0.125`-frame sweep with 1,284 samples and 1,565 allowed contacts.
+The 13 required renders are unique and manifest-matching. Draw18 documents the
+powered guided/magnetic transit rather than a conventional reach-to-back draw;
+Sheathe3 documents the hand-owned release phase. Candidate007 still reuses
+hash-pinned procedural preview maps, has no FBX or Unity integration, and is not
+promoted: `promotion_authorized` remains false pending owner visual approval and
+separate Unity-integration approval.
+
 ## Scope exclusions
 
 This milestone does not include multiplayer, networking, loot generation, a general inventory/equipment system, rarity, progression, skill trees, crafting, missions, quests, dialogue, story, save progression, procedural open world, bosses, multiple playable suits, a large arsenal, Steam integration, or final Asset Store publication.

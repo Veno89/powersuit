@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from clearance_face_policy import (  # noqa: E402
+    CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION,
+    CANDIDATE007_WEAPON_ASSET_ID,
     MANIFEST_SCHEMA,
     POLICY_VERSION,
     SEMANTIC_SCHEMA,
@@ -18,10 +20,12 @@ from clearance_face_policy import (  # noqa: E402
     SUIT_MAGAZINE_HAND_LEFT,
     SUIT_PRIMARY_HAND_RIGHT,
     SUIT_STOCK_POCKET_RIGHT,
+    SUIT_SUPPORT_HAND_LEFT,
     WEAPON_ATTRIBUTE,
     WEAPON_BUTTPAD,
     WEAPON_MAGAZINE_GRASP,
     WEAPON_PRIMARY_GRIP,
+    WEAPON_SUPPORT_GRIP,
     canonical_json_bytes,
     canonical_sha256,
     classify_face_contact,
@@ -30,7 +34,7 @@ from clearance_face_policy import (  # noqa: E402
 )
 
 
-def valid_windows() -> dict[str, list[dict[str, int | str]]]:
+def valid_windows() -> dict[str, list[dict[str, int | float | str]]]:
     return {
         "primary_grip": [{"action": "PS_Aim", "start": 1, "end": 30}],
         "support_grip": [{"action": "PS_Aim", "start": 1, "end": 30}],
@@ -69,7 +73,37 @@ def valid_manifest() -> dict[str, object]:
     }
 
 
+def enable_candidate007_transition_contacts(manifest: dict[str, object]) -> None:
+    manifest["weapon_asset_id"] = CANDIDATE007_WEAPON_ASSET_ID
+    manifest["contact_window_policy_version"] = (
+        CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION
+    )
+    windows = manifest["contact_windows"]
+    assert isinstance(windows, dict)
+    primary_transition_contacts = [
+        {"action": "PS_Weapon_Draw", "start": 26.75, "end": 30},
+        {"action": "PS_Weapon_Sheathe", "start": 1, "end": 4.25},
+    ]
+    support_transition_contacts = [
+        {"action": "PS_Weapon_Draw", "start": 29, "end": 30},
+        {"action": "PS_Weapon_Sheathe", "start": 1, "end": 2},
+    ]
+    for contact_key, transition_contacts in (
+        ("primary_grip", primary_transition_contacts),
+        ("support_grip", support_transition_contacts),
+    ):
+        contact_windows = windows[contact_key]
+        assert isinstance(contact_windows, list)
+        contact_windows.extend(dict(window) for window in transition_contacts)
+
+
 class ClearanceFacePolicyTests(unittest.TestCase):
+    def test_candidate007_policy_id_is_v3(self) -> None:
+        self.assertEqual(
+            CANDIDATE007_CONTACT_WINDOW_POLICY_VERSION,
+            "PS_CLEARANCE_CONTACT_WINDOWS_CANDIDATE007_V3",
+        )
+
     def test_canonical_json_and_hash_ignore_mapping_insertion_order(self) -> None:
         first = {"b": 2, "a": {"d": 4, "c": 3}}
         second = {"a": {"c": 3, "d": 4}, "b": 2}
@@ -160,6 +194,185 @@ class ClearanceFacePolicyTests(unittest.TestCase):
         errors = validate_manifest(manifest)
         self.assertTrue(any("right hand manipulates the bolt" in error for error in errors))
         self.assertTrue(any("left hand manipulates the magazine" in error for error in errors))
+
+    def test_baseline_policy_rejects_draw_and_sheathe_grip_windows(self) -> None:
+        manifest = valid_manifest()
+        windows = manifest["contact_windows"]
+        assert isinstance(windows, dict)
+        primary = windows["primary_grip"]
+        assert isinstance(primary, list)
+        primary.extend([
+            {"action": "PS_Weapon_Draw", "start": 29, "end": 30},
+            {"action": "PS_Weapon_Sheathe", "start": 1, "end": 2},
+        ])
+        errors = validate_manifest(manifest)
+        self.assertEqual(
+            sum("is not an active ready-family action" in error for error in errors),
+            2,
+        )
+
+    def test_candidate007_policy_allows_only_exact_transition_contacts(self) -> None:
+        manifest = valid_manifest()
+        enable_candidate007_transition_contacts(manifest)
+        self.assertEqual(validate_manifest(manifest), [])
+
+        windows = manifest["contact_windows"]
+        assert isinstance(windows, dict)
+        primary = windows["primary_grip"]
+        assert isinstance(primary, list)
+        acquisition = classify_face_contact(
+            "PS_Weapon_Draw",
+            26.75,
+            SUIT_PRIMARY_HAND_RIGHT,
+            WEAPON_PRIMARY_GRIP,
+            windows,
+        )
+        adjacent = classify_face_contact(
+            "PS_Weapon_Draw",
+            26.5,
+            SUIT_PRIMARY_HAND_RIGHT,
+            WEAPON_PRIMARY_GRIP,
+            windows,
+        )
+        self.assertTrue(acquisition.allowed)
+        self.assertFalse(adjacent.allowed)
+
+        primary_release = classify_face_contact(
+            "PS_Weapon_Sheathe",
+            4.25,
+            SUIT_PRIMARY_HAND_RIGHT,
+            WEAPON_PRIMARY_GRIP,
+            windows,
+        )
+        after_primary_release = classify_face_contact(
+            "PS_Weapon_Sheathe",
+            4.5,
+            SUIT_PRIMARY_HAND_RIGHT,
+            WEAPON_PRIMARY_GRIP,
+            windows,
+        )
+        support_acquisition = classify_face_contact(
+            "PS_Weapon_Draw",
+            29,
+            SUIT_SUPPORT_HAND_LEFT,
+            WEAPON_SUPPORT_GRIP,
+            windows,
+        )
+        before_support_acquisition = classify_face_contact(
+            "PS_Weapon_Draw",
+            28.75,
+            SUIT_SUPPORT_HAND_LEFT,
+            WEAPON_SUPPORT_GRIP,
+            windows,
+        )
+        support_release = classify_face_contact(
+            "PS_Weapon_Sheathe",
+            2,
+            SUIT_SUPPORT_HAND_LEFT,
+            WEAPON_SUPPORT_GRIP,
+            windows,
+        )
+        after_support_release = classify_face_contact(
+            "PS_Weapon_Sheathe",
+            2.25,
+            SUIT_SUPPORT_HAND_LEFT,
+            WEAPON_SUPPORT_GRIP,
+            windows,
+        )
+        self.assertTrue(primary_release.allowed)
+        self.assertFalse(after_primary_release.allowed)
+        self.assertTrue(support_acquisition.allowed)
+        self.assertFalse(before_support_acquisition.allowed)
+        self.assertTrue(support_release.allowed)
+        self.assertFalse(after_support_release.allowed)
+
+        for invalid_window in (
+            {"action": "PS_Weapon_Draw", "start": 26.5, "end": 26.5},
+            {"action": "PS_Weapon_Draw", "start": 26.5, "end": 30},
+            {"action": "PS_Weapon_Sheathe", "start": 4.5, "end": 4.5},
+            {"action": "PS_Weapon_Sheathe", "start": 1, "end": 4.5},
+        ):
+            with self.subTest(invalid_window=invalid_window):
+                primary.append(invalid_window)
+                errors = validate_manifest(manifest)
+                self.assertTrue(
+                    any(
+                        "is not an active ready-family action" in error
+                        for error in errors
+                    )
+                )
+                primary.pop()
+
+    def test_candidate007_policy_is_asset_bound_and_requires_all_windows(self) -> None:
+        manifest = valid_manifest()
+        enable_candidate007_transition_contacts(manifest)
+        manifest["weapon_asset_id"] = "PS_NextGenPrecisionRifle001"
+        errors = validate_manifest(manifest)
+        self.assertTrue(any("restricted" in error for error in errors))
+
+        manifest["weapon_asset_id"] = CANDIDATE007_WEAPON_ASSET_ID
+        windows = manifest["contact_windows"]
+        assert isinstance(windows, dict)
+        support = windows["support_grip"]
+        assert isinstance(support, list)
+        support.remove(
+            {"action": "PS_Weapon_Sheathe", "start": 1, "end": 2}
+        )
+        errors = validate_manifest(manifest)
+        self.assertTrue(any("missing exact transition contact" in error for error in errors))
+
+    def test_candidate007_rejects_stowed_legacy_contact_windows_only(self) -> None:
+        for action in ("PS_Idle", "PS_Walk", "PS_Hover"):
+            baseline = valid_manifest()
+            baseline_windows = baseline["contact_windows"]
+            assert isinstance(baseline_windows, dict)
+            baseline_primary = baseline_windows["primary_grip"]
+            assert isinstance(baseline_primary, list)
+            baseline_primary.append({"action": action, "start": 1, "end": 1})
+            self.assertEqual(validate_manifest(baseline), [], action)
+
+            for contact_key in ("primary_grip", "support_grip", "buttpad"):
+                with self.subTest(action=action, contact_key=contact_key):
+                    candidate = valid_manifest()
+                    enable_candidate007_transition_contacts(candidate)
+                    candidate_windows = candidate["contact_windows"]
+                    assert isinstance(candidate_windows, dict)
+                    contact_windows = candidate_windows[contact_key]
+                    assert isinstance(contact_windows, list)
+                    contact_windows.append(
+                        {"action": action, "start": 1, "end": 1}
+                    )
+                    errors = validate_manifest(candidate)
+                    self.assertTrue(
+                        any(
+                            "carries Candidate007 stowed and cannot authorize contact"
+                            in error
+                            for error in errors
+                        ),
+                        errors,
+                    )
+
+    def test_candidate007_malformed_windows_return_errors_instead_of_raising(self) -> None:
+        malformed_values = (
+            5,
+            None,
+            [{"action": [], "start": 26.75, "end": 30}],
+            [{"action": "PS_Weapon_Draw", "start": float("inf"), "end": 30}],
+        )
+        for malformed in malformed_values:
+            with self.subTest(malformed=malformed):
+                manifest = valid_manifest()
+                enable_candidate007_transition_contacts(manifest)
+                windows = manifest["contact_windows"]
+                assert isinstance(windows, dict)
+                windows["primary_grip"] = malformed
+                errors = validate_manifest(manifest)
+                self.assertIsInstance(errors, list)
+                self.assertTrue(errors)
+                self.assertTrue(
+                    any("contact_windows.primary_grip" in error for error in errors),
+                    errors,
+                )
 
 
 if __name__ == "__main__":

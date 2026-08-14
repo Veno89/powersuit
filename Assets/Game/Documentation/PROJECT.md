@@ -183,6 +183,25 @@ authored pass already fails. Stow/draw/sheathe, reload/bolt, and final PBR/art
 polish remain open. No Candidate006 FBX or Unity integration exists; Generator114
 remains active and every current Unity asset is unchanged.
 
+Candidate007 / NextGen Precision Rifle 002 is the isolated parallel successor;
+it does not retroactively alter Candidate006's archived failure. The final blend
+SHA-256 is
+`686dd185c800bc44c897948026da17988a5083c17993c4ef9d03af247f6c5ff2`.
+WeaponV3 passes 173 checks with 0 errors/0 warnings, preserving the 23-bone and
+24-action contract under weapon-action authoring V11, action-semantics schema
+V10, manipulation densification V5, and Candidate007 contact-window policy V3.
+Its strict visible-geometry reports pass with zero forbidden contacts/groups at
+24/483 authored samples (783 allowed), 24/923 integer samples (922 allowed), and
+4/1,284 dense samples at `0.125`-frame cadence (1,565 allowed).
+
+All 13 Candidate007 renders are unique and manifest-matching. Draw18 shows the
+powered guided/magnetic transit, not a conventional reach-to-back draw, while
+Sheathe3 shows the hand-owned release phase. The rifle still uses hash-pinned
+procedural preview textures. The structural gate is green, but
+`promotion_authorized` remains false pending owner visual approval and separate
+Unity-integration approval. No FBX or Unity asset was created or changed, and
+Generator114 remains the active rollback-safe model.
+
 Automated checks establish technical correctness and sustained capped performance on the certification machine; they do not prove subjective feel, performance on all representative hardware, detailed GPU cost, or production-quality content.
 
 ## Known limitations and exclusions
